@@ -1,0 +1,20 @@
+--- a/src/bdf/bdflib.c
++++ b/src/bdf/bdflib.c
+@@ -946 +946 @@
+-  static int
++  static int __cdecl
+--- a/src/psaux/afmparse.c
++++ b/src/psaux/afmparse.c
+@@ -666 +666 @@
+-  FT_CALLBACK_DEF( int )
++  static int __cdecl
+--- a/src/psnames/psmodule.c
++++ b/src/psnames/psmodule.c
+@@ -165 +165 @@
+-  FT_CALLBACK_DEF( int )
++  static int __cdecl
+--- a/src/type1/t1afm.c
++++ b/src/type1/t1afm.c
+@@ -80 +80 @@
+-  FT_CALLBACK_DEF( int )
++  static int __cdecl

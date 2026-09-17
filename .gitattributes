@@ -1,0 +1,13 @@
+/tools/VC7.1/** -text
+/tools/PlatformSDK-Aug2002/** -text
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+/source/** -text
+/source/**/*.c diff
+/source/**/*.cpp diff
+/source/**/*.h diff
+/source/**/*.inl diff
+/source/**/*.rc diff
+/source/**/*.manifest diff
+/source/**/*.patch whitespace=cr-at-eol

@@ -1,0 +1,27 @@
+Diagnostics:
+  Suppress:
+    - unused-includes
+    - c++11-compat-deprecated-writable-strings
+---
+If:
+  PathMatch:
+    - source/client/ProjectG/tinystr.cpp
+    - source/client/ProjectG/tinystr.h
+    - source/client/ProjectG/tinyxml.cpp
+    - source/client/ProjectG/tinyxml.h
+    - source/client/ProjectG/tinyxmlparser.cpp
+Diagnostics:
+  Suppress:
+    - bool-conversion
+    - pp_including_mainfile_in_preamble
+    - undefined-bool-conversion
+    - microsoft-extra-qualification
+    - readability-misleading-indentation
+---
+If:
+  PathMatch:
+    - tools/.*
+    - '.*\.h(pp|h|xx)?'
+    - '.*\.inl'
+Diagnostics:
+  Suppress: ["*"]

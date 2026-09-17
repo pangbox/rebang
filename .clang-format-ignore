@@ -1,0 +1,15 @@
+# This only covers files inside of source.
+# See how we're calculating the sources in the Makefile.
+
+# Vendored code: keep original formatting
+source/client/ProjectG/tinystr.cpp
+source/client/ProjectG/tinystr.h
+source/client/ProjectG/tinyxml.cpp
+source/client/ProjectG/tinyxml.h
+source/client/ProjectG/tinyxmlparser.cpp
+
+# Third-party libraries: keep original formatting.
+source/client/Wangreal/lib/freetype-2.2.1/**
+source/shared/LuaSystem/Lua/**
+source/client/Fresh/third_party/libpng-1.2.8/**
+source/client/Fresh/third_party/zlib-1.2.2/**

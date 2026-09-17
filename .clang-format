@@ -1,0 +1,64 @@
+---
+Language: Cpp
+BasedOnStyle: Microsoft
+Standard: c++03
+
+ColumnLimit: 80
+UseTab: ForContinuationAndIndentation
+TabWidth: 4
+IndentWidth: 4
+ContinuationIndentWidth: 4
+ConstructorInitializerIndentWidth: 4
+AccessModifierOffset: -4
+IndentCaseLabels: false
+IndentCaseBlocks: false
+IndentGotoLabels: false
+IndentExternBlock: Indent
+NamespaceIndentation: All
+
+BreakBeforeBraces: Allman
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortBlocksOnASingleLine: Never
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+SpaceInEmptyBlock: true
+
+AlignAfterOpenBracket: DontAlign
+AlignOperands: DontAlign
+AlignEscapedNewlines: DontAlign
+BinPackArguments: true
+BinPackParameters: BinPack
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeColon
+PackConstructorInitializers: NextLineOnly
+BreakTemplateDeclarations: Yes
+BreakStringLiterals: false
+
+PointerAlignment: Left
+ReferenceAlignment: Pointer
+DerivePointerAlignment: false
+SpaceAfterCStyleCast: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeParens: ControlStatements
+Cpp11BracedListStyle: false
+AlignArrayOfStructures: Left
+
+MaxEmptyLinesToKeep: 1
+KeepEmptyLines:
+  AtStartOfBlock: false
+  AtStartOfFile: false
+  AtEndOfFile: false
+EmptyLineBeforeAccessModifier: LogicalBlock
+InsertNewlineAtEOF: true
+LineEnding: DeriveLF
+ReflowComments: IndentOnly
+FixNamespaceComments: false
+
+SortIncludes: Never
+SortUsingDeclarations: Never
+...

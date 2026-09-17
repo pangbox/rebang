@@ -1,0 +1,12 @@
+[tool.ruff]
+include = ["tools/**/*.py"]
+target-version = "py310"
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ty.src]
+include = ["tools"]
+
+[tool.ty.environment]
+python-version = "3.10"
