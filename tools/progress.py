@@ -334,7 +334,7 @@ def render_graph(rows: list[dict[str, str]]) -> str:
             ".title{font-size:13px;font-weight:600;fill:#222}"
             ".axis{stroke:#ddd;stroke-width:1}"
             "@media (prefers-color-scheme:dark){"
-            "svg{background-color:#222}"
+            "svg{background-color:#0d1117}"
             "text{fill:#999}"
             ".title{fill:#fff}"
             ".axis{stroke:#344}"

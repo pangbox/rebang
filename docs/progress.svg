@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" role="img" aria-label="Decompilation progress over time">
-<style>text{font:11px system-ui,sans-serif;fill:#666}.title{font-size:13px;font-weight:600;fill:#222}.axis{stroke:#ddd;stroke-width:1}@media (prefers-color-scheme:dark){svg{background-color:#222}text{fill:#999}.title{fill:#fff}.axis{stroke:#344}}</style>
+<style>text{font:11px system-ui,sans-serif;fill:#666}.title{font-size:13px;font-weight:600;fill:#222}.axis{stroke:#ddd;stroke-width:1}@media (prefers-color-scheme:dark){svg{background-color:#0d1117}text{fill:#999}.title{fill:#fff}.axis{stroke:#344}}</style>
 <line class="axis" x1="56" y1="224.0" x2="704" y2="224.0" opacity="0.6"/>
 <text x="48" y="228.0" text-anchor="end">0.00%</text>
 <line class="axis" x1="56" y1="180.0" x2="704" y2="180.0" opacity="0.6"/>
