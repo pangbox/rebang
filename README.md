@@ -64,7 +64,7 @@ make clean
 
 There is no absolute guide for how to decompile an object file back into source code: it is challenging work. These delinked object files may produce the desired executable, but they are heavily lossy and do not represent the original compiler output, which means a lot of guesswork will be required to figure out how exactly to get the final linked output to match.
 
-Some documentation is available in the [docs](./docs) folder; of particular interest is probably the [troubleshooting document](./troubleshooting.md).
+Some documentation is available in the [docs](./docs) folder; of particular interest is probably the [troubleshooting document](./docs/troubleshooting.md).
 
 ## AI/LLM Policy
 
