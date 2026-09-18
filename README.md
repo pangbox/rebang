@@ -14,6 +14,12 @@ Note: be aware that object files are probably not fully relocatable; there could
 
 This project is intended primarily for educational purposes.
 
+## Progress
+
+This may take a while.
+
+[![Decompilation progress](./docs/progress.svg)](./docs/progress.md)
+
 ## Getting Started
 
 ### Prerequisites

@@ -1,0 +1,48 @@
+name: Progress
+
+on:
+  push:
+    branches: [master]
+
+permissions: {}
+
+concurrency:
+  group: progress
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: Record progress
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to write back progress to the repo.
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true # zizmor: ignore[artipacked]
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Record the current commit
+        run: |
+          nix develop --command python3 tools/progress.py record
+          nix develop --command python3 tools/progress.py graph
+          nix develop --command python3 tools/progress.py checklist
+
+      - name: Commit the updated graph
+        run: |
+          if git diff --quiet -- docs; then
+            echo "no progress change to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/progress-history.csv docs/progress.svg docs/progress.md
+          git commit -m "docs: progress update for ${GITHUB_SHA:0:8}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

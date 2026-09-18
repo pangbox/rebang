@@ -36,10 +36,17 @@ public:
 private:
 	BYTE* VMem(BITMAPINFO* bi)
 	{
-		int count = bi->bmiHeader.biBitCount > 8
-			? 0
-			: (bi->bmiHeader.biClrUsed ? bi->bmiHeader.biClrUsed : 256);
-		return reinterpret_cast<BYTE*>(&bi->bmiColors[count]);
+		unsigned size;
+		if (bi->bmiHeader.biBitCount > 8)
+			size = 0;
+		else
+		{
+			unsigned count = bi->bmiHeader.biClrUsed;
+			if (!count)
+				count = 256;
+			size = count * sizeof(RGBQUAD);
+		}
+		return reinterpret_cast<BYTE*>(bi) + sizeof(BITMAPINFOHEADER) + size;
 	}
 	bool m_lock;
 };

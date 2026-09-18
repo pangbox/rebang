@@ -25,6 +25,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import struct
 import sys
 from pathlib import Path
@@ -195,8 +196,6 @@ def delinked_objects():
 
 
 def build_json_inputs():
-    import json
-
     root = CONFIG.resolve().parent
     cfg = json.loads(CONFIG.read_text())
     out = []

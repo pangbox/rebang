@@ -669,7 +669,12 @@
           ]
         },
         "source/shared/tea.cpp",
-        "source/client/Wangreal/source/bitmap.obj",
+        {
+          "path": "source/client/Wangreal/source/bitmap.cpp",
+          "extra_flags": [
+            "/Op"
+          ]
+        },
         "source/client/Wangreal/source/westpak.obj",
         "source/client/Wangreal/source/wvideo.cpp",
         "source/client/Wangreal/source/wdevmng.obj",

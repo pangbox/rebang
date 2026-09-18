@@ -1,10 +1,15 @@
 .DEFAULT_GOAL := all
 .DELETE_ON_ERROR:
 
-.PHONY: all clean verify sources check format format-check
-all: build/ProjectG_ReleaseQA.exe
+.PHONY: all clean verify sources check format format-check progress
+all: build/ProjectG_ReleaseQA.exe docs/progress.md
 
-ifneq ($(filter-out clean check format format-check,$(or $(MAKECMDGOALS),all)),)
+progress: docs/progress.md
+
+docs/progress.md: build.json docs/module-sizes.csv tools/progress.py
+	@python3 tools/progress.py checklist
+
+ifneq ($(filter-out clean check format format-check progress,$(or $(MAKECMDGOALS),all)),)
 include build/rules.mk
 endif
 

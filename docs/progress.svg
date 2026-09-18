@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" role="img" aria-label="Decompilation progress over time">
+<style>text{font:11px system-ui,sans-serif;fill:#666}.title{font-size:13px;font-weight:600;fill:#222}.axis{stroke:#ddd;stroke-width:1}@media (prefers-color-scheme:dark){svg{background-color:#222}text{fill:#999}.title{fill:#fff}.axis{stroke:#344}}</style>
+<line class="axis" x1="56" y1="224.0" x2="704" y2="224.0" opacity="0.6"/>
+<text x="48" y="228.0" text-anchor="end">0.00%</text>
+<line class="axis" x1="56" y1="180.0" x2="704" y2="180.0" opacity="0.6"/>
+<text x="48" y="184.0" text-anchor="end">0.25%</text>
+<line class="axis" x1="56" y1="136.0" x2="704" y2="136.0" opacity="0.6"/>
+<text x="48" y="140.0" text-anchor="end">0.50%</text>
+<line class="axis" x1="56" y1="92.0" x2="704" y2="92.0" opacity="0.6"/>
+<text x="48" y="96.0" text-anchor="end">0.75%</text>
+<line class="axis" x1="56" y1="48.0" x2="704" y2="48.0" opacity="0.6"/>
+<text x="48" y="52.0" text-anchor="end">1.00%</text>
+<polygon points="56.0,178.0 574.2,178.0 574.2,178.0 574.4,178.0 574.4,178.0 704.0,178.0 704.0,224.0 574.4,224.0 574.4,224.0 574.2,224.0 574.2,224.0 56.0,224.0" fill="#48d" />
+<polygon points="56.0,164.6 574.2,164.6 574.2,157.5 574.4,157.5 574.4,157.5 704.0,157.5 704.0,178.0 574.4,178.0 574.4,178.0 574.2,178.0 574.2,178.0 56.0,178.0" fill="#5b6" />
+<polygon points="56.0,138.4 574.2,138.4 574.2,131.3 574.4,131.3 574.4,131.3 704.0,131.3 704.0,157.5 574.4,157.5 574.4,157.5 574.2,157.5 574.2,164.6 56.0,164.6" fill="#da4" />
+<polygon points="56.0,137.3 574.2,137.3 574.2,130.2 574.4,130.2 574.4,130.2 704.0,130.2 704.0,131.3 574.4,131.3 574.4,131.3 574.2,131.3 574.2,138.4 56.0,138.4" fill="#a7d" />
+<line class="axis" x1="56" y1="224" x2="704" y2="224"/>
+<text x="56.0" y="242" text-anchor="start">2026-09-17</text>
+<text x="574.4" y="242" text-anchor="middle">2026-09-18</text>
+<text class="title" x="56" y="20">Matched decompilation: 0.533% (36,913 / 6,925,558 bytes, 17 / 499 units)</text>
+<rect x="56" y="28" width="9" height="9" fill="#48d"/>
+<text x="70" y="36">ProjectG</text>
+<rect x="184" y="28" width="9" height="9" fill="#5b6"/>
+<text x="198" y="36">Wangreal</text>
+<rect x="312" y="28" width="9" height="9" fill="#da4"/>
+<text x="326" y="36">Fresh</text>
+<rect x="440" y="28" width="9" height="9" fill="#a7d"/>
+<text x="454" y="36">shared</text>
+</svg>
