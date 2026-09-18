@@ -2,30 +2,8 @@
 #include FT_FREETYPE_H
 #include <new>
 #include <string.h>
-
-typedef unsigned char uchar;
-
-const float g_PI = 3.14159265358979323846f;
-const float g_2_PI = 6.28318530717958647692f;
-const float g_PI_DIV_2 = 1.57079632679489661923f;
-const float g_HUGE = 3.402823466e+38f;
-const float g_EPSILON = 0.00001f;
-const float g_CM_TO_WU = 0.32f;
-
-namespace
-{
-	// This is a placeholder; there were probably inlines that used these
-	// constants, but we have not recovered them yet.
-	inline void InstantiateWangrealMathInlines()
-	{
-		(void)g_PI;
-		(void)g_2_PI;
-		(void)g_PI_DIV_2;
-		(void)g_HUGE;
-		(void)g_EPSILON;
-		(void)g_CM_TO_WU;
-	}
-}
+#include <math.h>
+#include "wmath.h"
 
 class cFile
 {

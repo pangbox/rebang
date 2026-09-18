@@ -1,65 +1,6 @@
 #include <math.h>
 #include <new>
-
-typedef unsigned long ulong;
-typedef unsigned short ushort;
-
-const float g_PI = 3.14159265358979323846f;
-const float g_2_PI = 6.28318530717958647692f;
-const float g_PI_DIV_2 = 1.57079632679489661923f;
-const float g_HUGE = 3.402823466e+38f;
-const float g_EPSILON = 0.00001f;
-const float g_CM_TO_WU = 0.32f;
-
-namespace
-{
-	// This is a placeholder; there were probably inlines that used these
-	// constants, but we have not recovered them yet.
-	inline void InstantiateWangrealMathInlines()
-	{
-		(void)g_PI;
-		(void)g_2_PI;
-		(void)g_PI_DIV_2;
-		(void)g_HUGE;
-		(void)g_EPSILON;
-		(void)g_CM_TO_WU;
-	}
-}
-
-class WVector
-{
-public:
-	union
-	{
-		struct
-		{
-			float x;
-			float y;
-			float z;
-		};
-		float p[3];
-	};
-
-	static const WVector ZERO;
-	friend float operator*(const WVector& left, const WVector& right);
-
-	WVector();
-	WVector(float x, float y, float z);
-	float Magnitude() const;
-	float SquareMagnitude() const;
-	void operator+=(const WVector& right);
-};
-
-class WMatrix
-{
-public:
-	float xx, yx, zx;
-	float xy, yy, zy;
-	float xz, yz, zz;
-	float xm, ym, zm;
-};
-
-#include "wmath.inl"
+#include "wmath.h"
 
 struct w_mesh
 {

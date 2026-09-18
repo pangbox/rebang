@@ -15,6 +15,7 @@
     "/D_MBCS"
   ],
   "includes": [
+    "source/rebang",
     "tools/VC7.1/include",
     "tools/PlatformSDK-Aug2002/include"
   ],
@@ -624,13 +625,21 @@
         "source/client/Wangreal/source/wmath.obj",
         "source/client/Wangreal/source/wshadowview.obj",
         "source/client/Wangreal/source/wview.obj",
-        "source/client/Wangreal/source/wtextureview.obj",
+        {
+          "path": "source/client/Wangreal/source/wtextureview.cpp",
+          "extra_flags": [
+            "/Op"
+          ]
+        },
         "source/client/Wangreal/source/w3danispr.obj",
         "source/client/Wangreal/source/textout.obj",
         {
           "path": "source/client/Wangreal/source/freetype2.cpp",
           "includes": [
-            "source/client/Wangreal/lib/freetype-2.2.1/include"
+            "source/client/Wangreal/lib/freetype-2.2.1/include",
+            "source/client/Fresh/include",
+            "source/client/Wangreal/include",
+            "source/client/ProjectG"
           ]
         },
         "source/client/Wangreal/source/wfont.obj",
@@ -662,12 +671,7 @@
         "source/shared/tea.cpp",
         "source/client/Wangreal/source/bitmap.obj",
         "source/client/Wangreal/source/westpak.obj",
-        {
-          "path": "source/client/Wangreal/include/wvideo.h",
-          "extra_flags": [
-            "/TP"
-          ]
-        },
+        "source/client/Wangreal/source/wvideo.cpp",
         "source/client/Wangreal/source/wdevmng.obj",
         "source/client/Wangreal/source/wresrcmng.obj",
         "source/client/Fresh/lib/zlib.lib",
@@ -677,7 +681,8 @@
       "includes": [
         "source/client/Fresh/include",
         "source/client/Wangreal/include",
-        "source/client/ProjectG"
+        "source/client/ProjectG",
+        "source/shared/thirties"
       ]
     },
     "source/client/ProjectG/lib/mss32.lib",

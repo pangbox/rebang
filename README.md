@@ -64,6 +64,8 @@ make clean
 
 There is no absolute guide for how to decompile an object file back into source code: it is challenging work. These delinked object files may produce the desired executable, but they are heavily lossy and do not represent the original compiler output, which means a lot of guesswork will be required to figure out how exactly to get the final linked output to match.
 
+Some documentation is available in the [docs](./docs) folder; of particular interest is probably the [troubleshooting document](./troubleshooting.md).
+
 ## AI/LLM Policy
 
 It is essentially impossible to ban all forms of AI influence now in 2026 - even the ghidra-delinker-extension has at least one LLM-assisted contribution these days. So here's the ground rules:

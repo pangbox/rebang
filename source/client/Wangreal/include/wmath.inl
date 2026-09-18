@@ -1,12 +1,3 @@
-inline WVector::WVector()
-{
-}
-
-inline WVector::WVector(float x, float y, float z)
-	: x(x), y(y), z(z)
-{
-}
-
 inline WVector operator+(const WVector& left, const WVector& right)
 {
 	return WVector(left.x + right.x, left.y + right.y, left.z + right.z);
@@ -25,6 +16,13 @@ inline WVector operator*(const WVector& vector, float scalar)
 inline float operator*(const WVector& left, const WVector& right)
 {
 	return left.x * right.x + left.y * right.y + left.z * right.z;
+}
+
+__forceinline WVector WCrossProduct(const WVector& left, const WVector& right)
+{
+	return WVector(left.y * right.z - left.z * right.y,
+		left.z * right.x - left.x * right.z,
+		left.x * right.y - left.y * right.x);
 }
 
 inline void WVector::operator+=(const WVector& right)

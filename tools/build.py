@@ -304,6 +304,7 @@ def clang_arguments(
         "-x",
         "c" if c else "c++",
         "-std=" + (("c89" if "/Za" in flags else "gnu89") if c else "c++03"),
+        "-D_CLANGD=1",
     ]
     for flag in flags:
         if flag[:1] in "-/" and flag[1:2] in ("D", "U"):
