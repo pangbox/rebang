@@ -96,7 +96,7 @@ public:
 	{
 		return GetResrcManager()->video;
 	}
-	float GetProjScale() const { return proj_scale; }
+	float xGetProjScale() const { return proj_scale; }
 
 	void xConvScreenRectByProjScale(WRect& rc) const
 	{

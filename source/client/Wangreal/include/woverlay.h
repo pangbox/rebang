@@ -10,7 +10,7 @@ public:
 	virtual int Load(const char*, unsigned long);
 	virtual void Render(WView*, const _WRECT&, const _WRECT&, int,
 		unsigned long, float, unsigned char);
-	virtual void SetCoordMode(int);
+	virtual void SetCoordMode(int mode);
 
 	int Load(const char*, Bitmap*, unsigned long);
 	void SetClippingArea(const WRect*);

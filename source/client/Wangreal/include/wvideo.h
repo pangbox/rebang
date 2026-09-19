@@ -333,21 +333,9 @@ public:
 
 struct WTVertex
 {
-	union
-	{
-		struct
-		{
-			float x;
-			float y;
-			float z;
-		};
-
-		struct
-		{
-			WVector pos;
-		};
-	};
-
+    float x;
+    float y;
+    float z;
 	float rhw;
 	unsigned int diffuse;
 	float tu;

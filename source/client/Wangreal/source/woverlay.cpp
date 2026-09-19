@@ -1,8 +1,8 @@
 #include "woverlay.h"
 #include <stdio.h>
 
-WTVertex WOverlay::m_vtx[4];
 WTVertex* WOverlay::m_vtxList[10];
+WTVertex WOverlay::m_vtx[4];
 
 WTVertex* WOverlay::m_vl[5] = {
 	&WOverlay::m_vtx[0],
@@ -13,17 +13,15 @@ WTVertex* WOverlay::m_vl[5] = {
 };
 
 WOverlay::WOverlay(void)
-	: m_clipArea(0, 0, 0, 0)
+	: m_texHandle(0)
+	, m_texWidth(0)
+	, m_texHeight(0)
+	, m_devTexWidth(0)
+	, m_devTexHeight(0)
+	, m_clipFlag(false)
+	, m_coordMode(0x2200)
 {
-	m_texHandle = 0;
-	m_texWidth = 0;
-	m_texHeight = 0;
-	m_devTexWidth = 0;
-	m_devTexHeight = 0;
-	m_clipFlag = false;
-	m_coordMode = 0x2200;
 }
-
 WOverlay::~WOverlay(void)
 {
 	if (m_texHandle)
@@ -134,43 +132,44 @@ int WOverlay::GetSection(WTVertex* v, float base, float angle)
 	if (angle < base)
 	{
 		v->x = m_clipArea.x + m_clipArea.w;
+		base = tan(angle);
+		v->y = m_clipArea.y - base * m_clipArea.w;
 		v->tu = 1.0f;
-		v->y = m_clipArea.y - (float)tan((double)angle) * m_clipArea.w;
-		v->tv = 0.5f -
-			((float)tan((double)angle) * m_clipArea.w * 0.5f) / m_clipArea.h;
+		angle = tan(angle);
+		v->tv = 0.5f - (angle * m_clipArea.w * 0.5f) / m_clipArea.h;
 		return 0;
 	}
 	if (angle == base)
 	{
 		v->x = m_clipArea.w + m_clipArea.x;
+		v->y = m_clipArea.y - m_clipArea.h;
 		v->tu = 1.0f;
 		v->tv = 0.0f;
-		v->y = m_clipArea.y - m_clipArea.h;
 		return 1;
 	}
-	if (base < angle && angle < g_PI - base)
+	if (angle > base && g_PI - base > angle)
 	{
 		angle = angle - 1.57079637f;
 		v->x = m_clipArea.x - tanf(angle) * m_clipArea.h;
 		v->y = m_clipArea.y - m_clipArea.h;
-		v->tv = 0.0f;
 		v->tu = 0.5f - (tanf(angle) * m_clipArea.h * 0.5f) / m_clipArea.w;
+		v->tv = 0.0f;
 		return 2;
 	}
 	float upper = g_PI - base;
 	if (angle == upper)
 	{
 		v->x = m_clipArea.x - m_clipArea.w;
+		v->y = m_clipArea.y - m_clipArea.h;
 		v->tu = 0.0f;
 		v->tv = 0.0f;
-		v->y = m_clipArea.y - m_clipArea.h;
 		return 3;
 	}
-	if (upper < angle && angle < base + g_PI)
+	if (angle > upper && base + g_PI > angle)
 	{
 		v->x = m_clipArea.x - m_clipArea.w;
-		v->tu = 0.0f;
 		v->y = tanf(angle) * m_clipArea.w + m_clipArea.y;
+		v->tu = 0.0f;
 		v->tv = (tanf(angle) * m_clipArea.w * 0.5f) / m_clipArea.h + 0.5f;
 		return 4;
 	}
@@ -178,34 +177,34 @@ int WOverlay::GetSection(WTVertex* v, float base, float angle)
 	if (angle == lower)
 	{
 		v->x = m_clipArea.x - m_clipArea.w;
+		v->y = m_clipArea.h + m_clipArea.y;
 		v->tu = 0.0f;
 		v->tv = 1.0f;
-		v->y = m_clipArea.h + m_clipArea.y;
 		return 5;
 	}
-	if (lower < angle && angle < 6.28318548f - base)
+	if (angle > lower && 6.28318548f - base > angle)
 	{
 		angle = angle - 4.71238899f;
 		v->x = tanf(angle) * m_clipArea.h + m_clipArea.x;
 		v->y = m_clipArea.y + m_clipArea.h;
-		v->tv = 1.0f;
 		v->tu = (tanf(angle) * m_clipArea.h * 0.5f) / m_clipArea.w + 0.5f;
+		v->tv = 1.0f;
 		return 6;
 	}
 	float wrap = 6.28318548f - base;
 	if (angle == wrap)
 	{
 		v->x = m_clipArea.w + m_clipArea.x;
+		v->y = m_clipArea.h + m_clipArea.y;
 		v->tu = 1.0f;
 		v->tv = 1.0f;
-		v->y = m_clipArea.h + m_clipArea.y;
 		return 7;
 	}
-	if (wrap < angle)
+	if (angle > wrap)
 	{
 		v->x = m_clipArea.x + m_clipArea.w;
-		v->tu = 1.0f;
 		v->y = m_clipArea.y - tanf(angle) * m_clipArea.w;
+		v->tu = 1.0f;
 		v->tv = 0.5f - (tanf(angle) * m_clipArea.w * 0.5f) / m_clipArea.h;
 		return 8;
 	}
@@ -246,14 +245,14 @@ void WOverlay::DrawLine(WView* pView, const _WPOINT& a, const _WPOINT& b,
 	vl[0] = &v[0];
 	v[0].x = a.x;
 	v[0].y = a.y;
+	v[0].z = 0.001f;
+	v[0].rhw = 1.0f;
+	v[0].diffuse = color;
 	vl[1] = &v[1];
 	v[1].x = b.x;
 	v[1].y = b.y;
-	v[0].z = 0.001f;
-	v[0].rhw = 1.0f;
 	v[1].z = 0.001f;
 	v[1].rhw = 1.0f;
-	v[0].diffuse = color;
 	v[1].diffuse = color;
 	vl[2] = 0;
 	pView->DrawPolygonFan(vl, flag | 0x4000000, 0, 1);
@@ -268,15 +267,15 @@ void WOverlay::DrawLine(WView* pView, const _WPOINT& a, const _WPOINT& b,
 	vl[0] = &v[0];
 	v[0].x = a.x;
 	v[0].y = a.y;
+	v[0].z = 0.001f;
 	v[0].rhw = 1.0f;
-	v[1].rhw = 1.0f;
 	v[0].diffuse = color1;
-	v[1].diffuse = color2;
 	vl[1] = &v[1];
 	v[1].x = b.x;
 	v[1].y = b.y;
-	v[0].z = 0.001f;
 	v[1].z = 0.001f;
+	v[1].rhw = 1.0f;
+	v[1].diffuse = color2;
 	vl[2] = 0;
 	pView->DrawPolygonFan(vl, flag | 0x4000000, 0, 1);
 }
@@ -284,26 +283,25 @@ void WOverlay::DrawLine(WView* pView, const _WPOINT& a, const _WPOINT& b,
 void WOverlay::DrawBox(WView* pView, const WRect& rc, int flag,
 	unsigned long color, float z)
 {
-	m_vtx[0].x = rc.x - 0.5f;
-	m_vtx[0].y = rc.y - 0.5f;
-	m_vtx[0].z = z;
-	m_vtx[0].rhw = 1.0f;
-	m_vtx[0].diffuse = color;
-	m_vtx[1].x = (rc.w + rc.x) - 0.5f;
-	m_vtx[1].y = rc.y - 0.5f;
-	m_vtx[1].z = z;
-	m_vtx[1].rhw = 1.0f;
-	m_vtx[1].diffuse = color;
-	m_vtx[2].x = rc.x - 0.5f;
-	m_vtx[2].y = (rc.h + rc.y) - 0.5f;
-	m_vtx[2].z = z;
-	m_vtx[2].rhw = 1.0f;
-	m_vtx[2].diffuse = color;
-	m_vtx[3].x = (rc.w + rc.x) - 0.5f;
-	m_vtx[3].y = (rc.h + rc.y) - 0.5f;
-	m_vtx[3].z = z;
-	m_vtx[3].rhw = 1.0f;
-	m_vtx[3].diffuse = color;
+	for (int i = 0; i < 4; ++i)
+	{
+		float px;
+		if (i & 1)
+			px = rc.w + rc.x;
+		else
+			px = rc.x;
+		m_vtx[i].x = px - 0.5f;
+
+		float py;
+		if (i & 2)
+			py = rc.h + rc.y;
+		else
+			py = rc.y;
+		m_vtx[i].y = py - 0.5f;
+		m_vtx[i].z = z;
+		m_vtx[i].rhw = 1.0f;
+		m_vtx[i].diffuse = color;
+	}
 	if (flag & 0x7ff)
 	{
 		for (int i = 0; i < 4; ++i)
@@ -328,26 +326,25 @@ void WOverlay::DrawBox(WView* pView, const WRect& rc, int flag,
 void WOverlay::DrawRainbowBox(WView* pView, const WRect& rc,
 	unsigned long* const colors, int flag, float z)
 {
-	m_vtx[0].x = rc.x - 0.5f;
-	m_vtx[0].z = z;
-	m_vtx[0].rhw = 1.0f;
-	m_vtx[0].y = rc.y - 0.5f;
-	m_vtx[0].diffuse = colors[0];
-	m_vtx[1].x = (rc.w + rc.x) - 0.5f;
-	m_vtx[1].z = z;
-	m_vtx[1].rhw = 1.0f;
-	m_vtx[1].y = rc.y - 0.5f;
-	m_vtx[1].diffuse = colors[1];
-	m_vtx[2].x = rc.x - 0.5f;
-	m_vtx[2].z = z;
-	m_vtx[2].rhw = 1.0f;
-	m_vtx[2].y = (rc.h + rc.y) - 0.5f;
-	m_vtx[2].diffuse = colors[2];
-	m_vtx[3].x = (rc.w + rc.x) - 0.5f;
-	m_vtx[3].z = z;
-	m_vtx[3].rhw = 1.0f;
-	m_vtx[3].y = (rc.h + rc.y) - 0.5f;
-	m_vtx[3].diffuse = colors[3];
+	for (int i = 0; i < 4; ++i)
+	{
+		float px;
+		if (i & 1)
+			px = rc.w + rc.x;
+		else
+			px = rc.x;
+		m_vtx[i].x = px - 0.5f;
+
+		float py;
+		if (i & 2)
+			py = rc.h + rc.y;
+		else
+			py = rc.y;
+		m_vtx[i].y = py - 0.5f;
+		m_vtx[i].z = z;
+		m_vtx[i].rhw = 1.0f;
+		m_vtx[i].diffuse = colors[i];
+	}
 	if (flag & 0x7ff)
 	{
 		for (int i = 0; i < 4; ++i)
@@ -372,21 +369,26 @@ void WOverlay::DrawRainbowBox(WView* pView, const WRect& rc,
 void WOverlay::DrawLineBox(WView* pView, const WRect& rc, int z,
 	unsigned long color)
 {
-	_WPOINT p0, p1, p2, p3;
+	_WPOINT p[5];
 
-	p0.x = rc.x;
-	p0.y = rc.y;
-	p1.x = rc.w + rc.x;
-	p1.y = rc.y;
-	p2.x = rc.w + rc.x;
-	p2.y = rc.h + rc.y;
-	p3.x = rc.x;
-	p3.y = rc.h + rc.y;
-	int flag = z | 0x300000;
-	DrawLine(pView, p0, p1, flag, color);
-	DrawLine(pView, p1, p2, flag, color);
-	DrawLine(pView, p2, p3, flag, color);
-	DrawLine(pView, p3, p0, flag, color);
+	p[0].x = rc.x;
+	p[1].x = rc.w;
+	p[4].y = p[1].x + p[0].x;
+	p[0].y = rc.y;
+	p[1].y = rc.h;
+	p[2].y = p[0].y;
+	p[3].y = p[0].y;
+	p[2].x = p[0].x;
+	p[4].x = p[4].y;
+	p[4].y = p[1].y + p[0].y;
+	p[1].x = p[0].x;
+	p[3].x = p[4].x;
+	p[1].y = p[4].y;
+
+	DrawLine(pView, p[2], p[3], z | 0x300000, color);
+	DrawLine(pView, p[3], p[4], z | 0x300000, color);
+	DrawLine(pView, p[4], p[1], z | 0x300000, color);
+	DrawLine(pView, p[1], p[2], z | 0x300000, color);
 }
 
 float WOverlay::GetUnit(WView* pView, float value, wUnitMode mode)
@@ -439,91 +441,96 @@ float WOverlay::GetUnit(WView* pView, float value, wUnitMode mode)
 
 WRect WOverlay::ConvertRect(WView* pView, const WRect& rc, int mode)
 {
-	WRect out;
 	float ox;
-	if (mode & 6)
-	{
-		ox = 0.5f;
-		if ((mode & 2) == 0)
-			ox = 1.0f;
-		ox = ox * pView->GetWidth();
-	}
-	else
+	if (!(mode & 6))
 	{
 		ox = 0.0f;
 	}
-	float oy;
-	if (mode & 0x60)
-	{
-		oy = 0.5f;
-		if ((mode & 0x20) == 0)
-			oy = 1.0f;
-		oy = oy * pView->GetHeight();
-	}
 	else
+	{
+		if (mode & 2)
+			ox = 0.5f;
+		else
+			ox = 1.0f;
+		ox *= pView->GetWidth();
+	}
+
+	float oy;
+	if (!(mode & 0x60))
 	{
 		oy = 0.0f;
 	}
-	float px, py;
+	else
+	{
+		if (mode & 0x20)
+			oy = 0.5f;
+		else
+			oy = 1.0f;
+		oy *= pView->GetHeight();
+	}
+
+	WRect ret;
 	if (mode & 0x100)
 	{
-		px = (pView->GetWidth() * rc.x) / 640.0f + ox;
-		py = (pView->GetHeight() * rc.y) / 480.0f + oy;
+		ret.x = pView->GetWidth() * rc.x / 640.0f + ox;
+		ret.y = pView->GetHeight() * rc.y / 480.0f + oy;
 	}
 	else
 	{
-		px = ox + rc.x;
-		py = oy + rc.y;
+		ret.x = rc.x + ox;
+		ret.y = rc.y + oy;
 	}
-	float pw, ph;
+
 	if (mode & 0x1000)
 	{
-		pw = (pView->GetWidth() * rc.w) / 640.0f;
-		ph = (pView->GetHeight() * rc.h) / 480.0f;
+		ret.w = pView->GetWidth() * rc.w / 640.0f;
+		ret.h = pView->GetHeight() * rc.h / 480.0f;
 	}
 	else
 	{
-		pw = rc.w;
-		ph = rc.h;
+		ret.w = rc.w;
+		ret.h = rc.h;
 	}
-	out.x = px;
-	out.h = ph;
-	out.y = py;
-	out.w = pw;
-	return out;
+	return ret;
 }
 
 void WOverlay::DrawPicture(WView* pView, const WRect& rc, int tex, int flag,
 	unsigned long color)
 {
-	m_vtx[0].x = rc.x - 0.5f;
-	m_vtx[0].y = rc.y - 0.5f;
-	m_vtx[0].tu = 0.0f;
-	m_vtx[0].tv = 0.0f;
-	m_vtx[0].diffuse = color;
-	m_vtx[0].rhw = 1.0f;
-	m_vtx[0].z = 0.001f;
-	m_vtx[1].x = (rc.w + rc.x) - 0.5f;
-	m_vtx[1].diffuse = color;
-	m_vtx[1].tu = 1.0f;
-	m_vtx[1].y = rc.y - 0.5f;
-	m_vtx[1].tv = 0.0f;
-	m_vtx[1].z = 0.001f;
-	m_vtx[1].rhw = 1.0f;
-	m_vtx[2].x = rc.x - 0.5f;
-	m_vtx[2].diffuse = color;
-	m_vtx[2].tu = 0.0f;
-	m_vtx[2].tv = 1.0f;
-	m_vtx[2].z = 0.001f;
-	m_vtx[2].rhw = 1.0f;
-	m_vtx[2].y = (rc.h + rc.y) - 0.5f;
-	m_vtx[3].x = (rc.w + rc.x) - 0.5f;
-	m_vtx[3].diffuse = color;
-	m_vtx[3].tu = 1.0f;
-	m_vtx[3].y = (rc.h + rc.y) - 0.5f;
-	m_vtx[3].tv = 1.0f;
-	m_vtx[3].z = 0.001f;
-	m_vtx[3].rhw = 1.0f;
+	for (int i = 0; i < 4; ++i)
+	{
+		float px;
+		if (i & 1)
+			px = rc.w + rc.x;
+		else
+			px = rc.x;
+		m_vtx[i].x = px - 0.5f;
+
+		float py;
+		if (i & 2)
+			py = rc.h + rc.y;
+		else
+			py = rc.y;
+		m_vtx[i].y = py - 0.5f;
+
+		float u;
+		if (i & 1)
+			u = 1.0f;
+		else
+			u = 0.0f;
+		m_vtx[i].tu = u;
+
+		float v;
+		if (i & 2)
+			v = 1.0f;
+		else
+			v = 0.0f;
+		m_vtx[i].tv = v;
+
+		m_vtx[i].diffuse = color;
+		m_vtx[i].rhw = 1.0f;
+		m_vtx[i].z = 0.001f;
+	}
 	pView->DrawPolygonFan(m_vl, (tex & 0x7ff) | flag | 0x20000000, 0, 1);
 }
 
@@ -746,71 +753,57 @@ void WOverlay::DrawFrameOverlay9(WView* pView, WOverlay** const pOv,
 
 int WOverlay::CrossRect(const WRect& a, const WRect& b, WRect* out)
 {
-	float x = a.x;
-	if (a.x < b.x)
-		x = b.x;
+	float ax = a.x;
+	float bx = b.x;
+	float x = (ax < bx) ? bx : ax;
 	out->x = x;
-	float y = a.y;
-	if (a.y < b.y)
-		y = b.y;
+	float ay = a.y;
+	float by = b.y;
+	float y = (ay < by) ? by : ay;
 	out->y = y;
+
 	float br = b.w + b.x;
 	float ar = a.w + a.x;
-	float r = ar;
-	if (ar > br)
-		r = br;
+	float r = (ar > br) ? br : ar;
 	out->w = r - x;
+
 	float bb = b.h + b.y;
 	float ab = a.h + a.y;
-	float bt = ab;
-	if (ab > bb)
-		bt = bb;
+	float bt = (ab > bb) ? bb : ab;
 	out->h = bt - y;
-	if (out->w >= 0.0f && out->h >= 0.0f)
-		return 0;
-	return 1;
+
+	if (out->w < 0.0f || out->h < 0.0f)
+		return 1;
+	return 0;
 }
 
 void WOverlay::SetClippingArea(WView* pView, const WRect* rc)
 {
-	if (rc == 0 && pView == 0)
+	if (rc || pView)
+	{
+		m_clipFlag = true;
+		if (rc)
+			m_clipArea = *rc;
+		if (pView)
+		{
+			if (rc)
+			{
+				WRect full(0.0f, 0.0f, pView->GetWidth(),
+					pView->GetHeight());
+				WRect out;
+				CrossRect(m_clipArea, full, &out);
+				m_clipArea = out;
+			}
+			else
+			{
+				m_clipArea =
+					WRect(0.0f, 0.0f, pView->GetWidth(), pView->GetHeight());
+			}
+		}
+	}
+	else
 	{
 		m_clipFlag = false;
-		return;
-	}
-	m_clipFlag = true;
-	if (rc != 0)
-	{
-		m_clipArea.x = rc->x;
-		m_clipArea.y = rc->y;
-		m_clipArea.w = rc->w;
-		m_clipArea.h = rc->h;
-	}
-	if (pView != 0)
-	{
-		float ys = pView->GetHeight();
-		float xs = pView->GetWidth();
-		if (rc != 0)
-		{
-			WRect full;
-			WRect out;
-			full.w = xs;
-			full.h = ys;
-			full.x = 0.0f;
-			full.y = 0.0f;
-			CrossRect(m_clipArea, full, &out);
-			m_clipArea.x = out.x;
-			m_clipArea.y = out.y;
-			m_clipArea.w = out.w;
-			m_clipArea.h = out.h;
-		}
-		else
-		{
-			m_clipArea.x = 0.0f;
-			m_clipArea.y = 0.0f;
-			m_clipArea.w = xs;
-			m_clipArea.h = ys;
-		}
 	}
 }
 
@@ -837,83 +830,79 @@ void WOverlay::DrawTexture(WView* pView, int tex, const _WRECT& src,
 	WRect d;
 	WRect c;
 
-	if ((m_coordMode & 0x400) == 0)
+	if (m_coordMode & 0x400)
 	{
-		d.x = dst.x;
-		d.y = dst.y;
+		d.x = floor(dst.x);
+		d.y = floor(dst.y);
 		d.w = dst.w;
 		d.h = dst.h;
-		bool cf = m_clipFlag;
-		if (cf)
+		if (m_clipFlag)
 		{
-			c.x = m_clipArea.x;
-			c.y = m_clipArea.y;
+			c.x = floor(m_clipArea.x);
+			c.y = floor(m_clipArea.y);
 			c.w = m_clipArea.w;
 			c.h = m_clipArea.h;
 		}
-		if (pView->GetProjScale() > 1.0f)
+	}
+	else
+	{
+		d = (const WRect&)dst;
+		bool cf = m_clipFlag;
+		if (cf)
+			c = m_clipArea;
+		if (pView->xGetProjScale() > 1.0f)
 		{
 			pView->xConvScreenRectByProjScale(d);
 			if (cf)
 				pView->xConvScreenRectByProjScale(c);
 		}
 	}
-	else
-	{
-		d.x = (float)floor((double)dst.x);
-		d.y = (float)floor((double)dst.y);
-		d.w = dst.w;
-		d.h = dst.h;
-		if (m_clipFlag)
-		{
-			c.x = (float)floor((double)m_clipArea.x);
-			c.y = (float)floor((double)m_clipArea.y);
-			c.w = m_clipArea.w;
-			c.h = m_clipArea.h;
-		}
-	}
-	if (clip)
+	if (clip == true)
 	{
 		WRect screen;
 		WRect out;
+		screen.h = pView->GetHeight();
+		screen.w = pView->GetWidth();
 		screen.x = 0.0f;
 		screen.y = 0.0f;
-		screen.w = pView->GetWidth();
-		screen.h = pView->GetHeight();
 		if (CrossRect(d, screen, &out) != 0)
 			return;
 		if (m_clipFlag && CrossRect(d, c, &out) != 0)
 			return;
-		if (d.w != out.w)
+		if (d.w != out.w || d.h != out.h)
 		{
-			float ratio = src.w / d.w;
-			float delta = out.x - d.x;
-			sx = delta * ratio + src.x;
-			sw = (((out.x + out.w) - (d.w + d.x)) - delta) * ratio + src.w;
+			if (d.w != out.w)
+			{
+				float ratio = src.w / d.w;
+				float delta = out.x - d.x;
+				c.x = delta * ratio + src.x;
+				c.w = (((out.x + out.w) - (d.w + d.x)) - delta) * ratio + src.w;
+			}
+			else
+			{
+				c.x = src.x;
+				c.w = src.w;
+			}
+			if (d.h != out.h)
+			{
+				float ratio = src.h / d.h;
+				float delta = out.y - d.y;
+				c.y = delta * ratio + src.y;
+				c.h = (((out.y + out.h) - (d.h + d.y)) - delta) * ratio + src.h;
+			}
+			else
+			{
+				c.y = src.y;
+				c.h = src.h;
+			}
+			sx = c.x;
+			sy = c.y;
+			sw = c.w;
+			sh = c.h;
+			d = out;
 		}
-		else
-		{
-			sx = src.x;
-			sw = src.w;
-		}
-		if (d.h != out.h)
-		{
-			float ratio = src.h / d.h;
-			float delta = out.y - d.y;
-			sy = delta * ratio + src.y;
-			sh = (((out.y + out.h) - (d.h + d.y)) - delta) * ratio + src.h;
-		}
-		else
-		{
-			sy = src.y;
-			sh = src.h;
-		}
-		d.x = out.x;
-		d.y = out.y;
-		d.w = out.w;
-		d.h = out.h;
 	}
-	float fx = 0.0f, fy = 0.0f, fx2 = 0.0f, fy2 = 0.0f;
+	float fx, fy, fx2, fy2;
 	if (m_coordMode & 0x400)
 	{
 		fx = d.x - 0.5f;
@@ -921,8 +910,8 @@ void WOverlay::DrawTexture(WView* pView, int tex, const _WRECT& src,
 		fy = d.y - 0.5f;
 		fy2 = fy + d.h;
 	}
-	unsigned int mv = (unsigned int)(unsigned char)(mirror >> 1);
-	unsigned int mu = (unsigned int)(unsigned char)~mirror;
+	unsigned int mv = ~(mirror >> 1) & 1;
+	unsigned int mu = ~mirror & 1;
 	for (int i = 0; i < 4; ++i)
 	{
 		if ((m_coordMode & 0x400) == 0)
@@ -958,21 +947,20 @@ void WOverlay::DrawTexture(WView* pView, int tex, const _WRECT& src,
 		m_vtx[i].z = 0.001f;
 		m_vtx[i].rhw = 1.0f;
 		m_vtx[i].diffuse = color;
-		float u = sx;
-		if ((unsigned int)(i & 1) == (mu & 1))
+		float u;
+		if ((unsigned int)(i & 1) == mu)
 			u = sw + sx;
+		else
+			u = sx;
 		m_vtx[i].tu = u;
-		float v = sy;
-		if ((unsigned int)((i >> 1) & 1) == (~mv & 1))
+		float v;
+		if ((unsigned int)((i >> 1) & 1) == mv)
 			v = sh + sy;
+		else
+			v = sy;
 		m_vtx[i].tv = v;
 	}
-	float mag;
-	if (rot < 0.0f)
-		mag = -rot;
-	else
-		mag = rot;
-	if (mag >= g_EPSILON)
+	if (rot != 0.0f)
 	{
 		float cs = (float)cos((double)rot);
 		float sn = (float)sin((double)rot);
@@ -1089,44 +1077,37 @@ void WOverlay::clip_2D_left(WView* pView, WTVertex* out, WTVertex* in,
 	int* count, int n)
 {
 	*count = 0;
-	if (n > 0)
+	if (n <= 0)
+		return;
+	WTVertex* p = in;
+	int j = 1;
+	float d0, d1, d2;
+	for (int i = n; i > 0; --i, ++p, ++j)
 	{
-		int j = 1;
-		WTVertex* p = in;
-		int left = n;
-		do
+		if (p->x > 0.0f)
 		{
-			if (p->x > 0.0f)
-			{
-				out[*count].x = p->x;
-				out[*count].y = p->y;
-				out[*count].tu = p->tu;
-				out[*count].tv = p->tv;
-				*count = *count + 1;
-			}
-			WTVertex* q = in + j % n;
-			if (p->x * q->x < 0.0f)
-			{
-				float d0 = p->x;
-				if (d0 <= 0.0f)
-					d0 = -d0;
-				float d1 = q->x;
-				if (d1 <= 0.0f)
-					d1 = -d1;
-				float d2 = p->x;
-				if (d2 <= 0.0f)
-					d2 = -d2;
-				out[*count].x = 0.0f;
-				d0 = d0 / (d2 + d1);
-				out[*count].y = (q->y - p->y) * d0 + p->y;
-				out[*count].tu = (q->tu - p->tu) * d0 + p->tu;
-				out[*count].tv = (q->tv - p->tv) * d0 + p->tv;
-				*count = *count + 1;
-			}
-			++j;
-			++p;
-			--left;
-		} while (left != 0);
+			out[*count].x = p->x;
+			out[*count].y = p->y;
+			out[*count].tu = p->tu;
+			out[*count].tv = p->tv;
+			*count = *count + 1;
+		}
+		WTVertex* q = in + j % n;
+		if (p->x * q->x < 0.0f)
+		{
+			float px = p->x;
+			d0 = (px > 0.0f) ? px : -px;
+			float qx = q->x;
+			d1 = (qx > 0.0f) ? qx : -qx;
+			float px2 = p->x;
+			d2 = (px2 > 0.0f) ? px2 : -px2;
+			out[*count].x = 0.0f;
+			float ratio = d0 / (d2 + d1);
+			out[*count].y = (q->y - p->y) * ratio + p->y;
+			out[*count].tu = (q->tu - p->tu) * ratio + p->tu;
+			out[*count].tv = (q->tv - p->tv) * ratio + p->tv;
+			*count = *count + 1;
+		}
 	}
 }
 
@@ -1134,44 +1115,38 @@ void WOverlay::clip_2D_right(WView* pView, WTVertex* out, WTVertex* in,
 	int* count, int n)
 {
 	*count = 0;
-	if (n > 0)
+	if (n <= 0)
+		return;
+	WTVertex* p = in;
+	int j = 1;
+	float d1, d0, d2;
+	for (int i = n; i > 0; --i, ++p, ++j)
 	{
-		int j = 1;
-		WTVertex* p = in;
-		int left = n;
-		do
+		if (p->x < pView->GetWidth())
 		{
-			if (p->x < pView->GetWidth())
-			{
-				out[*count].x = p->x;
-				out[*count].y = p->y;
-				out[*count].tu = p->tu;
-				out[*count].tv = p->tv;
-				*count = *count + 1;
-			}
-			WTVertex* q = in + j % n;
-			if ((q->x - pView->GetWidth()) * (p->x - pView->GetWidth()) < 0.0f)
-			{
-				float d0 = p->x - pView->GetWidth();
-				if (d0 <= 0.0f)
-					d0 = -d0;
-				float d1 = q->x - pView->GetWidth();
-				if (d1 <= 0.0f)
-					d1 = -d1;
-				float d2 = p->x - pView->GetWidth();
-				if (d2 <= 0.0f)
-					d2 = -d2;
-				out[*count].x = pView->GetWidth();
-				d0 = d0 / (d2 + d1);
-				out[*count].y = (q->y - p->y) * d0 + p->y;
-				out[*count].tu = (q->tu - p->tu) * d0 + p->tu;
-				out[*count].tv = (q->tv - p->tv) * d0 + p->tv;
-				*count = *count + 1;
-			}
-			++j;
-			++p;
-			--left;
-		} while (left != 0);
+			out[*count].x = p->x;
+			out[*count].y = p->y;
+			out[*count].tu = p->tu;
+			out[*count].tv = p->tv;
+			*count = *count + 1;
+		}
+		if ((in[j % n].x - pView->GetWidth()) * (p->x - pView->GetWidth()) <
+			0.0f)
+		{
+			WTVertex* q = &in[j % n];
+			float px = p->x - pView->GetWidth();
+			d0 = (px > 0.0f) ? px : -px;
+			float qx = q->x - pView->GetWidth();
+			d1 = (qx > 0.0f) ? qx : -qx;
+			px = p->x - pView->GetWidth();
+			d2 = (px > 0.0f) ? px : -px;
+			out[*count].x = pView->GetWidth();
+			float ratio = d0 / (d2 + d1);
+			out[*count].y = (q->y - p->y) * ratio + p->y;
+			out[*count].tu = (q->tu - p->tu) * ratio + p->tu;
+			out[*count].tv = (q->tv - p->tv) * ratio + p->tv;
+			*count = *count + 1;
+		}
 	}
 }
 
@@ -1179,44 +1154,37 @@ void WOverlay::clip_2D_top(WView* pView, WTVertex* out, WTVertex* in,
 	int* count, int n)
 {
 	*count = 0;
-	if (n > 0)
+	if (n <= 0)
+		return;
+	WTVertex* p = in;
+	int j = 1;
+	float d0, d1, d2;
+	for (int i = n; i > 0; --i, ++p, ++j)
 	{
-		int j = 1;
-		WTVertex* p = in;
-		int left = n;
-		do
+		if (p->y > 0.0f)
 		{
-			if (p->y > 0.0f)
-			{
-				out[*count].x = p->x;
-				out[*count].y = p->y;
-				out[*count].tu = p->tu;
-				out[*count].tv = p->tv;
-				*count = *count + 1;
-			}
-			WTVertex* q = in + j % n;
-			if (q->y * p->y < 0.0f)
-			{
-				float d0 = p->y;
-				if (d0 <= 0.0f)
-					d0 = -d0;
-				float d1 = q->y;
-				if (d1 <= 0.0f)
-					d1 = -d1;
-				float d2 = p->y;
-				if (d2 <= 0.0f)
-					d2 = -d2;
-				d0 = d0 / (d2 + d1);
-				out[*count].x = (q->x - p->x) * d0 + p->x;
-				out[*count].y = 0.0f;
-				out[*count].tu = (q->tu - p->tu) * d0 + p->tu;
-				out[*count].tv = (q->tv - p->tv) * d0 + p->tv;
-				*count = *count + 1;
-			}
-			++j;
-			++p;
-			--left;
-		} while (left != 0);
+			out[*count].x = p->x;
+			out[*count].y = p->y;
+			out[*count].tu = p->tu;
+			out[*count].tv = p->tv;
+			*count = *count + 1;
+		}
+		WTVertex* q = in + j % n;
+		if (p->y * q->y < 0.0f)
+		{
+			float py = p->y;
+			d0 = (py > 0.0f) ? py : -py;
+			float qy = q->y;
+			d1 = (qy > 0.0f) ? qy : -qy;
+			float py2 = p->y;
+			d2 = (py2 > 0.0f) ? py2 : -py2;
+			float ratio = d0 / (d2 + d1);
+			out[*count].x = (q->x - p->x) * ratio + p->x;
+			out[*count].y = 0.0f;
+			out[*count].tu = (q->tu - p->tu) * ratio + p->tu;
+			out[*count].tv = (q->tv - p->tv) * ratio + p->tv;
+			*count = *count + 1;
+		}
 	}
 }
 
@@ -1224,45 +1192,38 @@ void WOverlay::clip_2D_bottom(WView* pView, WTVertex* out, WTVertex* in,
 	int* count, int n)
 {
 	*count = 0;
-	if (n > 0)
+	if (n <= 0)
+		return;
+	WTVertex* p = in;
+	int j = 1;
+	float d1, d0;
+	for (int i = n; i > 0; --i, ++p, ++j)
 	{
-		int j = 1;
-		WTVertex* p = in;
-		int left = n;
-		do
+		if (p->y < pView->GetHeight())
 		{
-			if (p->y < pView->GetHeight())
-			{
-				out[*count].x = p->x;
-				out[*count].y = p->y;
-				out[*count].tu = p->tu;
-				out[*count].tv = p->tv;
-				*count = *count + 1;
-			}
-			WTVertex* q = in + j % n;
-			if ((p->y - pView->GetHeight()) * (q->y - pView->GetHeight()) <
-				0.0f)
-			{
-				float d0 = p->y - pView->GetHeight();
-				if (d0 <= 0.0f)
-					d0 = -d0;
-				float d1 = q->y - pView->GetHeight();
-				if (d1 <= 0.0f)
-					d1 = -d1;
-				float d2 = p->y - pView->GetHeight();
-				if (d2 <= 0.0f)
-					d2 = -d2;
-				d0 = d0 / (d2 + d1);
-				out[*count].x = (q->x - p->x) * d0 + p->x;
-				out[*count].y = pView->GetHeight();
-				out[*count].tu = (q->tu - p->tu) * d0 + p->tu;
-				out[*count].tv = (q->tv - p->tv) * d0 + p->tv;
-				*count = *count + 1;
-			}
-			++j;
-			++p;
-			--left;
-		} while (left != 0);
+			out[*count].x = p->x;
+			out[*count].y = p->y;
+			out[*count].tu = p->tu;
+			out[*count].tv = p->tv;
+			*count = *count + 1;
+		}
+		if ((p->y - pView->GetHeight()) * (in[j % n].y - pView->GetHeight()) <
+			0.0f)
+		{
+			WTVertex* q = &in[j % n];
+			float py0 = p->y - pView->GetHeight();
+			d0 = (py0 > 0.0f) ? py0 : -py0;
+			float qy = q->y - pView->GetHeight();
+			d1 = (qy > 0.0f) ? qy : -qy;
+			float py2 = p->y - pView->GetHeight();
+			float d2 = (py2 > 0.0f) ? py2 : -py2;
+			float ratio = d0 / (d2 + d1);
+			out[*count].x = (q->x - p->x) * ratio + p->x;
+			out[*count].y = pView->GetHeight();
+			out[*count].tu = (q->tu - p->tu) * ratio + p->tu;
+			out[*count].tv = (q->tv - p->tv) * ratio + p->tv;
+			*count = *count + 1;
+		}
 	}
 }
 
