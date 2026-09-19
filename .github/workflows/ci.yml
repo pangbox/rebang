@@ -30,10 +30,10 @@ jobs:
             experimental-features = nix-command flakes
 
       - name: Check Python sources
-        run: nix develop --command make check
+        run: nix develop .#build --command make check
 
       - name: Check C/C++ formatting
-        run: nix develop --command make format-check
+        run: nix develop .#build --command make format-check
 
       - name: Build and verify the image
-        run: nix develop --command make -j"$(nproc)" verify
+        run: nix develop .#build --command make -j"$(nproc)" verify
