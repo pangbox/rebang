@@ -37,7 +37,7 @@ jobs:
 
       - name: Commit the updated graph
         run: |
-          if git diff --quiet -- docs; then
+          if git diff --quiet -- docs/progress.md; then
             echo "no progress change to commit"
             exit 0
           fi
