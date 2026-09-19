@@ -31,7 +31,7 @@ public:
 class WRect : public _WRECT
 {
 public:
-    __forceinline WRect() { }
+	__forceinline WRect() { }
 
 	template <class Width, class Height>
 	WRect(float x, float y, Width width, Height height)

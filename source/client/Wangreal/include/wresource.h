@@ -84,7 +84,7 @@ public:
 class WResource : public BaseObject
 {
 public:
-    __forceinline WResource()
+	__forceinline WResource()
 		: m_resrcMng(0)
 	{
 	}

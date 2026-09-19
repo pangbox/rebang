@@ -333,9 +333,9 @@ public:
 
 struct WTVertex
 {
-    float x;
-    float y;
-    float z;
+	float x;
+	float y;
+	float z;
 	float rhw;
 	unsigned int diffuse;
 	float tu;

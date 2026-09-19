@@ -13,13 +13,13 @@ WTVertex* WOverlay::m_vl[5] = {
 };
 
 WOverlay::WOverlay(void)
-	: m_texHandle(0)
-	, m_texWidth(0)
-	, m_texHeight(0)
-	, m_devTexWidth(0)
-	, m_devTexHeight(0)
-	, m_clipFlag(false)
-	, m_coordMode(0x2200)
+	: m_texHandle(0),
+	  m_texWidth(0),
+	  m_texHeight(0),
+	  m_devTexWidth(0),
+	  m_devTexHeight(0),
+	  m_clipFlag(false),
+	  m_coordMode(0x2200)
 {
 }
 WOverlay::~WOverlay(void)
@@ -788,8 +788,7 @@ void WOverlay::SetClippingArea(WView* pView, const WRect* rc)
 		{
 			if (rc)
 			{
-				WRect full(0.0f, 0.0f, pView->GetWidth(),
-					pView->GetHeight());
+				WRect full(0.0f, 0.0f, pView->GetWidth(), pView->GetHeight());
 				WRect out;
 				CrossRect(m_clipArea, full, &out);
 				m_clipArea = out;
