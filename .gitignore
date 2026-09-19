@@ -5,6 +5,7 @@
 __pycache__/
 *.pyc
 .ruff_cache/
+.venv/
 /compile_commands.json
 
 # Third party sources that we derive from the upstream source.

@@ -7,10 +7,11 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
+      python = pkgs.python3.withPackages (ps: [ ps.capstone ]);
       buildPkgs = [
         pkgs.gnumake
         pkgs.patch
-        pkgs.python3
+        python
         pkgs.ruff
         pkgs.ty
         pkgs.wineWow64Packages.stable
@@ -19,6 +20,7 @@
       devPkgs = [
         pkgs.llvmPackages_21.bintools
         pkgs.radare2
+        pkgs.uv
       ];
       lintPkgs = [
         pkgs.actionlint

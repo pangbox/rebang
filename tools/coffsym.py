@@ -15,6 +15,9 @@ Usage:
     # Perform simple diff of symbols
     python tools/coffsym.py diff ./source/client/Wangreal/source/wtextureview.obj ./build/source/client/Wangreal/source/wtextureview.obj
 
+    # Diff with disassembly
+    python tools/coffsym.py diff -d ./source/client/Wangreal/source/woverlay.obj ./build/source/client/Wangreal/source/woverlay.obj
+
     # Patch the COMDAT selection flag for a specific symbol
     python tools/coffsym.py set-selection ./source/client/Wangreal/source/wview.obj '??1WView@@UAE@XZ' any
 
@@ -25,15 +28,28 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
+import shutil
 import struct
 import sys
 from pathlib import Path
 
 IMAGE_FILE_MACHINE_I386 = 0x014C
+IMAGE_SCN_CNT_CODE = 0x0020
 IMAGE_SCN_LNK_COMDAT = 0x1000
 IMAGE_SYM_CLASS_EXTERNAL = 2
 IMAGE_SYM_CLASS_STATIC = 3
+
+RELOCATIONS = {
+    0x0006: "dir32",
+    0x0007: "dir32nb",
+    0x000A: "section",
+    0x000B: "secrel",
+    0x000C: "token",
+    0x000D: "secrel7",
+    0x0014: "rel32",
+}
 
 SELECTIONS = {
     0: "plain",
@@ -50,14 +66,21 @@ CONFIG = ROOT / "build.json"
 
 
 class Section:
-    def __init__(self, index, name, size, characteristics):
+    def __init__(self, index, name, size, characteristics, raw_ptr, rel_ptr, nrelocs):
         self.index = index
         self.name = name
         self.size = size
         self.characteristics = characteristics
+        self.raw_ptr = raw_ptr
+        self.rel_ptr = rel_ptr
+        self.nrelocs = nrelocs
         self.selection = 0
         self.sel_offset = None
         self.owner = None
+
+    @property
+    def code(self):
+        return bool(self.characteristics & IMAGE_SCN_CNT_CODE)
 
     @property
     def comdat(self):
@@ -65,7 +88,8 @@ class Section:
 
 
 class Symbol:
-    def __init__(self, name, value, section, storage_class, offset=0):
+    def __init__(self, name, value, section, storage_class, offset=0, index=0):
+        self.index = index
         self.name = name
         self.value = value
         self.section = section
@@ -89,6 +113,7 @@ class Module:
         self.from_archive = from_archive
         self.sections = []
         self.symbols = []
+        self.symtab = {}
         self.strings = None
         self._parse()
 
@@ -104,9 +129,12 @@ class Module:
         for i in range(nsections):
             o = base + i * 40
             name = d[o : o + 8].rstrip(b"\0").decode("latin1")
-            size = struct.unpack_from("<I", d, o + 16)[0]
+            size, raw_ptr, rel_ptr = struct.unpack_from("<III", d, o + 16)
+            nrelocs = struct.unpack_from("<H", d, o + 32)[0]
             characteristics = struct.unpack_from("<I", d, o + 36)[0]
-            self.sections.append(Section(i + 1, name, size, characteristics))
+            self.sections.append(
+                Section(i + 1, name, size, characteristics, raw_ptr, rel_ptr, nrelocs)
+            )
 
         if not symptr:
             return
@@ -123,8 +151,9 @@ class Module:
             else:
                 name = raw[:8].rstrip(b"\0").decode("latin1")
             value, section, _type, storage, naux = struct.unpack_from("<IhHBB", raw, 8)
-            sym = Symbol(name, value, section, storage, self.base + o)
+            sym = Symbol(name, value, section, storage, self.base + o, i)
             self.symbols.append(sym)
+            self.symtab[i] = sym
 
             if naux and storage == IMAGE_SYM_CLASS_STATIC and 0 < section <= nsections:
                 sec = self.sections[section - 1]
@@ -135,6 +164,37 @@ class Module:
                 if sec.owner is None:
                     sec.owner = name
             i += 1 + naux
+
+    def section_data(self, sec):
+        if not sec.raw_ptr:
+            return b""
+        return self.data[sec.raw_ptr : sec.raw_ptr + sec.size]
+
+    def relocations(self, sec):
+        out = {}
+        for i in range(sec.nrelocs):
+            o = sec.rel_ptr + i * 10
+            addr, index, kind = struct.unpack_from("<IIH", self.data, o)
+            sym = self.symtab.get(index)
+            out[addr] = (
+                sym.name if sym else f"#{index}",
+                RELOCATIONS.get(kind, hex(kind)),
+            )
+        return out
+
+    def extent(self, sym):
+        sec = self.sections[sym.section - 1]
+        end = sec.size
+        for other in self.symbols:
+            if (
+                other.section == sym.section
+                and sym.value < other.value < end
+                and other.storage_class
+                in (IMAGE_SYM_CLASS_EXTERNAL, IMAGE_SYM_CLASS_STATIC)
+                and not other.name.startswith(".")
+            ):
+                end = other.value
+        return sym.value, end
 
 
 def archive_members(data):
@@ -220,6 +280,80 @@ def build_json_inputs():
     return out
 
 
+_CS = None
+
+
+def disassembler():
+    global _CS
+    if _CS is None:
+        try:
+            import capstone
+        except ImportError:
+            sys.exit(
+                "capstone not available - please use `uv run` or `nix develop` shell to run this script"
+            )
+        _CS = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+        _CS.skipdata = True
+    return _CS
+
+
+def disassemble(mod, sym):
+    """Quick'n'dirty disassembly output for a symbol"""
+    sec = mod.sections[sym.section - 1]
+    data = mod.section_data(sec)
+    if not data or not sec.code:
+        return []
+    start, end = mod.extent(sym)
+    relocs = mod.relocations(sec)
+    out = []
+    for insn in disassembler().disasm(data[start:end], start):
+        text = f"{insn.mnemonic} {insn.op_str}".strip()
+        targets = [
+            f"{relocs[a][0]} ({relocs[a][1]})"
+            for a in range(insn.address, insn.address + insn.size)
+            if a in relocs
+        ]
+        if targets:
+            text += "  ; " + ", ".join(targets)
+        out.append((insn.address - start, insn.bytes, text))
+    return out
+
+
+def side_by_side(left, right, width=None):
+    width = width or shutil.get_terminal_size((160, 24)).columns
+    col = max(24, (width - 5) // 2)
+
+    def render(row):
+        if row is None:
+            return ""
+        off, raw, text = row
+        hexed = raw.hex()
+        if len(hexed) > 12:
+            hexed = hexed[:11] + "+"
+        return f"{off:04x} {hexed:<12} {text}"
+
+    a = [t for _, _, t in left]
+    b = [t for _, _, t in right]
+    lines = []
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b).get_opcodes():
+        if tag == "equal":
+            pairs = [(left[i], right[j]) for i, j in zip(range(i1, i2), range(j1, j2))]
+            marks = [" "] * len(pairs)
+        else:
+            n = max(i2 - i1, j2 - j1)
+            ls = list(left[i1:i2]) + [None] * (n - (i2 - i1))
+            rs = list(right[j1:j2]) + [None] * (n - (j2 - j1))
+            pairs = list(zip(ls, rs))
+            marks = [
+                "~" if lr[0] and lr[1] else ("<" if lr[0] else ">") for lr in pairs
+            ]
+        for (lrow, rrow), mark in zip(pairs, marks):
+            lines.append(
+                f"  {render(lrow):<{col}.{col}} {mark} {render(rrow):.{col}}".rstrip()
+            )
+    return lines
+
+
 def cmd_sections(args):
     for mod in load_many(args.paths):
         print(f"== {mod.label}")
@@ -295,18 +429,33 @@ def cmd_diff(args):
         for mod in load_many([path]):
             for sym in mod.symbols:
                 if sym.defined:
-                    sec = mod.sections[sym.section - 1]
-                    out[sym.name] = (sec.name, sec.size)
+                    out[sym.name] = (mod, sym, mod.sections[sym.section - 1])
         return out
 
     a, b = index(args.a), index(args.b)
     for name in sorted(set(a) - set(b)):
-        print(f"- {a[name][0]:<12} {a[name][1]:<#8x} {name}")
+        print(f"- {a[name][2].name:<12} {a[name][2].size:<#8x} {name}")
     for name in sorted(set(b) - set(a)):
-        print(f"+ {b[name][0]:<12} {b[name][1]:<#8x} {name}")
+        print(f"+ {b[name][2].name:<12} {b[name][2].size:<#8x} {name}")
     for name in sorted(set(a) & set(b)):
-        if a[name][1] != b[name][1]:
-            print(f"~ {a[name][0]:<12} {a[name][1]:<#8x} -> {b[name][1]:<#8x} {name}")
+        amod, asym, asec = a[name]
+        bmod, bsym, bsec = b[name]
+        changed = asec.size != bsec.size
+        if not args.disasm:
+            if changed:
+                print(f"~ {asec.name:<12} {asec.size:<#8x} -> {bsec.size:<#8x} {name}")
+            continue
+        left, right = disassemble(amod, asym), disassemble(bmod, bsym)
+        if not left and not right:
+            continue
+        same = [t for _, _, t in left] == [t for _, _, t in right]
+        if same and not changed:
+            continue
+        sizes = f"{asec.size:#x} -> {bsec.size:#x}" if changed else f"{asec.size:#x}"
+        print(f"~ {asec.name:<12} {sizes:<18} {name}")
+        for line in side_by_side(left, right, args.width):
+            print(line)
+        print()
 
 
 def cmd_set_selection(args):
@@ -426,6 +575,10 @@ def main(argv=None):
     p = sub.add_parser("diff", help="compare object file symbol-by-symbol")
     p.add_argument("a")
     p.add_argument("b")
+    p.add_argument(
+        "-d", "--disasm", action="store_true", help="side-by-side disassembly"
+    )
+    p.add_argument("--width", type=int, help="total output width (default: terminal)")
     p.set_defaults(func=cmd_diff)
 
     p = sub.add_parser("rename", help="rename a symbol across objects")
