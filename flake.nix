@@ -14,10 +14,10 @@
         pkgs.ruff
         pkgs.ty
         pkgs.wineWow64Packages.stable
+        pkgs.llvmPackages_21.clang-tools
       ];
       devPkgs = [
         pkgs.llvmPackages_21.bintools
-        pkgs.llvmPackages_21.clang-tools
         pkgs.radare2
       ];
       lintPkgs = [
