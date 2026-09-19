@@ -1,5 +1,26 @@
 #pragma once
 
+typedef unsigned long ulong;
+typedef unsigned short ushort;
+typedef unsigned char uchar;
+
+enum wUnitMode
+{
+	W_UNIT_XPOS = 0,
+	W_UNIT_YPOS = 1,
+	W_UNIT_WIDTH = 2,
+	W_UNIT_HEIGHT = 3
+};
+
+struct _WPOINT
+{
+	float x, y;
+};
+struct _WRECT
+{
+	float x, y, w, h;
+};
+
 class WPoint
 {
 public:
@@ -7,17 +28,17 @@ public:
 	float y;
 };
 
-class WRect
+class WRect : public _WRECT
 {
 public:
+	WRect() { }
+
 	template <class Width, class Height>
 	WRect(float x, float y, Width width, Height height)
-		: x(x), y(y), width((float)width), height((float)height)
 	{
+		this->x = x;
+		this->y = y;
+		this->w = width;
+		this->h = height;
 	}
-
-	float x;
-	float y;
-	float width;
-	float height;
 };

@@ -1,10 +1,7 @@
 #pragma once
 #include "rebang.h"
+#include "wtypes.h"
 #include <math.h>
-
-typedef unsigned long ulong;
-typedef unsigned short ushort;
-typedef unsigned char uchar;
 
 const float g_PI = 3.14159265358979323846f;
 const float g_2_PI = 6.28318530717958647692f;
@@ -94,6 +91,19 @@ public:
 
 		float p[4];
 	};
+};
+
+class Waabb
+{
+public:
+	WVector min, max;
+};
+
+class Wobb
+{
+public:
+	WVector center;
+	WVector extend[3];
 };
 
 class WMatrix
