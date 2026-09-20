@@ -18,7 +18,7 @@ inline float operator*(const WVector& left, const WVector& right)
 	return left.x * right.x + left.y * right.y + left.z * right.z;
 }
 
-__forceinline WVector WCrossProduct(const WVector& left, const WVector& right)
+inline WVector WCrossProduct(const WVector& left, const WVector& right)
 {
 	return WVector(left.y * right.z - left.z * right.y,
 		left.z * right.x - left.x * right.z,
@@ -95,4 +95,35 @@ inline WPlane::WPlane(const WVector& normal_, const WVector& point)
 {
 	normal = normal_;
 	dis = -(normal * point);
+}
+
+inline int WisEqual(const WVector& left, const WVector& right, float epsilon)
+{
+	float x = left.x - right.x;
+	if (*(unsigned long*)&x & 0x80000000)
+		x = -x;
+	if (!(x < epsilon))
+		return 0;
+
+	float y = left.y - right.y;
+	if (*(unsigned long*)&y & 0x80000000)
+		y = -y;
+	if (!(y < epsilon))
+		return 0;
+
+	float z = left.z - right.z;
+	if (*(unsigned long*)&z & 0x80000000)
+		z = -z;
+	return z < epsilon;
+}
+
+inline WVector& WVector::Normalize()
+{
+	float size;
+	if (WisEqual(*this, ZERO, g_EPSILON))
+		size = 0.0f;
+	else
+		size = 1.0f / Magnitude();
+	*this *= size;
+	return *this;
 }

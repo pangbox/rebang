@@ -665,7 +665,12 @@
             "/Op"
           ]
         },
-        "source/client/Wangreal/source/w3dspr.obj",
+        {
+          "path": "source/client/Wangreal/source/w3dspr.cpp",
+          "extra_flags": [
+            "/Op"
+          ]
+        },
         {
           "path": "source/client/Wangreal/source/wbone_physics.cpp",
           "extra_flags": [

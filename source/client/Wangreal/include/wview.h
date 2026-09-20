@@ -31,6 +31,7 @@ public:
 	void SetClip(float, float, bool);
 	void SetPrevCamera(const WMatrix&);
 	void SetCamera(const WMatrix&);
+	const WMatrix& GetCamera() const { return camera; }
 	bool SetFogEnable(bool);
 	void SetFogState(float, float, unsigned long);
 	void SetViewport(float, float);
