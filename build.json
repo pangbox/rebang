@@ -695,7 +695,12 @@
         "source/client/Wangreal/source/baseobject.cpp",
         "source/client/Wangreal/source/wlock.cpp",
         "source/client/Wangreal/source/xzip.obj",
-        "source/client/Wangreal/source/xunzip.obj",
+        {
+          "path": "source/client/Wangreal/source/xunzip.cpp",
+          "extra_flags": [
+            "/Op"
+          ]
+        },
         "source/client/Wangreal/source/wblockmodel.obj",
         "source/client/Wangreal/source/wavi.obj",
         {
