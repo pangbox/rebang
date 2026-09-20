@@ -3,7 +3,13 @@ name: Workflows
 on:
   push:
     branches: [master]
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
   pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
 
 permissions: {}
 
