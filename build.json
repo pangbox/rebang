@@ -649,7 +649,12 @@
           ]
         },
         "source/client/Wangreal/source/wfont.obj",
-        "source/client/Wangreal/source/woverlay.obj",
+        {
+          "path": "source/client/Wangreal/source/woverlay.cpp",
+          "extra_flags": [
+            "/Op"
+          ]
+        },
         "source/client/Wangreal/source/w3dspr.obj",
         {
           "path": "source/client/Wangreal/source/wbone_physics.cpp",

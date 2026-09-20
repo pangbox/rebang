@@ -53,16 +53,37 @@ struct _WRECT
 	float x, y, w, h;
 };
 
-class WPoint
+class WPoint : public _WPOINT
 {
 public:
-	float x;
-	float y;
+	WPoint(float x, float y)
+	{
+		this->x = x;
+		this->y = y;
+	}
+	WPoint() { }
 };
 
 class WRect : public _WRECT
 {
 public:
+	WRect(const _WRECT& rect)
+	{
+		x = rect.x;
+		y = rect.y;
+		w = rect.w;
+		h = rect.h;
+	}
+	WRect(const WRect& rect)
+	{
+		x = rect.x;
+		y = rect.y;
+		w = rect.w;
+		h = rect.h;
+	}
+	float Right() const { return w + x; }
+	float Bottom() const { return h + y; }
+
 	__forceinline WRect() { }
 
 	template <class Width, class Height>
@@ -74,3 +95,12 @@ public:
 		this->h = height;
 	}
 };
+
+template <>
+inline WRect::WRect(float x, float y, float width, float height)
+{
+	this->x = x;
+	this->y = y;
+	this->w = width;
+	this->h = height;
+}

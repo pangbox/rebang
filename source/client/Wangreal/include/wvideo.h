@@ -333,11 +333,25 @@ public:
 
 struct WTVertex
 {
-	float x;
-	float y;
-	float z;
+	union
+	{
+		struct
+		{
+			float sx, sy, sz;
+		};
+		struct
+		{
+			float x, y, z;
+		};
+	};
+	void SetPosition(const WVector& p)
+	{
+		x = p.x;
+		y = p.y;
+		z = p.z;
+	}
 	float rhw;
-	unsigned int diffuse;
+	unsigned long diffuse;
 	float tu;
 	float tv;
 	float lu;
