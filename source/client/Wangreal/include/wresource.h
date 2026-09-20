@@ -31,6 +31,21 @@ struct w_texlist
 	char texname[1];
 };
 
+class cFile
+{
+public:
+	virtual ~cFile() { }
+	virtual bool Open(const char* pFilename) { return 0; }
+	virtual int Read(void* data, int len);
+	virtual int GetByte();
+	virtual int Tell();
+	virtual void Seek(int pos, int pivot);
+	int Length() { return m_nLen; }
+
+protected:
+	int m_nLen;
+};
+
 template <typename T>
 class WResrcCache
 {
@@ -63,6 +78,7 @@ public:
 	w_texlist* FindTexture(int handle);
 	int GetTextureWidth(int handle);
 	int GetTextureHeight(int handle);
+	cFile* GetCFile(const char* filename, int len);
 
 	WVideoDev* video;
 	WAudioDev* audio;

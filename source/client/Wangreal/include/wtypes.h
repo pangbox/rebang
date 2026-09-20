@@ -4,6 +4,38 @@ typedef unsigned long ulong;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
 
+class WFlags
+{
+public:
+	__forceinline WFlags()
+		: m_flag(0)
+	{
+	}
+	__forceinline WFlags(const unsigned long& flag)
+		: m_flag(flag)
+	{
+	}
+	__forceinline operator unsigned long() const { return m_flag; }
+	__forceinline void Disable(unsigned long flag) { this->m_flag &= ~flag; }
+	__forceinline void Enable(unsigned long flag) { this->m_flag |= flag; }
+	bool GetFlag(unsigned long flag) const
+	{
+		return (this->m_flag & flag) ? true : false;
+	}
+	__forceinline void Reset() { this->m_flag = 0; }
+	__forceinline void Set(unsigned long value) { this->m_flag = value; }
+	__forceinline void Turn(unsigned long flag, bool on)
+	{
+		if (on)
+			this->m_flag |= flag;
+		else
+			this->m_flag &= ~flag;
+	}
+
+private:
+	unsigned long m_flag;
+};
+
 enum wUnitMode
 {
 	W_UNIT_XPOS = 0,
