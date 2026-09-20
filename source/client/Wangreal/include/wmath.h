@@ -56,6 +56,9 @@ public:
 	float y;
 };
 
+class WMatrix;
+class WQuat;
+
 class WVector
 {
 public:
@@ -70,11 +73,6 @@ public:
 		float p[3];
 	};
 
-	static const WVector ZERO;
-	static const WVector UNIT_POS_Y;
-
-	friend float operator*(const WVector& left, const WVector& right);
-
 	__forceinline WVector() DEFAULT_IMPL;
 
 	__forceinline WVector(float x_, float y_, float z_)
@@ -83,9 +81,34 @@ public:
 	}
 
 	WVector& Normalize();
-	float Magnitude() const;
-	float SquareMagnitude() const;
 	void operator+=(const WVector& right);
+
+	float Magnitude() const;
+
+	float SquareMagnitude() const;
+
+	void operator*=(float scalar)
+	{
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
+	}
+
+	void operator-=(const WVector& other)
+	{
+		x -= other.x;
+		y -= other.y;
+		z -= other.z;
+	}
+
+	static const WVector ONE;
+	static const WVector ZERO;
+	static const WVector UNIT_POS_X;
+	static const WVector UNIT_POS_Y;
+	static const WVector UNIT_POS_Z;
+	static const WVector UNIT_NEG_X;
+	static const WVector UNIT_NEG_Y;
+	static const WVector UNIT_NEG_Z;
 };
 
 class WVector4
@@ -100,15 +123,37 @@ public:
 			float z;
 			float w;
 		};
-
 		float p[4];
 	};
+
+	WVector4() { }
+
+	WVector4(float x_, float y_, float z_, float w_);
+
+	static const WVector4 ONE;
+	static const WVector4 ZERO;
 };
 
 class Waabb
 {
 public:
-	WVector min, max;
+	Waabb(short* minimum, short* maximum);
+	Waabb(const WVector& minimum, const WVector& maximum);
+	Waabb();
+
+	WVector min;
+	WVector max;
+
+	Waabb& operator+=(const Waabb& box);
+	Waabb& operator+=(const WVector& vector);
+	void Reset();
+	void Default();
+	bool IsInclude(const Waabb& box) const;
+	bool IsInclude(const WVector& vector) const;
+	bool IsInclude(WVector& vector) const;
+	void Clear();
+	void AddPoint(const WVector& vector);
+	WVector GetCenter() const;
 };
 
 class Wobb
@@ -140,7 +185,35 @@ public:
 		float p[12];
 	};
 
+	WMatrix() { }
+
+	WMatrix(float xx_, float yx_, float zx_, float xy_, float yy_, float zy_,
+		float xz_, float yz_, float zz_)
+		: xx(xx_),
+		  yx(yx_),
+		  zx(zx_),
+		  xy(xy_),
+		  yy(yy_),
+		  zy(zy_),
+		  xz(xz_),
+		  yz(yz_),
+		  zz(zz_),
+		  xm(0.0f),
+		  ym(0.0f),
+		  zm(0.0f)
+	{
+	}
+
+	WMatrix& operator=(const WMatrix& other);
+	void operator=(const WQuat& quat);
+	void Normalize();
+	void GetRotMatrix(WMatrix* result) const;
+	void AxisScale(WVector& scale);
+	void Rotate(float angle, char direct);
+	void Rotate(const WVector& rotation);
+
 	static const WMatrix IDENTITY;
+	static const WMatrix ZERO;
 };
 
 class WMatrix4
@@ -159,7 +232,6 @@ public:
 			WVector pivot;
 			float wm;
 		};
-
 		struct
 		{
 			float xx, yx, zx;
@@ -174,6 +246,33 @@ public:
 		float m[4][4];
 		float p[16];
 	};
+
+	WMatrix4() { }
+
+	WMatrix4(float p0, float p1, float p2, float p3, float p4, float p5,
+		float p6, float p7, float p8, float p9, float p10, float p11, float p12,
+		float p13, float p14, float p15)
+	{
+		p[0] = p0;
+		p[1] = p1;
+		p[2] = p2;
+		p[3] = p3;
+		p[4] = p4;
+		p[5] = p5;
+		p[6] = p6;
+		p[7] = p7;
+		p[8] = p8;
+		p[9] = p9;
+		p[10] = p10;
+		p[11] = p11;
+		p[12] = p12;
+		p[13] = p13;
+		p[14] = p14;
+		p[15] = p15;
+	}
+
+	static const WMatrix4 IDENTITY;
+	static const WMatrix4 ZERO;
 };
 
 class WPlane
@@ -186,22 +285,20 @@ public:
 			float x;
 			float y;
 			float z;
+			float dis;
 		};
-
 		struct
 		{
 			float a;
 			float b;
 			float c;
+			float d;
 		};
-
 		struct
 		{
 			WVector normal;
 		};
 	};
-
-	float dis;
 };
 
 class WSphere
@@ -210,5 +307,39 @@ public:
 	WVector pos;
 	float radius;
 };
+
+class WQuat
+{
+public:
+	float x;
+	float y;
+	float z;
+	float w;
+
+	void Reset();
+	void Normalize();
+	void ConvertToAxisAngle(WVector* vector, float* theta);
+	void ConvertToRotationMatrix(WMatrix& rotation) const;
+	void SetFromAngles(float yaw, float pitch, float roll);
+	void operator=(const WMatrix& matrix);
+
+private:
+	void SetFromAxisAngle(const WVector& vector, float theta);
+};
+
+template <class T>
+T Between(T minimum, T value, T maximum);
+
+int WisEqual(const WVector& left, const WVector& right, float epsilon);
+int WisEqual(const float& left, const float& right, float epsilon);
+Waabb operator+(const Waabb& box, const WVector& vector);
+WMatrix operator*(const WMatrix& left, const WMatrix& right);
+WMatrix RotMat(float angle, char direct);
+WVector MinPointLineSegment(WVector& vp, WVector& va, WVector& vb, WVector* vt);
+float WCollisionTest(const Waabb& origin, const WVector& vec,
+	const Waabb& target, WPlane* plane);
+float __cdecl CalcDeltaAngle(const WVector& v1, const WVector& v2);
+void __cdecl InitMath();
+void __cdecl UninitMath();
 
 #include "wmath.inl"

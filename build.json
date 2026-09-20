@@ -628,7 +628,12 @@
         "source/client/Fresh/source/frtooltip.obj",
         "source/shared/thirties/gamath.obj",
         "source/client/Wangreal/source/wmathutil.obj",
-        "source/client/Wangreal/source/wmath.obj",
+        {
+          "path": "source/client/Wangreal/source/wmath.cpp",
+          "extra_flags": [
+            "/Op"
+          ]
+        },
         "source/client/Wangreal/source/wshadowview.obj",
         "source/client/Wangreal/source/wview.obj",
         {

@@ -51,3 +51,23 @@ inline WVector operator*(const WVector& vector, const WMatrix& matrix)
 		vector.x * matrix.zx + vector.y * matrix.zy + vector.z * matrix.zz +
 			matrix.zm);
 }
+
+inline Waabb::Waabb()
+{
+}
+
+inline Waabb::Waabb(const WVector& minimum, const WVector& maximum)
+{
+	min = minimum;
+	max = maximum;
+}
+
+inline int operator&(const Waabb& left, const Waabb& right)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (left.min.p[i] > right.max.p[i] || left.max.p[i] < right.min.p[i])
+			return 0;
+	}
+	return 1;
+}
