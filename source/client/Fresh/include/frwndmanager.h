@@ -15,6 +15,32 @@ class FrGraphicInterface;
 class FrScrollBar;
 class FrWnd;
 
+enum enumGuiType
+{
+	GI_NONE = 0x0,
+	GI_FORM = 0x1,
+	GI_STATIC = 0x2,
+	GI_TEXTBUTTON = 0x3,
+	GI_EDIT = 0x4,
+	GI_COMBOBOX = 0x5,
+	GI_COMBOCTLEX = 0x6,
+	GI_BUTTON = 0x7,
+	GI_FRAME = 0x8,
+	GI_RESOURCE = 0x9,
+	GI_BITMAP = 0xA,
+	GI_AREA = 0xB,
+	GI_LISTBOX = 0xC,
+	GI_GAUGEBAR = 0xD,
+	GI_GAUGEBAREX = 0xE,
+	GI_GAUGEBARIMAGE = 0xF,
+	GI_VIEWER = 0x10,
+	GI_CONTEXTMENU = 0x11,
+	GI_TABBUTTON = 0x12,
+	GI_GROUPBOX = 0x13,
+	GI_MACROITEM = 0x14,
+	GI_LAST = 0x15,
+};
+
 struct RectangleShort
 {
 	short left;
@@ -30,9 +56,12 @@ public:
 	virtual void Init(const void* node);
 	virtual const std::list<FrGuiItem*>* GetChildList();
 
-	char unknown_04[0x3c];
+	enumGuiType m_type;
+	std::string m_resource;
+	std::string m_caption;
 	std::string m_name;
-	char unknown_5c[0x10];
+	std::map<std::string, std::string> m_param;
+	unsigned int m_flag;
 	RectangleShort m_rect;
 };
 
