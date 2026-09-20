@@ -2,6 +2,7 @@
 #include "wmath.h"
 #include "wresource.h"
 #include "wscene.h"
+#include "wlist.h"
 #include <vector>
 
 class WBone;

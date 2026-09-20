@@ -26,16 +26,11 @@ public:
 	void operator-=(const T& item);
 
 protected:
+	void DelItem(const T& item);
 	listinfo* Link(listinfo* head, listinfo* item);
 	listinfo* Unlink(listinfo* head, listinfo* item);
-	void DelItem(const T& item);
 
 private:
-	void AddHash(int hashCode, listinfo* item);
-	int HASHCODE(const void* keycode) const;
-	listinfo* Alloc();
-	void DelHash(listinfo* item);
-
 	listinfo* m_list;
 	listinfo* m_surf;
 	listinfo* m_pre_alloc;
@@ -43,7 +38,11 @@ private:
 	int m_blk_len;
 	int m_hash_mask;
 	int m_hashNum;
+	listinfo* Alloc();
 	listinfo** m_hash_list;
+	void AddHash(int hashCode, listinfo* item);
+	void DelHash(listinfo* item);
+	int HASHCODE(const void* keycode) const;
 };
 
 #include "wlist.inl"

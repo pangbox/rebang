@@ -1,5 +1,6 @@
 #pragma once
 #include "wresource.h"
+#include "bitmap.h"
 #include "wview.h"
 
 class WOverlay : public WResource

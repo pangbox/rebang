@@ -1,6 +1,8 @@
 #pragma once
+
 #include "wresource.h"
 #include "wvideo.h"
+#include "wlist.h"
 
 class WView;
 

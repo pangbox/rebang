@@ -28,7 +28,7 @@ distribution.
 #include <locale.h>
 #include "tinyxml.h"
 #include "../Wangreal/include/cfile.h"
-#include "../Wangreal/include/wresource.h"
+#include "../Wangreal/include/wresrcmng.h"
 
 bool TiXmlBase::condenseWhiteSpace = true;
 

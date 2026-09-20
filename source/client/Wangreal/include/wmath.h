@@ -81,15 +81,15 @@ public:
 	{
 	}
 
-	#ifdef REBANG_LEGACY_CPP
+#ifdef REBANG_LEGACY_CPP
 	WVector& operator=(const WVector& other)
 	{
 		memcpy(this, &other, sizeof(WVector));
 		return *this;
 	}
-	#else
+#else
 	WVector& operator=(const WVector& other) = default;
-	#endif
+#endif
 
 	void Reset() { x = y = z = 0.0f; }
 	WVector operator-() const { return WVector(-x, -y, -z); }

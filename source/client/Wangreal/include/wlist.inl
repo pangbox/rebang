@@ -71,11 +71,11 @@ int WList<T>::HASHCODE(const void* keycode) const
 template <class T>
 WList<T>::WList(int len, int hashNum)
 {
-	m_blk_len = len;
 	m_hash_list = 0;
 	m_list = 0;
 	m_idle = 0;
 	m_pre_alloc = 0;
+	m_blk_len = len;
 	m_surf = 0;
 	m_hashNum = hashNum;
 	if (hashNum > 0)

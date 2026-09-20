@@ -1,7 +1,7 @@
 #pragma once
 #include "wmath.h"
 #include "wtypes.h"
-#include "wresource.h"
+#include "wresrcmng.h"
 #include "wvideo.h"
 
 class WView : public WResource
@@ -95,7 +95,7 @@ public:
 	__forceinline float GetHeight() const { return SCREEN_YS; }
 	__forceinline WVideoDev* GetVideoDevice() const
 	{
-		return GetResrcManager()->video;
+		return GetResrcManager()->m_video;
 	}
 	float xGetProjScale() const { return proj_scale; }
 
