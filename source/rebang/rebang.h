@@ -6,6 +6,10 @@
 // in the future.
 
 #if defined(_MSC_VER) && (_MSC_VER < 1900) && !defined(_CLANGD)
+#define REBANG_LEGACY_CPP
+#endif
+
+#ifdef REBANG_LEGACY_CPP
 #define DEFAULT_IMPL \
 	{ \
 	}
