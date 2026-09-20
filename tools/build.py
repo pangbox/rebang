@@ -462,7 +462,11 @@ def compile_source(source: str, precompile: bool = False) -> None:
         windows(source),
     ]
     print("PCH" if precompile else "CL", source, flush=True)
-    log = invoke("cl.exe", output, args)
+    # Workaround for C1033 errors.
+    pdb.parent.mkdir(parents=True, exist_ok=True)
+    with pdb.with_suffix(".pdb.lock").open("w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        log = invoke("cl.exe", output, args)
     headers: list[str] = []
     actual_paths = {
         str(p).lower(): p
