@@ -1,18 +1,41 @@
 #pragma once
+#include "wmemblock.h"
+#include <string.h>
 
-template <typename T>
+template <class T>
 class WList
 {
-private:
+public:
 	struct listinfo
 	{
-		char* item;
+		T item;
 		char* keycode;
 		bool alloc;
 		listinfo* prev;
 		listinfo* next;
 		listinfo* hash;
 	};
+
+	__declspec(nothrow) WList(int len = 8, int hashNum = 0);
+	__declspec(nothrow) ~WList();
+	T Start();
+	T Next();
+	void Reset();
+	void AddItem(const T& item, const char* keycode, bool alloc);
+	void operator+=(const T& item);
+	void operator-=(const T& item);
+
+protected:
+	listinfo* Link(listinfo* head, listinfo* item);
+	listinfo* Unlink(listinfo* head, listinfo* item);
+	void DelItem(const T& item);
+
+private:
+	void AddHash(int hashCode, listinfo* item);
+	int HASHCODE(const void* keycode) const;
+	listinfo* Alloc();
+	void DelHash(listinfo* item);
+
 	listinfo* m_list;
 	listinfo* m_surf;
 	listinfo* m_pre_alloc;
@@ -22,3 +45,5 @@ private:
 	int m_hashNum;
 	listinfo** m_hash_list;
 };
+
+#include "wlist.inl"

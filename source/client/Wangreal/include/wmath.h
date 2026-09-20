@@ -376,6 +376,7 @@ int WisEqual(const float& left, const float& right, float epsilon);
 Waabb operator+(const Waabb& box, const WVector& vector);
 WMatrix operator*(const WMatrix& left, const WMatrix& right);
 WMatrix RotMat(float angle, char direct);
+WMatrix RotMat(WVector rotation);
 WVector MinPointLineSegment(WVector& vp, WVector& va, WVector& vb, WVector* vt);
 float WCollisionTest(const Waabb& origin, const WVector& vec,
 	const Waabb& target, WPlane* plane);

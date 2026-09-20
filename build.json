@@ -647,7 +647,12 @@
             "/Op"
           ]
         },
-        "source/client/Wangreal/source/w3danispr.obj",
+        {
+          "path": "source/client/Wangreal/source/w3danispr.cpp",
+          "extra_flags": [
+            "/Op"
+          ]
+        },
         "source/client/Wangreal/source/textout.obj",
         {
           "path": "source/client/Wangreal/source/freetype2.cpp",
