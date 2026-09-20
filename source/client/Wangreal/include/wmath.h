@@ -2,6 +2,7 @@
 #include "rebang.h"
 #include "wtypes.h"
 #include <math.h>
+#include <string.h>
 
 const float g_PI = 3.14159265358979323846f;
 const float g_2_PI = 6.28318530717958647692f;
@@ -79,6 +80,15 @@ public:
 		: x(x_), y(y_), z(z_)
 	{
 	}
+
+	WVector& operator=(const WVector& other)
+	{
+		memcpy(this, &other, sizeof(WVector));
+		return *this;
+	}
+
+	void Reset() { x = y = z = 0.0f; }
+	WVector operator-() const { return WVector(-x, -y, -z); }
 
 	WVector& Normalize();
 	void operator+=(const WVector& right);
@@ -159,8 +169,12 @@ public:
 class Wobb
 {
 public:
+	Wobb() { }
+
 	WVector center;
 	WVector extend[3];
+
+	bool IsInclude(const WVector& point) const;
 };
 
 class WMatrix
@@ -299,6 +313,33 @@ public:
 			WVector normal;
 		};
 	};
+
+	WPlane() { }
+
+	WPlane(const WVector& normal_, const WVector& point);
+
+	WPlane(const WVector& normal_, float dis_)
+	{
+		x = normal_.x;
+		y = normal_.y;
+		z = normal_.z;
+		dis = dis_;
+	}
+
+	WPlane(float x_, float y_, float z_, float dis_)
+	{
+		x = x_;
+		y = y_;
+		z = z_;
+		dis = dis_;
+	}
+
+	WPlane& operator=(const WPlane& other)
+	{
+		normal = other.normal;
+		dis = other.dis;
+		return *this;
+	}
 };
 
 class WSphere
@@ -341,5 +382,28 @@ float WCollisionTest(const Waabb& origin, const WVector& vec,
 float __cdecl CalcDeltaAngle(const WVector& v1, const WVector& v2);
 void __cdecl InitMath();
 void __cdecl UninitMath();
+
+class WView;
+
+void __cdecl MakePlaneEq(WPlane* out_plane, const Waabb& aabb,
+	const WMatrix* matrix);
+bool __fastcall PlaneFromVecs(WPlane* result, const WVector& first,
+	const WVector& second, const WVector& point);
+float __cdecl RayIntersect(const WVector& pivot, const WVector& vec,
+	WPlane* plane, WPlane* out, float rlen);
+float __cdecl ObbIntersect(const Waabb& src_aabb, const WVector& direction,
+	const Wobb& dest_obb, WPlane* out_plane);
+float __fastcall RayIntersectAABB(const Waabb& box, const WVector& start,
+	const WVector& ray, WPlane* result, float radius);
+
+float __cdecl RayIntersectAABB(const Waabb& box, const WVector& start,
+	const WVector& ray, WMatrix* matrix, WPlane* result, float radius);
+float __cdecl AabbIntersect(const Waabb& src_aabb, const WVector& direction,
+	const Waabb& dest_aabb, WPlane* out_plane);
+float __cdecl DotContact(const WVector& vec, const WPlane* plane);
+WMatrix __cdecl Make3rdCamMatrix(const WVector& position,
+	const WVector& target);
+WRect __cdecl ScaleRect(WView* view, WRect* rectangle);
+void __cdecl ScalePoint(WView* view, WPoint* point);
 
 #include "wmath.inl"

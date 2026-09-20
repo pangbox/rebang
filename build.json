@@ -627,7 +627,12 @@
         "source/client/Fresh/source/frcontextmenuctrl.obj",
         "source/client/Fresh/source/frtooltip.obj",
         "source/shared/thirties/gamath.obj",
-        "source/client/Wangreal/source/wmathutil.obj",
+        {
+          "path": "source/client/Wangreal/source/wmathutil.cpp",
+          "extra_flags": [
+            "/Op"
+          ]
+        },
         {
           "path": "source/client/Wangreal/source/wmath.cpp",
           "extra_flags": [

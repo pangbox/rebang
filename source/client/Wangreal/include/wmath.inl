@@ -71,3 +71,28 @@ inline int operator&(const Waabb& left, const Waabb& right)
 	}
 	return 1;
 }
+
+inline float operator*(const WPlane& plane, const WVector& vector)
+{
+	return plane.normal * vector + plane.dis;
+}
+
+inline float operator*(const WVector& vector, const WPlane& plane)
+{
+	const WVector& value = vector;
+	return plane.normal * value + plane.dis;
+}
+
+inline bool Wobb::IsInclude(const WVector& point) const
+{
+	WVector direction = point - center;
+	return Abs(direction * extend[0]) <= (extend[0] * extend[0]) &&
+		Abs(direction * extend[1]) <= (extend[1] * extend[1]) &&
+		Abs(direction * extend[2]) <= (extend[2] * extend[2]);
+}
+
+inline WPlane::WPlane(const WVector& normal_, const WVector& point)
+{
+	normal = normal_;
+	dis = -(normal * point);
+}
