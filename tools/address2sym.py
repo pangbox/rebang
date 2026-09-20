@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Finds what translation unit an address belongs to."""
+
 import argparse
 import bisect
 import csv
@@ -39,7 +40,9 @@ def load_modules():
             "path": None,
         }
     for row in read_csv("module-sizes.csv"):
-        modules.setdefault(int(row["module"]), {}).setdefault("original_object", row["original_object"])
+        modules.setdefault(int(row["module"]), {}).setdefault(
+            "original_object", row["original_object"]
+        )
         modules[int(row["module"])]["path"] = row["path"]
     return modules
 
@@ -74,7 +77,11 @@ def lookup(rva, sections, contributions, modules):
     if i < 0:
         return section, None, None
     contrib = rows[i]
-    if not contrib["offset"] <= rva - section["rva"] < contrib["offset"] + contrib["size"]:
+    if (
+        not contrib["offset"]
+        <= rva - section["rva"]
+        < contrib["offset"] + contrib["size"]
+    ):
         # In a section but inside padding between contributions.
         return section, None, contrib
     return section, contrib, contrib
@@ -83,7 +90,9 @@ def lookup(rva, sections, contributions, modules):
 def main():
     ap = argparse.ArgumentParser(description="Find what module an address belongs to")
     ap.add_argument("addresses", nargs="+", help="addresses, e.g. 0x00702440")
-    ap.add_argument("--base", default=hex(IMAGE_BASE), help="image base (default 0x00400000)")
+    ap.add_argument(
+        "--base", default=hex(IMAGE_BASE), help="image base (default 0x00400000)"
+    )
     ap.add_argument("--rva", action="store_true", help="treat addresses as RVAs")
     args = ap.parse_args()
 
@@ -106,23 +115,28 @@ def main():
             print("  not in any section")
             status = 1
             continue
-        print(f"  section {section['id']} {section['name']} "
-              f"+{rva - section['rva']:#x}")
+        print(f"  section {section['id']} {section['name']} +{rva - section['rva']:#x}")
         if contrib is None:
             print("  no contribution covers this address")
             if nearest is not None:
                 m = modules.get(nearest["module"], {})
-                print(f"  previous contribution: {m.get('path') or m.get('original_object')}")
+                print(
+                    f"  previous contribution: {m.get('path') or m.get('original_object')}"
+                )
             status = 1
             continue
         m = modules.get(contrib["module"], {})
         start = section["rva"] + contrib["offset"] + base
-        print(f"  module {contrib['module']}: {m.get('original_object', '?')}"
-              f" (in {m.get('original_module', '?')})")
+        print(
+            f"  module {contrib['module']}: {m.get('original_object', '?')}"
+            f" (in {m.get('original_module', '?')})"
+        )
         print(f"  path: {m.get('path') or '<not yet decompiled>'}")
-        print(f"  contribution {contrib['contribution']}: "
-              f"{start:#010x}..{start + contrib['size']:#010x} "
-              f"(size {contrib['size']:#x}, +{rva - section['rva'] - contrib['offset']:#x})")
+        print(
+            f"  contribution {contrib['contribution']}: "
+            f"{start:#010x}..{start + contrib['size']:#010x} "
+            f"(size {contrib['size']:#x}, +{rva - section['rva'] - contrib['offset']:#x})"
+        )
     return status
 
 
