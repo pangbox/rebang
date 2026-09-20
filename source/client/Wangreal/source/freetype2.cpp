@@ -1,41 +1,8 @@
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include "freetype2.h"
+#include "cfile.h"
+#include "wmath.h"
 #include <new>
 #include <string.h>
-#include <math.h>
-#include "wmath.h"
-
-class cFile
-{
-public:
-	virtual void Unknown0() = 0;
-	virtual void Unknown1() = 0;
-	virtual void Read(void* buffer, int size) = 0;
-
-	int m_nLen;
-};
-
-cFile* __cdecl GetCFile(const char* filename, int mode, int unknown);
-void __cdecl CloseCFile(cFile* file);
-
-class CFreeType2
-{
-public:
-	CFreeType2();
-	~CFreeType2();
-	bool Load(const char* fname, int fntsize, int fontindex, bool preloadall);
-	bool ChangFontSize(int fontsize);
-	bool Render(unsigned short code, int* w, int* h);
-	void Write24(uchar* img24, int pitch);
-	void Write32a(uchar* img32, int pitch);
-
-private:
-	FT_Library m_Library;
-	FT_Face m_Face;
-	uchar* m_pFileBuffer;
-	int m_FontSize;
-	unsigned short m_LastLetter;
-};
 
 CFreeType2::CFreeType2()
 {

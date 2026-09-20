@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include "wtypes.h"
+#include "cfile.h"
 #include "wlist.h"
 #include "wlock.h"
 #include "baseobject.h"
@@ -29,21 +30,6 @@ struct w_texlist
 	int texhandle;
 	unsigned int size;
 	char texname[1];
-};
-
-class cFile
-{
-public:
-	virtual ~cFile() { }
-	virtual bool Open(const char* pFilename) { return 0; }
-	virtual int Read(void* data, int len);
-	virtual int GetByte();
-	virtual int Tell();
-	virtual void Seek(int pos, int pivot);
-	int Length() { return m_nLen; }
-
-protected:
-	int m_nLen;
 };
 
 template <typename T>
@@ -96,6 +82,8 @@ public:
 	WList<WResource*> originList;
 	WLock m_lock[3];
 };
+
+extern WResourceManager* g_resrcmng;
 
 class WResource : public BaseObject
 {

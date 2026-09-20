@@ -27,28 +27,8 @@ distribution.
 #include <ctype.h>
 #include <locale.h>
 #include "tinyxml.h"
-
-class cFile
-{
-public:
-	virtual ~cFile();
-	virtual int Open( const char* filename ) = 0;
-	virtual int Read( void* buffer, int size ) = 0;
-	virtual int GetByte() = 0;
-	virtual int Tell() = 0;
-	virtual int Seek( int offset, int origin ) = 0;
-
-	int m_nLen;
-};
-
-class WResourceManager
-{
-public:
-	cFile* GetCFile( const char* filename, int mode );
-};
-
-extern WResourceManager* g_resrcmng;
-void __cdecl CloseCFile( cFile* file );
+#include "../Wangreal/include/cfile.h"
+#include "../Wangreal/include/wresource.h"
 
 bool TiXmlBase::condenseWhiteSpace = true;
 
