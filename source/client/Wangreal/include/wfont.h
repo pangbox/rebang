@@ -9,6 +9,9 @@ public:
 	{
 	};
 
+	WFont();
+	virtual ~WFont();
+	virtual void SetCoordMode(int mode);
 	virtual WFont* MakeClone(void);
 	virtual float GetTextWidth(WView* view, const char* text);
 	virtual void SetFixedWidth(bool fixed);
@@ -17,8 +20,8 @@ public:
 	virtual void Flush(WView* view);
 	virtual void Reset(void);
 	virtual float PrintInside(WView* view, float x, float y, const char* text,
-		int, unsigned int, Bitmap* bitmap);
-	virtual float GetTextWidthInside(WView* view, const char* text);
+		int, unsigned long, Bitmap* bitmap) = 0;
+	virtual float GetTextWidthInside(WView* view, const char* text) = 0;
 
 	eFontStyle m_eType;
 	int m_space;

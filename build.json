@@ -17,7 +17,12 @@
   "includes": [
     "source/rebang",
     "tools/VC7.1/include",
-    "tools/PlatformSDK-Aug2002/include"
+    "tools/PlatformSDK-Aug2002/include",
+    "source/client/Wangreal/include",
+    "source/client/Wangreal/lib/freetype-2.2.1/include",
+    "source/client/Fresh/include",
+    "source/client/ProjectG",
+    "source/shared/thirties"
   ],
   "link_flags": [
     "/NOLOGO",
@@ -598,7 +603,8 @@
           "path": "source/client/Fresh/source/fresh.cpp",
           "pch": "source/client/Fresh/source/stdafx.cpp",
           "extra_flags": [
-            "/FIstdafx.h"
+            "/FIstdafx.h",
+            "/Op"
           ]
         },
         "source/client/Fresh/source/frform.obj",
@@ -609,7 +615,8 @@
           "path": "source/client/Fresh/source/frgroupbox.cpp",
           "pch": "source/client/Fresh/source/stdafx.cpp",
           "extra_flags": [
-            "/FIstdafx.h"
+            "/FIstdafx.h",
+            "/Op"
           ]
         },
         "source/client/Fresh/source/frlistbox.obj",
@@ -627,95 +634,32 @@
         "source/client/Fresh/source/frcontextmenuctrl.obj",
         "source/client/Fresh/source/frtooltip.obj",
         "source/shared/thirties/gamath.obj",
-        {
-          "path": "source/client/Wangreal/source/wmathutil.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
-        {
-          "path": "source/client/Wangreal/source/wmath.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
+        "source/client/Wangreal/source/wmathutil.cpp",
+        "source/client/Wangreal/source/wmath.cpp",
         "source/client/Wangreal/source/wshadowview.obj",
         "source/client/Wangreal/source/wview.obj",
-        {
-          "path": "source/client/Wangreal/source/wtextureview.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
-        {
-          "path": "source/client/Wangreal/source/w3danispr.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
-        "source/client/Wangreal/source/textout.obj",
-        {
-          "path": "source/client/Wangreal/source/freetype2.cpp",
-          "includes": [
-            "source/client/Wangreal/lib/freetype-2.2.1/include",
-            "source/client/Fresh/include",
-            "source/client/Wangreal/include",
-            "source/client/ProjectG"
-          ]
-        },
+        "source/client/Wangreal/source/wtextureview.cpp",
+        "source/client/Wangreal/source/w3danispr.cpp",
+        "source/client/Wangreal/source/textout.cpp",
+        "source/client/Wangreal/source/freetype2.cpp",
         "source/client/Wangreal/source/wfont.obj",
-        {
-          "path": "source/client/Wangreal/source/woverlay.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
-        {
-          "path": "source/client/Wangreal/source/w3dspr.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
-        {
-          "path": "source/client/Wangreal/source/wbone_physics.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
+        "source/client/Wangreal/source/woverlay.cpp",
+        "source/client/Wangreal/source/w3dspr.cpp",
+        "source/client/Wangreal/source/wbone_physics.cpp",
         "source/client/Wangreal/source/wboneset.obj",
         "source/client/Wangreal/source/wbone.obj",
-        {
-          "path": "source/client/Wangreal/source/wxpuppet.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
+        "source/client/Wangreal/source/wxpuppet.cpp",
         "source/client/Wangreal/source/wpuppet.obj",
         "source/client/Wangreal/source/wxtnlbuffer.obj",
         "source/client/Wangreal/source/baseobject.cpp",
         "source/client/Wangreal/source/wlock.cpp",
         "source/client/Wangreal/source/xzip.obj",
-        {
-          "path": "source/client/Wangreal/source/xunzip.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
+        "source/client/Wangreal/source/xunzip.cpp",
         "source/client/Wangreal/source/wblockmodel.obj",
         "source/client/Wangreal/source/wavi.obj",
-        {
-          "path": "source/client/Wangreal/source/wreg.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
+        "source/client/Wangreal/source/wreg.cpp",
         "source/shared/tea.cpp",
-        {
-          "path": "source/client/Wangreal/source/bitmap.cpp",
-          "extra_flags": [
-            "/Op"
-          ]
-        },
+        "source/client/Wangreal/source/bitmap.cpp",
         "source/client/Wangreal/source/westpak.obj",
         "source/client/Wangreal/source/wvideo.cpp",
         "source/client/Wangreal/source/wdevmng.cpp",
@@ -724,11 +668,8 @@
         "source/client/Fresh/lib/libpng.lib",
         "source/client/Wangreal/lib/ijl15.lib"
       ],
-      "includes": [
-        "source/client/Fresh/include",
-        "source/client/Wangreal/include",
-        "source/client/ProjectG",
-        "source/shared/thirties"
+      "extra_flags": [
+        "/Op"
       ]
     },
     "source/client/ProjectG/lib/mss32.lib",
