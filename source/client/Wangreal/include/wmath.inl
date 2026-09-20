@@ -54,6 +54,8 @@ inline WVector operator*(const WVector& vector, const WMatrix& matrix)
 
 inline Waabb::Waabb()
 {
+	min = WVector(0.0f, 0.0f, 0.0f);
+	max = WVector(0.0f, 0.0f, 0.0f);
 }
 
 inline Waabb::Waabb(const WVector& minimum, const WVector& maximum)

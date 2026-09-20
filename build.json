@@ -684,7 +684,12 @@
         },
         "source/client/Wangreal/source/wboneset.obj",
         "source/client/Wangreal/source/wbone.obj",
-        "source/client/Wangreal/source/wxpuppet.obj",
+        {
+          "path": "source/client/Wangreal/source/wxpuppet.cpp",
+          "extra_flags": [
+            "/Op"
+          ]
+        },
         "source/client/Wangreal/source/wpuppet.obj",
         "source/client/Wangreal/source/wxtnlbuffer.obj",
         "source/client/Wangreal/source/baseobject.cpp",

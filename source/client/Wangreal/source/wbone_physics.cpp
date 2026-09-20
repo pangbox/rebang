@@ -1,6 +1,6 @@
 #include <math.h>
 #include <new>
-#include "wmath.h"
+#include "wbone.h"
 
 struct w_mesh
 {
@@ -16,43 +16,6 @@ struct w_mesh
 	w_mesh* next;
 };
 
-class WBone
-{
-public:
-	struct w_bone_physic_link
-	{
-		struct w_bone_physic_link_element
-		{
-			int offset;
-			float length;
-		};
-
-		int vtxnum;
-		WVector* pos;
-		WVector* vel;
-		WVector** list;
-		w_bone_physic_link_element* link;
-		int* linkoffset;
-	};
-
-	void UpdatePhysicsModel(float delta, const WVector& accel);
-	void ResetPhysicsModel();
-	void SetPhysicsModel(int type);
-
-protected:
-	void ReleasePhysicsModel();
-	int FindLink(int body, w_mesh* mesh,
-		w_bone_physic_link::w_bone_physic_link_element* out, int offset);
-
-private:
-	w_bone_physic_link* m_physic;
-	w_mesh* m_mesh;
-	char unknown_08[0xe8];
-	ulong m_flag;
-	char unknown_f4[0x30];
-	WMatrix m_matrix;
-};
-
 void WBone::SetPhysicsModel(int type)
 {
 	int cnt = 0;
@@ -64,7 +27,7 @@ void WBone::SetPhysicsModel(int type)
 		++offset;
 	}
 
-	m_flag |= 0x2000;
+	m_flag.Enable(PHYSICSMODEL);
 	m_physic = new w_bone_physic_link;
 	m_physic->vtxnum = cnt;
 	m_physic->pos = new WVector[cnt];
