@@ -1,6 +1,7 @@
 #pragma once
 #include "rebang.h"
 #include "wtypes.h"
+#include "wminmax.h"
 #include <math.h>
 #include <string.h>
 
@@ -25,18 +26,6 @@ namespace
 		(void)g_EPSILON;
 		(void)g_CM_TO_WU;
 	}
-}
-
-template <class T>
-__forceinline T Max(T a, T b)
-{
-	return (a < b) ? b : a;
-}
-
-template <class T>
-__forceinline T Min(T a, T b)
-{
-	return (a > b) ? b : a;
 }
 
 template <class T>

@@ -656,7 +656,7 @@
         "source/client/Wangreal/source/xzip.obj",
         "source/client/Wangreal/source/xunzip.cpp",
         "source/client/Wangreal/source/wblockmodel.obj",
-        "source/client/Wangreal/source/wavi.obj",
+        "source/client/Wangreal/source/wavi.cpp",
         "source/client/Wangreal/source/wreg.cpp",
         "source/shared/tea.cpp",
         "source/client/Wangreal/source/bitmap.cpp",
