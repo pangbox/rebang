@@ -2,19 +2,7 @@
 #include <new>
 #include "wbone.h"
 
-struct w_mesh
-{
-	int vtxNum;
-	int rigidNum;
-	int blendedRigidNum;
-	int blendedTotalNum;
-	WVector* vecList;
-	char unknown_14[0x1c];
-	int indexNum;
-	ushort* indexList;
-	char unknown_38[0x2c];
-	w_mesh* next;
-};
+#include "wmesh.h"
 
 void WBone::SetPhysicsModel(int type)
 {

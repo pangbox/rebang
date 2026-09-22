@@ -32,6 +32,8 @@ public:
 	void SetPrevCamera(const WMatrix&);
 	void SetCamera(const WMatrix&);
 	const WMatrix& GetCamera() const { return camera; }
+	const WMatrix& GetInvCamera() const { return invcamera; }
+	bool ProcessEffect() { return m_bProcessEffect; }
 	bool SetFogEnable(bool);
 	void SetFogState(float, float, unsigned long);
 	void SetViewport(float, float);

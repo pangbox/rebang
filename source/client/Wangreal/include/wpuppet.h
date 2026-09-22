@@ -4,6 +4,9 @@
 #include "wscene.h"
 #include "wlist.h"
 #include <vector>
+#include <string>
+
+typedef std::vector<const WMatrix*> WMatrixPtrList;
 
 class WBone;
 class WView;
@@ -79,6 +82,15 @@ public:
 	virtual void UpdateMeshBonePtr(WPuppet* source);
 
 	void Transform(WView* view, float scale, int flags);
+	const char* GetPuppetName() const { return m_petName; }
+	WBone* GetRootBone() { return m_rootbone; }
+	int GetLightMode() { return m_lightmode; }
+	const WMatrixPtrList& xGetTransfMatPtrList() const
+	{
+		return m_xTransfMatPtrList;
+	}
+	static const WMatrixPtrList& GetOrginalMatrixPtrList(
+		const std::string& name);
 
 	__forceinline const WSphere& GetBoundSphere() const
 	{
@@ -112,5 +124,5 @@ public:
 	float m_aniLen;
 	int m_iPetType;
 	WBone* m_rootbone;
-	std::vector<WMatrix const*> m_xTransfMatPtrList;
+	WMatrixPtrList m_xTransfMatPtrList;
 };

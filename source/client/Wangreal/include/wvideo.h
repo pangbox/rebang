@@ -411,26 +411,25 @@ public:
 	virtual bool Reset(bool bWindowed, int iWidth, int iHeight, int iColor,
 		int lWndStyle, int fillMode) = 0;
 
-protected:
-	virtual unsigned int VertexSize(unsigned int dwVertexTypeDesc) = 0;
+	virtual unsigned long VertexSize(unsigned long dwVertexTypeDesc) = 0;
 
-public:
 	virtual BYTE xGetStride(int hVb) = 0;
-	virtual bool xHasVertexElem(unsigned int fvf, wWxVertexElem elem) const = 0;
-	virtual int xGetVertexElemOffset(unsigned int fvf,
+	virtual bool xHasVertexElem(unsigned long fvf,
 		wWxVertexElem elem) const = 0;
-	virtual int xGetBlendWeightSize(unsigned int fvf) const = 0;
-	virtual unsigned int xDetermineFVF(int iDrawFlag, int iDrawFlag2,
+	virtual int xGetVertexElemOffset(unsigned long fvf,
+		wWxVertexElem elem) const = 0;
+	virtual int xGetBlendWeightSize(unsigned long fvf) const = 0;
+	virtual unsigned long xDetermineFVF(int iDrawFlag, int iDrawFlag2,
 		int iMaxBoneNum) = 0;
-	virtual unsigned int xDetermineBufferUsage(unsigned int fvf) = 0;
-	virtual int xCreateVertexBuffer(int numVertices, unsigned int fvf,
-		unsigned int dwUsage) = 0;
-	virtual int xCreateIndexBuffer(int numIndices, unsigned int dwUsage) = 0;
+	virtual unsigned long xDetermineBufferUsage(unsigned long fvf) = 0;
+	virtual int xCreateVertexBuffer(int numVertices, unsigned long fvf,
+		unsigned long dwUsage) = 0;
+	virtual int xCreateIndexBuffer(int numIndices, unsigned long dwUsage) = 0;
 	virtual void xReleaseVertexBuffer(int hVb) = 0;
 	virtual void xReleaseIndexBuffer(int hIb) = 0;
-	virtual char* xLockVertexBuffer(int hVb, unsigned int uiOffset,
+	virtual unsigned char* xLockVertexBuffer(int hVb, unsigned int uiOffset,
 		unsigned int uiSize) = 0;
-	virtual char* xLockIndexBuffer(int hIb, unsigned int uiOffset,
+	virtual unsigned char* xLockIndexBuffer(int hIb, unsigned int uiOffset,
 		unsigned int uiSize) = 0;
 	virtual void xUnlockVertexBuffer(int hVb) = 0;
 	virtual void xUnlockIndexBuffer(int hIb) = 0;

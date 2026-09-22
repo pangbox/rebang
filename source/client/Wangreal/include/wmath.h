@@ -39,6 +39,16 @@ __forceinline T Abs(T value)
 	return result;
 }
 
+inline float Wabs(const float& value)
+{
+	return (*(const unsigned long*)&value & 0x80000000) ? -value : value;
+}
+
+inline int WisEqual(const float& left, const float& right, float epsilon)
+{
+	return Wabs(left - right) < epsilon;
+}
+
 class WVector2D
 {
 public:
@@ -211,10 +221,23 @@ public:
 	{
 	}
 
-	WMatrix& operator=(const WMatrix& other);
+	WMatrix& operator=(const WMatrix& other)
+	{
+		xa = other.xa;
+		ya = other.ya;
+		za = other.za;
+		pivot = other.pivot;
+		return *this;
+	}
 	void operator=(const WQuat& quat);
 	void Normalize();
+	void Reset()
+	{
+		xx = yy = zz = 1.0f;
+		yx = zx = xy = zy = xz = yz = xm = ym = zm = 0.0f;
+	}
 	void GetRotMatrix(WMatrix* result) const;
+	WMatrix operator~() const;
 	void AxisScale(WVector& scale);
 	void Rotate(float angle, char direct);
 	void Rotate(const WVector& rotation);
@@ -365,7 +388,6 @@ template <class T>
 T Between(T minimum, T value, T maximum);
 
 int WisEqual(const WVector& left, const WVector& right, float epsilon);
-int WisEqual(const float& left, const float& right, float epsilon);
 Waabb operator+(const Waabb& box, const WVector& vector);
 WMatrix operator*(const WMatrix& left, const WMatrix& right);
 WMatrix RotMat(float angle, char direct);
@@ -399,5 +421,7 @@ WMatrix __cdecl Make3rdCamMatrix(const WVector& position,
 	const WVector& target);
 WRect __cdecl ScaleRect(WView* view, WRect* rectangle);
 void __cdecl ScalePoint(WView* view, WPoint* point);
+
+WVector RotVec(const WVector& vector, const WMatrix& matrix);
 
 #include "wmath.inl"

@@ -129,3 +129,29 @@ inline WVector& WVector::Normalize()
 	*this *= size;
 	return *this;
 }
+
+inline WMatrix operator*(const WMatrix& left, const WMatrix& right)
+{
+	WMatrix m;
+	m.xx = left.xx * right.xx + left.yx * right.xy + left.zx * right.xz;
+	m.yx = left.xx * right.yx + left.yx * right.yy + left.zx * right.yz;
+	m.zx = left.xx * right.zx + left.yx * right.zy + left.zx * right.zz;
+	m.xy = left.xy * right.xx + left.yy * right.xy + left.zy * right.xz;
+	m.yy = left.xy * right.yx + left.yy * right.yy + left.zy * right.yz;
+	m.zy = left.xy * right.zx + left.yy * right.zy + left.zy * right.zz;
+	m.xz = left.xz * right.xx + left.yz * right.xy + left.zz * right.xz;
+	m.yz = left.xz * right.yx + left.yz * right.yy + left.zz * right.yz;
+	m.zz = left.xz * right.zx + left.yz * right.zy + left.zz * right.zz;
+	m.xm =
+		left.xm * right.xx + left.ym * right.xy + left.zm * right.xz + right.xm;
+	m.ym =
+		left.xm * right.yx + left.ym * right.yy + left.zm * right.yz + right.ym;
+	m.zm =
+		left.xm * right.zx + left.ym * right.zy + left.zm * right.zz + right.zm;
+	return m;
+}
+
+inline float __fastcall TransformZ(const WVector& v, const WMatrix& m)
+{
+	return (v.z * m.zz) + (v.x * m.zx) + (v.y * m.zy) + m.zm;
+}

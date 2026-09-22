@@ -12,18 +12,34 @@ struct LightSet
 
 struct WxBatchState
 {
-	unsigned int xiFlag0;
-	unsigned int xiFlag1;
+	int xiFlag0;
+	int xiFlag1;
 	int xiBaseVtxIdx;
-	int xNumVertices;
+	int xnVtxs;
 	int xiBaseIdxIdx;
-	int xNumIndices;
-	unsigned int xdwDiffuse;
+	int xnIdxs;
+	ulong xdwDiffuse;
 	WMatrix xmW;
 	float xfDepth;
 	int xnmTransfs;
 	const WMatrix* const* xpapmW;
 	const WMatrix* const* xpapmO;
+
+	WxBatchState()
+	{
+		xiFlag0 = 0;
+		xiFlag1 = 0;
+		xiBaseVtxIdx = 0;
+		xnVtxs = 0;
+		xiBaseIdxIdx = 0;
+		xnIdxs = 0;
+		xdwDiffuse = 0xffffffff;
+		xfDepth = g_HUGE;
+		xnmTransfs = 0;
+		xpapmW = 0;
+		xpapmO = 0;
+		xmW.Reset();
+	}
 };
 
 struct WxViewState

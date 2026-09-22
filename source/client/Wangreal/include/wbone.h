@@ -81,6 +81,9 @@ public:
 		std::map<float, std::vector<WBone::w_normalmerge::P> > m_wlist;
 	};
 
+	WBone* FindBone(const char* name, unsigned long hashCode);
+	static bool IsMeshVisible(WBone* bone, w_mesh* mesh);
+
 	void SetAlpha(unsigned char alpha, int recursive);
 	void xSetAlpha(unsigned char alpha, int recursive);
 	void SetLight(LightSet* light);
