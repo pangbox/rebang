@@ -76,11 +76,19 @@ public:
 	void Release(WTitleFont* font);
 	w_texlist* FindTexture(int handle);
 	w_texlist* FindTexture(const char* name);
+	bool CheckTexture(const char* name)
+	{
+		return FindTexture(name) ? true : false;
+	}
 	const char* FindMatchFile(const char* name);
 	cFile* GetCFile(const char* name, int mode);
 	void SetAutoMatchDirectory(const char* directory);
 	void ChangeTexturePart(int handle, Bitmap* bitmap, const tagRECT& rect);
 	void ChangeTexturePart(char* name, Bitmap* bitmap, const tagRECT& rect);
+	bool ChangeTexturePart(int handle, char* name, Bitmap** bitmap,
+		tagRECT* rect);
+	bool ChangeTexturePart(char* name, char* part, Bitmap** bitmap,
+		tagRECT* rect);
 	void Release(WFont* font);
 	void Release(int handle);
 	bool IsOrigin(WResource* resource);
@@ -92,6 +100,7 @@ public:
 	WPuppet* GetPuppet(const char*, bool, bool, bool);
 	WOverlay* GetOverlay(const char*, unsigned long);
 	int LoadTexture(const char*, unsigned long, int, const char*);
+	Bitmap* LoadBitmap(const char* name, int mode, bool flag);
 	int UploadTexture(const char* name, class Bitmap* bitmap,
 		unsigned long style, RECT* rect);
 

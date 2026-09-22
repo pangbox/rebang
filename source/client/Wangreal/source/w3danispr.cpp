@@ -1,78 +1,8 @@
+#include "wmemblock.inl"
 #include "w3danispr.h"
 #include "wview.h"
 #include "gamath.h"
 #include <stdio.h>
-
-template <>
-inline _WSPRITE* WList<_WSPRITE*>::Next();
-template <>
-inline WList<_WSPRITE*>::listinfo* WList<_WSPRITE*>::Link(listinfo* head,
-	listinfo* item);
-template <>
-inline WList<_WSPRITE*>::listinfo* WList<_WSPRITE*>::Unlink(listinfo* head,
-	listinfo* item);
-template <>
-inline void WList<_WSPRITE*>::AddHash(int hashCode, listinfo* item);
-template <>
-inline int WList<_WSPRITE*>::HASHCODE(const void* keycode) const;
-template <>
-inline WList<_WSPRITE*>::WList(int len, int hashNum);
-template <>
-inline WList<_WSPRITE*>::~WList();
-template <>
-inline _WSPRITE* WList<_WSPRITE*>::Start();
-template <>
-inline void WList<_WSPRITE*>::Reset();
-template <>
-inline void WList<int>::DelHash(listinfo* item);
-template <>
-inline WList<_WSPRITE*>::listinfo* WList<_WSPRITE*>::Alloc();
-template <>
-inline void WList<int>::DelItem(const int& item);
-template <>
-inline void WList<_WSPRITE*>::AddItem(_WSPRITE* const& item,
-	const char* keycode, bool alloc);
-template <>
-inline void WList<_WSPRITE*>::DelItem(_WSPRITE* const& item);
-template <>
-inline void WList<_WSPRITE*>::operator+=(_WSPRITE* const& item);
-template <>
-inline void WList<_WSPRITE*>::operator-=(_WSPRITE* const& item);
-template <>
-inline WList<int>::~WList();
-template <>
-inline void WList<int>::AddHash(int hashCode, listinfo* item);
-template <>
-inline int WList<int>::HASHCODE(const void* keycode) const;
-template <>
-inline WList<int>::listinfo* WList<int>::Alloc();
-
-void W3dAniSpr::SetPos(const WVector& position)
-{
-	pos = position;
-}
-
-void W3dAniSpr::Rotate(float w, float h, float& rw, float& rh, float angle)
-{
-	float cos = gaMath::Cos(angle);
-	float sin = gaMath::Sin(angle);
-	rw = w * cos - h * sin;
-	rh = w * sin + h * cos;
-}
-
-void W3dAniSpr::SetRect(float width, float height, float pivotX, float pivotY)
-{
-	w1 = -pivotX;
-	w2 = width - pivotX;
-	h1 = -pivotY;
-	h2 = height - pivotY;
-}
-
-void W3dAniSpr::SetColor(const int color)
-{
-	for (int i = 0; i < 4; ++i)
-		vl[i]->diffuse = color;
-}
 
 W3dAniSpr::W3dAniSpr()
 {
@@ -93,295 +23,20 @@ W3dAniSpr::W3dAniSpr()
 	m_nTotalSprite = 0;
 }
 
-_WSPRITE* W3dAniSpr::FindSprite(int index)
+W3dAniSpr::~W3dAniSpr()
 {
-	_WSPRITE* sprite;
-	sprite = m_SpriteList.Start();
-	for (int i = 0; i < index && sprite; ++i)
-		sprite = m_SpriteList.Next();
-	return sprite;
-}
-
-// TODO: not sure why this is needed :(
-template <>
-inline void WList<_WSPRITE*>::operator+=(_WSPRITE* const& item)
-{
-	AddItem(item, 0, false);
-}
-
-template <>
-inline void WList<_WSPRITE*>::operator-=(_WSPRITE* const& item)
-{
-	DelItem(item);
-}
-
-template <>
-inline void WList<int>::DelItem(const int& item)
-{
-	listinfo* found = m_list;
-	if (found)
+	AllDelSprite();
+	int handle;
+	while ((handle = m_TextureList.Start()) != 0)
 	{
-		do
-		{
-			if (found->item == item)
-			{
-				if (m_surf == found)
-					m_surf = m_surf->next == m_list ? 0 : m_surf->next;
-				if (found->keycode)
-				{
-					DelHash(found);
-					if (found->alloc)
-						g_mem.Free(found->keycode);
-				}
-				m_list = Unlink(m_list, found);
-				m_idle = Link(m_idle, found);
-				if (!m_list)
-					m_surf = 0;
-				break;
-			}
-			found = found->next;
-		} while (found != m_list);
+		GetResrcManager()->Release(handle);
+		m_TextureList -= handle;
 	}
 }
 
-template <>
-inline void WList<_WSPRITE*>::AddItem(_WSPRITE* const& item,
-	const char* keycode, bool alloc)
+void W3dAniSpr::SetPos(const WVector& position)
 {
-	listinfo* info = Alloc();
-	info->item = item;
-	info->alloc = alloc;
-	if (alloc)
-	{
-		info->keycode = (char*)g_mem.Alloc((int)strlen(keycode) + 1);
-		strcpy(info->keycode, keycode);
-	}
-	else
-	{
-		info->keycode = (char*)keycode;
-	}
-	if (keycode)
-		AddHash(HASHCODE(keycode), info);
-	m_list = Link(m_list, info);
-}
-
-template <>
-inline void WList<_WSPRITE*>::DelItem(_WSPRITE* const& item)
-{
-	listinfo* found = m_list;
-	if (found)
-	{
-		do
-		{
-			if (found->item == item)
-			{
-				if (m_surf == found)
-					m_surf = m_surf->next == m_list ? 0 : m_surf->next;
-				if (found->keycode)
-				{
-					DelHash(found);
-					if (found->alloc)
-						g_mem.Free(found->keycode);
-				}
-				m_list = Unlink(m_list, found);
-				m_idle = Link(m_idle, found);
-				if (!m_list)
-					m_surf = 0;
-				break;
-			}
-			found = found->next;
-		} while (found != m_list);
-	}
-}
-
-template <>
-inline _WSPRITE* WList<_WSPRITE*>::Next()
-{
-	if (m_surf)
-	{
-		_WSPRITE* item = m_surf->item;
-		m_surf = m_surf->next == m_list ? 0 : m_surf->next;
-		return item;
-	}
-	return 0;
-}
-
-template <>
-inline WList<_WSPRITE*>::listinfo* WList<_WSPRITE*>::Link(listinfo* head,
-	listinfo* item)
-{
-	if (!head)
-	{
-		item->prev = item;
-		item->next = item;
-		return item;
-	}
-	item->next = head;
-	item->prev = head->prev;
-	head->prev = item;
-	item->prev->next = item;
-	return head;
-}
-
-template <>
-inline WList<_WSPRITE*>::listinfo* WList<_WSPRITE*>::Unlink(listinfo* head,
-	listinfo* item)
-{
-	item->next->prev = item->prev;
-	item->prev->next = item->next;
-	if (item != head)
-		return head;
-	if (item->next == head)
-		return 0;
-	return item->next;
-}
-
-template <>
-inline void WList<_WSPRITE*>::AddHash(int hashCode, listinfo* item)
-{
-	item->hash = m_hash_list[hashCode];
-	m_hash_list[hashCode] = item;
-}
-
-template <>
-inline int WList<_WSPRITE*>::HASHCODE(const void* keycode) const
-{
-	const unsigned char* string = (const unsigned char*)keycode;
-	int length = (int)strlen((const char*)string);
-	int last;
-	if (length > 0)
-		last = length - 1;
-	else
-		last = 0;
-	return (string[last] & 0x15 | string[0] & 0x2a | length * 0x40) &
-		m_hash_mask;
-}
-
-template <>
-inline WList<_WSPRITE*>::WList(int len, int hashNum)
-{
-	m_blk_len = len;
-	m_hash_list = 0;
-	m_list = 0;
-	m_idle = 0;
-	m_pre_alloc = 0;
-	m_surf = 0;
-	m_hashNum = hashNum;
-	if (hashNum > 0)
-	{
-		int size = m_hashNum * sizeof(listinfo*);
-		m_hash_list = (listinfo**)g_mem.Alloc(size);
-		m_hash_mask = m_hashNum - 1;
-		for (int i = 0; i < m_hashNum; ++i)
-			m_hash_list[i] = 0;
-	}
-	else
-	{
-		m_hash_list = 0;
-	}
-}
-
-template <>
-inline WList<_WSPRITE*>::~WList()
-{
-	while (m_pre_alloc)
-	{
-		listinfo* allocation = m_pre_alloc;
-		m_pre_alloc = Unlink(m_pre_alloc, allocation);
-		g_mem.Free(allocation);
-	}
-	if (m_hash_list)
-	{
-		g_mem.Free(m_hash_list);
-		m_hash_list = 0;
-	}
-}
-
-template <>
-inline _WSPRITE* WList<_WSPRITE*>::Start()
-{
-	m_surf = m_list;
-	return Next();
-}
-
-template <>
-inline void WList<_WSPRITE*>::Reset()
-{
-	if (m_list)
-	{
-		if (m_idle)
-		{
-			m_list->prev->next = m_idle->next;
-			m_idle->next->prev = m_list->prev;
-			m_idle->next = m_list;
-			m_list->prev = m_idle;
-			m_list = 0;
-		}
-		else
-		{
-			do
-			{
-				listinfo* list = Unlink(m_list, m_list);
-				m_idle = Link(m_idle, m_list);
-				m_list = list;
-			} while (m_list);
-		}
-	}
-	for (int i = 0; i < m_hashNum; ++i)
-		m_hash_list[i] = 0;
-}
-
-template <>
-inline int WList<int>::HASHCODE(const void* keycode) const
-{
-	const unsigned char* string = (const unsigned char*)keycode;
-	int length = (int)strlen((const char*)string);
-	int last;
-	if (length > 0)
-		last = length - 1;
-	else
-		last = 0;
-	return (string[last] & 0x15 | string[0] & 0x2a | length * 0x40) &
-		m_hash_mask;
-}
-
-template <>
-inline void WList<int>::DelHash(listinfo* item)
-{
-	int hashCode = HASHCODE(item->keycode);
-	listinfo* current = m_hash_list[hashCode];
-	if (current == item)
-	{
-		m_hash_list[hashCode] = item->hash;
-		return;
-	}
-	if (current)
-	{
-		while (current)
-		{
-			if (current->hash == item)
-			{
-				current->hash = item->hash;
-				break;
-			}
-			current = current->hash;
-		}
-	}
-}
-
-template <>
-inline WList<_WSPRITE*>::listinfo* WList<_WSPRITE*>::Alloc()
-{
-	if (!m_idle)
-	{
-		listinfo* block = (listinfo*)g_mem.Alloc(m_blk_len * sizeof(listinfo));
-		m_pre_alloc = Link(m_pre_alloc, block);
-		for (int i = 1; i < m_blk_len; ++i)
-			m_idle = Link(m_idle, block + i);
-	}
-	listinfo* item = m_idle;
-	m_idle = Unlink(m_idle, item);
-	return item;
+	pos = position;
 }
 
 void W3dAniSpr::Render(WView* view, int type, w_spr_align align, int nSprNum)
@@ -563,39 +218,26 @@ void W3dAniSpr::Render(WView* view, const WMatrix& rot, int type, int nSprNum)
 	}
 }
 
-void W3dAniSpr::AddSprite(_WSPRITE* sprite)
+void W3dAniSpr::Rotate(float w, float h, float& rw, float& rh, float angle)
 {
-	m_SpriteList += sprite;
-	++m_nTotalSprite;
+	float cos = gaMath::Cos(angle);
+	float sin = gaMath::Sin(angle);
+	rw = w * cos - h * sin;
+	rh = w * sin + h * cos;
 }
 
-void W3dAniSpr::DelSprite(_WSPRITE* sprite)
+void W3dAniSpr::SetRect(float width, float height, float pivotX, float pivotY)
 {
-	if (sprite)
-	{
-		m_SpriteList -= sprite;
-		delete sprite;
-		--m_nTotalSprite;
-	}
+	w1 = -pivotX;
+	w2 = width - pivotX;
+	h1 = -pivotY;
+	h2 = height - pivotY;
 }
 
-void W3dAniSpr::AllDelSprite()
+void W3dAniSpr::SetColor(const int color)
 {
-	_WSPRITE* sprite;
-	while ((sprite = m_SpriteList.Start()) != 0)
-		DelSprite(sprite);
-	m_SpriteList.Reset();
-}
-
-W3dAniSpr::~W3dAniSpr()
-{
-	AllDelSprite();
-	int handle;
-	while ((handle = m_TextureList.Start()) != 0)
-	{
-		GetResrcManager()->Release(handle);
-		m_TextureList -= handle;
-	}
+	for (int i = 0; i < 4; ++i)
+		vl[i]->diffuse = color;
 }
 
 int W3dAniSpr::LoadSprite(const char* filename, int type)
@@ -679,4 +321,37 @@ int W3dAniSpr::LoadTexture(int handle, float fSprSizeX, float fSprSizeY)
 		fy += fUnitY;
 	}
 	return 1;
+}
+
+void W3dAniSpr::AddSprite(_WSPRITE* sprite)
+{
+	m_SpriteList += sprite;
+	++m_nTotalSprite;
+}
+
+void W3dAniSpr::DelSprite(_WSPRITE* sprite)
+{
+	if (sprite)
+	{
+		m_SpriteList -= sprite;
+		delete sprite;
+		--m_nTotalSprite;
+	}
+}
+
+void W3dAniSpr::AllDelSprite()
+{
+	_WSPRITE* sprite;
+	while ((sprite = m_SpriteList.Start()) != 0)
+		DelSprite(sprite);
+	m_SpriteList.Reset();
+}
+
+_WSPRITE* W3dAniSpr::FindSprite(int index)
+{
+	_WSPRITE* sprite;
+	sprite = m_SpriteList.Start();
+	for (int i = 0; i < index && sprite; ++i)
+		sprite = m_SpriteList.Next();
+	return sprite;
 }

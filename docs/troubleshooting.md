@@ -1,3 +1,13 @@
+This is a guide to troubleshooting mismatching decompilations.
+
+The general best advice for starting here is:
+
+- Always consult the PDB. Use `cvdump` and IDA/Ghidra. The PDB contains many useful hints.
+- When working on a new unit, before even cutting over to the .cpp build, start with the prerequisites. Confirm names using PDB addresses, contributions, references wherever possible.
+- Many symbols have the wrong COMDAT flags in the delink and will need to be marked `any`.
+- Many symbols are not properly named in the delink and need to be matched up when you discover section(s) that should be elided by COMDAT.
+- If you run into a wall, start digging deeper into the compiler behavior itself. We're not going to finish this by getting lucky with thousands of random guesses :)
+
 # `fatal error LNK1169: one or more multiply defined symbols found`
 
 You may run into some issues caused by COMDAT (common data) flags. The final linked executable loses the necessary information to correctly reconstruct section flags. This will result in duplicate symbol errors. To fix this, sections incorrectly marked `IMAGE_COMDAT_SELECT_NODUPLICATES` may need to be re-written to `IMAGE_COMDAT_SELECT_ANY`.
@@ -8,7 +18,7 @@ For example:
 $ python tools/coffsym.py set-selection ./source/client/Wangreal/source/wview.obj '??1WView@@UAE@XZ' any
 ```
 
-# Register allocation troubleshooting
+# Codegen troubleshooting
 
 ## Register allocation varies based on temporaries
 
@@ -69,6 +79,21 @@ Changing between `while` and `do while` has no impact here - it's just the condi
 
 This can happen even if the conditional is eliminated from the code, which is probably why this one is so hard to spot in the first place. It is possibly a case where the developer did an unnecessary `if` guarding a loop.
 
+### Floating point casts can impact scheduling without emitting instructions
+
+With `/Op`, casts to floating point types can impact instruction scheduling counterintuitively. Where a and b are `float`, `a + b` may result in different scheduling than `(float)(a + b)`. This effect applies within subexpressions, e.g. `(float)(c ? a + b : d - e)` is not equivalent to `c ? (float)(a + b) : (float)(d - e)`.
+
+### Code generation variations caused by counterintuitive cost heuristics
+
+- The compiler heuristics used to determine when to apply optimizations like inlining or loop unrolling often depends on seemingly superficial details, like no-op casts, temporaries, wrappers, etc.
+- Equivalent ways of expressing loops often produce identical machine code but different cost heuristics, which can change whether a later call is eligible for inlining.
+
+### Emission order
+
+- Generally, MSVC orders functions roughly by the order of their dependency on inline functions, then by the order they appear in the translation unit.
+- Emission order is dependent on the state at the point the function is defined at the point a function depends on it.
+- Different ways of instantiating functions can sometimes cause emission order to change - explicit args vs forwarding overloads, direct vs indirect operator calls, etc. This may depend on *all* instantiations of a function in a translation unit, so some experimentation will be necessary.
+
 ## General advice
 
 MSVC 7.1 allocates registers lowest-free-first in the order they are created: `ecx`, `edx` then `eax`. Creation order is influenced by source order and not codegen order.
@@ -80,7 +105,7 @@ MSVC 7.1 allocates registers lowest-free-first in the order they are created: `e
 | Named local in ours doesn't exist in PDB                     | Var didn't exist/was narrow, wrong control flow  | Look for widening in PDB line table, convert `do/while` to `for`, etc. |
 | Registers become mismatched at one point                     | Register allocation diverged due to temporaries  | Try re-ordering temporaries                                            |
 
-Generally, as far as we can tell, the following things **do not impact code generation**:
+Generally, as far as we can tell, the following things **usually do not impact code generation** (but sometimes do):
 
 - &p[i] vs p + i
 - Regrouping values (distributive/associativity/commutative)
@@ -90,7 +115,7 @@ Generally, as far as we can tell, the following things **do not impact code gene
 - Different ways of writing `operator=`
 - chained vs separate assignment expressions
 
-The following things **can impact code generation**:
+The following things **often impact code generation**:
 
 - Visibility of non-inlined inline function bodies
 - The actual inlined body, e.g. one-return ternary vs two-return if/else
@@ -151,7 +176,7 @@ $ python tools/coffsym.py set-selection ./source/client/ProjectG/pool.obj '?GetV
 
 The `rename` tool will rename the symbol across the entire tree. This is necessary so that external references can be correctly resolved.
 
-To locate the original symbol, compile with the `/FAcs` flags. It will give you an assembly listing with data and code intermixed. Then, search for a match at a plausible symbol address. Since the relocated operands will be unresolved in the output, they need to be wildcarded. Another challenge is the fact that not all translation units were compiled with the same flags, so sometimes the copy that makes it into the image was built with different compiler flags than the one you're currently looking at. You may have to cycle through different compiler flags, such as `/Op` or `/Oy`.
+In a lot of cases, you can figure out what the symbol is supposed to be by looking for clues in the PDB. If that fails you, then compile with the `/FAcs` flags. It will give you an assembly listing with data and code intermixed. Then, search for a match at a plausible symbol address. Since the relocated operands will be unresolved in the output, they need to be wildcarded. Another challenge is the fact that not all translation units were compiled with the same flags, so sometimes the copy that makes it into the image was built with different compiler flags than the one you're currently looking at. You may have to cycle through different compiler flags, such as `/Op` or `/Oy`.
 
 There may be multiple chunks that match exactly. Unfortunately, it isn't really possible to be 100% sure which chunk corresponds to what you are looking at. Do not rename everything that is a perfect match; only one symbol can possibly be the _actual_ match.
 

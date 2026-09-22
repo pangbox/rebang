@@ -18,6 +18,11 @@ inline float operator*(const WVector& left, const WVector& right)
 	return left.x * right.x + left.y * right.y + left.z * right.z;
 }
 
+inline float WVectorLen(const WVector& vector)
+{
+	return (float)sqrt(vector.SquareMagnitude());
+}
+
 inline WVector WCrossProduct(const WVector& left, const WVector& right)
 {
 	return WVector(left.y * right.z - left.z * right.y,
@@ -32,9 +37,22 @@ inline void WVector::operator+=(const WVector& right)
 	z += right.z;
 }
 
+#ifdef REBANG_LEGACY_CPP
+inline WVector& WVector::operator=(const WVector& other)
+{
+	memcpy(this, &other, sizeof(WVector));
+	return *this;
+}
+#endif
+
 inline float WVector::SquareMagnitude() const
 {
 	return *this * *this;
+}
+
+inline void WVector::Reset()
+{
+	x = y = z = 0.0f;
 }
 
 inline float WVector::Magnitude() const
@@ -50,18 +68,6 @@ inline WVector operator*(const WVector& vector, const WMatrix& matrix)
 			matrix.ym,
 		vector.x * matrix.zx + vector.y * matrix.zy + vector.z * matrix.zz +
 			matrix.zm);
-}
-
-inline Waabb::Waabb()
-{
-	min = WVector(0.0f, 0.0f, 0.0f);
-	max = WVector(0.0f, 0.0f, 0.0f);
-}
-
-inline Waabb::Waabb(const WVector& minimum, const WVector& maximum)
-{
-	min = minimum;
-	max = maximum;
 }
 
 inline int operator&(const Waabb& left, const Waabb& right)
@@ -101,32 +107,17 @@ inline WPlane::WPlane(const WVector& normal_, const WVector& point)
 
 inline int WisEqual(const WVector& left, const WVector& right, float epsilon)
 {
-	float x = left.x - right.x;
-	if (*(unsigned long*)&x & 0x80000000)
-		x = -x;
-	if (!(x < epsilon))
-		return 0;
-
-	float y = left.y - right.y;
-	if (*(unsigned long*)&y & 0x80000000)
-		y = -y;
-	if (!(y < epsilon))
-		return 0;
-
-	float z = left.z - right.z;
-	if (*(unsigned long*)&z & 0x80000000)
-		z = -z;
-	return z < epsilon;
+	return WisEqual(left.x, right.x, epsilon) &&
+		WisEqual(left.y, right.y, epsilon) &&
+		WisEqual(left.z, right.z, epsilon);
 }
 
 inline WVector& WVector::Normalize()
 {
-	float size;
 	if (WisEqual(*this, ZERO, g_EPSILON))
-		size = 0.0f;
+		*this *= 0.0f;
 	else
-		size = 1.0f / Magnitude();
-	*this *= size;
+		*this *= 1.0f / Magnitude();
 	return *this;
 }
 
@@ -154,4 +145,28 @@ inline WMatrix operator*(const WMatrix& left, const WMatrix& right)
 inline float __fastcall TransformZ(const WVector& v, const WMatrix& m)
 {
 	return (v.z * m.zz) + (v.x * m.zx) + (v.y * m.zy) + m.zm;
+}
+
+inline WVector RotVec(const WVector& vector, const WMatrix& matrix)
+{
+	return WVector(vector.x * matrix.xx + vector.y * matrix.xy +
+			vector.z * matrix.xz,
+		vector.x * matrix.yx + vector.y * matrix.yy + vector.z * matrix.yz,
+		vector.x * matrix.zx + vector.y * matrix.zy + vector.z * matrix.zz);
+}
+
+inline WMatrix& WMatrix::operator=(const WMatrix& other)
+{
+	xa = other.xa;
+	ya = other.ya;
+	za = other.za;
+	pivot = other.pivot;
+	return *this;
+}
+
+inline WPlane& WPlane::operator=(const WPlane& other)
+{
+	normal = other.normal;
+	dis = other.dis;
+	return *this;
 }

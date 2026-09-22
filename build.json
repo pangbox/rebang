@@ -649,7 +649,7 @@
         "source/client/Wangreal/source/wboneset.obj",
         "source/client/Wangreal/source/wbone.obj",
         "source/client/Wangreal/source/wxpuppet.cpp",
-        "source/client/Wangreal/source/wpuppet.obj",
+        "source/client/Wangreal/source/wpuppet.cpp",
         "source/client/Wangreal/source/wxtnlbuffer.cpp",
         "source/client/Wangreal/source/baseobject.cpp",
         "source/client/Wangreal/source/wlock.cpp",

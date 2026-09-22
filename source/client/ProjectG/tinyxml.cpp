@@ -28,6 +28,7 @@ distribution.
 #include <locale.h>
 #include "tinyxml.h"
 #include "../Wangreal/include/cfile.h"
+#include "../Wangreal/include/wmemblock.inl"
 #include "../Wangreal/include/wresrcmng.h"
 
 bool TiXmlBase::condenseWhiteSpace = true;

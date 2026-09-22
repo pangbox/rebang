@@ -1,3 +1,4 @@
+#include "wmemblock.inl"
 #include "w3dspr.h"
 #include "wview.h"
 #include "gamath.h"

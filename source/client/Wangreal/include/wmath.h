@@ -81,16 +81,12 @@ public:
 	}
 
 #ifdef REBANG_LEGACY_CPP
-	WVector& operator=(const WVector& other)
-	{
-		memcpy(this, &other, sizeof(WVector));
-		return *this;
-	}
+	WVector& operator=(const WVector& other);
 #else
 	WVector& operator=(const WVector& other) = default;
 #endif
 
-	void Reset() { x = y = z = 0.0f; }
+	void Reset();
 	WVector operator-() const { return WVector(-x, -y, -z); }
 
 	WVector& Normalize();
@@ -150,16 +146,24 @@ public:
 class Waabb
 {
 public:
+	Waabb() { Reset(); }
+	Waabb(const WVector& minimum, const WVector& maximum)
+	{
+		min = minimum;
+		max = maximum;
+	}
 	Waabb(short* minimum, short* maximum);
-	Waabb(const WVector& minimum, const WVector& maximum);
-	Waabb();
 
 	WVector min;
 	WVector max;
 
 	Waabb& operator+=(const Waabb& box);
 	Waabb& operator+=(const WVector& vector);
-	void Reset();
+	void Reset()
+	{
+		min.Reset();
+		max.Reset();
+	}
 	void Default();
 	bool IsInclude(const Waabb& box) const;
 	bool IsInclude(const WVector& vector) const;
@@ -214,21 +218,12 @@ public:
 		  zy(zy_),
 		  xz(xz_),
 		  yz(yz_),
-		  zz(zz_),
-		  xm(0.0f),
-		  ym(0.0f),
-		  zm(0.0f)
+		  zz(zz_)
 	{
+		pivot.Reset();
 	}
 
-	WMatrix& operator=(const WMatrix& other)
-	{
-		xa = other.xa;
-		ya = other.ya;
-		za = other.za;
-		pivot = other.pivot;
-		return *this;
-	}
+	WMatrix& operator=(const WMatrix& other);
 	void operator=(const WQuat& quat);
 	void Normalize();
 	void Reset()
@@ -350,17 +345,19 @@ public:
 		dis = dis_;
 	}
 
-	WPlane& operator=(const WPlane& other)
-	{
-		normal = other.normal;
-		dis = other.dis;
-		return *this;
-	}
+	WPlane& operator=(const WPlane& other);
 };
 
 class WSphere
 {
 public:
+	WSphere() { }
+	WSphere(const WVector& position, float length)
+	{
+		pos = position;
+		radius = length;
+	}
+
 	WVector pos;
 	float radius;
 };
@@ -422,6 +419,7 @@ WMatrix __cdecl Make3rdCamMatrix(const WVector& position,
 WRect __cdecl ScaleRect(WView* view, WRect* rectangle);
 void __cdecl ScalePoint(WView* view, WPoint* point);
 
+float WVectorLen(const WVector& vector);
 WVector RotVec(const WVector& vector, const WMatrix& matrix);
 
 #include "wmath.inl"

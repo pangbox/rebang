@@ -1,3 +1,4 @@
+#include "wmemblock.inl"
 #include "textout.h"
 #include "freetype2.h"
 #include "wresrcmng.h"

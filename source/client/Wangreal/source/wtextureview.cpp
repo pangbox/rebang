@@ -1,3 +1,4 @@
+#include "wmemblock.inl"
 #include "wtextureview.h"
 #include "bitmap.h"
 #include "gamath.h"

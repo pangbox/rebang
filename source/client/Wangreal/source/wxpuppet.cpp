@@ -1,3 +1,4 @@
+#include "wmemblock.inl"
 #include <math.h>
 #include <new>
 #include <stdio.h>

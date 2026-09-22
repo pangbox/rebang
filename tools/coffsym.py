@@ -192,6 +192,7 @@ class Module:
                 and other.storage_class
                 in (IMAGE_SYM_CLASS_EXTERNAL, IMAGE_SYM_CLASS_STATIC)
                 and not other.name.startswith(".")
+                and not (sec.code and other.name.startswith("$"))
             ):
                 end = other.value
         return sym.value, end

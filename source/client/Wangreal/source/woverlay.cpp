@@ -1,3 +1,4 @@
+#include "wmemblock.inl"
 #include "woverlay.h"
 #include <stdio.h>
 

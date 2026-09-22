@@ -1,3 +1,4 @@
+#include "wmemblock.inl"
 #include "wxtnlbuffer.h"
 #include "wmath.h"
 #include "wview.h"
