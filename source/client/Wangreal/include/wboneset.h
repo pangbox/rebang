@@ -21,8 +21,11 @@ public:
 	~WBoneSet();
 	void Clear() { m_keyList.Reset(); }
 	WBoneKey* FindBoneKey(char* name) { return m_keyList.Find(name); }
+	void AddBoneKey(char* name, WQuat* quat, WVector* pivot, float* scale,
+		int flags);
 	void CopyFrom(WBoneSet* source);
-	void Blend(WBoneSet* first, WBoneSet* second, float ratio);
+	__declspec(nothrow) void Blend(WBoneSet* first, WBoneSet* second,
+		float ratio);
 
 private:
 	WList<WBoneKey*> m_keyList;

@@ -365,6 +365,8 @@ public:
 class WQuat
 {
 public:
+	WQuat() DEFAULT_IMPL;
+
 	float x;
 	float y;
 	float z;
@@ -384,6 +386,8 @@ private:
 template <class T>
 T Between(T minimum, T value, T maximum);
 
+WQuat __fastcall WQuaternionSlerp(const WQuat& first, const WQuat& second,
+	float fraction);
 int WisEqual(const WVector& left, const WVector& right, float epsilon);
 Waabb operator+(const Waabb& box, const WVector& vector);
 WMatrix operator*(const WMatrix& left, const WMatrix& right);

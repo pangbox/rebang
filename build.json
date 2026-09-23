@@ -646,7 +646,7 @@
         "source/client/Wangreal/source/woverlay.cpp",
         "source/client/Wangreal/source/w3dspr.cpp",
         "source/client/Wangreal/source/wbone_physics.cpp",
-        "source/client/Wangreal/source/wboneset.obj",
+        "source/client/Wangreal/source/wboneset.cpp",
         "source/client/Wangreal/source/wbone.obj",
         "source/client/Wangreal/source/wxpuppet.cpp",
         "source/client/Wangreal/source/wpuppet.cpp",
