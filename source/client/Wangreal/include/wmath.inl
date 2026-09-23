@@ -13,6 +13,11 @@ inline WVector operator*(const WVector& vector, float scalar)
 	return WVector(vector.x * scalar, vector.y * scalar, vector.z * scalar);
 }
 
+inline WVector operator*(float scalar, const WVector& vector)
+{
+	return vector * scalar;
+}
+
 inline float operator*(const WVector& left, const WVector& right)
 {
 	return left.x * right.x + left.y * right.y + left.z * right.z;
@@ -99,9 +104,53 @@ inline bool Wobb::IsInclude(const WVector& point) const
 		Abs(direction * extend[2]) <= (extend[2] * extend[2]);
 }
 
-inline WPlane::WPlane(const WVector& normal_, const WVector& point)
+inline float __fastcall TransformZ(float x, float y, float z, const WMatrix& m)
 {
-	normal = normal_;
+	return x * m.zx + y * m.zy + z * m.zz + m.zm;
+}
+
+inline void __fastcall SetWMatrix4FromWMatrix(WMatrix4& d, const WMatrix& s)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		*(WVector*)d.m[i] = (&s.xa)[i];
+		d.m[i][3] = 0.0f;
+	}
+	*(WVector*)d.m[3] = s.pivot;
+	d.m[3][3] = 1.0f;
+}
+
+inline WMatrix4::WMatrix4(float p0, float p1, float p2, float p3, float p4,
+	float p5, float p6, float p7, float p8, float p9, float p10, float p11,
+	float p12, float p13, float p14, float p15)
+{
+	p[0] = p0;
+	p[1] = p1;
+	p[2] = p2;
+	p[3] = p3;
+	p[4] = p4;
+	p[5] = p5;
+	p[6] = p6;
+	p[7] = p7;
+	p[8] = p8;
+	p[9] = p9;
+	p[10] = p10;
+	p[11] = p11;
+	p[12] = p12;
+	p[13] = p13;
+	p[14] = p14;
+	p[15] = p15;
+}
+
+inline WMatrix4& WMatrix4::operator=(const WMatrix4& other)
+{
+	memcpy(this, &other, sizeof(WMatrix4));
+	return *this;
+}
+
+inline WPlane::WPlane(const WVector& normal_, const WVector& point)
+	: normal(normal_)
+{
 	dis = -(normal * point);
 }
 

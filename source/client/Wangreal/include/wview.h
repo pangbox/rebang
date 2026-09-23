@@ -24,7 +24,7 @@ public:
 		bool transform);
 	virtual void DrawIndexedTriangles(WTVertex* vertices, int vertexCount,
 		unsigned short* indices, int indexCount, int flags, int transform);
-	virtual bool IsShadowView();
+	virtual bool IsShadowView(void) { return false; }
 	virtual void DrawIndexedTrianglesDirect(WTVertex*, int, unsigned short*,
 		int, int, int);
 
@@ -59,6 +59,7 @@ public:
 	LightSet* xGetLight(void);
 	void xScaleProjMat(int, int);
 	void SetScale(float);
+	float GetScale() const { return m_scale; }
 	void SetProjectionMode(PROJECTION_MODE);
 	WVector Projection(const WVector&);
 	void Projection2(WTVertex*, const WVector&);
@@ -66,7 +67,22 @@ public:
 	void xDrawIndexedTriangles(const WxBatchState&);
 
 protected:
-	void CheckReflectiveAndConvertCullFlag(int&) const;
+	void CheckReflectiveAndConvertCullFlag(int& flag) const
+	{
+		if (m_isReflective)
+		{
+			switch (flag & 0xc00)
+			{
+			case 0:
+				flag |= 0x800;
+				break;
+			case 0x800:
+				flag &= ~0x800;
+				break;
+			}
+		}
+	}
+
 	void SetFOV_Unmodified(float);
 	void CheckViewAndProjTransformUpdateToVideo(void);
 	WVector Projection_Perspective(const WVector&);
@@ -95,6 +111,9 @@ public:
 
 	__forceinline float GetWidth() const { return SCREEN_XS; }
 	__forceinline float GetHeight() const { return SCREEN_YS; }
+	float GetRatio() const { return SCREEN_YS / SCREEN_XS; }
+	float GetClipNearValue() const { return clip_near; }
+	float GetClipFarValue() const { return clip_far; }
 	__forceinline WVideoDev* GetVideoDevice() const
 	{
 		return GetResrcManager()->m_video;

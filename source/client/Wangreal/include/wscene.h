@@ -8,6 +8,15 @@ struct LightSet
 	unsigned int diffuse;
 	unsigned int ambient;
 	unsigned int ambient2;
+
+	LightSet()
+	{
+		type = 0;
+		diffuse = 0;
+		ambient = 0;
+		ambient2 = 0xffffff;
+		nearOne.x = nearOne.y = nearOne.z = 0.0f;
+	}
 };
 
 struct WxBatchState

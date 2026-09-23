@@ -52,6 +52,11 @@ inline int WisEqual(const float& left, const float& right, float epsilon)
 class WVector2D
 {
 public:
+	WVector2D() { }
+	WVector2D(float x_, float y_)
+		: x(x_), y(y_)
+	{
+	}
 	float x;
 	float y;
 };
@@ -102,6 +107,8 @@ public:
 		y *= scalar;
 		z *= scalar;
 	}
+
+	void operator/=(float scalar) { *this *= 1.0f / scalar; }
 
 	void operator-=(const WVector& other)
 	{
@@ -276,25 +283,9 @@ public:
 
 	WMatrix4(float p0, float p1, float p2, float p3, float p4, float p5,
 		float p6, float p7, float p8, float p9, float p10, float p11, float p12,
-		float p13, float p14, float p15)
-	{
-		p[0] = p0;
-		p[1] = p1;
-		p[2] = p2;
-		p[3] = p3;
-		p[4] = p4;
-		p[5] = p5;
-		p[6] = p6;
-		p[7] = p7;
-		p[8] = p8;
-		p[9] = p9;
-		p[10] = p10;
-		p[11] = p11;
-		p[12] = p12;
-		p[13] = p13;
-		p[14] = p14;
-		p[15] = p15;
-	}
+		float p13, float p14, float p15);
+
+	WMatrix4& operator=(const WMatrix4& other);
 
 	static const WMatrix4 IDENTITY;
 	static const WMatrix4 ZERO;

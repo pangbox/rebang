@@ -363,6 +363,8 @@ struct WTVertex
 
 class WVideoDev : public WDevice
 {
+	friend class WView;
+
 public:
 	virtual ~WVideoDev();
 	virtual wVDevState GetDeviceState() = 0;
