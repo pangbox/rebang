@@ -653,7 +653,7 @@
         "source/client/Wangreal/source/wxtnlbuffer.cpp",
         "source/client/Wangreal/source/baseobject.cpp",
         "source/client/Wangreal/source/wlock.cpp",
-        "source/client/Wangreal/source/xzip.obj",
+        "source/client/Wangreal/source/xzip.cpp",
         "source/client/Wangreal/source/xunzip.cpp",
         "source/client/Wangreal/source/wblockmodel.obj",
         "source/client/Wangreal/source/wavi.cpp",
