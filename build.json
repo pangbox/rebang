@@ -660,7 +660,7 @@
         "source/client/Wangreal/source/wreg.cpp",
         "source/shared/tea.cpp",
         "source/client/Wangreal/source/bitmap.cpp",
-        "source/client/Wangreal/source/westpak.obj",
+        "source/client/Wangreal/source/westpak.cpp",
         "source/client/Wangreal/source/wvideo.cpp",
         "source/client/Wangreal/source/wdevmng.cpp",
         "source/client/Wangreal/source/wresrcmng.obj",

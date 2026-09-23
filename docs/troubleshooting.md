@@ -154,6 +154,11 @@ Since these PDBs are old, you can't use `llvm-pdbutil` or most other tools to re
 - If we match our locals to the PDB names and declare them all in one scope, we can deduce which locals originally shared a scope.
 - Locals backed by a register do not have a record.
 - A stack record does not prove the variable was aliased; it could just be a result of register pressure. Lack of copy propagation is more compelling evidence.
+- Parameters and locals can share stack offsets; incorrectly initializing a local that was originally not initialized, or providing a default argument where there wasn't one, can impact this behavior and impact when leaf nodes are merged.
+
+## Zero-initialized globals
+
+Uninitialized declarations and explicit zero initializers for globals have different behaviors with regards to the order and padding of globals. This applies regardless of whether or not the data goes to `.bss`. Check PDB for hints.
 
 ## Header inlines
 
