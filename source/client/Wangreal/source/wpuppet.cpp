@@ -1366,6 +1366,97 @@ int WPuppet::SeekChunkFromPET(cFile* file, char* tag)
 	return 0;
 }
 
+inline int ReadID(cFile* file);
+
+WBone* WPuppet::LoadPET_Bone(cFile* file, int version)
+{
+	char name[256];
+	WBone* root;
+	WBone** bones;
+	int count;
+	WMatrix mat;
+	WMatrix* mats;
+
+	root = 0;
+	if (SeekChunkFromPET(file, "BONE") == 0)
+		return 0;
+	mat.Reset();
+	count = file->GetByte();
+	if (count == 0)
+		file->Read(&count, 2);
+	bones = new WBone*[count];
+	mats = new WMatrix[count];
+	for (int i = 0; i < count; ++i)
+	{
+		name[0] = (char)file->GetByte();
+		if (name[0])
+		{
+			for (char* p = name; *p; *++p = (char)file->GetByte())
+			{
+			}
+		}
+		bones[i] = new WBone;
+		bones[i]->SetName(name);
+		bones[i]->SetIDNumber(i);
+		int parent = ReadID(file);
+		if (root != 0)
+		{
+			if (parent != -1)
+				bones[i]->SetParent(root->FindBone(parent));
+			else
+				root->SetNext(bones[i], true);
+		}
+		else
+		{
+			root = bones[i];
+		}
+		if (version == 0xff || version == 0x82 || version == 0x11b ||
+			version == 6)
+		{
+			file->Read(&mat.xx, 4);
+			file->Read(&mat.yx, 4);
+			file->Read(&mat.zx, 4);
+			file->Read(&mat.xy, 4);
+			file->Read(&mat.yy, 4);
+			file->Read(&mat.zy, 4);
+			file->Read(&mat.xz, 4);
+			file->Read(&mat.yz, 4);
+			file->Read(&mat.zz, 4);
+			file->Read(&mat.xm, 4);
+			file->Read(&mat.ym, 4);
+			file->Read(&mat.zm, 4);
+			WVectorLen(mat.xa);
+			if (version == 6)
+			{
+				mat.xm = mat.xm * 0.32f;
+				mat.ym = mat.ym * 0.32f;
+				mat.zm = mat.zm * 0.32f;
+				mats[i] = mat;
+				if (parent >= 0)
+					mat = mats[i] * ~mats[parent];
+			}
+		}
+		bones[i]->SetBasicMatrix(mat);
+	}
+	delete[] mats;
+	delete[] bones;
+	for (WBone* previous = root; previous->m_next != 0;
+		previous = previous->m_next)
+	{
+		if (strstr(previous->m_next->GetBoneName(), "Bip") != 0 ||
+			strstr(previous->m_next->GetBoneName(), "Bone") != 0 ||
+			strstr(previous->m_next->GetBoneName(), "Dummy") != 0)
+		{
+			WBone* next = previous->m_next;
+			previous->SetNext(0, true);
+			next->SetNext(root, true);
+			root = next;
+			break;
+		}
+	}
+	return root;
+}
+
 inline int ReadID(cFile* file)
 {
 	int id = file->GetByte();
@@ -1810,95 +1901,6 @@ void WPuppet::LoadPET_Frame(cFile* file)
 			found = strstr(found + 3, "msg");
 		}
 	}
-}
-
-WBone* WPuppet::LoadPET_Bone(cFile* file, int version)
-{
-	char name[256];
-	WBone* root;
-	WBone** bones;
-	int count;
-	WMatrix mat;
-	WMatrix* mats;
-
-	root = 0;
-	if (SeekChunkFromPET(file, "BONE") == 0)
-		return 0;
-	mat.Reset();
-	count = file->GetByte();
-	if (count == 0)
-		file->Read(&count, 2);
-	bones = new WBone*[count];
-	mats = new WMatrix[count];
-	for (int i = 0; i < count; ++i)
-	{
-		name[0] = (char)file->GetByte();
-		if (name[0])
-		{
-			for (char* p = name; *p; *++p = (char)file->GetByte())
-			{
-			}
-		}
-		bones[i] = new WBone;
-		bones[i]->SetName(name);
-		bones[i]->SetIDNumber(i);
-		int parent = ReadID(file);
-		if (root != 0)
-		{
-			if (parent != -1)
-				bones[i]->SetParent(root->FindBone(parent));
-			else
-				root->SetNext(bones[i], true);
-		}
-		else
-		{
-			root = bones[i];
-		}
-		if (version == 0xff || version == 0x82 || version == 0x11b ||
-			version == 6)
-		{
-			file->Read(&mat.xx, 4);
-			file->Read(&mat.yx, 4);
-			file->Read(&mat.zx, 4);
-			file->Read(&mat.xy, 4);
-			file->Read(&mat.yy, 4);
-			file->Read(&mat.zy, 4);
-			file->Read(&mat.xz, 4);
-			file->Read(&mat.yz, 4);
-			file->Read(&mat.zz, 4);
-			file->Read(&mat.xm, 4);
-			file->Read(&mat.ym, 4);
-			file->Read(&mat.zm, 4);
-			WVectorLen(mat.xa);
-			if (version == 6)
-			{
-				mat.xm = mat.xm * 0.32f;
-				mat.ym = mat.ym * 0.32f;
-				mat.zm = mat.zm * 0.32f;
-				mats[i] = mat;
-				if (parent >= 0)
-					mat = mats[i] * ~mats[parent];
-			}
-		}
-		bones[i]->SetBasicMatrix(mat);
-	}
-	delete[] mats;
-	delete[] bones;
-	for (WBone* previous = root; previous->m_next != 0;
-		previous = previous->m_next)
-	{
-		if (strstr(previous->m_next->GetBoneName(), "Bip") != 0 ||
-			strstr(previous->m_next->GetBoneName(), "Bone") != 0 ||
-			strstr(previous->m_next->GetBoneName(), "Dummy") != 0)
-		{
-			WBone* next = previous->m_next;
-			previous->SetNext(0, true);
-			next->SetNext(root, true);
-			root = next;
-			break;
-		}
-	}
-	return root;
 }
 
 w_pet_texture_info* WPuppet::LoadPET_Texture(cFile* file, bool alphaTest,

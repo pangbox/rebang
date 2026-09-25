@@ -33,6 +33,20 @@ public:
 	void SetCamera(const WMatrix&);
 	const WMatrix& GetCamera() const { return camera; }
 	const WMatrix& GetInvCamera() const { return invcamera; }
+	bool InFrustum(const WSphere& sphere)
+	{
+		for (int i = 0; i < 6; ++i)
+			if (frustum[i] * sphere.pos > sphere.radius)
+				return false;
+		return true;
+	}
+	bool InFrustumSafe(const WSphere& sphere)
+	{
+		for (int i = 0; i < 6; ++i)
+			if (frustumSafe[i] * sphere.pos + sphere.radius >= 0.0f)
+				return false;
+		return true;
+	}
 	bool ProcessEffect() { return m_bProcessEffect; }
 	bool SetFogEnable(bool);
 	void SetFogState(float, float, unsigned long);
@@ -136,8 +150,11 @@ public:
 protected:
 	const WMatrix& GetLastCamera() { return lastcam; }
 
+public:
 	WMatrix camera;
 	WMatrix invcamera;
+
+protected:
 	WMatrix matrix;
 	WPlane frustum[6];
 	WPlane frustumSafe[6];

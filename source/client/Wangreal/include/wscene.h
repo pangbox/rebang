@@ -3,11 +3,11 @@
 
 struct LightSet
 {
-	unsigned int type;
+	unsigned long type;
 	WVector nearOne;
-	unsigned int diffuse;
-	unsigned int ambient;
-	unsigned int ambient2;
+	unsigned long diffuse;
+	unsigned long ambient;
+	unsigned long ambient2;
 
 	LightSet()
 	{
@@ -56,4 +56,12 @@ struct WxViewState
 	LightSet xLight;
 	WMatrix4 xmView;
 	WMatrix4 xmProj;
+};
+
+class WScene
+{
+public:
+	virtual ~WScene();
+	virtual LightSet* GetLightSet(const WVector& pos);
+	virtual float CollTest(const WVector&, const WVector&, WPlane*, float);
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "rebang.h"
 #include "wtypes.h"
-#include "wminmax.h"
+#include "wutil.h"
 #include <math.h>
 #include <string.h>
 
@@ -26,17 +26,6 @@ namespace
 		(void)g_EPSILON;
 		(void)g_CM_TO_WU;
 	}
-}
-
-template <class T>
-__forceinline T Abs(T value)
-{
-	T result;
-	if (value > 0)
-		result = value;
-	else
-		result = -value;
-	return result;
 }
 
 inline float Wabs(const float& value)
@@ -78,11 +67,13 @@ public:
 		float p[3];
 	};
 
-	__forceinline WVector() DEFAULT_IMPL;
+	WVector() DEFAULT_IMPL;
 
-	__forceinline WVector(float x_, float y_, float z_)
-		: x(x_), y(y_), z(z_)
+	WVector(const float x_, const float y_, const float z_)
 	{
+		x = x_;
+		y = y_;
+		z = z_;
 	}
 
 #ifdef REBANG_LEGACY_CPP
@@ -92,7 +83,7 @@ public:
 #endif
 
 	void Reset();
-	WVector operator-() const { return WVector(-x, -y, -z); }
+	WVector operator-() const;
 
 	WVector& Normalize();
 	void operator+=(const WVector& right);
@@ -101,21 +92,9 @@ public:
 
 	float SquareMagnitude() const;
 
-	void operator*=(float scalar)
-	{
-		x *= scalar;
-		y *= scalar;
-		z *= scalar;
-	}
-
-	void operator/=(float scalar) { *this *= 1.0f / scalar; }
-
-	void operator-=(const WVector& other)
-	{
-		x -= other.x;
-		y -= other.y;
-		z -= other.z;
-	}
+	void operator*=(float scalar);
+	void operator/=(float scalar);
+	void operator-=(const WVector& other);
 
 	static const WVector ONE;
 	static const WVector ZERO;
@@ -175,8 +154,26 @@ public:
 	bool IsInclude(const Waabb& box) const;
 	bool IsInclude(const WVector& vector) const;
 	bool IsInclude(WVector& vector) const;
-	void Clear();
-	void AddPoint(const WVector& vector);
+	void Clear()
+	{
+		min = WVector(3.402823466e+38f, 3.402823466e+38f, 3.402823466e+38f);
+		max = WVector(-3.402823466e+38f, -3.402823466e+38f, -3.402823466e+38f);
+	}
+	void AddPoint(const WVector& vector)
+	{
+		if (vector.x > max.x)
+			max.x = vector.x;
+		if (vector.x < min.x)
+			min.x = vector.x;
+		if (vector.y > max.y)
+			max.y = vector.y;
+		if (vector.y < min.y)
+			min.y = vector.y;
+		if (vector.z > max.z)
+			max.z = vector.z;
+		if (vector.z < min.z)
+			min.z = vector.z;
+	}
 	WVector GetCenter() const;
 };
 
@@ -240,6 +237,7 @@ public:
 	}
 	void GetRotMatrix(WMatrix* result) const;
 	WMatrix operator~() const;
+	void operator*=(float right);
 	void AxisScale(WVector& scale);
 	void Rotate(float angle, char direct);
 	void Rotate(const WVector& rotation);
@@ -356,13 +354,22 @@ public:
 class WQuat
 {
 public:
-	WQuat() DEFAULT_IMPL;
-
 	float x;
 	float y;
 	float z;
 	float w;
 
+	WQuat() DEFAULT_IMPL;
+
+	WQuat(float x_, float y_, float z_, float w_)
+	{
+		x = x_;
+		y = y_;
+		z = z_;
+		w = w_;
+	}
+
+	WQuat& operator=(const WQuat& other);
 	void Reset();
 	void Normalize();
 	void ConvertToAxisAngle(WVector* vector, float* theta);
@@ -374,11 +381,6 @@ private:
 	void SetFromAxisAngle(const WVector& vector, float theta);
 };
 
-template <class T>
-T Between(T minimum, T value, T maximum);
-
-WQuat __fastcall WQuaternionSlerp(const WQuat& first, const WQuat& second,
-	float fraction);
 int WisEqual(const WVector& left, const WVector& right, float epsilon);
 Waabb operator+(const Waabb& box, const WVector& vector);
 WMatrix operator*(const WMatrix& left, const WMatrix& right);

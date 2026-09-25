@@ -1,8 +1,10 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <stdio.h>
 #include "wmath.h"
 #include "wscene.h"
+#include "wvideo.h"
 
 class WScene;
 class WPuppet;
@@ -11,19 +13,22 @@ class WBlockModel;
 class cFile;
 
 struct w_mesh;
+struct w_faces;
+struct w_keyframe;
+struct w_common_bone_data;
 struct w_pet_vertex;
 struct w_pet_tri_point;
 struct w_pet_texture_info;
 
-class w_keyframe_pos
+struct w_keyframe_pos
 {
-	float t;
+	float time;
 	WVector pos;
 };
 
-class w_keyframe_rot
+struct w_keyframe_rot
 {
-	float t;
+	float time;
 	WQuat rot;
 };
 
@@ -97,9 +102,112 @@ public:
 			std::map<w_mesh*, std::vector<WBone::w_normalmerge::N> > m_meshList;
 		};
 
+	public:
+		void AddVertex(w_mesh* mesh, int index);
+
+	private:
+		void MergeNormal();
+		void NormalizeMergedNormals();
+		void ApplyToBlendedNormalList();
+		static P* Find(std::vector<P>& list, const WVector& v);
+		static N* Find(std::vector<N>& list, const WVector& v);
+		static void SetMyNormalsEqualToFirstNormal(w_mesh*,
+			const std::vector<int>&);
 		std::map<float, std::vector<WBone::w_normalmerge::P> > m_wlist;
 	};
 
+	void SetLocalMatrix(const WQuat& quat, const WVector& pos)
+	{
+		m_localMat = quat;
+		m_localMat.pivot = pos;
+	}
+
+	bool IsVisible() { return m_flag.GetFlag(VISIBLE); }
+
+	bool IsHidden() { return m_flag.GetFlag(HIDEBONE); }
+
+	WQuat& GetBasicRot() { return m_basicQuat; }
+
+private:
+	WTVertex* GetVtxBuff() { return m_vtxList; }
+
+	WTVertex* GetVtxBuff(int index) { return m_vtxList + index; }
+
+public:
+	void EnableAlphaBlend(void);
+	void RestoreVtxColor(void);
+	void ResetLight(void);
+	void GetBoneInfo(int* totals);
+	void SetInvisible(bool recursive, bool invisible);
+	void ResetMyNormalList(void);
+
+protected:
+	void CalcLight_Directional(LightSet* light, int flag, WScene* scene);
+
+	void CalcLight_Directional_Per_Bone(LightSet* light, int flag,
+		WScene* scene);
+
+	void CalcLight_Point(LightSet* light, int flag, WScene* scene);
+
+	void CalcLight_Diffuse_Equals_Ambient(LightSet* light, int flag);
+
+	void CalcLight_SelfIllum(void);
+
+public:
+	void ApplyScale(float scale);
+	WQuat GetKeyRot(float time);
+	void SetMatrix(const WMatrix& matrix, WView* view);
+	void CalcENVCoord(WView* view, w_mesh* mesh);
+	void CalcHilightCoord(WView* view, const LightSet& light, w_mesh* mesh);
+	int GetOverlapBox(float* box, WBone* bone);
+	int SaveBoneName(FILE* file, int type, char* name);
+	int SaveAnimationKey(FILE* file, int id, float (*range)[2], int count);
+
+private:
+	int OptimizePosKey(float (*range)[2], int count, w_keyframe_pos** out);
+
+	int OptimizeRotKey(float (*range)[2], int count, w_keyframe_rot** out);
+
+public:
+	void GatherNormalMergeInfo(w_normalmerge& merge) const;
+	static void __fastcall CalcMeshAABB(WBone& bone, w_mesh& mesh);
+	w_mesh* GetIndexedmesh(w_pet_vertex* vertexList, w_pet_tri_point* pointList,
+		WBone** boneList, w_pet_texture_info** texList, int faceNum,
+		int* faceIndexList);
+	w_mesh* CopyMesh(w_mesh* source);
+	void CopyBone(w_common_bone_data* data);
+
+	void SetRigidVtxFlag(void);
+	void AllocVTX(int count);
+	int SetID(int id, bool flag, char* name);
+	bool ChangeTexture(const char* name, int handle);
+	bool ChangeTexture(const char* name, int oldHandle, int handle);
+	void OptimizeBoneSet(float (*range)[2], int count, int child);
+	void CopyBasicMatrix(WBone* root, bool child);
+	void xRender(WView* view, WxBatchState* state, bool setMatrix, int handle,
+		int newHandle);
+
+private:
+	static int __cdecl SortByTextureHandle(const void* left, const void* right);
+
+	char* GetNameSubBip(void);
+
+	bool CheckSuitableForKeyframe(float start, float end, float (*range)[2],
+		int count, bool last);
+
+public:
+	void SetMesh(w_faces* faces, int count);
+	void SetKeyframe(w_keyframe* frame, float end, float start);
+	void ReplaceKeyframe(WBone* bone, float time);
+	w_mesh* GetIndexedmesh(w_faces** faces, int count);
+	unsigned long* FindVColor(const WVector& pos, const WVector& normal);
+
+private:
+	void CountVtxBuff(int count);
+
+	void ClearMesh(w_mesh* mesh);
+
+public:
 	WBone();
 	~WBone();
 	WBone* FindBone(const char* name, unsigned long hashCode);
@@ -242,4 +350,10 @@ public:
 	LightSet m_light;
 	unsigned int m_vtxColor;
 	float m_bonescale;
+
+private:
+	static WTVertex* m_vtxList;
+	static WVector* m_vecList;
+	static int m_vtx_len;
+	static int m_vtx_count;
 };

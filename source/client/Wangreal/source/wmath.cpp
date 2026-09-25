@@ -312,11 +312,8 @@ float __cdecl CalcDeltaAngle(const WVector& v1, const WVector& v2)
 	if ((*(unsigned long*)&la & 0x80000000 ? -la : la) < g_EPSILON ||
 		(*(unsigned long*)&lb & 0x80000000 ? -lb : lb) < g_EPSILON)
 		return 0.0f;
-	// Preserve the float rounding at both boundaries of the original inline call.
-	volatile float cosine = Between<float>(-1.0f, va * vb / (la * lb), 1.0f);
-	volatile float angle = (float)acos((double)cosine);
-	float ang = angle;
-	return v2.x * v1.z - v2.z * v1.x > 0.0f ? ang : -ang;
+	float angle = acosf(Between<float>(-1.0f, va * vb / (la * lb), 1.0f));
+	return v2.x * v1.z - v2.z * v1.x > 0.0f ? angle : -angle;
 }
 
 float __fastcall WCollisionTest(const Waabb& origin, const WVector& vec,

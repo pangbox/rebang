@@ -188,7 +188,7 @@ bool WTextureImposterView::NeedToUpdate(const WMatrix& cam)
 	camMat.ya = WCrossProduct(camMat.za, camMat.xa);
 
 	float dist = toTarget.Magnitude();
-	SetFOV(gaMath::ASin(sphere.radius / dist) * 1280.0f / 480.0f);
+	SetFOV(asinf(sphere.radius / dist) * 1280.0f / 480.0f);
 	float nearClip = dist - sphere.radius;
 	SetClip(nearClip < 0.0f ? 0.0f : nearClip, dist + sphere.radius, false);
 	SetCamera(camMat);

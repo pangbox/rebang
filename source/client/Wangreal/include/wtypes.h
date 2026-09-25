@@ -26,7 +26,7 @@ public:
 	__forceinline void Set(unsigned long value) { this->m_flag = value; }
 	__forceinline void Turn(unsigned long flag, bool on)
 	{
-		if (on)
+		if (on == true)
 			this->m_flag |= flag;
 		else
 			this->m_flag &= ~flag;
