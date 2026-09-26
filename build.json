@@ -633,7 +633,23 @@
         "source/client/Fresh/texturecache/tcachemanager.obj",
         "source/client/Fresh/source/frcontextmenuctrl.obj",
         "source/client/Fresh/source/frtooltip.obj",
-        "source/shared/thirties/gamath.obj",
+        {
+          "path": "source/shared/thirties/gamath.cpp",
+          "flags": [
+            "/MD",
+            "/W3",
+            "/GX",
+            "/Zi",
+            "/O2",
+            "/Gr",
+            "/GS",
+            "/DNDEBUG",
+            "/DWIN32",
+            "/D_WINDOWS",
+            "/D_MBCS"
+          ],
+          "extra_flags": []
+        },
         "source/client/Wangreal/source/wmathutil.cpp",
         "source/client/Wangreal/source/wmath.cpp",
         "source/client/Wangreal/source/wshadowview.cpp",
