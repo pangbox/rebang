@@ -83,6 +83,13 @@ public:
 	}
 	float Right() const { return w + x; }
 	float Bottom() const { return h + y; }
+	bool IsInRect(const WPoint& point)
+	{
+		if (point.x >= x && point.x <= x + w && point.y >= y &&
+			point.y <= y + h)
+			return true;
+		return false;
+	}
 
 	__forceinline WRect() { }
 

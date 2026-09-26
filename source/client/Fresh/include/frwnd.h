@@ -13,6 +13,23 @@ struct FrInputState;
 class FrScrollBar;
 class FrGraphicInterface;
 
+enum eFrStyle
+{
+	FWS_NONE = 0x0,
+	FWS_VISIBLE = 0x1,
+	FWS_DISABLED = 0x2,
+	FWS_HASTITLE = 0x4,
+	FWS_CHILD = 0x8,
+	FWS_TOPMOST = 0x10,
+	FWS_MOVEFRAME = 0x20,
+	FWS_NOMOUSEEVENT = 0x40,
+	FWS_KEYEVENT = 0x80,
+	FWS_FIXED = 0x100,
+	FWS_NODBLCLICK = 0x200,
+	FWS_HOVER = 0x400,
+	FWS_NOWHEELEVENT = 0x800
+};
+
 class FrWnd : public IObject, public FrCmdTarget
 {
 	// Not 100% sure if true.
@@ -43,12 +60,17 @@ public:
 	bool SendCmdToOwnerTarget(eFrCmd cmd, int var1, sFRESH_HANDLER* pHandler);
 	FrGraphicInterface* GDI() const;
 	FrWndManager* WndManager() const { return m_pWndManager; }
+	void SetToolTipText(const std::string& text);
+	bool IsViewFocused() const;
+	bool SetCapture();
+	bool ReleaseCapture();
 	void SetCursor(int cursor);
+	bool PlayPushSound();
 	static const WRTTI m_RTTI;
 
 protected:
 	virtual void OnDraw();
-	virtual void OnProc(float elapsed);
+	virtual void OnProc(const float deltaTime);
 	virtual void OnResize();
 	virtual void OnMouseMove(const WPoint& point);
 	virtual bool OnLButtonUp(const WPoint& point);

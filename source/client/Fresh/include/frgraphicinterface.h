@@ -6,6 +6,8 @@ class Bitmap;
 class FrGraphicInterface
 {
 public:
+	void DrawTexture(const Bitmap* bitmap, const WRect& dst,
+		unsigned long color, int flags) const;
 	void DrawTexture(const Bitmap* bitmap, const WRect& src, const WRect& dst,
 		unsigned long color, int flags) const;
 };
