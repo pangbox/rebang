@@ -23,11 +23,6 @@ __declspec(align(8)) const WMatrix4 WMatrix4::ZERO(0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 __declspec(align(8)) const WVector4 WVector4::ZERO(0.0f, 0.0f, 0.0f, 0.0f);
 
-WVector4::WVector4(float x_, float y_, float z_, float w_)
-	: x(x_), y(y_), z(z_), w(w_)
-{
-}
-
 Waabb& Waabb::operator+=(const WVector& vector)
 {
 	if (vector.x > 0.0f)

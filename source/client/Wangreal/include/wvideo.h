@@ -261,12 +261,17 @@ struct WRenderToTextureSizeInfo
 	static const WRenderToTextureSizeInfo SIZE_HALF;
 	static const WRenderToTextureSizeInfo SIZE_ABS;
 
-	WRenderToTextureSizeInfo();
+	WRenderToTextureSizeInfo() { Reset(); }
 	WRenderToTextureSizeInfo(bool isAbsolute, float width, float height)
 		: m_isAbsolute(isAbsolute), m_width(width), m_height(height)
 	{
 	}
-	void Reset();
+	void Reset()
+	{
+		m_isAbsolute = true;
+		m_width = 0.0f;
+		m_height = 0.0f;
+	}
 };
 
 struct WRenderToTextureParam
@@ -316,10 +321,13 @@ struct WRenderToTextureParam
 	RtTexInfo m_rtTexInfo1;
 	DepthSurfInfo m_depthSurfInfo;
 
-	int GetTexture(unsigned index) const;
+	int GetTexture(unsigned index) const
+	{
+		if (index < NUM_SIMULTANEOUSRTS)
+			return (&m_rtTexInfo0)[index].m_hTex;
+		return 0;
+	}
 	bool CanClearAtOnce() const;
-
-	WRenderToTextureParam();
 };
 
 class WProc;

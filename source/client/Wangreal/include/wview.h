@@ -40,6 +40,18 @@ public:
 				return false;
 		return true;
 	}
+	bool InFrustum(const Waabb& box)
+	{
+		for (int i = 0; i < 6; ++i)
+		{
+			WVector v(frustum[i].x < 0.0f ? box.max.x : box.min.x,
+				frustum[i].y < 0.0f ? box.max.y : box.min.y,
+				frustum[i].z < 0.0f ? box.max.z : box.min.z);
+			if (frustum[i] * v > 0.0f)
+				return false;
+		}
+		return true;
+	}
 	bool InFrustumSafe(const WSphere& sphere)
 	{
 		for (int i = 0; i < 6; ++i)
@@ -74,6 +86,7 @@ public:
 	void xScaleProjMat(int, int);
 	void SetScale(float);
 	float GetScale() const { return m_scale; }
+	float GetFOV_Unmodified() const { return FOV; }
 	void SetProjectionMode(PROJECTION_MODE);
 	WVector Projection(const WVector&);
 	void Projection2(WTVertex*, const WVector&);
@@ -133,6 +146,7 @@ public:
 		return GetResrcManager()->video;
 	}
 	float xGetProjScale() const { return proj_scale; }
+	const WxViewState& xGetViewState() const { return m_xViewState; }
 
 	void xConvScreenRectByProjScale(WRect& rc) const
 	{

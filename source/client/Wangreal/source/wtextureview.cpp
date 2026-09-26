@@ -3,10 +3,6 @@
 #include "bitmap.h"
 #include "gamath.h"
 
-inline WRenderToTextureParam::WRenderToTextureParam()
-{
-}
-
 WTextureView::WTextureView()
 {
 	SetCamera(WMatrix::IDENTITY);

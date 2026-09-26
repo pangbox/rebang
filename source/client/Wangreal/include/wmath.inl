@@ -226,6 +226,47 @@ inline WMatrix4& WMatrix4::operator=(const WMatrix4& other)
 	return *this;
 }
 
+inline WMatrix4 operator*(const WMatrix4& a, const WMatrix4& b)
+{
+	WMatrix4 m;
+	m.m[0][0] = a.m[0][0] * b.m[0][0] + a.m[0][1] * b.m[1][0] +
+		a.m[0][2] * b.m[2][0] + a.m[0][3] * b.m[3][0];
+	m.m[0][1] = a.m[0][0] * b.m[0][1] + a.m[0][1] * b.m[1][1] +
+		a.m[0][2] * b.m[2][1] + a.m[0][3] * b.m[3][1];
+	m.m[0][2] = a.m[0][0] * b.m[0][2] + a.m[0][1] * b.m[1][2] +
+		a.m[0][2] * b.m[2][2] + a.m[0][3] * b.m[3][2];
+	m.m[0][3] = a.m[0][0] * b.m[0][3] + a.m[0][1] * b.m[1][3] +
+		a.m[0][2] * b.m[2][3] + a.m[0][3] * b.m[3][3];
+
+	m.m[1][0] = a.m[1][0] * b.m[0][0] + a.m[1][1] * b.m[1][0] +
+		a.m[1][2] * b.m[2][0] + a.m[1][3] * b.m[3][0];
+	m.m[1][1] = a.m[1][0] * b.m[0][1] + a.m[1][1] * b.m[1][1] +
+		a.m[1][2] * b.m[2][1] + a.m[1][3] * b.m[3][1];
+	m.m[1][2] = a.m[1][0] * b.m[0][2] + a.m[1][1] * b.m[1][2] +
+		a.m[1][2] * b.m[2][2] + a.m[1][3] * b.m[3][2];
+	m.m[1][3] = a.m[1][0] * b.m[0][3] + a.m[1][1] * b.m[1][3] +
+		a.m[1][2] * b.m[2][3] + a.m[1][3] * b.m[3][3];
+
+	m.m[2][0] = a.m[2][0] * b.m[0][0] + a.m[2][1] * b.m[1][0] +
+		a.m[2][2] * b.m[2][0] + a.m[2][3] * b.m[3][0];
+	m.m[2][1] = a.m[2][0] * b.m[0][1] + a.m[2][1] * b.m[1][1] +
+		a.m[2][2] * b.m[2][1] + a.m[2][3] * b.m[3][1];
+	m.m[2][2] = a.m[2][0] * b.m[0][2] + a.m[2][1] * b.m[1][2] +
+		a.m[2][2] * b.m[2][2] + a.m[2][3] * b.m[3][2];
+	m.m[2][3] = a.m[2][0] * b.m[0][3] + a.m[2][1] * b.m[1][3] +
+		a.m[2][2] * b.m[2][3] + a.m[2][3] * b.m[3][3];
+
+	m.m[3][0] = a.m[3][0] * b.m[0][0] + a.m[3][1] * b.m[1][0] +
+		a.m[3][2] * b.m[2][0] + a.m[3][3] * b.m[3][0];
+	m.m[3][1] = a.m[3][0] * b.m[0][1] + a.m[3][1] * b.m[1][1] +
+		a.m[3][2] * b.m[2][1] + a.m[3][3] * b.m[3][1];
+	m.m[3][2] = a.m[3][0] * b.m[0][2] + a.m[3][1] * b.m[1][2] +
+		a.m[3][2] * b.m[2][2] + a.m[3][3] * b.m[3][2];
+	m.m[3][3] = a.m[3][0] * b.m[0][3] + a.m[3][1] * b.m[1][3] +
+		a.m[3][2] * b.m[2][3] + a.m[3][3] * b.m[3][3];
+	return m;
+}
+
 inline float operator*(const WPlane& plane, const WVector& vector)
 {
 	return plane.normal * vector + plane.dis;
@@ -326,4 +367,9 @@ inline bool Wobb::IsInclude(const WVector& point) const
 	return Abs(direction * extend[0]) <= (extend[0] * extend[0]) &&
 		Abs(direction * extend[1]) <= (extend[1] * extend[1]) &&
 		Abs(direction * extend[2]) <= (extend[2] * extend[2]);
+}
+
+inline WVector4::WVector4(float x_, float y_, float z_, float w_)
+	: x(x_), y(y_), z(z_), w(w_)
+{
 }

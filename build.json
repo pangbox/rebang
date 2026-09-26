@@ -636,7 +636,7 @@
         "source/shared/thirties/gamath.obj",
         "source/client/Wangreal/source/wmathutil.cpp",
         "source/client/Wangreal/source/wmath.cpp",
-        "source/client/Wangreal/source/wshadowview.obj",
+        "source/client/Wangreal/source/wshadowview.cpp",
         "source/client/Wangreal/source/wview.cpp",
         "source/client/Wangreal/source/wtextureview.cpp",
         "source/client/Wangreal/source/w3danispr.cpp",
