@@ -663,7 +663,13 @@
         "source/client/Wangreal/source/westpak.cpp",
         "source/client/Wangreal/source/wvideo.cpp",
         "source/client/Wangreal/source/wdevmng.cpp",
-        "source/client/Wangreal/source/wresrcmng.obj",
+        {
+          "path": "source/client/Wangreal/source/wresrcmng.cpp",
+          "includes": [
+            "source/client/Fresh/third_party/libpng-1.2.8",
+            "source/client/Fresh/third_party/zlib-1.2.2"
+          ]
+        },
         "source/client/Fresh/lib/zlib.lib",
         "source/client/Fresh/lib/libpng.lib",
         "source/client/Wangreal/lib/ijl15.lib"

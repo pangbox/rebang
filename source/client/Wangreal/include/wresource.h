@@ -13,6 +13,11 @@ public:
 
 	__forceinline virtual ~WResource() { }
 
+	__forceinline void SetResourceManager(WResourceManager* resrcMng)
+	{
+		m_resrcMng = resrcMng;
+	}
+
 protected:
 	__forceinline WResourceManager* GetResrcManager() const
 	{

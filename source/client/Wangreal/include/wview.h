@@ -130,7 +130,7 @@ public:
 	float GetClipFarValue() const { return clip_far; }
 	__forceinline WVideoDev* GetVideoDevice() const
 	{
-		return GetResrcManager()->m_video;
+		return GetResrcManager()->video;
 	}
 	float xGetProjScale() const { return proj_scale; }
 
@@ -194,4 +194,10 @@ protected:
 
 public:
 	__forceinline virtual ~WView();
+};
+
+class WViewOrth : public WView
+{
+public:
+	virtual ~WViewOrth() { }
 };

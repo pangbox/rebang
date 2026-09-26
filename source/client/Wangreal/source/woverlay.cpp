@@ -44,10 +44,9 @@ int WOverlay::Load(const char* name, unsigned long flags)
 	{
 		m_texWidth = GetResrcManager()->GetTextureWidth(m_texHandle);
 		m_texHeight = GetResrcManager()->GetTextureHeight(m_texHandle);
-		m_devTexWidth =
-			GetResrcManager()->m_video->GetTextureWidth(m_texHandle);
+		m_devTexWidth = GetResrcManager()->video->GetTextureWidth(m_texHandle);
 		m_devTexHeight =
-			GetResrcManager()->m_video->GetTextureHeight(m_texHandle);
+			GetResrcManager()->video->GetTextureHeight(m_texHandle);
 		sprintf(hint, "WOverlay:%s", name);
 		SetLeakHint(hint);
 	}
@@ -68,10 +67,9 @@ int WOverlay::Load(const char* name, Bitmap* bitmap, unsigned long flags)
 	{
 		m_texWidth = GetResrcManager()->GetTextureWidth(m_texHandle);
 		m_texHeight = GetResrcManager()->GetTextureHeight(m_texHandle);
-		m_devTexWidth =
-			GetResrcManager()->m_video->GetTextureWidth(m_texHandle);
+		m_devTexWidth = GetResrcManager()->video->GetTextureWidth(m_texHandle);
 		m_devTexHeight =
-			GetResrcManager()->m_video->GetTextureHeight(m_texHandle);
+			GetResrcManager()->video->GetTextureHeight(m_texHandle);
 		sprintf(hint, "WOverlay:%s", name);
 		SetLeakHint(hint);
 	}

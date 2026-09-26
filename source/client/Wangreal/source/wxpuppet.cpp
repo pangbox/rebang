@@ -37,7 +37,7 @@ int WxPuppet::LoadPET(char* name, bool flag, int loadFlags)
 	{
 		xReleaseTnLBuffer();
 		m_xpTnLBuf = new WxTnLBuffer;
-		WVideoDev* video = GetResrcManager()->m_video;
+		WVideoDev* video = GetResrcManager()->video;
 		int createResult = m_xpTnLBuf->xCreateBuffers(video, this);
 		return m_xpTnLBuf->xFillBuffers() | createResult;
 	}
@@ -50,7 +50,7 @@ void WxPuppet::xUpdateTnLBuffers(bool rebuild)
 	{
 		xReleaseTnLBuffer();
 		m_xpTnLBuf = new WxTnLBuffer;
-		m_xpTnLBuf->xCreateBuffers(GetResrcManager()->m_video, this);
+		m_xpTnLBuf->xCreateBuffers(GetResrcManager()->video, this);
 	}
 	m_xpTnLBuf->xFillBuffers();
 }
@@ -61,7 +61,7 @@ void WxPuppet::xShareTnLResources(WxPuppet* destination)
 	(void)&WList<int>::Next;
 	if (m_xpTnLBuf)
 	{
-		m_xpTnLBuf->xCopy(&destination->m_xpTnLBuf, GetResrcManager()->m_video);
+		m_xpTnLBuf->xCopy(&destination->m_xpTnLBuf, GetResrcManager()->video);
 		destination->m_xpTnLBuf->xSetRootBone(destination);
 	}
 }
@@ -142,7 +142,7 @@ int WxStaticPuppetGrp::xLoad(int count, const char*, WPuppet** puppets)
 	m_xnPets = 0;
 	m_xpapPets = new WPuppet*[count];
 	memcpy(m_xpapPets, puppets, count * sizeof(WPuppet*));
-	m_xTnLBuf.xCreateStaticBuffers(GetResrcManager()->m_video, puppets, count);
+	m_xTnLBuf.xCreateStaticBuffers(GetResrcManager()->video, puppets, count);
 	m_xTnLBuf.xUpdateStaticBufferInfo(puppets, count);
 	m_xTnLBuf.xFillBuffers();
 	m_xnPets = count;

@@ -45,6 +45,16 @@ typedef struct tagWTITLEFONT
 
 class WTitleFont : public WFont
 {
+public:
+	WTitleFont();
+	virtual ~WTitleFont();
+
+protected:
+	virtual float PrintInside(WView* view, float x, float y, const char* text,
+		int, unsigned long, Bitmap* bitmap);
+	virtual float GetTextWidthInside(WView* view, const char* text);
+
+private:
 	WTITLEFONT m_info;
 	int* m_iTexIndex;
 	float* m_fWidthIndex;
@@ -53,4 +63,93 @@ class WTitleFont : public WFont
 	int m_numPerPage;
 	int m_numWidth;
 	int m_numTex;
+};
+
+class WTexFont : public WFont
+{
+public:
+	WTexFont(const char* filename);
+	virtual ~WTexFont();
+	int Load(const char* filename, int type);
+
+protected:
+	virtual float PrintInside(WView* view, float x, float y, const char* text,
+		int, unsigned long, Bitmap* bitmap);
+	virtual float GetTextWidthInside(WView* view, const char* text);
+};
+
+class WFntFont : public WFont
+{
+public:
+	WFntFont(unsigned char* font);
+	virtual ~WFntFont();
+	virtual WFont* MakeClone(void);
+	int Load(const char* filename);
+	virtual void Flush(WView* view);
+	void SetFullEnglish(bool full);
+	virtual void SetFixedWidth(bool fixed);
+
+private:
+	virtual float PrintInside(WView* view, float x, float y, const char* text,
+		int, unsigned long, Bitmap* bitmap);
+	virtual float GetTextWidthInside(WView* view, const char* text);
+
+	bool m_bFullEnglish;
+	bool m_bFixedWidth;
+	unsigned char* m_font;
+	unsigned char m_midbuff[256];
+	Bitmap* m_bitmap[8];
+	int m_cachedHandle[8];
+	int m_updateFrame[8];
+	unsigned short m_cached[128];
+	unsigned char m_cachedFontWidth[128];
+	int m_cacheLen;
+	bool m_clone;
+};
+
+class WFixedFont : public WFont
+{
+public:
+	struct w_fixedtext
+	{
+		int px;
+		int py;
+		int width;
+		char msg[1];
+	};
+
+	struct w_flush_area
+	{
+		w_fixedtext* tex;
+		float x;
+		float y;
+		unsigned long diffuse;
+		int type;
+	};
+
+	WFixedFont(int size);
+	virtual ~WFixedFont();
+	virtual WFont* MakeClone(void);
+	int Load(const char* filename);
+	virtual void Flush(WView* view);
+	void Clear(bool all);
+	void SetFullEnglish(bool full);
+	virtual void SetFixedWidth(bool fixed);
+	void Update();
+	virtual void Reset();
+	virtual int GetFontHeight();
+
+protected:
+	virtual float PrintInside(WView* view, float x, float y, const char* text,
+		int, unsigned long, Bitmap* bitmap);
+	virtual float GetTextWidthInside(WView* view, const char* text);
+
+private:
+	WList<w_fixedtext*> m_textList;
+	w_flush_area m_flush_list[128];
+	int m_flush_num;
+	bool m_update_flag;
+	bool m_bFullEnglish;
+	bool m_bFixedWidth;
+	unsigned char m_pad[0xb0c - 0xad7];
 };
