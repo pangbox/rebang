@@ -20,7 +20,7 @@ public:
 		float, int, unsigned long, unsigned char);
 	void RenderWithShear(WView*, const _WRECT&, const _WRECT&, float, int,
 		unsigned long);
-	virtual void SetCoordMode(int mode);
+	virtual void SetCoordMode(int coordMode) { m_coordMode = coordMode; }
 	void SetClippingArea(const WRect*);
 	void SetClippingArea(WView*, const WRect*);
 	static void DrawLine(WView*, const _WPOINT&, const _WPOINT&, int,
@@ -63,11 +63,11 @@ protected:
 	unsigned int m_texHeight;
 	unsigned int m_devTexWidth;
 	unsigned int m_devTexHeight;
-
-private:
 	WRect m_clipArea;
 	bool m_clipFlag;
 	int m_coordMode;
+
+private:
 	static WTVertex m_vtx[4];
 	static WTVertex* m_vl[5];
 	static WTVertex* m_vtxList[10];

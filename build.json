@@ -642,7 +642,7 @@
         "source/client/Wangreal/source/w3danispr.cpp",
         "source/client/Wangreal/source/textout.cpp",
         "source/client/Wangreal/source/freetype2.cpp",
-        "source/client/Wangreal/source/wfont.obj",
+        "source/client/Wangreal/source/wfont.cpp",
         "source/client/Wangreal/source/woverlay.cpp",
         "source/client/Wangreal/source/w3dspr.cpp",
         "source/client/Wangreal/source/wbone_physics.cpp",
