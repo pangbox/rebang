@@ -11,6 +11,7 @@ class FrWnd;
 class CChatMsg;
 struct FrInputState;
 class FrScrollBar;
+class FrGraphicInterface;
 
 class FrWnd : public IObject, public FrCmdTarget
 {
@@ -39,6 +40,10 @@ public:
 	virtual void MoveWindow(const WPoint& point);
 	virtual void Enable(bool enable);
 	virtual void SetVisible(bool visible);
+	bool SendCmdToOwnerTarget(eFrCmd cmd, int var1, sFRESH_HANDLER* pHandler);
+	FrGraphicInterface* GDI() const;
+	FrWndManager* WndManager() const { return m_pWndManager; }
+	void SetCursor(int cursor);
 	static const WRTTI m_RTTI;
 
 protected:
@@ -55,7 +60,7 @@ protected:
 	virtual const char* OnSelectText(const FrInputState* input) { return NULL; }
 	virtual void OnKeyFocus(CChatMsg* message);
 	virtual void OnSetCursor(bool active, const WPoint& point);
-	virtual void EnableKeyFocus(FrInputState& input) { m_nFlags.Set(0x10); }
+	virtual void EnableKeyFocus(FrInputState& input) { m_nFlags.Enable(0x10); }
 	virtual void SetIconRect(const WRect& rect);
 
 	WFlags m_nFlags;

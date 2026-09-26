@@ -590,7 +590,13 @@
     {
       "library": "source/client/Fresh/lib/Fresh_ReleaseQA.lib",
       "members": [
-        "source/client/Fresh/source/frarea.obj",
+        {
+          "path": "source/client/Fresh/source/frarea.cpp",
+          "pch": "source/client/Fresh/source/stdafx.cpp",
+          "extra_flags": [
+            "/FIstdafx.h"
+          ]
+        },
         "source/client/Fresh/source/frbutton.obj",
         "source/client/Fresh/source/frcmdtarget.cpp",
         "source/client/Fresh/source/frcombobox.obj",
