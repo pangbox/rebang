@@ -4,6 +4,16 @@
 #include "wlist.h"
 #include "wflag.h"
 class WVector;
+class WPuppet;
+
+struct sClubSet
+{
+	IFF_STRUCT::sClubSet* pClubSet;
+	WPuppet* puppet[4];
+	WPuppet* uiPuppet[4];
+	WMatrix uiCamera[4];
+	LightSet uiLight[4];
+};
 
 class CClub
 {
@@ -32,6 +42,10 @@ public:
 	void SelectBestClub();
 	void ClearPointFactor();
 	void SetPointFactor(float factor);
+	sClubSet* FindClubSet(unsigned long typeId);
+	sClubSet* AddClubSet(unsigned long typeId);
+	void ClearClubSet();
+
 	void AddCrypticValue();
 	void Process(float dt);
 
@@ -53,6 +67,7 @@ public:
 	unsigned char GetIndex() { return m_pClub->index; }
 	unsigned char GetID() { return m_pClub->id; }
 	bool Updated() { return m_flag.GetFlag(1); }
+	bool TypeUpdated() { return m_flag.GetFlag(2); }
 	void SelectClubByDist(float distance);
 	bool IsPowerPutter() { return m_bPowerPutter; }
 	bool Is(char* name, sClub* club = NULL)

@@ -338,7 +338,11 @@
       "extra_flags": ["/FIstdafx.h", "/Zd"]
     },
     "source/client/ProjectG/golfcadie.obj",
-    "source/client/ProjectG/golfplayer.obj",
+    {
+      "path": "source/client/ProjectG/golfplayer.cpp",
+      "pch": "source/client/ProjectG/stdafx.cpp",
+      "extra_flags": ["/FIstdafx.h", "/Zd"]
+    },
     {
       "path": "source/client/ProjectG/grid.cpp",
       "pch": "source/client/ProjectG/stdafx.cpp",

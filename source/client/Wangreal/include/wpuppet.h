@@ -210,7 +210,7 @@ public:
 	bool CheckFrameData(int first, int last, int& from, int& to);
 	float GetAnimationLength() { return m_aniLen; }
 	unsigned int GetFrameCount() { return m_framenum; }
-	char* GetFrameData(int);
+	char* GetFrameData(int index) { return m_frame[index].data; }
 	float GetFrameDataTime(int index) { return m_frame[index].num / 30.0f; }
 	bool GetFrameCheck(int);
 	WMatrix& GetMatrix() { return m_mat; }
