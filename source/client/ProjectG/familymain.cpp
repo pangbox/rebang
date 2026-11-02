@@ -690,7 +690,8 @@ ON_FRESH_VV("FAMILY.obar.messenger_alarm", FRCMD_LBUTTONUP, CTaskMain::OnMesseng
 ON_FRESH_VI("FAMILY.obar.gift_alarm", FRCMD_INIT, CTaskMain::OnMessengerGiftAlarmBtnInit)
 ON_FRESH_VV("FAMILY.obar.gift_alarm", FRCMD_LBUTTONUP, CTaskMain::OnMessengerGiftAlarmBtnUp)
 ON_FRESH_VI("FAMILY.obar.tooltip", FRCMD_OWNERDRAW, CTaskMain::OnBarTooltipOwnerDraw)
-END_FRESH_MSGMAP()
+{ 0, FRCMD_NONE, FrFuncNone, 0 }
+};
 // clang-format on
 
 void CFamilyMain::OnInitFamilyMain(int param)
