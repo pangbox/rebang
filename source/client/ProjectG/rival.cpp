@@ -9,11 +9,6 @@
 #include "wind.h"
 #include "commonutil.h"
 
-inline int WisZero(const float& value, float epsilon)
-{
-	return Wabs(value) < epsilon;
-}
-
 CRival::CRival()
 {
 	int& state = m_unknown40;

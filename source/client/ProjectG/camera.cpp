@@ -23,11 +23,6 @@ extern "C" void _WriteBarrier();
 #pragma intrinsic(_WriteBarrier)
 
 extern Fresh* g_pFresh;
-inline int WisZero(const float& f, float epsilon = g_EPSILON)
-{
-	return Wabs(f) < epsilon;
-}
-
 CCamera::CCamera()
 {
 	(void)&g_HUGE;

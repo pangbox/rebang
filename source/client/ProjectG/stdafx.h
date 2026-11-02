@@ -3,10 +3,8 @@
 #define WINVER 0x0400
 #define _WIN32_WINNT 0x0400
 #define _ATL_STATIC_REGISTRY
-
 #define WLIST_ALLOC(size) malloc(size)
 #define WLIST_FREE(ptr) free(ptr)
-
 #include <winsock2.h>
 #include <windows.h>
 #include "../Wangreal/include/wtypes.h"
@@ -27,7 +25,6 @@ ILFILLX1
 #include <atlmisc.h>
 #include <atldlgs.h>
 ILFILLX1B
-
 #include <math.h>
 #include <stdexcept>
 ILFILLX2
@@ -65,6 +62,7 @@ ILNUM_WF1
 #include "wboneset.h"
 #include "wpetfile.h"
 ILNUM_SND0
+#include "wlocalize.h"
 #include "z_ilfill.h"
 ILFILL0
 #include "exception.h"
@@ -75,7 +73,6 @@ ILNUM_EXC
 ILNUM_WOV
 #include "woverlay.h"
 #include "singleton.h"
-
 #include <string>
 #include <list>
 #include <map>
@@ -91,6 +88,7 @@ ILNUM_CU
 #include "../../shared/exceptionreport.h"
 #include "lock.hpp"
 #include "packet.h"
+ILNUM_PK
 #include "titles_client.h"
 ILFILLC
 #include "../../shared/classdefine.h"
@@ -99,6 +97,8 @@ ILFILLC
 #include "clientsocket.h"
 ILFILLEXC
 ILNUM_EXC2
+#include "tweaker.h"
+ILNUM_TWK
 #include "frelement.h"
 ILNUM_FGI
 #include "ucclibrary.h"
@@ -122,11 +122,18 @@ ILFILLF2
 ILFILLTB
 ILNUM_TB0
 #include "frtabbutton.h"
+#include "frgaugebar.h"
+ILNUM_GB
 #include "frwndmanager.h"
 ILNUM_G0
 #include "frgraphicinterface.h"
 #include "fresh.h"
 // HACK: packet.h belongs here
+inline WSendPacket::WSendPacket(enumClientPacket type)
+	: WMemBlock(0x40)
+{
+	InitPacket(type);
+}
 inline WSendPacket::WSendPacket(int type)
 	: WMemBlock(0x40)
 {
@@ -135,7 +142,6 @@ inline WSendPacket::WSendPacket(int type)
 #include "soundmanager.h"
 #include "inputmanager.h"
 ILNUM_G1
-#include "tweaker.h"
 #include "networksystem.h"
 ILNUM_NET
 #include "networkmonitor.h"
@@ -146,7 +152,7 @@ template unsigned int std::vector<CRC_MT::sCRC_CHKTASK*>::size() const;
 #include "projectg.h"
 ILNUM_TB2
 #include "tooltip.h"
-#include "frgaugebar.h"
+ILNUM_GB2
 #include "fremoticon.h"
 #include "frviewer.h"
 #include "../../shared/globalgamedefine.h"
@@ -157,7 +163,7 @@ ILNUM_TB2
 #include "taskmanager.h"
 #include "actor.h"
 #include "taskmain.h"
-#include "scenemanager.h"
+ILNUM_SCENE
 
 // HACK: workaround for unsolved symbol ordering problems
 template void std::vector<WVector>::reserve(unsigned int);

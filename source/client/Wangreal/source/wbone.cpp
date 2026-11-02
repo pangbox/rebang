@@ -19,7 +19,6 @@ int WBone::m_vtx_len = 0;
 int WBone::m_vtx_count = 0;
 
 int WriteID(int, FILE*);
-int WisZero(const float& v, float e);
 bool VECEQU(const WVector&, const WVector&);
 bool QUATEQU(const WQuat&, const WQuat&);
 struct w_keyframe_scale;
@@ -3549,11 +3548,6 @@ void WBone::GetTotalOverlapBox(WVector* min, WVector* max, WMatrix* matrix,
 
 	if (m_child)
 		m_child->GetTotalOverlapBox(min, max, matrix, visibleOnly);
-}
-
-inline int WisZero(const float& v, float e)
-{
-	return Wabs(v) < e;
 }
 
 void WBone::Rotate(float angle, int axis, bool reset)

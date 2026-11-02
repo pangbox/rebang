@@ -8,16 +8,11 @@
 #include "frtooltip.h"
 #include "soundmanager.h"
 
-FRESH_TU_ILFILL
+FRESH_TU_ILFILL_FRWND
 
 extern WView* g_view;
 
 typedef std::list<FrWnd*> FRWNDLIST;
-
-inline int WisZero(const float& v, float e)
-{
-	return Wabs(v) < e;
-}
 
 FrToolTip* FrWnd::m_pToolTip = NULL;
 

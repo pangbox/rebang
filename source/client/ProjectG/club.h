@@ -3,11 +3,19 @@
 #include "encrypttypes.h"
 #include "wlist.h"
 #include "wflag.h"
+#include "wscene.h"
+#include <list>
 class WVector;
 class WPuppet;
 
 struct sClubSet
 {
+	sClubSet()
+	{
+		pClubSet = NULL;
+		memset(puppet, 0, sizeof(puppet));
+	}
+
 	IFF_STRUCT::sClubSet* pClubSet;
 	WPuppet* puppet[4];
 	WPuppet* uiPuppet[4];
@@ -15,10 +23,38 @@ struct sClubSet
 	LightSet uiLight[4];
 };
 
+struct sFindClubSet
+{
+	sFindClubSet(unsigned long tid) { m_tid = tid; }
+	bool operator()(sClubSet* pSet)
+	{
+		return pSet->pClubSet->c.TypeId == m_tid;
+	}
+
+	unsigned long m_tid;
+};
+
 class CClub
 {
 public:
-	enum eClub;
+	enum eClub
+	{
+		CLUB_WOOD_1,
+		CLUB_WOOD_2,
+		CLUB_WOOD_3,
+		CLUB_IRON_2,
+		CLUB_IRON_3,
+		CLUB_IRON_4,
+		CLUB_IRON_5,
+		CLUB_IRON_6,
+		CLUB_IRON_7,
+		CLUB_IRON_8,
+		CLUB_IRON_9,
+		CLUB_WEDGE_P,
+		CLUB_WEDGE_S,
+		CLUB_PUTTER_1,
+		CLUB_PUTTER_2
+	};
 
 	struct sClub
 	{
@@ -35,6 +71,15 @@ public:
 		WCrypticValue<float> barSpeed;
 	};
 
+	CClub();
+	~CClub();
+	float GetAirNightLuckyRange(char* name);
+	float GetAirNightLuckyPower(char* name);
+	unsigned char GetType(unsigned char index);
+	float GetPowerShotFactor();
+	void ClearClubSet();
+	sClubSet* FindClubSet(unsigned long typeId);
+	sClubSet* AddClubSet(unsigned long typeId);
 	const char* GetClubString(eClub club);
 	void SetClub(const char* name);
 	void SetClub(unsigned char index);
@@ -42,10 +87,6 @@ public:
 	void SelectBestClub();
 	void ClearPointFactor();
 	void SetPointFactor(float factor);
-	sClubSet* FindClubSet(unsigned long typeId);
-	sClubSet* AddClubSet(unsigned long typeId);
-	void ClearClubSet();
-
 	void AddCrypticValue();
 	void Process(float dt);
 
@@ -77,7 +118,7 @@ public:
 			result = strstr(club->name, name);
 		else
 			result = strstr(m_pClub->name, name);
-		return result != NULL;
+		return bool(result);
 	}
 	void SetBar(int value) { m_bar = value; }
 	void SetItemWindow(bool value) { m_bItemWindow = value; }
@@ -88,6 +129,13 @@ public:
 	void SetCalcRandomPower(bool bCalc) { m_bCalcRandomPower = bCalc; }
 
 private:
+	void BarProcess(float deltaTime);
+	sClub* SelectClub(unsigned char index);
+	void ClubProcess(float deltaTime);
+	void AddClub(char* name, float range, float lie, float power, float curve,
+		float spin, unsigned char type);
+	void Init();
+
 	int m_reserved;
 	sClub* m_pClub;
 	WList<sClub*> m_clubList;
@@ -108,7 +156,7 @@ private:
 	float m_wideAccuracy;
 	float m_randomPower;
 	bool m_bCalcRandomPower;
-	// TODO: incomplete
+	std::list<sClubSet*> m_clubSetList;
 };
 
 CClub& GolfClub();

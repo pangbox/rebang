@@ -2,12 +2,6 @@
 #include "christamseventdlg.h"
 #include "wresrcmng.h"
 
-// HACK
-inline int WisZero(const float& f, float epsilon = g_EPSILON)
-{
-	return Wabs(f) < epsilon;
-}
-
 inline WVector2D& WVector2D::Normalize()
 {
 	if (WisZero(x) && WisZero(y))

@@ -37,7 +37,6 @@ inline int float2int(float value)
 	return (int)value;
 }
 
-unsigned char GetDifficulty();
 void ResizeScoreBar23(FrArea* bar2, FrArea* bar3, float x, float w);
 
 const char* SCORE_PPL_DIR = "./score_ppl";

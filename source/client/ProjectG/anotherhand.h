@@ -55,3 +55,5 @@ public:
 protected:
 	WorkItem m_aWork[MAX_ANOTHERHAND_WORK];
 };
+
+#include "anotherhand.inl"

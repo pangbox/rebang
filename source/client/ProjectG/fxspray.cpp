@@ -7,11 +7,6 @@
 #include "minatl.h"
 #include "mathconsts.h"
 
-inline int WisZero(const float& f, float epsilon = g_EPSILON)
-{
-	return Wabs(f) < epsilon;
-}
-
 inline WVector operator/(const WVector& vector, float scalar)
 {
 	return vector * (1.0f / scalar);

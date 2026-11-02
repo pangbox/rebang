@@ -83,7 +83,7 @@ public:
 
 	void SubState(unsigned long state) { SetState(m_state & ~state); }
 
-	void SetHeadIcon(int icon) { m_headIcon = icon; }
+	void SetHeadIcon(int icon);
 
 private:
 	void SendMove(const WVector& pos, bool bForce);
@@ -106,7 +106,7 @@ public:
 	char m_followName[22];
 	bool m_bShowProviderId;
 	char m_providerId[128];
-	unsigned long m_guid;
+	int m_guid;
 	bool m_bGM;
 	unsigned char m_mark;
 	bool m_bGoodPlayer;
@@ -127,12 +127,12 @@ public:
 	int m_headIcon;
 	WVector m_moveDir;
 	CRealMyRoom_AvatarBurden m_burden;
-	bool m_bBurdenLoaded;
+	bool m_bCharInfoChanged;
 	sCharacterInfo m_charInfo;
 	CPartTidList m_partTidList;
 	CPetFrame* m_pPetFrame;
 	std::list<sTexturePart*> m_texPartList;
-	float m_height;
+	float m_alpha;
 	LightSet m_light;
 	bool m_bHide;
 	w_motion_data* m_pMotionData;
@@ -142,13 +142,14 @@ public:
 	int m_prevMotion;
 	WBoneSet m_prevBones;
 	float m_blendTime;
-	float m_blendElapsed;
 	float m_motionTime;
+	float m_elapsedTime;
 	float m_facialTime;
 	unsigned long m_lastMotionSendTime;
 	ntBalloonText* m_pBalloon;
-	float m_balloonColor[4];
+	float m_random[3];
 	float m_balloonTime;
+	unsigned long m_balloonElapsed;
 	char m_tradeTitle[64];
 	const Bitmap* m_pEmblem;
 	CRealMyRoomMain* m_pMain;

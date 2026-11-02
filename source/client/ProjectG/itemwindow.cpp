@@ -20,11 +20,6 @@ namespace S5
 void PerformPowerBarSetting();
 int float2int(float value);
 
-inline int WisZero(const float& value, float epsilon)
-{
-	return Wabs(value) < epsilon;
-}
-
 inline CItemWindow::~CItemWindow()
 {
 }

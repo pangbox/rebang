@@ -3364,11 +3364,6 @@ float CQuadTree::CheckCollision(const WVector& pos, const WVector& dir,
 	return minT;
 }
 
-inline int WisZero(const float& value, float epsilon = g_EPSILON)
-{
-	return Wabs(value) < epsilon;
-}
-
 void CQuadTree::CalcGreenPlane()
 {
 	if (WisEqual(m_greenArea.max, m_greenArea.min, g_EPSILON))

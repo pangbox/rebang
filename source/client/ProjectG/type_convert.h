@@ -32,9 +32,9 @@ public:
 		key.from = typeid(From).name();
 		key.to = typeid(To).name();
 
-		converter_map::iterator it = convmap().find(key);
+		converter_map::const_iterator it = convmap().find(key);
 		if (it != convmap().end())
-			(*it).second(from, to);
+			it->second(from, to);
 		else
 			m_bFailed = true;
 	}

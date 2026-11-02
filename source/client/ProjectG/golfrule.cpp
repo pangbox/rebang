@@ -68,12 +68,6 @@ void RequestUccInfo(sUserInfo& info);
 std::string GetMyComputerName();
 extern const char* ball_stop_replay_data_name;
 
-// HACK: Wangreal inlines that other units still link out of line
-inline int WisZero(const float& f, float epsilon = g_EPSILON)
-{
-	return Wabs(f) < epsilon;
-}
-
 ILFILLTU_GOLFRULE3
 
 const char* g_bgmPutting[] = {

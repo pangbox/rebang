@@ -42,12 +42,18 @@ struct sActor
 	const char* name;
 };
 
+typedef std::allocator<const char*>::size_type ActorClassSize;
+
 class CActorFactory
 {
 public:
 	CActorFactory();
 	~CActorFactory();
 
+	void AddActorType(const std::string& name, const std::string& type)
+	{
+		m_actorTypeList[name] = type;
+	}
 	void AddActorClass(const char* className);
 	IActor* CreateActor(const char* className);
 

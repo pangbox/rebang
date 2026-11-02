@@ -2,11 +2,6 @@
 #include "cutinsystem.h"
 #include "clientsetting.h"
 
-inline int WisZero(const float& value, float epsilon = g_EPSILON)
-{
-	return Wabs(value) < epsilon;
-}
-
 const float WAIT_TIME = 0.1f;
 
 namespace

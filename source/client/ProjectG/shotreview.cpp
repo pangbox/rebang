@@ -5,11 +5,6 @@
 #include "quadtree.h"
 #include "mathconsts.h"
 
-inline int WisZero(const float& value, float epsilon)
-{
-	return fabs(value) < epsilon;
-}
-
 SpotHistory::SpotHistory()
 {
 	m_pFont = new CBarFont;

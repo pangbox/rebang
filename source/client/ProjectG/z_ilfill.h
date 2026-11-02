@@ -43,7 +43,7 @@
 			int v; \
 			ILFILLFN(0) \
 			\
-			void g() { ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL16 ILFILL16 ILFILL16 ILFILL4 v += 1; } \
+			void g() { ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL4 ILFILL4 v += 1; v += 1; { v += 1; } { v += 1; } { v += 1; } v += 200; v += 200; v += 200; v += 200; v += 200; v += 200; v += 200; } \
 		}; \
 	}
 
@@ -73,7 +73,7 @@
 		struct Pad \
 		{ \
 			int v; \
-			void g() { ILFILL256 ILFILL16 ILFILL16 ILFILL4 } \
+			void g() { ILFILL64 ILFILL64 ILFILL64 ILFILL16 ILFILL16 ILFILL16 ILFILL4 ILFILL4 ILFILL4 v += 1; v += 1; v += 1; } \
 		}; \
 	}
 
@@ -84,7 +84,7 @@
 		{ \
 			int v; \
 			ILFILLFN(0) ILFILLFN(1) ILFILLFN(2) \
-			void g() { ILFILL64 ILFILL64 ILFILL16 ILFILL4 ILFILL4 ILFILL4 } \
+			void g() { ILFILL64 ILFILL64 v += 1; } \
 		}; \
 	}
 
@@ -104,7 +104,7 @@
 		struct Pad \
 		{ \
 			int v; \
-			void g() { ILFILL64 ILFILL64 ILFILL16 ILFILL4 } \
+			void g() { ILFILL64 ILFILL64 ILFILL16 ILFILL4 v += 1; v += 1; v += 1; v += 200; { v += 1; } { v += 1; } } \
 		}; \
 	}
 
@@ -126,7 +126,7 @@
 			int v; \
 			ILFILLFN(0) ILFILLFN(1) \
 			void h(); \
-			void g() { ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL64 ILFILL64 ILFILL16 ILFILL16 ILFILL16 ILFILL4 ILFILL4 ILFILL4 v += 1; v += 1; v = v + 1; h(); { v += 1; } } \
+			void g() { ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL64 ILFILL64 ILFILL16 ILFILL16 ILFILL4 ILFILL4 ILFILL4 v += 1; v += 1; v += 1; { v += 1; } v += 200; v += 200; } \
 		}; \
 	}
 
@@ -139,7 +139,7 @@
 		struct Pad \
 		{ \
 			int v; \
-			void g() { ILFILL64 ILFILL16 ILFILL16 ILFILL16 ILFILL4 ILFILL4 } \
+			void g() { ILFILL64 ILFILL16 ILFILL16 ILFILL16 ILFILL4 ILFILL4 ILFILL4 ILFILL4 ILFILL4 v += 1; v += 1; v += 1; { v += 1; } { v += 1; } { v += 1; } { v += 1; } v += 200; v += 200; } \
 		}; \
 	}
 
@@ -149,7 +149,7 @@
 		struct Pad \
 		{ \
 			int v; \
-			void g() { ILFILL256 ILFILL256 ILFILL256 ILFILL64 ILFILL64 ILFILL16 ILFILL4 ILFILL4 ILFILL4 v += 1; } \
+			void g() { ILFILL256 ILFILL256 ILFILL256 { v += 1; } { v += 1; } v += 200; v += 200; v += 200; v += 200; v += 200; v += 200; } \
 		}; \
 	}
 
@@ -169,7 +169,7 @@
 		struct Pad \
 		{ \
 			int v; \
-			void g() { ILFILL256 ILFILL64 ILFILL16 ILFILL4 ILFILL4 ILFILL4 v += 1; v += 1; v; } \
+			void g() { ILFILL256 ILFILL64 ILFILL16 ILFILL4 v += 1; v += 1; v; } \
 		}; \
 	}
 
@@ -226,7 +226,7 @@
 		struct Pad \
 		{ \
 			int v; \
-			void g() { ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL64 ILFILL64 ILFILL64 v += 1; } \
+			void g() { ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL256 ILFILL16 ILFILL16 ILFILL16 v += 1; v += 1; v += 1; } \
 		}; \
 	}
 
@@ -262,27 +262,31 @@ inline void ILCOUNT5(){}
 // HACK! pads for symbol numbering; global symbol immediates are hashed by c1 symbol number % 64
 // ILNUM begin
 #define ILNUM_EXC namespace ILNUM_EXC { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; typedef int t45; typedef int t46; typedef int t47; typedef int t48; typedef int t49; typedef int t50; typedef int t51; typedef int t52; typedef int t53; typedef int t54; typedef int t55; typedef int t56; typedef int t57; typedef int t58; typedef int t59; typedef int t60; typedef int t61; typedef int t62; } // n=63
-#define ILNUM_CU namespace ILNUM_CU { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; typedef int t45; typedef int t46; typedef int t47; typedef int t48; typedef int t49; } // n=50
+#define ILNUM_CU namespace ILNUM_CU { typedef int t0; } // n=1
 #define ILNUM_EXC2 namespace ILNUM_EXC2 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; typedef int t45; typedef int t46; } // n=47
-#define ILNUM_NET namespace ILNUM_NET { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; } // n=26
+#define ILNUM_NET namespace ILNUM_NET { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; } // n=20
 #define ILNUM_GDH namespace ILNUM_GDH { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; } // n=35
-#define ILNUM_PSS namespace ILNUM_PSS { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; } // n=19
+#define ILNUM_PSS namespace ILNUM_PSS { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; } // n=23
 #define ILNUM_WF0 namespace ILNUM_WF0 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; } // n=45
 #define ILNUM_WF1 namespace ILNUM_WF1 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; } // n=32
-#define ILNUM_SND0 namespace ILNUM_SND0 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; } // n=17
+#define ILNUM_SND0 namespace ILNUM_SND0 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; } // n=13
 #define ILNUM_WOV namespace ILNUM_WOV { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; } // n=19
 #define ILNUM_FGI namespace ILNUM_FGI { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; } // n=18
 #define ILNUM_FW namespace ILNUM_FW { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; typedef int t45; typedef int t46; typedef int t47; typedef int t48; typedef int t49; typedef int t50; typedef int t51; typedef int t52; typedef int t53; } // n=54
 #define ILNUM_TB0 namespace ILNUM_TB0 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; typedef int t45; typedef int t46; typedef int t47; typedef int t48; typedef int t49; typedef int t50; typedef int t51; typedef int t52; typedef int t53; typedef int t54; typedef int t55; typedef int t56; typedef int t57; typedef int t58; typedef int t59; typedef int t60; typedef int t61; typedef int t62; } // n=63
-#define ILNUM_G0 namespace ILNUM_G0 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; } // n=12
-#define ILNUM_G1 namespace ILNUM_G1 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; typedef int t45; typedef int t46; typedef int t47; typedef int t48; } // n=49
+#define ILNUM_G0 namespace ILNUM_G0 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; } // n=4
+#define ILNUM_G1 namespace ILNUM_G1 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; } // n=4
 #define ILNUM_TB2 namespace ILNUM_TB2 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; } // n=4
-#define ILNUM_UI namespace ILNUM_UI { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; } // n=36
+#define ILNUM_UI namespace ILNUM_UI { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; } // n=38
 #define ILNUM_UT namespace ILNUM_UT { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; typedef int t45; typedef int t46; typedef int t47; typedef int t48; typedef int t49; typedef int t50; typedef int t51; typedef int t52; typedef int t53; typedef int t54; typedef int t55; typedef int t56; typedef int t57; } // n=58
 #define ILNUM_UF namespace ILNUM_UF { typedef int t0; } // n=1
 #define ILNUM_MASCOT namespace ILNUM_MASCOT { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; } // n=11
 #define ILNUM_FXSPRAY namespace ILNUM_FXSPRAY { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; } // n=32
-#define ILNUM_QT namespace ILNUM_QT { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; } // n=22
-#define ILNUM_HELP namespace ILNUM_HELP { "help i'm trapped in a decomp factory" } // n=?
+#define ILNUM_QT namespace ILNUM_QT { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; } // n=24
+#define ILNUM_SCENE namespace ILNUM_SCENE { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; } // n=12
+#define ILNUM_PK namespace ILNUM_PK { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; } // n=6
+#define ILNUM_TWK namespace ILNUM_TWK { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; } // n=45
+#define ILNUM_GB namespace ILNUM_GB { typedef int t0; typedef int t1; typedef int t2; } // n=3
+#define ILNUM_GB2 namespace ILNUM_GB2 { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; typedef int t45; typedef int t46; typedef int t47; typedef int t48; typedef int t49; typedef int t50; typedef int t51; typedef int t52; typedef int t53; typedef int t54; typedef int t55; typedef int t56; typedef int t57; typedef int t58; typedef int t59; typedef int t60; } // n=61
 // ILNUM end
 // clang-format on

@@ -44,11 +44,7 @@ class WSendPacket : public WMemBlock
 {
 public:
 	WSendPacket();
-	WSendPacket(enumClientPacket type)
-		: WMemBlock(0x40)
-	{
-		InitPacket(type);
-	}
+	WSendPacket(enumClientPacket type);
 	WSendPacket(int type);
 	virtual ~WSendPacket();
 

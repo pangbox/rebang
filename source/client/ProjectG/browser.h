@@ -4,8 +4,20 @@
 
 #include "anotherhand.h"
 
-extern ATL::_ATL_FUNC_INFO WindowClosingInfo;
-extern ATL::_ATL_FUNC_INFO DownloadInfo;
+__declspec(selectany) ATL::_ATL_FUNC_INFO BeforeNavigate2Info = {
+	CC_STDCALL, VT_EMPTY, 7,
+	{ VT_DISPATCH, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF,
+				   VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF, VT_VARIANT | VT_BYREF,
+				   VT_BOOL | VT_BYREF }
+};
+__declspec(selectany) ATL::_ATL_FUNC_INFO NavigateComplete2Info = {
+	CC_STDCALL, VT_EMPTY, 2, { VT_DISPATCH, VT_VARIANT | VT_BYREF }
+};
+__declspec(selectany) ATL::_ATL_FUNC_INFO WindowClosingInfo = {
+	CC_STDCALL, VT_EMPTY, 2, { VT_BOOL, VT_BOOL | VT_BYREF }
+};
+__declspec(selectany) ATL::_ATL_FUNC_INFO DownloadInfo = { CC_STDCALL, VT_EMPTY,
+	0, { 0 } };
 
 class CBrowserView : public ATL::CWindowImpl<CBrowserView, ATL::CAxWindow>,
 					 public WTL::CMessageFilter,

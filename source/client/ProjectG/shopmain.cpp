@@ -32,7 +32,6 @@
 #include "lobbytask.h"
 #include "partsinfo.h"
 #include "mathconsts.h"
-#include "anotherhand.inl"
 
 extern Fresh* g_pFresh;
 extern WView* g_view;

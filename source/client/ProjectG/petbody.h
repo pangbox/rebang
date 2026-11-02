@@ -76,7 +76,7 @@ public:
 	void MultRotate(WMatrix* mat);
 	void Update();
 	WMatrix GetMatrix(eBody body);
-	const Waabb& GetBoundBox() const;
+	const Waabb& GetBoundBox() const { return m_pPet->GetBoundBox(); }
 	WPuppet* GetPet();
 	void SetMotion(const char* name, bool bMove, float time, bool bApplyDelta);
 	void SetNextMotion(const char* name, bool bMove);

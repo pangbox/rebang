@@ -10,11 +10,6 @@
 #include "spin.h"
 #include "../../shared/localize.h"
 
-inline int WisZero(const float& f, float epsilon = g_EPSILON)
-{
-	return Wabs(f) < epsilon;
-}
-
 IMPLEMENT_ACTOR(CSpin, IActor)
 
 CSpin::CSpin()

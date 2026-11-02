@@ -6,6 +6,7 @@
 #include "actor.h"
 #include "work.h"
 #include "anotherhand.h"
+#include "scenemanager.h"
 #include "frcmdtarget.h"
 
 static const char* s_taskNames[] = { "CLobbyTask", "CShopTask",
@@ -223,9 +224,15 @@ inline int AfxPostMsg(const IActor* sender, const char* target, int message,
 
 inline CTask* AfxGetTask()
 {
-	if (CTaskManager::Instance() == NULL)
+	if (!CTaskManager::IsInstantiated())
 		return NULL;
 	return CTaskManager::Instance()->GetCurrentTask();
+}
+
+inline CTaskDoc* AfxGetDocument()
+{
+	CTask* task = AfxGetTask();
+	return task ? task->GetDocument() : NULL;
 }
 
 inline CTask* AfxGetPreservedTask()

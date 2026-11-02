@@ -136,7 +136,7 @@ public:
 	static const WMatrixPtrList& GetOrginalMatrixPtrList(
 		const std::string& name);
 
-	void LockBoneSetPos(unsigned char);
+	void LockBoneSetPos(unsigned char pos) { ms_lockedBoneSetPos = pos; }
 	unsigned char GetBoneSetPos() const;
 
 	void SetRenderMode(int mode);

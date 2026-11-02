@@ -194,6 +194,11 @@ inline void SetHoles(unsigned char holes)
 	Doc()->m_golfGame.holes = holes;
 }
 
+inline unsigned char GetStartHole()
+{
+	return Doc()->m_holeOrder[0];
+}
+
 inline unsigned char GetHoleType()
 {
 	return Doc()->m_holeType;
@@ -204,19 +209,9 @@ inline void SetHoleType(unsigned char holeType)
 	Doc()->m_holeType = holeType;
 }
 
-inline unsigned char GetStartHole()
-{
-	return Doc()->m_holeOrder[0];
-}
-
 inline unsigned char GetEndHole()
 {
 	return Doc()->m_holeOrder[GetHoles() - 1];
-}
-
-inline void SetWeather(unsigned char weather)
-{
-	Doc()->m_golfGame.weather = weather;
 }
 
 inline unsigned char GetHoleIndex(unsigned char hole)
@@ -234,14 +229,26 @@ inline unsigned char GetWeather()
 	return Doc()->m_golfGame.weather;
 }
 
-inline unsigned long GetShotTimeLimit()
+inline void SetWeather(unsigned char weather)
 {
-	return Doc()->m_golfGame.shotTimeLimit;
+	Doc()->m_golfGame.weather = weather;
+}
+
+inline unsigned char GetDifficulty()
+{
+	if (Doc()->m_golfGame.pCourse == NULL)
+		return 1;
+	return Doc()->m_golfGame.pCourse->Difficulty;
 }
 
 inline void SetShotTimeLimit(unsigned long limit)
 {
 	Doc()->m_golfGame.shotTimeLimit = limit;
+}
+
+inline unsigned long GetShotTimeLimit()
+{
+	return Doc()->m_golfGame.shotTimeLimit;
 }
 
 inline CItemManager* ItemManager()

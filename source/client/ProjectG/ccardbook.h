@@ -75,7 +75,14 @@ public:
 		m_pSlot = NULL;
 		m_pFont = NULL;
 
-		static char* strBonusNumber = "font_wind.jpg";
+		// HACK! Not sure what was here in the original code.
+		{
+		}
+		{
+		}
+		{
+		}
+		static char* strBonusNumber = "[font_wind.jpg";
 
 		tagWTITLEFONT tf;
 		memset(&tf, 0, sizeof(tf));

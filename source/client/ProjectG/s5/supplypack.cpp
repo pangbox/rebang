@@ -5,11 +5,6 @@
 #include "../../shared/sharedtables.h"
 #include "minatl.h"
 
-inline int WisZero(const float& f, float epsilon = g_EPSILON)
-{
-	return Wabs(f) < epsilon;
-}
-
 inline WVector2D& WVector2D::Normalize()
 {
 	if (WisZero(x) && WisZero(y))

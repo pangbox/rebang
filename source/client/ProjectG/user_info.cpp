@@ -3459,5 +3459,3 @@ int FrUserInfoForm::IsTotalTab()
 {
 	return m_seasonType == SEASON_TOTAL;
 }
-
-#include "anotherhand.inl"

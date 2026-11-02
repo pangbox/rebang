@@ -4,6 +4,7 @@
 #include <list>
 
 #include "fx.h"
+#include "wflag.h"
 
 #include "parttidlist.h"
 
@@ -12,7 +13,23 @@ class CFxSpray;
 class CFxSequence;
 struct sTexturePart;
 
-enum eExhibitType;
+enum eExhibitType
+{
+	EXHIBIT_CHARACTER = 0,
+	EXHIBIT_CADDIE = 1,
+	EXHIBIT_BALL = 2,
+	EXHIBIT_CLUB = 3,
+	EXHIBIT_MATCH = 4,
+	EXHIBIT_ITEM = 5,
+	EXHIBIT_MASCOT = 6,
+	EXHIBIT_FURNITURE = 7,
+	EXHIBIT_FURNITURE_BASE = 8,
+	EXHIBIT_FURNITURE_WALL = 9,
+	EXHIBIT_FURNITURE_FLOOR = 10,
+	EXHIBIT_FURNITURE_ROOM = 11,
+	EXHIBIT_CARD = 12,
+	EXHIBIT_FURNITURE_TEXTURE = 13,
+};
 
 class CExhibition
 {
@@ -65,7 +82,7 @@ public:
 		m_minDist = fMin;
 		m_maxDist = fMax;
 	}
-	void SetControlFlag(unsigned long flag) { m_controlFlag = flag; }
+	void SetControlFlag(unsigned long flag) { m_controlFlag.Set(flag); }
 	void SetAutoRecoverCamera(bool bEnable) { m_bAutoRecover = bEnable; }
 	void SetEnableRotate(bool bEnable) { m_bEnableRotate = bEnable; }
 	void SetEnableZoom(bool bEnable) { m_bEnableZoom = bEnable; }
@@ -75,7 +92,7 @@ public:
 	float GetInitialMotionLength() { return m_motionLength; }
 
 	unsigned long GetTypeId() const { return m_typeId; }
-	float GetDirection() { return m_yaw; }
+	float GetDirection() { return m_angle.y; }
 	WMatrix& GetMatrix() { return m_modelMat; }
 
 protected:
@@ -104,12 +121,9 @@ protected:
 	bool m_bRButtonDown;
 	float m_alpha;
 	float m_prevYaw;
-	float m_pitch;
-	float m_yaw;
-	float m_pitchVel;
-	float m_yawVel;
-	float m_defPitch;
-	float m_defYaw;
+	WVector2D m_angle;
+	WVector2D m_angleVel;
+	WVector2D m_defaultAngle;
 	float m_curDist;
 	float m_dist;
 	float m_defDist;
@@ -138,7 +152,7 @@ protected:
 	eExhibitType m_type;
 	unsigned long m_typeId;
 	unsigned long* m_pAuxParts;
-	unsigned long m_controlFlag;
+	WFlags m_controlFlag;
 	bool m_bNextMotion;
 	float m_dirTime;
 	float m_facialTime;

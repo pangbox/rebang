@@ -64,7 +64,6 @@ ILNUM_QT
 #include "guildactor.h"
 #include "gatewayactor.h"
 #include "avatar_task.h"
-#include "anotherhand.inl"
 #include "minatl.h"
 
 namespace S5
@@ -10160,6 +10159,14 @@ void CRealMyRoomMain::OpenInformation(FrListItem* pItem)
 void CRealMyRoomMain::OpenInformation(unsigned long* pTypeId, sGiftInfo* pGift,
 	unsigned long* pUid)
 {
+	// HACK!
+	typedef int Tls0;
+	typedef int Tls1;
+	typedef int Tls2;
+	typedef int Tls3;
+	typedef int Tls4;
+	typedef int Tls5;
+
 	FrWnd* pWnd =
 		g_pFresh->GetManager()->GetDesktop()->FindChildByName("information");
 	if (pWnd)

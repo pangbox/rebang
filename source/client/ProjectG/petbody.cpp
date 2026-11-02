@@ -22,11 +22,6 @@ const char* GetStrConst(const char* str, char* out);
 int Ceil(float value, float epsilon);
 
 static WMatrix s_headMat(0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-inline int WisZero(const float& f, float epsilon = g_EPSILON)
-{
-	return Wabs(f) < epsilon;
-}
-
 CPetBody::CPetBody(const char* script, bool bOption)
 	: m_scriptHandle(8, 0)
 {

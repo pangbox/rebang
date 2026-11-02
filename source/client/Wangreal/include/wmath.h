@@ -14,24 +14,22 @@ const float g_HUGE = 3.402823466e+38f;
 const float g_EPSILON = 0.00001f;
 const float g_CM_TO_WU = 0.32f;
 
-namespace
+// This is a placeholder; there were probably inlines that used these
+// constants, but we have not recovered them yet.
+inline void InstantiateWangrealMathInlines()
 {
-	// This is a placeholder; there were probably inlines that used these
-	// constants, but we have not recovered them yet.
-	inline void InstantiateWangrealMathInlines()
-	{
-		(void)g_PI;
-		(void)g_2_PI;
-		(void)g_PI_DIV_2;
-		(void)g_HUGE;
-		(void)g_EPSILON;
-		(void)g_CM_TO_WU;
-	}
+	(void)(g_PI, g_2_PI, g_PI_DIV_2);
+	(void)(g_HUGE, g_EPSILON, g_CM_TO_WU);
 }
 
 inline float Wabs(const float& value)
 {
 	return (*(const unsigned long*)&value & 0x80000000) ? -value : value;
+}
+
+inline int WisZero(const float& value, float epsilon = g_EPSILON)
+{
+	return Wabs(value) < epsilon;
 }
 
 inline int WisEqual(const float& left, const float& right, float epsilon)
@@ -103,6 +101,12 @@ public:
 #endif
 
 	void Reset();
+	void Negate()
+	{
+		x = -x;
+		y = -y;
+		z = -z;
+	}
 	WVector operator-() const;
 
 	WVector& Normalize();

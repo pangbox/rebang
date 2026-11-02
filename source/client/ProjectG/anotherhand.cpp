@@ -166,5 +166,3 @@ void CAnotherHand::ResetQueue()
 	m_curWork = 0;
 	m_vacation = 0;
 }
-
-#include "anotherhand.inl"

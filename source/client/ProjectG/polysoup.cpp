@@ -1775,6 +1775,30 @@ namespace ILNUM_POLYSTATS
 	typedef int t1;
 	typedef int t2;
 	typedef int t3;
+	typedef int t4;
+	typedef int t5;
+	typedef int t6;
+	typedef int t7;
+	typedef int t8;
+	typedef int t9;
+	typedef int t10;
+	typedef int t11;
+	typedef int t12;
+	typedef int t13;
+	typedef int t14;
+	typedef int t15;
+	typedef int t16;
+	typedef int t17;
+	typedef int t18;
+	typedef int t19;
+	typedef int t20;
+	typedef int t21;
+	typedef int t22;
+	typedef int t23;
+	typedef int t24;
+	typedef int t25;
+	typedef int t26;
+	typedef int t27;
 }
 
 void WPolySoup::MakeStatistics()

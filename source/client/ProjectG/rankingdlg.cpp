@@ -6,7 +6,6 @@
 #include "emoticondlg.h"
 #include "avatar_task.h"
 #include "avatar_avatar.h"
-#include "anotherhand.inl"
 #include "frtextbutton.h"
 #include "frcombobox.h"
 #include "exhibition.h"
