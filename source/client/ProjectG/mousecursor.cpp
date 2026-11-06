@@ -14,7 +14,6 @@
 extern WMatrix g_camera;
 extern Fresh* g_pFresh;
 bool IsMyTurn(bool check);
-int float2int(float value);
 extern "C" float __fastcall floorf(float value);
 
 class CRealMyRoomTask

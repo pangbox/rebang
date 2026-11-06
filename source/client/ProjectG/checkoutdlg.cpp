@@ -15,7 +15,6 @@
 
 extern Fresh* g_pFresh;
 extern WView* g_view;
-int float2int(float value);
 
 IMPLEMENT_OBJECT(FrCheckoutDlg, FrForm)
 BEGIN_FRESH_MSGMAP(FrCheckoutDlg, FrForm)

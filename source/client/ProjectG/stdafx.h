@@ -49,7 +49,6 @@ ILFILLX2
 #include "bitmap.h"
 #include "wavi.h"
 #include "wpuppet.h"
-#include "wmathutil.inl"
 #include "wview.h"
 ILNUM_WF0
 #include "wfont.h"
@@ -60,10 +59,12 @@ ILNUM_WF1
 #include "westpak.h"
 #include "wblockmodel.h"
 #include "wboneset.h"
+#include "wmathutil.inl"
 #include "wpetfile.h"
 ILNUM_SND0
 #include "wlocalize.h"
-#include "z_ilfill.h"
+#include "commonutil.h"
+ILNUM_CU1
 ILFILL0
 #include "exception.h"
 ILNUM_EXC
@@ -80,7 +81,6 @@ ILNUM_WOV
 #include <algorithm>
 
 #include "basicdebug.h"
-#include "commonutil.h"
 ILNUM_CU
 
 #include "tinyxml.h"
@@ -127,6 +127,7 @@ ILNUM_GB
 #include "frwndmanager.h"
 ILNUM_G0
 #include "frgraphicinterface.h"
+#include "fremoticon.h"
 #include "fresh.h"
 // HACK: packet.h belongs here
 inline WSendPacket::WSendPacket(enumClientPacket type)
@@ -151,9 +152,7 @@ template unsigned int std::vector<CRC_MT::sCRC_CHKTASK*>::size() const;
 #include "mainframe.h"
 #include "projectg.h"
 ILNUM_TB2
-#include "tooltip.h"
 ILNUM_GB2
-#include "fremoticon.h"
 #include "frviewer.h"
 #include "../../shared/globalgamedefine.h"
 #include "../../shared/globalnetworkdefine.h"
@@ -169,6 +168,7 @@ ILNUM_SCENE
 template void std::vector<WVector>::reserve(unsigned int);
 template float Min<float>(float, float);
 #include "shareddoc.h"
+ILNUM_SD
 #include "uccmanager.h"
 #include "frtext.h"
 #include "wtemplate.h"

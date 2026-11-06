@@ -6,12 +6,6 @@
 #include "taskmanager.h"
 #include "actor.h"
 
-template <>
-inline bool _FindByGuid::operator()<sItemInfo>(const sItemInfo& item) const
-{
-	return m_guid == item.guid;
-}
-
 extern Fresh* g_pFresh;
 extern CInputManager* g_input;
 

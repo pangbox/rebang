@@ -89,7 +89,7 @@ public:
 	bool GetPrizeSwitch() const { return m_bPrizeSwitch; }
 
 protected:
-	static const int MAX_HOLE;
+	static const int MAX_HOLE = 18;
 
 	eGMToolResult Parser();
 	bool PhraseSaperator(const char* command);
@@ -102,7 +102,7 @@ protected:
 	void SetConfirmWaitTag(eGMCommandTag tag)
 	{
 		m_confirmWaitTag = tag;
-		m_toolkitStatus = GM_TOOLKIT_CONFIRM_WAIT;
+		SetToolKitStatus(GM_TOOLKIT_CONFIRM_WAIT);
 	}
 	void SetToolKitStatus(eGMToolkitStatus status) { m_toolkitStatus = status; }
 	bool FindItem(unsigned long typeId, char* name) const;
@@ -113,12 +113,12 @@ protected:
 		char buffer[256] = "\0";
 		for (typename M::iterator it = table.begin(); it != table.end(); ++it)
 		{
-			if (FindKeywordInString(it->second.name, keyword))
+			if (FindKeywordInString((*it).second.c.Name, keyword))
 			{
 				memset(buffer, 0, sizeof(buffer));
 				bFind = true;
-				sprintf(buffer, "%12d : %s", it->second.IFF_ITEM_COMMON::typeId,
-					it->second.name);
+				sprintf(buffer, "%12d : %s", (*it).second.c.TypeId,
+					(*it).second.c.Name);
 				Display(buffer, 0xc6ff85);
 			}
 		}

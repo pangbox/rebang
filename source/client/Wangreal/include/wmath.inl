@@ -13,6 +13,11 @@ inline int operator==(const WVector& a, const WVector& b)
 	return WisEqual(a, b, g_EPSILON);
 }
 
+inline int operator!=(const WVector& a, const WVector& b)
+{
+	return !(a == b);
+}
+
 inline WVector WVector::operator-() const
 {
 	return WVector(-x, -y, -z);
@@ -33,12 +38,22 @@ inline WVector operator*(const WVector& vector, float scalar)
 	return WVector(vector.x * scalar, vector.y * scalar, vector.z * scalar);
 }
 
+inline WVector operator/(const WVector& vector, float scalar)
+{
+	return vector * (1.0f / scalar);
+}
+
 inline WVector operator*(float scalar, const WVector& vector)
 {
 	return vector * scalar;
 }
 
 inline float operator*(const WVector& left, const WVector& right)
+{
+	return left.x * right.x + left.y * right.y + left.z * right.z;
+}
+
+inline float WDotProduct(const WVector& left, const WVector& right)
 {
 	return left.x * right.x + left.y * right.y + left.z * right.z;
 }
@@ -156,6 +171,16 @@ inline WMatrix operator*(const WMatrix& matrix, float scalar)
 }
 
 #ifndef WANGREAL_DEVICE
+inline WMatrix RotMat(WVector rotation)
+{
+	return WMatrix(1.0f, 0.0f, 0.0f, 0.0f, cosf(rotation.x), -sinf(rotation.x),
+			   0.0f, sinf(rotation.x), cosf(rotation.x)) *
+		WMatrix(cosf(rotation.y), 0.0f, sinf(rotation.y), 0.0f, 1.0f, 0.0f,
+			-sinf(rotation.y), 0.0f, cosf(rotation.y)) *
+		WMatrix(cosf(rotation.z), sinf(rotation.z), 0.0f, -sinf(rotation.z),
+			cosf(rotation.z), 0.0f, 0.0f, 0.0f, 1.0f);
+}
+
 inline WMatrix RotMat(float angle, char direct)
 {
 	float c = cosf(angle);
@@ -178,12 +203,12 @@ inline WMatrix RotMat(const WVector& axis, float angle)
 	float s = sinf(angle);
 	WVector v = axis;
 	v.Normalize();
-	float t = 1.0f - c;
 
-	return WMatrix(v.x * v.x * t + c, v.x * v.y * t - v.z * s,
-		v.x * v.z * t + v.y * s, v.x * v.y * t + v.z * s, v.y * v.y * t + c,
-		v.y * v.z * t - v.x * s, v.x * v.z * t - v.y * s,
-		v.y * v.z * t + v.x * s, v.z * v.z * t + c);
+	return WMatrix((v.x * v.x) * (1.0f - c) + c,
+		(v.x * v.y) * (1.0f - c) - v.z * s, (v.x * v.z) * (1.0f - c) + v.y * s,
+		(v.x * v.y) * (1.0f - c) + v.z * s, (v.y * v.y) * (1.0f - c) + c,
+		(v.y * v.z) * (1.0f - c) - v.x * s, (v.x * v.z) * (1.0f - c) - v.y * s,
+		(v.y * v.z) * (1.0f - c) + v.x * s, (v.z * v.z) * (1.0f - c) + c);
 }
 #endif
 
@@ -487,18 +512,19 @@ inline float WDotProduct(const WQuat& left, const WQuat& right)
 
 inline WQuat WQuaternionSlerp(const WQuat& from, const WQuat& to, float t)
 {
-	WQuat from1 = from;
+	WQuat from1;
 	float omega, cosom, sinom, scale0, scale1;
 
 	cosom = WDotProduct(from, to);
 
 	if (cosom < 0.0f)
 	{
-		from1.x = -from.x;
-		from1.y = -from.y;
-		from1.z = -from.z;
-		from1.w = -from.w;
+		from1 = WQuat(-from.x, -from.y, -from.z, -from.w);
 		cosom = -cosom;
+	}
+	else
+	{
+		from1 = from;
 	}
 
 	if ((1.0f + cosom) > 0.05f)
@@ -584,15 +610,6 @@ inline void Wobb::operator+=(const WVector& vector)
 	center.z += vector.z;
 }
 
-inline Wobb& Wobb::operator=(const WMatrix& mat)
-{
-	center = mat.pivot;
-	extend[0] = mat.xa;
-	extend[1] = mat.ya;
-	extend[2] = mat.za;
-	return *this;
-}
-
 inline Wobb& Wobb::operator=(const Wobb& obb)
 {
 	center = obb.center;
@@ -606,6 +623,15 @@ inline Waabb& Waabb::operator=(const Waabb& box)
 {
 	min = box.min;
 	max = box.max;
+	return *this;
+}
+
+inline Wobb& Wobb::operator=(const WMatrix& mat)
+{
+	center = mat.pivot;
+	extend[0] = mat.xa;
+	extend[1] = mat.ya;
+	extend[2] = mat.za;
 	return *this;
 }
 

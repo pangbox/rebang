@@ -27,7 +27,6 @@ protected:
 };
 
 extern Fresh* g_pFresh;
-int float2int(float value);
 
 IMPLEMENT_ACTOR(CMascot, IActor)
 
@@ -105,9 +104,10 @@ int CMascot::ChangeMascotMsgInTex(const char* msg,
 					device->SetTextStyle(1);
 					device->SetAlpha(1.0f);
 					device->SetTextColor(0xff000000, 0xff808080);
-					float y = float2int(bitmap->Height() * 0.5f) - 6.0f;
-					float x = float2int(bitmap->Width() * 0.5f);
-					device->PrintText(WPoint(x, y), 1, msg, bitmap);
+					device->PrintText(
+						WPoint(float2int(bitmap->Width() * 0.5f),
+							float2int(bitmap->Height() * 0.5f) - 6.0f),
+						1, msg, bitmap);
 				}
 			}
 			g_resrcmng->ChangeTexturePart(texture, bitmap, rect);

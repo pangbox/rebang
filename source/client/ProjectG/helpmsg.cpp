@@ -8,8 +8,6 @@
 #include "inputmanager.h"
 #include "minatl.h"
 
-int float2int(float value);
-
 CHelpMsg::CHelpMsg()
 	: m_pOverlay(NULL),
 	  m_helpId(-1),

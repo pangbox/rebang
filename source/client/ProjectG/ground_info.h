@@ -33,6 +33,7 @@ public:
 	void Process(float delta);
 	void Display();
 	void SetNormal(const WVector& normal);
+	void SetAngle(float angle) { m_angle = angle; }
 	WMatrix GetBaseMatrix();
 	sBall* ChangeBall(unsigned long typeId);
 	void ChangeTurn();

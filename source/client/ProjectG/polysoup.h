@@ -29,6 +29,7 @@ struct sSoundBox
 
 class WPolySoup : public WResource
 {
+	friend class CSceneManager;
 	friend class CSky;
 	friend class CGolfBg;
 	friend class CAmbientSound;

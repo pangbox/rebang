@@ -9,7 +9,6 @@
 #include "projectg.h"
 #include "../../shared/localize.h"
 extern Fresh* g_pFresh;
-int float2int(float f);
 IMPLEMENT_OBJECT(FrAvatarUserListDlg, FrForm)
 
 BEGIN_FRESH_MSGMAP(FrAvatarUserListDlg, FrForm)

@@ -80,8 +80,6 @@ inline int Abs(int value)
 	return value > 0 ? value : -value;
 }
 
-int float2int(float f);
-
 class ILoginInfo;
 
 class CLoginInfo
@@ -11298,8 +11296,6 @@ void CLobbyMain::OnGameRoom_RoomUserInit(int param)
 	}
 }
 
-int float2int(float f);
-
 void CLobbyMain::OnGameRoom_RoomUserOwnerDraw(int param)
 {
 	FrListItem* pItem = (FrListItem*)param;
@@ -11494,12 +11490,11 @@ void CLobbyMain::OnGameRoom_RoomUserOwnerDraw(int param)
 
 		if (pBmp)
 		{
-			unsigned h = pBmp->Height(), w = pBmp->Width();
-			float x = pItem->pos.x + 90.0f;
-			x -= float2int(pBmp->Width() * 0.5f);
 			pGDI->DrawTexture(pBmp,
-				WRect(x, pItem->pos.y + 68.0f, (float)w, (float)h), 0xffffffff,
-				0);
+				WRect(pItem->pos.x + 90.0f - float2int(pBmp->Width() * 0.5f),
+					pItem->pos.y + 68.0f, (float)pBmp->Width(),
+					(float)pBmp->Height()),
+				0xffffffff, 0);
 		}
 
 		if (pSlot->GuildId && pSlot->IsInvite)

@@ -9494,7 +9494,7 @@ int CTask::OnPacketCommon(WReceivedPacket& packet)
 				for (std::list<sGameServerInfo>::iterator it = servers.begin();
 					it != servers.end(); ++it)
 				{
-					if ((*it).id == info.serverId)
+					if ((*it).guid == info.serverId)
 					{
 						wsprintf(server, "%s", (*it).name);
 						break;

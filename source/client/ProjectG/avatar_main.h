@@ -23,6 +23,8 @@ class FrContextMenuCtrl;
 
 class ntAvatarChatMain : public CTaskMain, public CRenderFuncPtr
 {
+	friend class ntAvatar;
+
 public:
 	DECLARE_OBJECT(ntAvatarChatMain)
 
@@ -200,8 +202,8 @@ protected:
 	int m_chatLineCount;
 	int m_uiMode;
 	unsigned long m_masterOID;
-	bool m_bPreserved0;
-	bool m_bPreserved1;
+	unsigned char m_preservedMap;
+	unsigned char m_preservedHole;
 	bool m_bCameraLock;
 	LightSet m_light;
 	CQuadTree* m_pPVS;

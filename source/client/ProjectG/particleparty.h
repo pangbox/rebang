@@ -80,6 +80,7 @@ public:
 		float m_fEndSize;
 	};
 
+	CDust(void) { }
 	CDust(int nCount);
 	virtual ~CDust(void);
 	virtual void Process(float fElapsed);

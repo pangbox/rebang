@@ -7,8 +7,6 @@
 #include "fx.h"
 #include "wbone.h"
 
-int Ceil(float value, float epsilon);
-int float2int(float value);
 const char* GetStrConst(const char* source, char* dest);
 
 IMPLEMENT_ACTOR(CNPC, IActor)

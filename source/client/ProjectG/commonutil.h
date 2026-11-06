@@ -5,6 +5,31 @@
 #include <stack>
 #include "singleton.h"
 
+inline int float2int(float value)
+{
+	return (int)value;
+}
+
+inline int Ceil(float value, float tolerance)
+{
+	if (value > 0)
+	{
+		int result = (int)value;
+		if (value - result < tolerance)
+			return result;
+
+		return result + 1;
+	}
+	else
+	{
+		int result = (int)value;
+		if (result - value < tolerance)
+			return result;
+
+		return result - 1;
+	}
+}
+
 class cFile;
 class WResourceManager;
 

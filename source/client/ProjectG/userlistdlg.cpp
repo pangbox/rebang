@@ -11,11 +11,6 @@
 #include "packet.h"
 #include "../../shared/localize.h"
 
-inline unsigned long CSharedDoc::GetFriendGameSvrUID()
-{
-	return m_friendGameSvrUID;
-}
-
 extern Fresh* g_pFresh;
 
 IMPLEMENT_OBJECT(FrUserListDlg, FrForm)

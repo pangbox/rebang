@@ -198,7 +198,7 @@ struct _FindByGuid
 	template <class T>
 	bool operator()(const T& t) const
 	{
-		return m_guid == t.id;
+		return m_guid == t.guid;
 	}
 
 	unsigned long m_guid;

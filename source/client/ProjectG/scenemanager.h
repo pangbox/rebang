@@ -75,7 +75,8 @@ struct SceneElement
 		{
 			return false;
 		}
-		return _strcmpi(m_name, name) == 0;
+
+		return strcmpi(m_name, name) == 0;
 	}
 };
 
@@ -121,6 +122,11 @@ struct SceneElemRegister
 	unsigned long m_flags;
 	Waabb* m_pBox;
 };
+
+typedef std::list<SceneElement>::iterator SceneElementIter;
+typedef std::list<CustomElement>::iterator CustomElementIter;
+typedef std::list<TransparentElement>::iterator TransparentElementIter;
+ILNUM_SMI
 
 class CSceneManager : public CStackableSingleton<CSceneManager>
 {

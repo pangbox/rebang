@@ -438,6 +438,14 @@ inline int IsObserver(unsigned long identity)
 	return (identity & 0xe) == 0xe;
 }
 
+inline int IsAdministrator(unsigned long identity)
+{
+	if (identity == 0xffffffff)
+		identity = Doc()->m_myInfo.info.dwIdentity;
+
+	return (identity & 4) == 4;
+}
+
 inline __int64 MyPang()
 {
 	return Doc()->m_myInfo.stat.i64Pang;

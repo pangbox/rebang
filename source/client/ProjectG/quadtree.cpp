@@ -14,7 +14,6 @@
 extern char g_colTex[16][32];
 extern int g_colNum;
 
-int Ceil(float value, float epsilon);
 const char* GetStrConst(const char* source, char* dest);
 
 namespace intersection

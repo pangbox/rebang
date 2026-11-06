@@ -91,7 +91,6 @@ namespace
 }
 
 int WisZero(const float& f, float eps);
-int float2int(float value);
 
 bool IsGameType(unsigned char type)
 {

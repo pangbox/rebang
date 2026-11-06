@@ -10,14 +10,7 @@
 #include "netresourcemanager.h"
 #include "../../shared/localize.h"
 
-int float2int(float value);
 sItemInfo* GetMyItemInfo(unsigned long id);
-
-template <>
-inline bool _FindByGuid::operator()<sItemInfo>(const sItemInfo& item) const
-{
-	return m_guid == item.guid;
-}
 
 extern Fresh* g_pFresh;
 

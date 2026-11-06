@@ -10,7 +10,6 @@
 #include "../../shared/localize.h"
 
 extern Fresh* g_pFresh;
-int float2int(float value);
 void DrawAbility(const sTradeItem& item, FrListItem* row);
 void DrawPartsSlot(WPoint pos, sTradeItem* item)
 {

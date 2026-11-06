@@ -37,6 +37,32 @@ inline int WisEqual(const float& left, const float& right, float epsilon)
 	return Wabs(left - right) < epsilon;
 }
 
+inline float RadianNormalize2PI(float angle)
+{
+	if (angle >= g_2_PI || angle < 0.0f)
+	{
+		angle -= (float)floor(angle * 0.15915494f) * g_2_PI;
+	}
+
+	return angle;
+}
+
+inline float RadianNormalizePI(float angle)
+{
+	angle = RadianNormalize2PI(angle);
+	if (angle > g_PI)
+	{
+		angle -= g_2_PI;
+	}
+
+	return angle;
+}
+
+inline float RadianDelta(float a, float b)
+{
+	return RadianNormalizePI(a - b);
+}
+
 class WVector2D
 {
 public:

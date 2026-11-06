@@ -31,70 +31,6 @@
 #define BONE_PELVIS "Bip01 Pelvis"
 #define OVERLAY_NEAR_Z 0.044f
 
-inline float __fastcall RayIntersectAABB(const Waabb& box, const WVector& start,
-	const WVector& ray, WPlane* result, float radius)
-{
-	for (int i = 0; i < 3; i = (i == 0) ? 2 : ((i == 1) ? 3 : 1))
-	{
-		if (Wabs(ray.p[i]) < g_EPSILON)
-			continue;
-
-		float edge;
-		if (ray.p[i] > 0.0f)
-		{
-			if (box.max.p[i] + radius < start.p[i])
-				return 1.0f;
-			edge = box.min.p[i] - radius;
-			if (start.p[i] + ray.p[i] < edge)
-				return 1.0f;
-			if (start.p[i] > edge)
-				continue;
-		}
-		else
-		{
-			if (box.min.p[i] - radius > start.p[i])
-				return 1.0f;
-			edge = box.max.p[i] + radius;
-			if (start.p[i] + ray.p[i] > edge)
-				return 1.0f;
-			if (start.p[i] < edge)
-				continue;
-		}
-
-		float t = (edge - start.p[i]) / ray.p[i];
-		int j;
-		for (j = 0; j < 3; ++j)
-		{
-			if (j == i)
-				continue;
-			float hit = start.p[j] + t * ray.p[j];
-			if (hit < box.min.p[j] - radius || hit > box.max.p[j] + radius)
-				break;
-		}
-		if (j == 3)
-		{
-			if (result)
-			{
-				for (int k = 0; k < 3; ++k)
-				{
-					if (k != i)
-					{
-						result->normal.p[k] = 0.0f;
-					}
-					else
-					{
-						result->normal.p[k] = ray.p[k] < 0.0f ? 1.0f : -1.0f;
-						result->dis = -(
-							(start.p[k] + t * ray.p[k]) * result->normal.p[k]);
-					}
-				}
-			}
-			return t;
-		}
-	}
-	return 1.0f;
-}
-
 const char* __fastcall GetStrConst(const char* src, char* dest);
 const char* GetCharsTillSpace(const char* str, char* out);
 
@@ -122,15 +58,6 @@ static const char* g_faceTexture[10][4] = {
 };
 
 #include "balloontext.h"
-
-inline float __fastcall RadianNormalize2PI(float angle)
-{
-	if (angle >= g_2_PI || angle < 0.f)
-		angle -= (float)floor(angle * .15915494f) * g_2_PI;
-	return angle;
-}
-
-int __fastcall Ceil(float value, float epsilon);
 
 unsigned long ModifyColor(unsigned long color, float factor);
 
@@ -1111,7 +1038,7 @@ void CRealMyRoom_Avatar::RenderOverlay(bool bDetail)
 		else if (m_bGoodPlayer)
 			pIcon = static_cast<WOverlay*>(m_pMain->m_pMannerMark[m_mark % 2]);
 		else
-			pIcon = static_cast<WOverlay*>(m_pMain->m_pSexMark[0][m_mark]);
+			pIcon = static_cast<WOverlay*>(m_pMain->m_pSexMark[m_mark]);
 
 		unsigned int emblemWidth = m_pEmblem ? m_pEmblem->Width() : 0;
 		int iconWidth = pIcon->GetWidth();
@@ -1173,7 +1100,8 @@ void CRealMyRoom_Avatar::ScriptProcess(const w_motion_data* motion, float from,
 		end =
 			Wabs((float)floor(to) - to) < 1e-5f ? (int)to - 1 : (int)floor(to);
 
-		if (start == (int)floor(motion->s * 30.0f + 0.5f))
+		int startFrame = (int)floor(motion->s * 30.0f + 0.5f);
+		if (start == startFrame)
 			start++;
 
 		if (start > end)

@@ -128,7 +128,7 @@ public:
 	T End(void*& pos) const
 	{
 		pos = m_list ? m_list->prev : 0;
-		return m_list ? m_list->prev->item : 0;
+		return m_list ? ((listinfo*)pos)->item : 0;
 	}
 	T Prev(void*& pos) const
 	{

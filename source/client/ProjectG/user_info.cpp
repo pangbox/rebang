@@ -16,7 +16,6 @@
 extern Fresh* g_pFresh;
 extern WResourceManager* g_resrcmng;
 
-int float2int(float value);
 void RemakeNumber(int value, char* text);
 
 IMPLEMENT_OBJECT(FrUserInfoForm, FrForm)
@@ -902,7 +901,7 @@ void FrUserInfoForm::UpdateEditUserLocation()
 						 Doc()->m_gameServerList.begin();
 					it != Doc()->m_gameServerList.end(); ++it)
 				{
-					if ((*it).id == buddy->userPosition.iServerGUID)
+					if ((*it).guid == buddy->userPosition.iServerGUID)
 					{
 						wsprintf(text, "%s", (*it).name);
 						bFind = true;

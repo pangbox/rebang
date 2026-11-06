@@ -33,12 +33,6 @@ const char* GetUccItemName(unsigned long typeId, const char* index);
 #include "taskmanager.h"
 #include "binstr.h"
 
-template <>
-inline bool _FindByGuid::operator()<sItemInfo>(const sItemInfo& item) const
-{
-	return m_guid == item.guid;
-}
-
 template <class T, class P>
 bool TSafeNew(P& p, unsigned int count)
 {

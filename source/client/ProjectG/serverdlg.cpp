@@ -613,11 +613,11 @@ void FrServerDlg::ConnectToServer(unsigned long serverUID)
 		FrListItem* item = m_pServerList->GetItem(count - i);
 		if (item && (server = (sGameServerInfo*)item->pData) && server->name[0])
 		{
-			if (!Doc()->m_curGameServer.id)
+			if (!Doc()->m_curGameServer.guid)
 				Doc()->m_curGameServer = m_curServer;
-			else if (Doc()->m_curGameServer.id == server->id)
+			else if (Doc()->m_curGameServer.guid == server->guid)
 				continue;
-			if (server->id == serverUID)
+			if (server->guid == serverUID)
 				break;
 		}
 	}
@@ -630,7 +630,7 @@ void FrServerDlg::ConnectToServer()
 	m_pChannelList->Enable(false);
 	Doc()->m_gameServerAddr = m_curServer.addr;
 	Doc()->m_gameServerPort = m_curServer.port;
-	Doc()->m_gameServerUID = m_curServer.id;
+	Doc()->m_gameServerUID = m_curServer.guid;
 	if (NET()->IsConnected(WNetworkSystem::NET_GAME))
 		NET()->ForceShutDown(WNetworkSystem::NET_GAME);
 	NET()->SendMessage(WNetworkSystem::NET_GAME, NetworkUnit::eEVENT_NEXT);
@@ -715,7 +715,7 @@ void FrServerDlg::OnServerListBtnDown()
 		return;
 	sGameServerInfo* server = (sGameServerInfo*)item->pData;
 	if (!server || !server->name[0] ||
-		Doc()->m_curGameServer.id == server->id || m_reconnectDelay > 0)
+		Doc()->m_curGameServer.guid == server->guid || m_reconnectDelay > 0)
 		return;
 	if (!(Doc()->m_myInfo.info.dwIdentity & 0x8014))
 	{
@@ -847,7 +847,7 @@ void FrServerDlg::OnServerListOwnerDraw(int param)
 	if (strcmp(server->name, "") != 0)
 	{
 		graphic->SetTextStyle(1);
-		if (Doc()->m_curGameServer.id == server->id)
+		if (Doc()->m_curGameServer.guid == server->guid)
 		{
 			graphic->DrawTexture(m_pImgConnection,
 				WRect(item->pos.x + 9.0f, item->pos.y + 3.0f,
@@ -1262,7 +1262,7 @@ void FrServerDlg::FailedToConnectServer()
 {
 	if (NET()->IsConnected(WNetworkSystem::NET_GAME))
 		NET()->ForceShutDown(WNetworkSystem::NET_GAME);
-	Doc()->m_curGameServer.id = 0;
+	Doc()->m_curGameServer.guid = 0;
 	m_bConnecting = false;
 	m_state = (gsLoginState_t)0;
 	m_pCurServer->SetCaption(Doc()->m_curGameServer.name);

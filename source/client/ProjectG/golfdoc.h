@@ -41,7 +41,7 @@ struct sWinningPrize
 struct sPrizeInfo
 {
 	unsigned long typeId;
-	unsigned char unknown[2];
+	unsigned short unknown;
 	unsigned short quantity;
 	int type;
 };

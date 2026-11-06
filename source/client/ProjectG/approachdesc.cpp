@@ -1,18 +1,6 @@
 #include "stdafx.h"
 
-class DescBlock
-{
-public:
-	DescBlock() { memset(m_desc, 0, sizeof(m_desc)); }
-	virtual ~DescBlock() { }
-
-protected:
-	virtual void BuildDesc(unsigned long param1, unsigned long param2,
-		const char* name)
-	{
-	}
-	char m_desc[128];
-};
+#include "approachdesc.h"
 
 class Mission_1 : public DescBlock
 {
@@ -849,16 +837,6 @@ public:
 			"\xb0\xa1\xc0\xe5 \xbb\xa1\xb8\xae \xc4\xa8\xc0\xce\xc0\xbb \xc7\xd1 \xc0\xaf\xc0\xfa\xb4\xc2 \xb9\xcc\xbc\xc7\xbc\xba\xb0\xf8.";
 		strcpy(m_desc, text);
 	}
-};
-
-class CApproachDesc
-{
-public:
-	CApproachDesc(int mission, unsigned long param1, unsigned long param2,
-		const char* name);
-
-private:
-	DescBlock* m_desc;
 };
 
 CApproachDesc::CApproachDesc(int mission, unsigned long param1,

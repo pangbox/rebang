@@ -8238,256 +8238,54 @@ void CGolfRule::DoFlyBall_Flying(float delta)
 		CCameraWork::Instance()->Process(delta, 1.0f - t);
 }
 
-#ifndef REBANG_SEMANTIC_ONLY
-extern "C" void __cdecl rb_GetPVS__YIAAVCQuadTree__XZ(void);
-#pragma comment(linker, \
-	"/alternatename:_rb_GetPVS__YIAAVCQuadTree__XZ=?GetPVS@@YIAAVCQuadTree@@XZ")
-extern "C" void __cdecl rb_GetPlayer_CGolfDoc__QAEPAUsPlayerData__E_Z(void);
-#pragma comment(linker, \
-	"/alternatename:_rb_GetPlayer_CGolfDoc__QAEPAUsPlayerData__E_Z=?GetPlayer@CGolfDoc@@QAEPAUsPlayerData@@E@Z")
-extern "C" void __cdecl rb_SetWind_CWind__QAEXABVWVector___Z(void);
-#pragma comment(linker, \
-	"/alternatename:_rb_SetWind_CWind__QAEXABVWVector___Z=?SetWind@CWind@@QAEXABVWVector@@@Z")
-extern "C" void __cdecl rb_Wind__YIAAVCWind__XZ(void);
-#pragma comment(linker, \
-	"/alternatename:_rb_Wind__YIAAVCWind__XZ=?Wind@@YIAAVCWind@@XZ")
-extern "C" int rb_m_pInstance___WSingleton_VCSharedDoc____1PAVCSharedDoc__A;
-#pragma comment(linker, \
-	"/alternatename:_rb_m_pInstance___WSingleton_VCSharedDoc____1PAVCSharedDoc__A=?m_pInstance@?$WSingleton@VCSharedDoc@@@@1PAVCSharedDoc@@A")
-__declspec(naked) bool CGolfRule::GetShotCntData()
-{
-	__asm {
-		push ebp
-		mov ebp, esp
-		sub esp, 8
-		mov edx, dword ptr [rb_m_pInstance___WSingleton_VCSharedDoc____1PAVCSharedDoc__A]
-		cmp dword ptr [edx+5B94h], 0Eh
-		push ebx
-		push esi
-		mov esi, dword ptr [edx+50F0h]
-		mov eax, 1
-		push edi
-		mov ebx, ecx
-		mov edi, eax
-		mov byte ptr [ebp-1], 0
-		jne LGetShotCntData_003c
-		pop edi
-		pop esi
-		mov dword ptr [edx+5BCCh], 0
-		pop ebx
-		mov esp, ebp
-		pop ebp
-		ret
-	LGetShotCntData_003c:
-		mov ecx, dword ptr [edx+5BCCh]
-		cmp ecx, esi
-		jg LGetShotCntData_0050
-		je LGetShotCntData_005c
-		add dword ptr [edx+5BCCh], eax
-		jmp LGetShotCntData_0056
-	LGetShotCntData_0050:
-		mov dword ptr [edx+5BCCh], esi
-	LGetShotCntData_0056:
-		mov edx, dword ptr [rb_m_pInstance___WSingleton_VCSharedDoc____1PAVCSharedDoc__A]
-	LGetShotCntData_005c:
-		mov esi, dword ptr [edx+50ECh]
-		mov ecx, dword ptr [esi]
-		cmp ecx, esi
-		mov byte ptr [ebp-1], al
-		je LGetShotCntData_0290
-		mov edx, dword ptr [edx+5BCCh]
-	LGetShotCntData_0075:
-		cmp edi, edx
-		je LGetShotCntData_008b
-		mov ecx, dword ptr [ecx]
-		add edi, eax
-		cmp ecx, esi
-		jne LGetShotCntData_0075
-		mov al, byte ptr [ebp-1]
-		pop edi
-		pop esi
-		pop ebx
-		mov esp, ebp
-		pop ebp
-		ret
-	LGetShotCntData_008b:
-		lea esi, [ecx+8]
-		lea eax, [ebx+2F8h]
-		lea edi, [ebx+2F4h]
-		mov ecx, 22h
-		push eax
-		rep movsd
-		call rb_Wind__YIAAVCWind__XZ
-		mov ecx, eax
-		call rb_SetWind_CWind__QAEXABVWVector___Z
-		movzx ecx, byte ptr [ebx+360h]
-		mov edx, dword ptr [rb_m_pInstance___WSingleton_VCSharedDoc____1PAVCSharedDoc__A]
-		mov byte ptr [edx+5BD0h], cl
-		mov eax, dword ptr [rb_m_pInstance___WSingleton_VCSharedDoc____1PAVCSharedDoc__A]
-		mov ecx, dword ptr [eax+5040h]
-		push 0
-		call rb_GetPlayer_CGolfDoc__QAEPAUsPlayerData__E_Z
-		mov ecx, dword ptr [ebx+374h]
-		xor ecx, dword ptr [ebx+36Ch]
-		add eax, 4B8h
-		not ecx
-		not ecx
-		xor ecx, dword ptr [eax+8]
-		mov dword ptr [ebp-8], eax
-		mov dword ptr [eax], ecx
-		movzx ecx, cl
-		xor cl, al
-		mov byte ptr [eax+4], cl
-		movzx edx, byte ptr [eax+1]
-		xor dl, ah
-		mov byte ptr [eax+5], dl
-		movzx ecx, byte ptr [eax+2]
-		mov edx, eax
-		shr edx, 10h
-		xor cl, dl
-		mov byte ptr [eax+6], cl
-		movzx edx, byte ptr [eax+3]
-		mov ecx, eax
-		shr ecx, 18h
-		xor dl, cl
-		mov byte ptr [eax+7], dl
-		mov esi, dword ptr [ebx+344h]
-		call rb_GetPVS__YIAAVCQuadTree__XZ
-		mov dword ptr [eax+21C0h], esi
-		mov dword ptr [eax+21BCh], 0
-		mov eax, dword ptr [rb_m_pInstance___WSingleton_VCSharedDoc____1PAVCSharedDoc__A]
-		cmp dword ptr [eax+5BCCh], 0
-		mov eax, dword ptr [eax+5040h]
-		push 0
-		mov ecx, eax
-		jne LGetShotCntData_01f4
-		call rb_GetPlayer_CGolfDoc__QAEPAUsPlayerData__E_Z
-		mov ecx, dword ptr [eax+500h]
-		add eax, 4F8h
-		not ecx
-		movzx edx, cl
-		mov dword ptr [eax], ecx
-		xor dl, al
-		mov byte ptr [eax+4], dl
-		movzx ecx, byte ptr [eax+1]
-		xor cl, ah
-		mov byte ptr [eax+5], cl
-		movzx edx, byte ptr [eax+2]
-		mov ebx, eax
-		shr ebx, 10h
-		xor dl, bl
-		mov byte ptr [eax+6], dl
-		movzx ecx, byte ptr [eax+3]
-		mov edx, eax
-		shr edx, 18h
-		xor cl, dl
-		mov byte ptr [eax+7], cl
-		mov edx, dword ptr [rb_m_pInstance___WSingleton_VCSharedDoc____1PAVCSharedDoc__A]
-		mov ecx, dword ptr [edx+5040h]
-		push 0
-		mov dword ptr [ebp-8], eax
-		call rb_GetPlayer_CGolfDoc__QAEPAUsPlayerData__E_Z
-		mov ecx, dword ptr [eax+4F0h]
-		add eax, 4E8h
-		not ecx
-		movzx edx, cl
-		mov dword ptr [eax], ecx
-		xor dl, al
-		mov byte ptr [eax+4], dl
-		movzx ecx, byte ptr [eax+1]
-		xor cl, ah
-		mov byte ptr [eax+5], cl
-		movzx edx, byte ptr [eax+2]
-		mov ebx, eax
-		shr ebx, 10h
-		xor dl, bl
-		mov byte ptr [eax+6], dl
-		movzx ecx, byte ptr [eax+3]
-		mov edx, eax
-		shr edx, 18h
-		pop edi
-		xor cl, dl
-		pop esi
-		mov dword ptr [ebp-8], eax
-		mov byte ptr [eax+7], cl
-		mov al, byte ptr [ebp-1]
-		pop ebx
-		mov esp, ebp
-		pop ebp
-		ret
-	LGetShotCntData_01f4:
-		call rb_GetPlayer_CGolfDoc__QAEPAUsPlayerData__E_Z
-		mov ecx, dword ptr [ebx+368h]
-		add eax, 4F8h
-		not ecx
-		xor ecx, dword ptr [eax+8]
-		push 0
-		movzx edx, cl
-		mov dword ptr [eax], ecx
-		xor dl, al
-		mov byte ptr [eax+4], dl
-		movzx ecx, byte ptr [eax+1]
-		xor cl, ah
-		mov byte ptr [eax+5], cl
-		movzx edx, byte ptr [eax+2]
-		mov ecx, eax
-		shr ecx, 10h
-		xor dl, cl
-		mov byte ptr [eax+6], dl
-		movzx ecx, byte ptr [eax+3]
-		mov edx, eax
-		shr edx, 18h
-		xor cl, dl
-		mov byte ptr [eax+7], cl
-		mov edx, dword ptr [rb_m_pInstance___WSingleton_VCSharedDoc____1PAVCSharedDoc__A]
-		mov ecx, dword ptr [edx+5040h]
-		mov dword ptr [ebp-8], eax
-		call rb_GetPlayer_CGolfDoc__QAEPAUsPlayerData__E_Z
-		mov ecx, dword ptr [ebx+364h]
-		add eax, 4E8h
-		not ecx
-		xor ecx, dword ptr [eax+8]
-		mov dword ptr [ebp-8], eax
-		mov dword ptr [eax], ecx
-		movzx ecx, cl
-		xor cl, al
-		mov byte ptr [eax+4], cl
-		movzx edx, byte ptr [eax+1]
-		xor dl, ah
-		mov byte ptr [eax+5], dl
-		movzx ecx, byte ptr [eax+2]
-		mov edx, eax
-		shr edx, 10h
-		xor cl, dl
-		mov byte ptr [eax+6], cl
-		movzx edx, byte ptr [eax+3]
-		mov ecx, eax
-		shr ecx, 18h
-		xor dl, cl
-		mov byte ptr [eax+7], dl
-	LGetShotCntData_0290:
-		mov al, byte ptr [ebp-1]
-		pop edi
-		pop esi
-		pop ebx
-		mov esp, ebp
-		pop ebp
-		ret
-	}
-	if (0)
-	{
-		std::list<sShotData>::iterator it = Doc()->m_shotDataList.begin();
-		it != Doc()->m_shotDataList.end();
-		it++;
-		PLAYER(0);
-	}
-}
-#else
 bool CGolfRule::GetShotCntData()
 {
 	int cnt = 1;
 	int size = Doc()->m_shotDataList.size();
-	volatile bool bRet = false;
+	volatile bool bRet;
+	if (Doc()->m_replayPlayType == 2)
+	{
+		bRet = false;
+	}
+	else
+	{
+		if (Doc()->m_replayHoleStroke)
+		{
+			if (Doc()->m_gameMode)
+			{
+				bRet = false;
+			}
+			else
+			{
+				if (Doc()->m_replayPlayType)
+				{
+					bRet = false;
+				}
+				else
+				{
+					bRet = false;
+				}
+			}
+		}
+		else
+		{
+			if (Doc()->m_gameMode)
+			{
+				bRet = false;
+			}
+			else
+			{
+				if (Doc()->m_replayPlayType)
+				{
+					bRet = false;
+				}
+				else
+				{
+					bRet = false;
+				}
+			}
+		}
+	}
 
 	if (Doc()->GetReplayState() == 14)
 	{
@@ -8538,7 +8336,6 @@ bool CGolfRule::GetShotCntData()
 
 	return bRet;
 }
-#endif
 
 extern Fresh* g_pFresh;
 

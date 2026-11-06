@@ -7,11 +7,6 @@
 #include "minatl.h"
 #include "mathconsts.h"
 
-inline WVector operator/(const WVector& vector, float scalar)
-{
-	return vector * (1.0f / scalar);
-}
-
 CFxParticle::CFxParticle()
 {
 	sprite = NULL;

@@ -4294,7 +4294,7 @@ void CTaskMain::HandleMsgCommon(const MsgObject& msg)
 			it != Doc()->m_gameServerList.end(); ++it)
 		{
 			info = *it;
-			if (info.id == serverUID)
+			if (info.guid == serverUID)
 				break;
 		}
 
@@ -4315,7 +4315,7 @@ void CTaskMain::HandleMsgCommon(const MsgObject& msg)
 
 		Doc()->m_gameServerAddr = info.addr;
 		Doc()->m_gameServerPort = info.port;
-		Doc()->m_gameServerUID = info.id;
+		Doc()->m_gameServerUID = info.guid;
 
 		if (WNetworkSystem::Instance()->IsConnected(WNetworkSystem::NET_GAME))
 			WNetworkSystem::Instance()->ForceShutDown(WNetworkSystem::NET_GAME);

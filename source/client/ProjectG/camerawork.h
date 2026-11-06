@@ -151,9 +151,7 @@ public:
 protected:
 	sInput m_input;
 	void (CCameraWork::*m_pfnCamera)(float delta, float frame);
-	WVector m_src;
-	WVector m_oldSrc;
-	WVector m_oldSrc2;
+	WVector m_src[3];
 	WVector m_dest;
 	int m_driveNum;
 	int m_puttNum;

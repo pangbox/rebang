@@ -19,7 +19,6 @@
 #include "mathconsts.h"
 
 extern "C" __declspec(dllimport) int __cdecl mkdir(const char* path);
-int float2int(float value);
 
 extern Fresh* g_pFresh;
 

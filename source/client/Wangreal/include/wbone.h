@@ -293,6 +293,8 @@ public:
 
 	w_mesh* GetMesh() { return m_mesh; }
 	WVector Transform(const WVector& vector) { return vector * m_matrix; }
+	unsigned char GetAlpha() { return m_alpha; }
+	const LightSet& GetLight() { return m_light; }
 	WSphere GetBoundSphere() { return m_bound_sphere; }
 	bool HasAnimation()
 	{

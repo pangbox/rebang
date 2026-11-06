@@ -18,7 +18,6 @@ namespace S5
 }
 
 void PerformPowerBarSetting();
-int float2int(float value);
 
 inline CItemWindow::~CItemWindow()
 {

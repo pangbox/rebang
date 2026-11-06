@@ -124,7 +124,6 @@ public:
 	virtual void UpdateMeshBonePtr(WPuppet* source);
 
 	void Transform(WView* view, float scale, int flags);
-	const char* GetPuppetName() const { return m_petName; }
 	int GetRenderMode() const;
 	WBone* GetRootBone() { return m_rootbone; }
 	int GetFaceNum() { return m_faceNum; }
@@ -141,7 +140,7 @@ public:
 
 	void SetRenderMode(int mode);
 	void SetLightLine(float value);
-	void SetLightMode(unsigned long);
+	void SetLightMode(unsigned long mode) { m_lightmode = mode; }
 	void UpdateLightSource(WScene* scene);
 	void RenderHierarchy(WView* view, bool transform, float value, float scale);
 	void RenderNormals(WView* view, bool transform, float value, float scale);
@@ -224,6 +223,7 @@ public:
 	{
 		return m_boundSphere;
 	}
+	const char* GetPuppetName() const { return m_petName; }
 	void UpdateBound(bool transform, bool flag);
 	void UpdateBSphere();
 	Waabb GetTransformedBoundBox() const;

@@ -27,16 +27,6 @@ struct sIntrusionReport
 };
 #pragma pack(pop)
 
-struct sFindRival
-{
-	unsigned long oid;
-	sFindRival(unsigned long value)
-		: oid(value)
-	{
-	}
-	bool operator()(sRivalData& rival) { return rival.oid == oid; }
-};
-
 unsigned char CIntrusion::GetCalcExpMemberSize()
 {
 	return m_calcExpMemberSize;

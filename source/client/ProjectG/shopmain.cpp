@@ -36,7 +36,6 @@
 extern Fresh* g_pFresh;
 extern WView* g_view;
 extern WResourceManager* g_resrcmng;
-int float2int(float value);
 
 namespace S5
 {

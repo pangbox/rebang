@@ -26,7 +26,6 @@ extern WMatrix g_camera;
 
 const char* __fastcall GetStrConst(const char* str, char* out);
 const char* GetCharsTillSpace(const char* str, char* out);
-int __fastcall Ceil(float value, float epsilon);
 
 static const int s_charMotionTable[10][12] = {
 	{ 0, 1, 3, 5, 6, -1 },
@@ -416,8 +415,7 @@ zoom_check:
 			m_bChatFacial = false;
 		}
 	}
-	float idle = m_delay;
-	m_delay = idle - deltaTime;
+	m_delay -= deltaTime;
 	if (m_delay > 0.0f)
 		return;
 	if (m_pMotion)

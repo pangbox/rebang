@@ -7,6 +7,7 @@
 #include "work.h"
 #include "anotherhand.h"
 #include "scenemanager.h"
+#include "tooltip.h"
 #include "frcmdtarget.h"
 
 static const char* s_taskNames[] = { "CLobbyTask", "CShopTask",

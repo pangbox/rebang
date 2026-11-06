@@ -1253,20 +1253,22 @@ long __stdcall CProjectG::WinProc(HWND hwnd, unsigned int message,
 				it != Doc()->m_gameServerList.end(); ++it)
 			{
 				sGameServerInfo server = *it;
-				if (Doc()->m_curGameServer.id != server.id)
+				if (Doc()->m_curGameServer.guid != server.guid)
 				{
 					users = server.curUser;
 					selected = server;
 					found = true;
 				}
 				else if (found != true)
+				{
 					continue;
+				}
 
 				std::list<unsigned long>& visited = Doc()->m_guildMemberList;
 				for (std::list<unsigned long>::iterator visit = visited.begin();
 					visit != visited.end(); ++visit)
 				{
-					if (*visit == server.id)
+					if (*visit == server.guid)
 					{
 						memset(&selected, 0, sizeof(selected));
 						found = false;
@@ -1274,7 +1276,7 @@ long __stdcall CProjectG::WinProc(HWND hwnd, unsigned int message,
 					}
 				}
 				if (server.curUser < users &&
-					Doc()->m_curGameServer.id != server.id)
+					Doc()->m_curGameServer.guid != server.guid)
 				{
 					users = server.curUser;
 					selected = server;
@@ -1292,7 +1294,7 @@ NextServer:;
 			}
 			Doc()->m_gameServerAddr = selected.addr;
 			Doc()->m_gameServerPort = selected.port;
-			Doc()->m_gameServerUID = selected.id;
+			Doc()->m_gameServerUID = selected.guid;
 			if (NET()->IsConnected(WNetworkSystem::NET_GAME))
 				NET()->ForceShutDown(WNetworkSystem::NET_GAME);
 			NET()->SendMessage(WNetworkSystem::NET_GAME,
@@ -1300,7 +1302,7 @@ NextServer:;
 			Doc()->m_curGameServer = selected;
 			Doc()->SetDirectMoveRoomInfo(Doc()->m_curChannel.Uid, 0xffff,
 				0xffffffff);
-			Doc()->m_guildMemberList.push_back(selected.id);
+			Doc()->m_guildMemberList.push_back(selected.guid);
 			return 1;
 		}
 		else
@@ -1757,7 +1759,7 @@ bool CProjectG::OnGameServerResult(int result, FrForm* form)
 		{
 			std::list<sGameServerInfo>::iterator it = std::find_if(
 				doc->m_gameServerList.begin(), doc->m_gameServerList.end(),
-				_FindByGuid(doc->m_curGameServer.id));
+				_FindByGuid(doc->m_curGameServer.guid));
 			if (it != doc->m_gameServerList.end())
 				doc->m_gameServerList.erase(it);
 			Doc()->m_channelList.clear();

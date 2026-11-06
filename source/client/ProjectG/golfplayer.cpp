@@ -26,7 +26,6 @@
 
 const char* GetStrConst(const char* str, char* out);
 const char* GetCharsTillSpace(const char* str, char* out);
-int Ceil(float value, float epsilon);
 
 IMPLEMENT_ACTOR(CGolfPlayer, IActor)
 

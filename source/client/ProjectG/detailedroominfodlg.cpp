@@ -13,8 +13,6 @@ namespace
 #include "netresourcemanager.h"
 #include "projectg.h"
 
-int float2int(float f);
-
 extern Fresh* g_pFresh;
 
 static bool CompareIdDesc(const void* left, const void* right)

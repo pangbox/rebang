@@ -5,23 +5,26 @@ unsigned char WBoneSet::m_curAlloc;
 
 // HACK: Workaround to preserve original COMDAT order
 
-template <>
-WBoneKey* WList<WBoneKey*>::Next()
+static void BlendBoneKey(WBoneKey* a, WBoneKey* b, WBoneKey* c, float fraction)
 {
-	if (m_surf)
-	{
-		WBoneKey* item = m_surf->item;
-		m_surf = m_surf->next == m_list ? 0 : m_surf->next;
-		return item;
-	}
-	return 0;
+	if (b->flags & 1)
+		c->quat = (a->flags & 1) ? WQuaternionSlerp(a->quat, b->quat, fraction)
+								 : b->quat;
+	if (b->flags & 2)
+		c->pivot = (a->flags & 2) ? a->pivot + (b->pivot - a->pivot) * fraction
+								  : b->pivot;
+	if (b->flags & 4)
+		c->scale = (a->flags & 4)
+			? a->scale = (1 - fraction) * a->scale + fraction * b->scale
+			: b->scale;
+	c->flags = a->flags | b->flags;
 }
 
 template <>
-void WList<WBoneKey*>::AddHash(int hashCode, listinfo* item)
+WBoneKey* WList<WBoneKey*>::Start()
 {
-	item->hash = m_hash_list[hashCode];
-	m_hash_list[hashCode] = item;
+	m_surf = m_list;
+	return Next();
 }
 
 template <>
@@ -68,21 +71,6 @@ void WBoneSet::CopyFrom(WBoneSet* a)
 		AddBoneKey(key->name, &key->quat, &key->pivot, &key->scale, key->flags);
 }
 
-static void BlendBoneKey(WBoneKey* a, WBoneKey* b, WBoneKey* c, float fraction)
-{
-	if (b->flags & 1)
-		c->quat = (a->flags & 1) ? WQuaternionSlerp(a->quat, b->quat, fraction)
-								 : b->quat;
-	if (b->flags & 2)
-		c->pivot = (a->flags & 2) ? a->pivot + (b->pivot - a->pivot) * fraction
-								  : b->pivot;
-	if (b->flags & 4)
-		c->scale = (a->flags & 4)
-			? a->scale = (1 - fraction) * a->scale + fraction * b->scale
-			: b->scale;
-	c->flags = a->flags | b->flags;
-}
-
 void WBoneSet::Blend(WBoneSet* a, WBoneSet* b, float fraction)
 {
 	if (WisEqual(fraction, 0.0f, g_EPSILON))
@@ -109,7 +97,9 @@ void WBoneSet::Blend(WBoneSet* a, WBoneSet* b, float fraction)
 			result = &key;
 		}
 		else
+		{
 			result = 0;
+		}
 		AddBoneKey(result->name, &result->quat, &result->pivot, &result->scale,
 			result->flags);
 	}

@@ -9,7 +9,6 @@
 #include "fremoticon.h"
 
 extern Fresh* g_pFresh;
-int float2int(float value);
 
 CHeadIcon::CHeadIcon()
 {

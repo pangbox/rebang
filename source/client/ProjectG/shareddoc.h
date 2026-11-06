@@ -38,6 +38,57 @@ struct sSaleItem;
 struct sCardStack;
 struct sPrizeInfo;
 
+struct sRivalData
+{
+	unsigned long uid;
+	unsigned long oid;
+	char nickname[22];
+	char guildName[21];
+	unsigned char team;
+	unsigned short level;
+	unsigned char state;
+	int holeScore[18];
+	unsigned char holeStroke[18];
+	__int64 holePang[18];
+	__int64 totalPang;
+	__int64 totalBonusPang;
+	int totalScore;
+	unsigned char totalStroke;
+	unsigned char hole;
+	unsigned char rank;
+	unsigned char order;
+	unsigned char quitOrder;
+	unsigned char finishOrder;
+	WVector ballPos;
+	unsigned long observerState;
+	unsigned char observerRank;
+	unsigned long titleTypeId;
+	unsigned char flag;
+	unsigned long guildUID;
+	char guildMark[12];
+	unsigned long guildPoint;
+	unsigned long approachDistance;
+	unsigned long approachResultDistance;
+	int approachTime;
+	unsigned long capability;
+	unsigned long mascotTypeId;
+	unsigned char pangMastery;
+	unsigned char pangNitro;
+};
+
+struct sFindRival
+{
+	unsigned long oid;
+
+	sFindRival(unsigned long value)
+		: oid(value)
+	{
+	}
+
+	bool operator()(sRivalData& rival) { return rival.oid == oid; }
+};
+ILNUM_FR
+
 enum eStateTrade
 {
 	STATE_TRADE_INIT,
@@ -110,44 +161,6 @@ struct sGolfGame
 
 enum eReplayModeType
 {
-};
-
-struct sRivalData
-{
-	unsigned long uid;
-	unsigned long oid;
-	char nickname[22];
-	char guildName[21];
-	unsigned char team;
-	unsigned short level;
-	unsigned char state;
-	int holeScore[18];
-	unsigned char holeStroke[18];
-	__int64 holePang[18];
-	__int64 totalPang;
-	__int64 totalBonusPang;
-	int totalScore;
-	unsigned char totalStroke;
-	unsigned char hole;
-	unsigned char rank;
-	unsigned char order;
-	unsigned char quitOrder;
-	unsigned char finishOrder;
-	WVector ballPos;
-	unsigned long observerState;
-	unsigned char observerRank;
-	unsigned long titleTypeId;
-	unsigned char flag;
-	unsigned long guildUID;
-	char guildMark[12];
-	unsigned long guildPoint;
-	unsigned long approachDistance;
-	unsigned long approachResultDistance;
-	int approachTime;
-	unsigned long capability;
-	unsigned long mascotTypeId;
-	unsigned char pangMastery;
-	unsigned char pangNitro;
 };
 
 #pragma pack(push, 1)
@@ -243,6 +256,7 @@ public:
 		return m_myInfo.info.iBongdariShopRemainedBonus;
 	}
 	int GetTimeBlock() { return m_myInfo.info.iTimeBlock; }
+	void SetTimeBlock(int timeBlock) { m_myInfo.info.iTimeBlock = timeBlock; }
 	void SetBsUsableTimes(short times)
 	{
 		m_myInfo.info.iBongdariShopUsableTimes = times;
@@ -433,14 +447,18 @@ public:
 	int IsEquipParts(unsigned long uid, unsigned long typeId);
 	bool IsEquipParts(sCharacterInfo& info, unsigned long uid,
 		unsigned long typeId);
+	void SetFriendGameSvrUID(unsigned long uid) { m_friendGameSvrUID = uid; }
+	unsigned long GetFriendGameSvrUID() { return m_friendGameSvrUID; }
+	void SetInviteMode(int mode) { m_inviteMode = mode; }
+	int IsInviteMode() { return m_inviteMode; }
+	void SetForceNicknameChange(unsigned char force)
+	{
+		m_forceNicknameChange = force;
+	}
 	unsigned char GetForceNicknameChange() const
 	{
 		return m_forceNicknameChange;
 	}
-	void SetFriendGameSvrUID(unsigned long uid) { m_friendGameSvrUID = uid; }
-	unsigned long GetFriendGameSvrUID();
-	void SetInviteMode(int mode) { m_inviteMode = mode; }
-	int IsInviteMode() { return m_inviteMode; }
 	void SetGoWithModeStart(int uid) { m_goWithFriendUID = uid; }
 	void SetGoWithModeEnd()
 	{
@@ -737,6 +755,7 @@ bool SetCurMap(unsigned char map);
 unsigned char GetCurMap();
 bool IsCurMapSnow();
 
+ILNUM_SDC
 ILFILL3
 
 #include "golftask.h"

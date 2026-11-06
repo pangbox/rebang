@@ -9,7 +9,6 @@
 #include <algorithm>
 
 extern Fresh* g_pFresh;
-int float2int(float value);
 
 void __fastcall CallErrorMsg(const char* message)
 {

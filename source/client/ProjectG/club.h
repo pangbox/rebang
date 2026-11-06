@@ -120,6 +120,8 @@ public:
 			result = strstr(m_pClub->name, name);
 		return bool(result);
 	}
+	float GetBarWidth() { return m_barWidth; }
+	unsigned char GetBarAlpha() { return (unsigned char)m_barAlpha; }
 	void SetBar(int value) { m_bar = value; }
 	void SetItemWindow(bool value) { m_bItemWindow = value; }
 	bool BarIs(int state) { return m_bar == state; }

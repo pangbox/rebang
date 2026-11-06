@@ -767,7 +767,7 @@ public:
 	int m_prevUiHideMode;
 	bool m_bFlag[5];
 	int m_offlineShopEdit;
-	WOverlay* m_pSexMark[3][2];
+	WOverlay* m_pSexMark[6];
 	WOverlay* m_pMannerMark[2];
 	WOverlay* m_pAngelMark[2];
 	bool m_bCardBookVisible;
@@ -806,29 +806,29 @@ public:
 	bool AddModel(sFurniture_List furniture);
 	bool SaveModel(bool bSave);
 	cModel* CreateModel(const char* name);
-	cModel* CreateModel(const char* name, WVector pos, float rotate,
-		bool bFloor, short wall);
+	cModel* CreateModel(const char* name, WVector pos, float angle,
+		bool bRename, short type);
 	void ResotreList();
 	void DeleteList();
-	void ResetList(bool bRestore);
+	void ResetList(bool all);
 	cModel* ModelByRayIntersect(const WVector& org, const WVector& dir);
 	cModel* ModelByRayIntersectOBB(const WVector& pos);
-	void ChangeFloorTexture(sFurniture_List* pFurniture, bool bApply);
-	void ChangeWallTexture(sFurniture_List* pFurniture, bool bApply);
+	void ChangeFloorTexture(sFurniture_List* pList, bool bReset);
+	void ChangeWallTexture(sFurniture_List* pList, bool bReset);
 	bool ChangePosterTexture(unsigned long typeId, WPolySoup::sModel& model);
 	void SetRotate(float angle);
-	void SetTargetPosition(const WVector& pos, unsigned char phase);
-	void MoveModelPosition(unsigned char phase);
-	WVector ChangeModelPosition(int index, cModel* pModel,
-		WPolySoup::sModel* pWall);
-	WVector SlideWallPosition(cModel* pModel, WPolySoup::sModel* pWall);
+	void SetTargetPosition(const WVector& pos, unsigned char mode);
+	void MoveModelPosition(unsigned char mode);
+	WVector ChangeModelPosition(int mode, cModel* pModel,
+		WPolySoup::sModel* pData);
+	WVector SlideWallPosition(cModel* pModel, WPolySoup::sModel* pData);
 	void SetModelPosition();
 	unsigned long GetState();
 	void SetState(unsigned long state);
-	void ListFurnitureSelect(sFurniture_List* pFurniture);
-	bool IsArragementFurniture(unsigned long typeId);
-	cModel* GetModelData(unsigned long uid, unsigned long typeId);
-	bool IsModelData_SaveList(unsigned long uid, unsigned long typeId);
+	void ListFurnitureSelect(sFurniture_List* pList);
+	bool IsArragementFurniture(unsigned long id);
+	cModel* GetModelData(unsigned long id, unsigned long typeId);
+	bool IsModelData_SaveList(unsigned long id, unsigned long typeId);
 	int IsFunritureValueChange(cModel& model);
 
 	WList<cModel*> m_modelList;

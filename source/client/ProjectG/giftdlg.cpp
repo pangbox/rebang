@@ -14,7 +14,6 @@
 
 extern Fresh* g_pFresh;
 extern WView* g_view;
-int float2int(float value);
 
 extern days_t days[];
 
