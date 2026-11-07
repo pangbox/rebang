@@ -4,18 +4,17 @@ class WBone;
 
 struct w_pet_vertex
 {
-	struct w_blended
-	{
-		unsigned char blendWeight;
-		WBone* bone;
-	};
-
 	float x;
 	float y;
 	float z;
 	float weight;
 	unsigned char blendWeight;
 	char* bonename;
+	struct w_blended
+	{
+		unsigned char blendWeight;
+		WBone* bone;
+	};
 	w_blended* list;
 	int listNum;
 };

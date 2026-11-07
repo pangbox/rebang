@@ -189,7 +189,7 @@ void GroundItem::DrawBoundingVolume()
 		GetBoundingSphere(pivot, length);
 		g_view->DrawSphere(pivot, length, 0xffff0000, 10, 0);
 
-		g_view->DrawAABB(m_pPuppet->m_bound, 0xff00ff00, false, 0);
+		g_view->DrawAABB(m_pPuppet->GetBoundBox(), 0xff00ff00, false, 0);
 	}
 }
 

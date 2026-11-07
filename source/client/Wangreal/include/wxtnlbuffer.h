@@ -67,11 +67,11 @@ struct WxBatchGrp
 		int nVtxs, int iBaseIdxIdx, int nIdxs);
 	void xClear();
 	void xCopy(WxBatchGrp** ppOut);
-	void xRenderSubset(WView* pView, WxBatchState* pState, WxBatch* pBatch,
-		int nBatches);
 	void xRenderByBatch(WView* pView, WxBatchState* pState);
 	void xRenderAtOnce(WView* pView, WxBatchState* pState, bool bEffect,
 		int* pOrder, int nOrder);
+	void xRenderSubset(WView* pView, WxBatchState* pState, WxBatch* pBatch,
+		int nBatches);
 };
 
 void __fastcall xRender(WView* pView, WxBatchState* pState, WBone* pBone,

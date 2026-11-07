@@ -3452,7 +3452,7 @@ void CGolfPlayer::SetLight()
 		m_petFrame[GOLFDOC()->m_currentPlayer].GetBonePet()->FindBoneByTail(
 			"Head");
 	m_lightSet.diffuse = ModifyColor(g_lightset.diffuse,
-		GetPVS().GetShadowIntensity(pBone->m_matrix.pivot));
+		GetPVS().GetShadowIntensity(pBone->GetMatrix().pivot));
 }
 
 void CGolfPlayer::SetLight(int player)
@@ -3463,7 +3463,7 @@ void CGolfPlayer::SetLight(int player)
 
 		if (pBone)
 			m_lightSet.diffuse = ModifyColor(g_lightset.diffuse,
-				GetPVS().GetShadowIntensity(pBone->m_matrix.pivot));
+				GetPVS().GetShadowIntensity(pBone->GetMatrix().pivot));
 	}
 }
 

@@ -763,13 +763,13 @@ void CQuadTree::MakeObjStructure(short index, int modelIndex, bool bRebuild)
 	{
 		WBone* bone = box->bone;
 
-		if (strcmpi(box->info->name, bone->m_name))
+		if (strcmpi(box->info->name, bone->GetBoneName()))
 			continue;
 
 		if (bAbv && !strstr(_strlwr(box->info->name), "abv"))
 			continue;
 
-		for (w_mesh* mesh = bone->m_mesh; mesh; mesh = mesh->next)
+		for (w_mesh* mesh = bone->GetMesh(); mesh; mesh = mesh->next)
 		{
 			for (i = 0; i < mesh->indexNum; i += 3)
 			{
@@ -780,7 +780,7 @@ void CQuadTree::MakeObjStructure(short index, int modelIndex, bool bRebuild)
 					for (k = 0; k < 3; k++)
 						model->tri[n].v[k] =
 							mesh->vecList[mesh->indexList[i + k]] *
-							bone->m_matrix;
+							bone->GetMatrix();
 
 					WVector* v = (WVector*)((char*)model->tri + ofs);
 
@@ -838,13 +838,13 @@ build_quad:
 	{
 		WBone* bone = box->bone;
 
-		if (strcmpi(box->info->name, bone->m_name) == 0)
+		if (strcmpi(box->info->name, bone->GetBoneName()) == 0)
 		{
-			for (w_mesh* mesh = bone->m_mesh; mesh; mesh = mesh->next)
+			for (w_mesh* mesh = bone->GetMesh(); mesh; mesh = mesh->next)
 			{
 				for (i = 0; i < mesh->vtxNum; i++)
 				{
-					pos += mesh->vecList[i] * bone->m_matrix;
+					pos += mesh->vecList[i] * bone->GetMatrix();
 					n++;
 				}
 			}
@@ -2177,16 +2177,16 @@ void CQuadTree::MakeCollisionData(short index)
 			box = model->pet->m_bbList.Next())
 		{
 			WBone* bone = box->bone;
-			if (strcmpi(box->info->name, bone->m_name) == 0)
+			if (strcmpi(box->info->name, bone->GetBoneName()) == 0)
 			{
-				for (w_mesh* mesh = bone->m_mesh; mesh; mesh = mesh->next)
+				for (w_mesh* mesh = bone->GetMesh(); mesh; mesh = mesh->next)
 				{
 					for (int i = 0; i < mesh->indexNum; i += 3)
 					{
 						for (int j = 0; j < 3; j++)
 							model->tri[count].v[j] =
 								mesh->vecList[mesh->indexList[i + j]] *
-								bone->m_matrix;
+								bone->GetMatrix();
 
 						WVector* v = model->tri[count].v;
 
@@ -2214,10 +2214,10 @@ void CQuadTree::CalcObjMeshData(short index, int tri)
 			box = model->pet->m_bbList.Next())
 		{
 			WBone* bone = box->bone;
-			if (strcmpi(box->info->name, bone->m_name) == 0)
+			if (strcmpi(box->info->name, bone->GetBoneName()) == 0)
 			{
 				int count = 0;
-				for (w_mesh* mesh = bone->m_mesh; mesh; mesh = mesh->next)
+				for (w_mesh* mesh = bone->GetMesh(); mesh; mesh = mesh->next)
 				{
 					for (int i = 0; i < mesh->indexNum; i += 3, count++)
 					{
@@ -2226,7 +2226,7 @@ void CQuadTree::CalcObjMeshData(short index, int tri)
 							for (int j = 0; j < 3; j++)
 								model->tri[count].v[j] =
 									mesh->vecList[mesh->indexList[i + j]] *
-									bone->m_matrix;
+									bone->GetMatrix();
 							return;
 						}
 					}
@@ -2433,7 +2433,7 @@ void CQuadTree::ScriptProcess(int index, float from, float to)
 		if (pet->CheckFrameData(first, last, start, end))
 		{
 			for (int i = start; i <= end; i++)
-				ParsePuppetScript(index, pet->m_frame[i].data);
+				ParsePuppetScript(index, pet->GetFrameData(i));
 		}
 	}
 }
@@ -2506,7 +2506,7 @@ void CQuadTree::ParsePuppetScript(int index, const char* script)
 				if (pet)
 				{
 					WVector pivot = pet->GetPivot(NULL);
-					WMatrix mat = pet->m_mat;
+					WMatrix mat = pet->GetMatrix();
 					unsigned char type =
 						GetGroundType(pivot * mat, false, NULL);
 					if ((type == 10 || type == 14) && strstr(filename, "dust"))
@@ -2536,7 +2536,7 @@ void CQuadTree::ParsePuppetScript(int index, const char* script)
 					WBone* found = pet->FindBone(bone);
 					if (found)
 					{
-						attacher.mat[j] = &found->m_matrix;
+						attacher.mat[j] = &found->GetMatrix();
 					}
 					else
 					{
@@ -2544,7 +2544,7 @@ void CQuadTree::ParsePuppetScript(int index, const char* script)
 						if (box)
 						{
 							if (box->bone)
-								attacher.mat[j] = &box->bone->m_matrix;
+								attacher.mat[j] = &box->bone->GetMatrix();
 
 							attacher.pos[j] = &box->info->spherePivot;
 						}
@@ -4702,7 +4702,7 @@ bool CQuadTree::OverlappedWithObject(WVector pos, float radius)
 			do
 			{
 				Wobb obb;
-				obb = bb->bone->m_matrix;
+				obb = bb->bone->GetMatrix();
 				obb *= (bb->info->aabb.max - bb->info->aabb.min) * 0.5f +
 					WVector::ONE * radius;
 				obb.center = bb->info->spherePivot * bb->bone->m_matrix;
@@ -4928,7 +4928,7 @@ float CQuadTree::RayIntersectAll(const WVector& from, const WVector& dir,
 		if (!model->pet)
 			continue;
 
-		int num = model->pet->m_faceNum;
+		int num = model->pet->GetFaceNum();
 		for (int j = 0; j < num; j++)
 		{
 			if (!bAll && IsPenetrable(model->tri[j].propIndex))
@@ -5362,7 +5362,7 @@ void CQuadTree::TraceAABB(const WVector& from, const WVector& to,
 			while (bb)
 			{
 				count++;
-				Waabb charBox = bb->info->aabb + model->pet->m_mat.pivot;
+				Waabb charBox = bb->info->aabb + model->pet->GetMatrix().pivot;
 				float t = AabbIntersect(src, direction, charBox, &plane);
 				if (t < fraction)
 				{
@@ -5535,7 +5535,7 @@ void CQuadTree::DrawDebugTraceAABB(const WVector& from, const WVector& to,
 			while (bb)
 			{
 				count++;
-				Waabb charBox = bb->info->aabb + model->pet->m_mat.pivot;
+				Waabb charBox = bb->info->aabb + model->pet->GetMatrix().pivot;
 				g_view->DrawAABB(charBox, 0xffff0000, false, 0);
 
 				bb = model->pet->FindBoundBox(MakeStr("char%d", count));
@@ -6037,7 +6037,7 @@ void CQuadTree::TraceOBB_New(const WVector& from, const WVector& to,
 					obb *=
 						(bbox->info->aabb.max - bbox->info->aabb.min) * half +
 						WVector::ONE * radius;
-					const WMatrix& mat = bbox->bone->m_matrix;
+					const WMatrix& mat = bbox->bone->GetMatrix();
 					obb.center = bbox->info->spherePivot * mat;
 
 					if (obb.IsInclude(pos))
@@ -6254,7 +6254,7 @@ void CQuadTree::TraceOBB_Avatar_genPosition(const WVector& from,
 				Wobb charObb;
 				charObb = bone->GetMatrix();
 				charObb *= (bb->info->aabb.max - bb->info->aabb.min) * 0.5f;
-				charObb.center = bb->info->spherePivot * bone->m_matrix;
+				charObb.center = bb->info->spherePivot * bone->GetMatrix();
 
 				dir.y = 0.0f;
 				Wobb moved = charObb;
@@ -6576,7 +6576,7 @@ int CQuadTree::Get_WallSlidingAngle(const WVector& pos,
 	if (!bb)
 		return -1;
 
-	centerBox = bb->info->aabb + pet->m_mat.pivot;
+	centerBox = bb->info->aabb + pet->GetMatrix().pivot;
 
 	if (!center)
 		return -1;

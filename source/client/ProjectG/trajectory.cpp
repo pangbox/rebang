@@ -226,7 +226,7 @@ void CTrajectory::HandleMsg(const MsgObject& msg)
 	case 396:
 	{
 		WPuppet* ball = CSceneManager::Instance()->GetPuppet("\xb0\xf8");
-		if (ball && ball->m_rootbone)
+		if (ball && ball->GetRootBone())
 			ball->SetAlpha(255);
 		for (int j = 0; j < 2; ++j)
 			m_pTrace[j] = NULL;
@@ -272,7 +272,7 @@ void CTrajectory::HandleMsg(const MsgObject& msg)
 	case 352:
 	{
 		WPuppet* ball = CSceneManager::Instance()->GetPuppet("\xb0\xf8");
-		if (ball && ball->m_rootbone)
+		if (ball && ball->GetRootBone())
 			ball->SetAlpha(255);
 		m_pLastPuttLine = NULL;
 		for (int i = 0; i < 32; ++i)

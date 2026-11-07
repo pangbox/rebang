@@ -22,9 +22,9 @@ public:
 	virtual void EndScene() { }
 	virtual bool IsShadowView() { return true; }
 
-	virtual void Render() = 0;
 	virtual void Render(WPuppet* pet, bool bTransform, float matscale,
 		bool noclipping, bool updatemat) = 0;
+	virtual void Render() = 0;
 
 protected:
 	unsigned char m_fgColor;
@@ -39,9 +39,9 @@ public:
 	virtual void SetTextureSize(int w, int h);
 	virtual int GetTexture() { return m_texture; }
 	virtual void Clear(ulong clearColor, int mode);
-	virtual void Render();
 	virtual void Render(WPuppet* pet, bool bTransform, float matscale,
 		bool noclipping, bool updatemat);
+	virtual void Render();
 
 protected:
 	virtual void DrawIndexedTrianglesDirect(WTVertex* plist, int pn,
@@ -70,9 +70,9 @@ public:
 		return m_filteredTexView ? m_filteredTexView->GetTexture(0) : 0;
 	}
 	virtual void Clear(ulong clearColor, int mode);
-	virtual void Render();
 	virtual void Render(WPuppet* pet, bool bTransform, float matscale,
 		bool noclipping, bool updatemat);
+	virtual void Render();
 
 private:
 	WRenderToTextureParam m_orgTexParam;

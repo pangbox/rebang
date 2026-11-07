@@ -102,8 +102,7 @@ int FxInterpreter::ParseBoundingBoxScript_fx(WPuppet* pet, eScripFormat format)
 	for (w_bound_box* box = pet->m_bbList.Start(); box;
 		box = pet->m_bbList.Next())
 	{
-		if (!box->info->option || !box->bone ||
-			box->bone->m_flag.GetFlag(WBone::INVISIBLE))
+		if (!box->info->option || !box->bone || box->bone->IsInvisible())
 			continue;
 
 		const char* str = box->info->option;
@@ -115,7 +114,7 @@ int FxInterpreter::ParseBoundingBoxScript_fx(WPuppet* pet, eScripFormat format)
 			if (ParseFxName(&str, name, format, type))
 			{
 				Attacher attacher;
-				attacher.mat[0] = &box->bone->m_matrix;
+				attacher.mat[0] = &box->bone->GetMatrix();
 				attacher.pos[0] = &box->info->spherePivot;
 				bAttached = AttachFx(name, &attacher, type);
 			}

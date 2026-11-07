@@ -111,7 +111,6 @@ ILFILLEXC
 #include "z_ilfill.h"
 ILFILL1
 #include "frwndinl.h"
-ILNUM_FW
 ILFILLF1
 #include "frframe.h"
 #include "frbutton.h"
@@ -137,7 +136,6 @@ ILNUM_G0
 #include "clientsocket.h"
 #include "soundmanager.h"
 #include "inputmanager.h"
-ILNUM_G1
 #include "networksystem.h"
 ILNUM_NET
 #include "networkmonitor.h"

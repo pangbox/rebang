@@ -31,10 +31,10 @@ public:
 	virtual bool Open(const char* filename);
 	virtual int Read(void* buffer, int size);
 	virtual int GetByte(void);
-	virtual int Tell(void);
 	virtual void Seek(int offset, int origin);
+	virtual int Tell(void);
 
-private:
+protected:
 	HANDLE m_hFile;
 	HANDLE m_hMap;
 	char* m_pBuff;

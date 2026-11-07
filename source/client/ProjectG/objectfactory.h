@@ -30,24 +30,23 @@ protected:
 class CObjectFactory
 {
 public:
-	typedef IObject* (*ObjectFunctor)();
 	CObjectFactory() { }
 	~CObjectFactory() { Reset(); }
-	void Reset();
-	void AddObjectType(IObject* object, const char* name);
-	void AddObjectFunctor(ObjectFunctor function, const char* name);
 	IObject* CreateObject(const char* name)
 	{
-		std::map<const std::string, ObjectFunctor>::iterator it =
+		std::map<const std::string, IObject* (*)()>::iterator it =
 			m_objectFuncList.find(name);
 		if (it != m_objectFuncList.end())
 			return (*it).second();
 		return NULL;
 	}
+	void AddObjectType(IObject* object, const char* name);
+	void AddObjectFunctor(IObject* (*function)(), const char* name);
+	void Reset();
 
 protected:
 	std::map<const std::string, IObject*> m_objectTypeList;
-	std::map<const std::string, ObjectFunctor> m_objectFuncList;
+	std::map<const std::string, IObject* (*)()> m_objectFuncList;
 };
 
 CObjectFactory& ObjectFactory();

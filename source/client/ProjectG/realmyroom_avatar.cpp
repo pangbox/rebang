@@ -952,7 +952,7 @@ void CRealMyRoom_Avatar::Render()
 
 	if (m_pPetFrame != NULL && m_pPetFrame->GetCurAniPet() != NULL)
 	{
-		if (g_view->InFrustum(m_pPetFrame->GetBonePet()->m_bound))
+		if (g_view->InFrustum(m_pPetFrame->GetBonePet()->GetBoundBox()))
 		{
 			if (CRealMyRoom_AvatarManager::Instance()->m_pPickedAvatar == this)
 			{
@@ -993,7 +993,7 @@ void CRealMyRoom_Avatar::RenderOverlay(bool bDetail)
 	if (m_pPetFrame == NULL || m_pPetFrame->GetCurAniPet() == NULL)
 		return;
 
-	if (!g_view->InFrustum(m_pPetFrame->GetBonePet()->m_bound))
+	if (!g_view->InFrustum(m_pPetFrame->GetBonePet()->GetBoundBox()))
 		return;
 
 	WVector head;
@@ -1113,7 +1113,7 @@ void CRealMyRoom_Avatar::ScriptProcess(const w_motion_data* motion, float from,
 			if (pPuppet->CheckFrameData(start, end, first, last))
 			{
 				for (int i = first; i <= last; i++)
-					ParsePuppetScript(pPuppet->m_frame[i].data);
+					ParsePuppetScript(pPuppet->GetFrameData(i));
 			}
 		}
 	}
@@ -1417,8 +1417,7 @@ void CRealMyRoom_Avatar::ParseBoundingBoxScript()
 	for (w_bound_box* bb = pList->Start(); bb != NULL; bb = pList->Next())
 	{
 		const char* option = bb->info->option;
-		if (option == NULL || bb->bone == NULL ||
-			bb->bone->m_flag.GetFlag(WBone::INVISIBLE))
+		if (option == NULL || bb->bone == NULL || bb->bone->IsInvisible())
 			continue;
 
 		const char* next;

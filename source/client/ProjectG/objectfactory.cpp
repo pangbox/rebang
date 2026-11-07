@@ -16,7 +16,7 @@ void CObjectFactory::AddObjectType(IObject* object, const char* name)
 	m_objectTypeList[name] = object;
 }
 
-void CObjectFactory::AddObjectFunctor(ObjectFunctor function, const char* name)
+void CObjectFactory::AddObjectFunctor(IObject* (*function)(), const char* name)
 {
 	m_objectFuncList[name] = function;
 }

@@ -334,7 +334,7 @@ void CBase::AttachFx()
 					WBone* bone =
 						m_ball->puppet->FindBone(m_ball->info->FxBone[0]);
 					if (bone)
-						attacher.mat[0] = &bone->m_matrix;
+						attacher.mat[0] = &bone->GetMatrix();
 					else
 					{
 						w_bound_box* box;
@@ -346,7 +346,7 @@ void CBase::AttachFx()
 						if (box)
 						{
 							if (box->bone)
-								attacher.mat[0] = &box->bone->m_matrix;
+								attacher.mat[0] = &box->bone->GetMatrix();
 							attacher.pos[0] = &box->info->spherePivot;
 						}
 					}

@@ -13,7 +13,7 @@ class CMouseCursor : public WSingleton<CMouseCursor>
 public:
 	CMouseCursor();
 	virtual ~CMouseCursor();
-	void Process(float dt);
+	void Process(const float dt);
 	void Display();
 	bool IsActive() { return m_active; }
 	void SetActive(bool active);

@@ -7,21 +7,20 @@ class WView;
 class W3dSpr : public WResource
 {
 public:
+	W3dSpr();
+	virtual ~W3dSpr();
 	enum w_spr_align
 	{
 		CAMERA_XY_ALIGN,
 		CAMERA_X_ALIGN,
 		NO_ALIGN,
 	};
-
-	W3dSpr();
-	virtual ~W3dSpr();
-	void SetPos(const WVector& position);
-	void Render(WView* view, int type, w_spr_align align);
-	void SetRect(float width, float height, float pivotX, float pivotY);
-	void SetColor(const int color);
 	int LoadSprite(const char* name, int flags);
 	int AttachTexture(int handle);
+	void SetPos(const WVector& position);
+	void SetRect(float width, float height, float pivotX, float pivotY);
+	void SetColor(const int color);
+	void Render(WView* view, int type, w_spr_align align);
 	void Render(WView* view, float angle, int type);
 
 private:

@@ -94,11 +94,11 @@ void WxBatch::xProcessShader(WView* pView)
 		xnVtxs * nStride);
 
 	WBone* pBone = xpBone;
-	WMatrix mInv = ~pBone->m_matrix;
-	if (pBone->m_light.type == 1)
+	WMatrix mInv = ~pBone->GetMatrix();
+	if (pBone->GetLight().type == 1)
 	{
 	}
-	else if (pBone->m_light.type == 2)
+	else if (pBone->GetLight().type == 2)
 	{
 		WVector vLocalE;
 		WVector vLocalL;
@@ -109,7 +109,7 @@ void WxBatch::xProcessShader(WView* pView)
 			xpMesh->myNormalList ? xpMesh->myNormalList : xpMesh->normList;
 
 		vLocalE = pView->GetCamera().pivot * mInv;
-		vLocalL = RotVec(pBone->m_light.nearone, mInv).Normalize();
+		vLocalL = RotVec(pBone->GetLight().nearone, mInv).Normalize();
 
 		for (i = 0; i < xnVtxs; i++, pData += nStride)
 		{
@@ -200,7 +200,7 @@ void WxBatchGrp::xRenderByBatch(WView* pView, WxBatchState* pState)
 				(pBatch->xpMesh->drawFlag & 0x300000) != 0x100000))
 		{
 			WBone* pBone = pBatch->xpBone;
-			pState->xmW = pBone->m_matrix;
+			pState->xmW = pBone->GetMatrix();
 			pState->xnmTransfs = 0;
 			xRenderSubset(pView, pState, pBatch, 1);
 		}
@@ -239,7 +239,8 @@ void WxBatchGrp::xRenderAtOnce(WView* pView, WxBatchState* pState, bool bEffect,
 				}
 				else if (pStart)
 				{
-					if (pBatch->xpBone->m_alpha == pStart->xpBone->m_alpha &&
+					if (pBatch->xpBone->GetAlpha() ==
+							pStart->xpBone->GetAlpha() &&
 						pBatch->xpMesh->drawFlag == pStart->xpMesh->drawFlag &&
 						pBatch->xpMesh->xiDrawFlag2 ==
 							pStart->xpMesh->xiDrawFlag2 &&
@@ -381,7 +382,7 @@ void WxTnLBuffer::xCopy(WxTnLBuffer** ppOut, WVideoDev* pVideo)
 void WxTnLBuffer::xSetRootBone(WPuppet* pPet)
 {
 	m_xpPet = pPet;
-	xUpdateBones(pPet->m_rootbone);
+	xUpdateBones(pPet->GetRootBone());
 }
 
 void WxTnLBuffer::xUpdateBones(WBone* pBone)
@@ -393,10 +394,10 @@ void WxTnLBuffer::xUpdateBones(WBone* pBone)
 			for (WxBatch* pBatch = pGrp->xpaBatches; pBatch;
 				pBatch = pBatch->xpNext)
 			{
-				if (pBatch->xpBone->m_id == pBone->m_id)
+				if (pBatch->xpBone->GetID() == pBone->GetID())
 				{
-					w_mesh* pOld = pBatch->xpBone->m_mesh;
-					w_mesh* pNew = pBone->m_mesh;
+					w_mesh* pOld = pBatch->xpBone->GetMesh();
+					w_mesh* pNew = pBone->GetMesh();
 					if (pOld)
 					{
 						do
@@ -414,9 +415,9 @@ void WxTnLBuffer::xUpdateBones(WBone* pBone)
 				}
 			}
 		}
-		if (pBone->m_next)
-			xUpdateBones(pBone->m_next);
-		pBone = pBone->m_child;
+		if (pBone->GetNext())
+			xUpdateBones(pBone->GetNext());
+		pBone = pBone->GetChild();
 	} while (pBone);
 }
 
@@ -446,7 +447,7 @@ int WxTnLBuffer::xCreateStaticBuffers(WVideoDev* pVideo, WPuppet** ppPets,
 
 int WxTnLBuffer::xDetermineProperty(WBone* pBone, int nCopies, int iLightMode)
 {
-	w_mesh* pMesh = pBone->m_mesh;
+	w_mesh* pMesh = pBone->GetMesh();
 	if (pMesh)
 	{
 		unsigned int uShadow = ~((unsigned int)iLightMode >> 11) & 0x2000;
@@ -470,10 +471,10 @@ int WxTnLBuffer::xDetermineProperty(WBone* pBone, int nCopies, int iLightMode)
 			pMesh = pMesh->next;
 		} while (pMesh);
 	}
-	if (pBone->m_next)
-		xDetermineProperty(pBone->m_next, nCopies, iLightMode);
-	if (pBone->m_child)
-		xDetermineProperty(pBone->m_child, nCopies, iLightMode);
+	if (pBone->GetNext())
+		xDetermineProperty(pBone->GetNext(), nCopies, iLightMode);
+	if (pBone->GetChild())
+		xDetermineProperty(pBone->GetChild(), nCopies, iLightMode);
 	return 0;
 }
 
@@ -596,7 +597,7 @@ int WxTnLBuffer::xAllocBuffers(int nCopies)
 				for (; pBatch; pBatch = pBatch->xpNext)
 				{
 					pBatch->xiBaseVtxIdx = iBase;
-					xCount(true, pGrp, pBatch, m_xpPet->m_rootbone);
+					xCount(true, pGrp, pBatch, m_xpPet->GetRootBone());
 					int nVtxs = pBatch->xnVtxs;
 					if (nCopies > 1)
 					{
@@ -637,7 +638,7 @@ int WxTnLBuffer::xAllocBuffers(int nCopies)
 					for (; pBatch; pBatch = pBatch->xpNext)
 					{
 						pBatch->xiBaseIdxIdx = iBaseIdx;
-						xCount(false, pGrp, pBatch, m_xpPet->m_rootbone);
+						xCount(false, pGrp, pBatch, m_xpPet->GetRootBone());
 						int nIdxs = pBatch->xnIdxs;
 						if (nCopies > 1)
 						{
@@ -668,7 +669,7 @@ void WxTnLBuffer::xCount(bool bVtxs, WxBatchGrp* pGrp, WxBatch* pBatch,
 	WBone* pBone)
 {
 	{
-		for (w_mesh* pMesh = pBone->m_mesh; pMesh; pMesh = pMesh->next)
+		for (w_mesh* pMesh = pBone->GetMesh(); pMesh; pMesh = pMesh->next)
 		{
 			if (pMesh->xpBatch == pBatch)
 			{
@@ -679,10 +680,10 @@ void WxTnLBuffer::xCount(bool bVtxs, WxBatchGrp* pGrp, WxBatch* pBatch,
 				break;
 			}
 		}
-		if (pBone->m_next)
-			xCount(bVtxs, pGrp, pBatch, pBone->m_next);
-		if (pBone->m_child)
-			xCount(bVtxs, pGrp, pBatch, pBone->m_child);
+		if (pBone->GetNext())
+			xCount(bVtxs, pGrp, pBatch, pBone->GetNext());
+		if (pBone->GetChild())
+			xCount(bVtxs, pGrp, pBatch, pBone->GetChild());
 	}
 }
 
@@ -723,7 +724,7 @@ void WxTnLBuffer::xFillVertexBufferByBone(unsigned char* pBuf, WxBatchGrp* pGrp,
 	WxBatch* pBatch, WBone* pBone)
 {
 	{
-		for (w_mesh* pMesh = pBone->m_mesh; pMesh; pMesh = pMesh->next)
+		for (w_mesh* pMesh = pBone->GetMesh(); pMesh; pMesh = pMesh->next)
 		{
 			if (pMesh->xpBatch == pBatch)
 			{
@@ -733,10 +734,10 @@ void WxTnLBuffer::xFillVertexBufferByBone(unsigned char* pBuf, WxBatchGrp* pGrp,
 				break;
 			}
 		}
-		if (pBone->m_next)
-			xFillVertexBufferByBone(pBuf, pGrp, pBatch, pBone->m_next);
-		if (pBone->m_child)
-			xFillVertexBufferByBone(pBuf, pGrp, pBatch, pBone->m_child);
+		if (pBone->GetNext())
+			xFillVertexBufferByBone(pBuf, pGrp, pBatch, pBone->GetNext());
+		if (pBone->GetChild())
+			xFillVertexBufferByBone(pBuf, pGrp, pBatch, pBone->GetChild());
 	}
 }
 
@@ -759,7 +760,7 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 			pList = &WPuppet::GetOrginalMatrixPtrList(pMesh->mpetName);
 		else
 			pList = &m_xpPet->xGetTransfMatPtrList();
-		int iId = pBatch->xpBone->m_id;
+		int iId = pBatch->xpBone->GetID();
 		if (iId < (int)pList->size())
 			pMat = (*pList)[iId];
 		else
@@ -767,7 +768,7 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 	}
 	else
 	{
-		pMat = &pBatch->xpBone->m_matrix;
+		pMat = &pBatch->xpBone->GetMatrix();
 	}
 	WMatrix mRot;
 	pMat->GetRotMatrix(&mRot);
@@ -788,7 +789,7 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 		{
 			if (i < pMesh->rigidNum)
 				*(WVector*)(pBuf + iOff) =
-					pMesh->vecList[i] * *(*pList)[pMesh->boneList[i]->m_id];
+					pMesh->vecList[i] * *(*pList)[pMesh->boneList[i]->GetID()];
 			else
 				*(WVector*)(pBuf + iOff) = pMesh->vecList[i] * *pMat;
 			iOff += 0x10 + nBlendSize;
@@ -805,7 +806,7 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 			else if (i < pMesh->rigidNum)
 			{
 				WMatrix mBone;
-				(*pList)[pMesh->boneList[i]->m_id]->GetRotMatrix(&mBone);
+				(*pList)[pMesh->boneList[i]->GetID()]->GetRotMatrix(&mBone);
 				*(WVector*)(pBuf + iOff) = pNorm[i] * mBone;
 			}
 			else
@@ -849,14 +850,15 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 				{
 					if (pMesh->blendedBoneList[iBone])
 					{
-						uIdx |= pMesh->blendedBoneList[iBone]->m_id << (j * 8);
+						uIdx |= pMesh->blendedBoneList[iBone]->GetID()
+							<< (j * 8);
 						afWeights[j] = pMesh->blendWeightList[iBone];
 						fTotal += pMesh->blendWeightList[iBone];
 					}
 				}
 				if (j == 3 && fTotal < 0.999f && pMesh->blendedBoneList[iBone])
 				{
-					uIdx |= pMesh->blendedBoneList[iBone]->m_id << 24;
+					uIdx |= pMesh->blendedBoneList[iBone]->GetID() << 24;
 					++iBone;
 				}
 
@@ -875,14 +877,14 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 			{
 				do
 				{
-					int iId = pMesh->boneList[iVtx]->m_id;
+					int iId = pMesh->boneList[iVtx]->GetID();
 					memcpy(&pBuf[iDst], afWeights, nBlendSize);
 					*(int*)(pBuf + nBlendSize + iDst) = iId;
 					++iVtx;
 					iDst += nStride;
 				} while (iVtx < pMesh->rigidNum);
 			}
-			int iId = pBatch->xpBone->m_id;
+			int iId = pBatch->xpBone->GetID();
 			if (iVtx < pMesh->vtxNum)
 			{
 				do
@@ -901,12 +903,12 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 				do
 				{
 					*(int*)(pBuf + nBlendSize + iDst) =
-						pMesh->boneList[iVtx]->m_id;
+						pMesh->boneList[iVtx]->GetID();
 					++iVtx;
 					iDst += nStride;
 				} while (iVtx < pMesh->rigidNum);
 			}
-			int iId = pBatch->xpBone->m_id;
+			int iId = pBatch->xpBone->GetID();
 			if (iVtx < pMesh->vtxNum)
 			{
 				do
@@ -941,7 +943,7 @@ void WxTnLBuffer::xFillIndexBufferByBone(unsigned char* pBuf, WxBatchGrp* pGrp,
 {
 	{
 		unsigned char* pDst = pBuf;
-		for (w_mesh* pMesh = pBone->m_mesh; pMesh; pMesh = pMesh->next)
+		for (w_mesh* pMesh = pBone->GetMesh(); pMesh; pMesh = pMesh->next)
 		{
 			if (pMesh->xpBatch == pBatch)
 			{
@@ -954,28 +956,28 @@ void WxTnLBuffer::xFillIndexBufferByBone(unsigned char* pBuf, WxBatchGrp* pGrp,
 				break;
 			}
 		}
-		if (pBone->m_next)
-			xFillIndexBufferByBone(pBuf, pGrp, pBatch, pBone->m_next);
-		if (pBone->m_child)
-			xFillIndexBufferByBone(pBuf, pGrp, pBatch, pBone->m_child);
+		if (pBone->GetNext())
+			xFillIndexBufferByBone(pBuf, pGrp, pBatch, pBone->GetNext());
+		if (pBone->GetChild())
+			xFillIndexBufferByBone(pBuf, pGrp, pBatch, pBone->GetChild());
 	}
 }
 
 void WxTnLBuffer::xUpdateStaticBufferInfo(WPuppet** ppPets, int nPets)
 {
-	WBone* pRoot = ppPets[0]->m_rootbone;
+	WBone* pRoot = ppPets[0]->GetRootBone();
 	for (int i = 1; i < nPets; ++i)
-		xUpdateStaticBufferInfo(pRoot, ppPets[i]->m_rootbone, i);
+		xUpdateStaticBufferInfo(pRoot, ppPets[i]->GetRootBone(), i);
 }
 
 void WxTnLBuffer::xUpdateStaticBufferInfo(WBone* pSrc, WBone* pDst, int iIdx)
 {
 	{
-		WBone* pFound = pDst->FindBone(pSrc->m_name, 0);
+		WBone* pFound = pDst->FindBone(pSrc->GetBoneName(), 0);
 		if (pFound)
 		{
-			w_mesh* pMeshSrc = pSrc->m_mesh;
-			for (w_mesh* pMeshDst = pFound->m_mesh; pMeshSrc && pMeshDst;
+			w_mesh* pMeshSrc = pSrc->GetMesh();
+			for (w_mesh* pMeshDst = pFound->GetMesh(); pMeshSrc && pMeshDst;
 				pMeshDst = pMeshDst->next)
 			{
 				WxBatchGrp* pGrp = pMeshSrc->xpBatchGrp;
@@ -992,83 +994,88 @@ void WxTnLBuffer::xUpdateStaticBufferInfo(WBone* pSrc, WBone* pDst, int iIdx)
 				pMeshSrc = pMeshSrc->next;
 			}
 		}
-		if (pSrc->m_next)
-			xUpdateStaticBufferInfo(pSrc->m_next, pDst, iIdx);
-		if (pSrc->m_child)
-			xUpdateStaticBufferInfo(pSrc->m_child, pDst, iIdx);
+		if (pSrc->GetNext())
+			xUpdateStaticBufferInfo(pSrc->GetNext(), pDst, iIdx);
+		if (pSrc->GetChild())
+			xUpdateStaticBufferInfo(pSrc->GetChild(), pDst, iIdx);
 	}
 }
 
-void WxTnLBuffer::xUpdateMatrixIdx(WPuppet* pPet)
+void WxTnLBuffer::xUpdateMatrixIdx(WPuppet* pNewPet)
 {
-	for (WxBatchGrp* pGrp = m_xpaBatchGrps; pGrp; pGrp = pGrp->xpNext)
+	for (WxBatchGrp* pBatchGrp = m_xpaBatchGrps; pBatchGrp;
+		pBatchGrp = pBatchGrp->xpNext)
 	{
-		if (pGrp->xiFlag1 & 0x1000)
+		if (pBatchGrp->xiFlag1 & 0x1000)
 		{
-			int nStride = m_xpVideo->VertexSize(pGrp->xpVb->xdwFVF);
-			unsigned char* pBuf =
-				m_xpVideo->xLockVertexBuffer(pGrp->xpVb->xhVb, 0, 0);
-			for (WxBatch* pBatch = pGrp->xpaBatches; pBatch;
+			int iStride = m_xpVideo->VertexSize(pBatchGrp->xpVb->xdwFVF);
+			unsigned char* paData =
+				m_xpVideo->xLockVertexBuffer(pBatchGrp->xpVb->xhVb, 0, 0);
+			for (WxBatch* pBatch = pBatchGrp->xpaBatches; pBatch;
 				pBatch = pBatch->xpNext)
-				xUpdateMatrixIdx(pBuf + pBatch->xiBaseVtxIdx * nStride, pGrp,
-					pBatch, m_xpPet->m_rootbone, pPet);
-			m_xpVideo->xUnlockVertexBuffer(pGrp->xpVb->xhVb);
+				xUpdateMatrixIdx(paData + pBatch->xiBaseVtxIdx * iStride,
+					pBatchGrp, pBatch, m_xpPet->GetRootBone(), pNewPet);
+			m_xpVideo->xUnlockVertexBuffer(pBatchGrp->xpVb->xhVb);
 		}
 	}
 }
 
-void WxTnLBuffer::xUpdateMatrixIdx(unsigned char* pBuf, WxBatchGrp* pGrp,
-	WxBatch* pBatch, WBone* pBone, WPuppet* pPet)
+void WxTnLBuffer::xUpdateMatrixIdx(unsigned char* paData, WxBatchGrp* pBatchGrp,
+	WxBatch* pBatch, WBone* pBone, WPuppet* pNewPet)
 {
 	{
-		w_mesh* pMesh = pBone->m_mesh;
+		w_mesh* pMesh = pBone->GetMesh();
 		while (pMesh && pMesh->xpBatch != pBatch)
 			pMesh = pMesh->next;
 		if (pMesh)
 		{
-			unsigned long fvf = pGrp->xpVb->xdwFVF;
-			int nStride = m_xpVideo->VertexSize(fvf);
+			unsigned long fvf = pBatchGrp->xpVb->xdwFVF;
+			int iStride = m_xpVideo->VertexSize(fvf);
 			int iVtx;
 			int iBone = 0;
-			int iOff = 0x18;
+			int iOffs = 0x18;
 			for (iVtx = 0; iVtx < pMesh->blendedRigidNum; ++iVtx)
 			{
 				{
 					unsigned int uIdx = 0;
-					float fTotal = 0.0f;
+					float fTotalWeight = 0.0f;
 					int j = 0;
 					do
 					{
 						if (j >= 3)
 							break;
-						uIdx |= pMesh->blendedBoneList[iBone]->m_id << (j * 8);
-						fTotal += pMesh->blendWeightList[iBone];
+						uIdx |= pMesh->blendedBoneList[iBone]->GetID()
+							<< (j * 8);
+						fTotalWeight += pMesh->blendWeightList[iBone];
 						++j;
 						++iBone;
-					} while (fTotal < 0.999f);
-					if (j == 3 && fTotal < 0.999f)
+					} while (fTotalWeight < 0.999f);
+					if (j == 3 && fTotalWeight < 0.999f)
 					{
-						uIdx |= pMesh->blendedBoneList[iBone++]->m_id << 24;
+						uIdx |= pMesh->blendedBoneList[iBone]->GetID() << 24;
+						++iBone;
 					}
-					*(unsigned int*)(pBuf + iOff) = uIdx;
-					iOff += nStride;
+					*(unsigned int*)(paData + iOffs) = uIdx;
+					iOffs += iStride;
 				}
 			}
 			if (iVtx < pMesh->rigidNum)
 			{
-				int* pIdx = (int*)(pBuf + iOff);
+				int* pIdx = (int*)(paData + iOffs);
 				do
 				{
-					*pIdx = pMesh->boneList[iVtx]->m_id;
+					*pIdx = pMesh->boneList[iVtx]->GetID();
 					++iVtx;
-					pIdx = (int*)((char*)pIdx + nStride);
+					pIdx = (int*)((char*)pIdx + iStride);
 				} while (iVtx < pMesh->rigidNum);
 			}
 		}
-		if (pBone->m_next)
-			xUpdateMatrixIdx(pBuf, pGrp, pBatch, pBone->m_next, pPet);
-		if (pBone->m_child)
-			xUpdateMatrixIdx(pBuf, pGrp, pBatch, pBone->m_child, pPet);
+		if (pBone->GetNext())
+			xUpdateMatrixIdx(paData, pBatchGrp, pBatch, pBone->GetNext(),
+				pNewPet);
+		if (pBone->GetChild())
+			xUpdateMatrixIdx(paData, pBatchGrp, pBatch, pBone->GetChild(),
+				pNewPet);
 	}
 }
 
@@ -1137,12 +1144,12 @@ void __fastcall xRender(WView* pView, WxBatchState* pState, WBone* pBone,
 		{
 			LightSet* pLight = pView->xGetLight();
 			pState->xdwDiffuse =
-				((unsigned long)pBone->m_alpha << 24) | pLight->ambient2;
+				((unsigned long)pBone->GetAlpha() << 24) | pLight->ambient2;
 		}
 		else
 		{
 			pState->xdwDiffuse =
-				((unsigned long)pBone->m_alpha << 24) | 0xffffff;
+				((unsigned long)pBone->GetAlpha() << 24) | 0xffffff;
 		}
 		if (pState->xiFlag0 & 0x400000)
 		{
@@ -1168,9 +1175,9 @@ void __fastcall xRender(WView* pView, WxBatchState* pState, WBone* pBone,
 			float fMax = -g_HUGE;
 			WMatrix mWorld;
 			if (pMesh->aabbBone)
-				mWorld = pMesh->aabbBone->m_matrix * pView->GetInvCamera();
+				mWorld = pMesh->aabbBone->GetMatrix() * pView->GetInvCamera();
 			else
-				mWorld = pBone->m_matrix * pView->GetInvCamera();
+				mWorld = pBone->GetMatrix() * pView->GetInvCamera();
 			for (int i = 0; i < 8; ++i)
 			{
 				v[i].z = TransformZ(v[i], mWorld);

@@ -586,7 +586,7 @@ void CCreature::Init(const char* name, unsigned long flag)
 			for (int i = from; i <= to; ++i)
 			{
 				sAlpha alpha;
-				const char* data = m_pPet->m_frame[i].data;
+				const char* data = m_pPet->GetFrameData(i);
 				if (sscanf(data, "*opa %f", &alpha.alpha))
 				{
 					alpha.alpha *= 2.55f;
@@ -815,7 +815,7 @@ void CCreature::ScriptProcess(const w_motion_data* motion, float prevTime,
 			if (m_pPet->CheckFrameData(first, last, from, to))
 			{
 				for (int i = from; i <= to; ++i)
-					ParsePuppetScript(m_pPet->m_frame[i].data);
+					ParsePuppetScript(m_pPet->GetFrameData(i));
 			}
 		}
 
@@ -833,7 +833,7 @@ void CCreature::ScriptProcess(const w_motion_data* motion, float prevTime,
 				if (m_pPet->CheckFrameData(first, last, from, to))
 				{
 					for (int i = from; i <= to; ++i)
-						ParsePuppetScript(m_pPet->m_frame[i].data);
+						ParsePuppetScript(m_pPet->GetFrameData(i));
 				}
 			}
 		}

@@ -134,7 +134,7 @@ void WxPuppet::Render(WView* view, bool transform, float scale, bool flag0,
 	{
 		if (transform)
 			Transform(view, scale, (flag0 ? 1 : 0) | (flag1 ? 0 : 2));
-		view->xSetLight(0, m_rootbone->m_light);
+		view->xSetLight(0, m_rootbone->GetLight());
 		m_xpTnLBuf->xRender(view);
 	}
 }
@@ -177,11 +177,12 @@ void WxStaticPuppetGrp::xUpdateCullFlag(WView* view)
 	for (int i = 0; i < m_xnPets; ++i)
 	{
 		WPuppet* puppet = m_xpapPets[i];
-		if (puppet->m_rootbone)
+		if (puppet->GetRootBone())
 		{
-			float scale = (float)sqrt(puppet->m_mat.xx * puppet->m_mat.xx +
-				puppet->m_mat.yx * puppet->m_mat.yx +
-				puppet->m_mat.zx * puppet->m_mat.zx);
+			float scale =
+				(float)sqrt(puppet->GetMatrix().xx * puppet->GetMatrix().xx +
+					puppet->GetMatrix().yx * puppet->GetMatrix().yx +
+					puppet->GetMatrix().zx * puppet->GetMatrix().zx);
 			m_xpapPets[i]->Transform(view, scale, 2);
 		}
 	}

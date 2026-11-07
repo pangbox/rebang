@@ -473,7 +473,7 @@ void CBall::AttachFx(int type)
 	if (ball->info->FxBone[type][0] && m_pPuppet &&
 		(bone = m_pPuppet->FindBone(ball->info->FxBone[type])))
 	{
-		attacher.mat[0] = &bone->m_matrix;
+		attacher.mat[0] = &bone->GetMatrix();
 	}
 	else if (m_pPuppet)
 	{
@@ -485,7 +485,7 @@ void CBall::AttachFx(int type)
 		if (box)
 		{
 			if (box->bone)
-				attacher.mat[0] = &box->bone->m_matrix;
+				attacher.mat[0] = &box->bone->GetMatrix();
 			attacher.pos[0] = &box->info->spherePivot;
 		}
 	}

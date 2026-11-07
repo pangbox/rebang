@@ -152,6 +152,7 @@ protected:
 public:
 	void CalcENVCoord(WView* view, w_mesh* mesh);
 	void CalcHilightCoord(WView* view, const LightSet& light, w_mesh* mesh);
+	void SetLightMode(unsigned long mode);
 	void Render(WView* view, const LightSet& light);
 	void RenderHierarchy(WView* view, float axisLen);
 	void RenderNormals(WView* view, float axisLen);
@@ -166,7 +167,9 @@ public:
 	WSphere GetBoundSphere() { return m_bound_sphere; }
 	Waabb GetBoundBox();
 	bool IsVisible() { return m_flag.GetFlag(VISIBLE); }
+	bool HasRigidVtx();
 	bool IsHidden() { return m_flag.GetFlag(HIDEBONE); }
+	bool IsSelfIllum();
 	void SetRigidVtxFlag(void);
 	void SetInvisible(bool recursive, bool invisible);
 	bool IsInvisible() { return m_flag.GetFlag(INVISIBLE); }
@@ -207,6 +210,7 @@ public:
 	void ShowBone(bool recursive);
 	void SetSelfIllum(bool enabled, bool recursive);
 	void SetSelfIllumColor(unsigned long color, bool recursive);
+	unsigned long GetSelfIllumColor() const;
 	void ToggleSelfIllum()
 	{
 		unsigned char off = (unsigned char)~((unsigned long)m_flag >> 1);
@@ -218,6 +222,7 @@ public:
 	WBone* GetChild() const { return m_child; }
 	WBone* GetNext() const { return m_next; }
 	WBone* GetParent() const { return m_parent; }
+	WBone* GetRoot();
 	void SetPhysicsModel(int type);
 	void ResetPhysicsModel();
 	void UpdatePhysicsModel(float delta, const WVector& accel);
@@ -236,14 +241,12 @@ public:
 		w_bone_physic_link_element* link;
 		int* linkoffset;
 	};
-	WBone::w_bone_physic_link* m_physic;
 
 protected:
+	WBone::w_bone_physic_link* m_physic;
 	void ReleasePhysicsModel();
 	int FindLink(int body, w_mesh* mesh,
 		w_bone_physic_link::w_bone_physic_link_element* out, int offset);
-
-public:
 	w_mesh* m_mesh;
 
 private:
@@ -253,16 +256,10 @@ private:
 	int OptimizeRotKey(float (*range)[2], int count, w_keyframe_rot** out);
 	int OptimizePosKey(float (*range)[2], int count, w_keyframe_pos** out);
 	static int __cdecl SortByTextureHandle(const void* left, const void* right);
-
-public:
 	char m_name[64];
 	unsigned long m_hashCode;
 	char* m_motion_bone_name;
-
-private:
 	char* GetNameSubBip(void);
-
-public:
 	WQuat m_basicQuat;
 	WMatrix m_basicMat;
 	WSphere m_bound_sphere;
@@ -303,12 +300,14 @@ public:
 	};
 	WFlags m_flag;
 	WMatrix m_localMat;
+
+public:
 	WMatrix m_matrix;
+
+private:
 	WMatrix m_rotateMat;
 	WVector m_moveVec;
 	LightSet m_light;
-
-private:
 	void CountVtxBuff(int count);
 	WTVertex* GetVtxBuff() { return m_vtxList; }
 	WTVertex* GetVtxBuff(int index) { return m_vtxList + index; }
@@ -316,16 +315,17 @@ private:
 public:
 	void AllocVTX(int count);
 	void SetVtxColor(unsigned long color);
-	unsigned long m_vtxColor;
 
 private:
+	unsigned long m_vtxColor;
 	static WTVertex* m_vtxList;
 	static WVector* m_vecList;
 	static int m_vtx_len;
 	static int m_vtx_count;
 
-public:
 	float m_bonescale;
+
+public:
 	bool CompareBasicMatrix(WBone* bone);
 	void xBuildTransfMatPtrList(std::vector<const WMatrix*>& list) const;
 	void xSetAlpha(unsigned char alpha, int recursive);
@@ -339,6 +339,7 @@ public:
 	void GatherNormalMergeInfo(w_normalmerge& merge) const;
 	void SetMirrored(bool mirrored);
 	void SetScale(float scale);
+	float GetBoneScale();
 	static void __fastcall CalcMeshAABB(WBone& bone, w_mesh& mesh);
 	static bool IsMeshVisible(WBone* bone, w_mesh* mesh);
 	bool CheckMeshBoneAllVertexRigid() const;

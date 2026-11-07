@@ -1215,7 +1215,8 @@ void CPetFrame::ApplyHideMask(bool apply)
 						for (WBone* mesh = m_pPartPet[j]->FindMeshBone(NULL);
 							mesh; mesh = m_pPartPet[j]->FindMeshBone(mesh))
 						{
-							WBone* bone = m_pBonePet->FindBone(mesh->m_name);
+							WBone* bone =
+								m_pBonePet->FindBone(mesh->GetBoneName());
 							if (bone)
 								bone->SetInvisible(false, apply);
 						}

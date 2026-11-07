@@ -769,7 +769,7 @@ void WRecvViewHw::CollectRecvTris(WPuppet* pPet, bool bTransform,
 	float matscale, bool noclipping, bool updatemat)
 {
 	MakeEqualToRenderView();
-	m_hasRecver = InFrustum(pPet->m_bound);
+	m_hasRecver = InFrustum(pPet->GetBoundBox());
 }
 
 void WRecvViewHw::Render(WShadowView* shadowView, WPuppet* pPet)

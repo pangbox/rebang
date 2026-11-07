@@ -4,9 +4,6 @@
 WBoneKey WBoneSet::m_preAlloc[256];
 unsigned char WBoneSet::m_curAlloc;
 
-// HACK: Preserve the original template emission order.
-template WList<WBoneKey*>::listinfo* WList<WBoneKey*>::Alloc();
-
 void WBoneSet::AddBoneKey(char* name, WQuat* quat, WVector* pivot, float* scale,
 	int flags)
 {

@@ -73,22 +73,22 @@ public:
 	virtual ~WAVIEncoder();
 
 	bool Open(char* filename, int w, int h, int fps, HWND hwnd);
+	void Write(Bitmap* bitmap);
 	sAviResult Close();
 	void SetFrameBuffer(int page);
-	void Write(Bitmap* bitmap);
 	bool IsOpened() const { return m_bOpened; }
 
 protected:
 	void WriteAVI(Bitmap* bitmap);
 	void Flush();
-	void Release();
-	void CopyBitmap(Bitmap* image, Bitmap* bitmap, bool flip);
-	void ScaleBitmap(Bitmap* image, Bitmap* bitmap, int w, int h, int px,
-		int py, bool flip);
 	Bitmap* ScaleBitmap(Bitmap* bitmap, int w, int h, int px, int py,
 		bool flip);
+	void ScaleBitmap(Bitmap* image, Bitmap* bitmap, int w, int h, int px,
+		int py, bool flip);
 
-private:
+	void CopyBitmap(Bitmap* image, Bitmap* bitmap, bool flip);
+	void Release();
+
 	IAVIFile* m_pfile;
 	IAVIStream* m_ps;
 	IAVIStream* m_psCompressed;

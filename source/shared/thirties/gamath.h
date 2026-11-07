@@ -10,8 +10,8 @@ struct gaQ;
 
 struct gaMath
 {
-	static float Sign(float fValue);
 	static int Sign(int iValue);
+	static float Sign(float fValue);
 	static float Sin(float fValue);
 	static float Cos(float fValue);
 	static float Tan(float fValue);
@@ -26,8 +26,8 @@ struct gaMath
 	static float Exp(float fValue);
 	static float Log(float fValue);
 	static float FAbs(float fValue);
-	static int Abs(int iValue);
 	static float Abs(float fValue);
+	static int Abs(int iValue);
 	static float Floor(float fValue);
 	static float Ceil(float fValue);
 	static float FMod(float fX, float fY);
@@ -67,12 +67,12 @@ struct gaMath
 struct gaV2
 {
 	float x, y;
+	gaV2() { }
+	gaV2(const float* af);
+	gaV2(const gaV2& v);
+	gaV2(float fx, float fy);
 
 	gaV2(float* af);
-	gaV2(float fx, float fy);
-	gaV2(const gaV2& v);
-	gaV2(const float* af);
-	gaV2() { }
 
 	gaV2& SetZero();
 	gaV2& SetOne();
@@ -80,24 +80,24 @@ struct gaV2
 	gaV2& SetUnitX();
 	gaV2& SetUnitY();
 	gaV2& SetUnitZ();
-	gaV2& Set(const gaV2& v);
-	gaV2& Set(float fx, float fy);
 	gaV2& Set(float f);
+	gaV2& Set(float fx, float fy);
+	gaV2& Set(const gaV2& v);
 
 	operator float*();
 	operator const float*() const;
-	float operator[](int i) const;
 	float& operator[](int i);
+	float operator[](int i) const;
 
 	gaV2& operator+=(const gaV2& v);
 	gaV2& operator-=(const gaV2& v);
 	gaV2& operator*=(float f);
 	gaV2& operator/=(float f);
+	gaV2 operator+() const;
 
 	gaV2 operator+(const gaV2& v) const;
-	gaV2 operator+() const;
-	gaV2 operator-(const gaV2& v) const;
 	gaV2 operator-() const;
+	gaV2 operator-(const gaV2& v) const;
 	gaV2 operator*(float f) const;
 	gaV2 operator/(float f) const;
 
@@ -107,8 +107,8 @@ struct gaV2
 	float Length() const;
 	float SquaredLength() const;
 	float Dot(const gaV2& v) const;
-	float Normalize(gaV2& v) const;
 	float Normalize();
+	float Normalize(gaV2& v) const;
 	gaV2 Perp() const;
 	gaV2 UnitPerp() const;
 	bool IsFinite() const;
@@ -129,12 +129,12 @@ struct gaV2
 struct gaV3
 {
 	float x, y, z;
+	gaV3() { }
+	gaV3(const float* af);
+	gaV3(const gaV3& v);
+	gaV3(float fx, float fy, float fz);
 
 	gaV3(float* af);
-	gaV3(float fx, float fy, float fz);
-	gaV3(const gaV3& v);
-	gaV3(const float* af);
-	gaV3() { }
 
 	gaV3& SetZero();
 	gaV3& SetOne();
@@ -142,24 +142,24 @@ struct gaV3
 	gaV3& SetUnitX();
 	gaV3& SetUnitY();
 	gaV3& SetUnitZ();
-	gaV3& Set(const gaV3& v);
-	gaV3& Set(float fx, float fy, float fz);
 	gaV3& Set(float f);
+	gaV3& Set(float fx, float fy, float fz);
+	gaV3& Set(const gaV3& v);
 
 	operator float*();
 	operator const float*() const;
-	float operator[](int i) const;
 	float& operator[](int i);
+	float operator[](int i) const;
 
 	gaV3& operator+=(const gaV3& v);
 	gaV3& operator-=(const gaV3& v);
 	gaV3& operator*=(float f);
 	gaV3& operator/=(float f);
+	gaV3 operator+() const;
 
 	gaV3 operator+(const gaV3& v) const;
-	gaV3 operator+() const;
-	gaV3 operator-(const gaV3& v) const;
 	gaV3 operator-() const;
+	gaV3 operator-(const gaV3& v) const;
 	gaV3 operator*(float f) const;
 	gaV3 operator/(float f) const;
 	friend gaV3 operator*(float f, const gaV3& v);
@@ -170,8 +170,8 @@ struct gaV3
 	float Length() const;
 	float SquaredLength() const;
 	float Dot(const gaV3& v) const;
-	float Normalize(gaV3& v) const;
 	float Normalize();
+	float Normalize(gaV3& v) const;
 	gaV3 Cross(const gaV3& v) const;
 	gaV3 UnitCross(const gaV3& v) const;
 	bool IsFinite() const;
@@ -205,13 +205,13 @@ struct gaM3
 			float m31, m32, m33;
 		};
 	};
+	gaM3() { }
+	gaM3(const float* af);
+	gaM3(const float af[3][3]);
+	gaM3(const gaM3& mat);
 
 	gaM3(float _11, float _12, float _13, float _21, float _22, float _23,
 		float _31, float _32, float _33);
-	gaM3(const gaM3& mat);
-	gaM3(const float af[3][3]);
-	gaM3(const float* af);
-	gaM3() { }
 
 	void SetZero();
 	void SetIdentity();
@@ -219,33 +219,33 @@ struct gaM3
 	void SetColumns(const gaV3& v0, const gaV3& v1, const gaV3& v2);
 	void SetDiagonal(float f0, float f1, float f2);
 	void MakeDiagonal(float f0, float f1, float f2);
+	float& operator()(int iRow, int iCol);
 
 	float operator()(int iRow, int iCol) const;
-	float& operator()(int iRow, int iCol);
-	float* operator[](int iRow) const;
 	float* operator[](int iRow);
+	float* operator[](int iRow) const;
 	gaV3 GetColumn(int iCol) const;
 	void GetColumns(gaV3& v0, gaV3& v1, gaV3& v2) const;
 	gaV3 GetDiagonal() const;
 	operator float*();
 	operator const float*() const;
+	gaM3& operator*=(const gaM3& mat);
 
 	gaM3& operator*=(float f);
-	gaM3& operator*=(const gaM3& mat);
 	gaM3& operator+=(const gaM3& mat);
 	gaM3& operator-=(const gaM3& mat);
 	gaM3& operator/=(float f);
+	gaM3 operator+() const;
 
 	gaM3 operator+(const gaM3& mat) const;
-	gaM3 operator+() const;
-	gaM3 operator-(const gaM3& mat) const;
 	gaM3 operator-() const;
-	gaV3 operator*(const gaV3& v) const;
-	gaM3 operator*(float f) const;
+	gaM3 operator-(const gaM3& mat) const;
 	gaM3 operator*(const gaM3& mat) const;
+	gaM3 operator*(float f) const;
+	gaV3 operator*(const gaV3& v) const;
 	gaM3 operator/(float f) const;
-	gaM3 TransposeTimes(const gaM3& mat) const;
 	gaV3 TransposeTimes(const gaV3& v) const;
+	gaM3 TransposeTimes(const gaM3& mat) const;
 	gaM3 TimesTranspose(const gaM3& mat) const;
 	gaM3 operator^(const gaV3& v) const;
 
@@ -284,12 +284,12 @@ struct gaV8
 {
 	float lx, ly, lz, lw;
 	float ax, ay, az, aw;
+	gaV8() { }
+	gaV8(float LX, float LY, float LZ, float AX, float AY, float AZ);
+	gaV8(float* af);
+	gaV8(const gaV8& v);
 
 	gaV8(const gaV3& vL, const gaV3& vA);
-	gaV8(const gaV8& v);
-	gaV8(float* af);
-	gaV8(float LX, float LY, float LZ, float AX, float AY, float AZ);
-	gaV8() { }
 
 	float& operator[](int i) const;
 	operator float*();
@@ -299,8 +299,8 @@ struct gaV8
 	bool operator!=(const gaV8& v) const;
 
 	gaV8 operator+(const gaV8& v) const;
-	gaV8 operator-() const;
 	gaV8 operator-(const gaV8& v) const;
+	gaV8 operator-() const;
 	gaV8 operator*(float f) const;
 	gaV8 operator/(float f) const;
 
@@ -331,17 +331,17 @@ struct gaT3
 	gaM3 R;
 	gaV3 T;
 	gaV3 S;
+	gaT3() { }
+	gaT3(const gaM3& r, const gaV3& t, const gaV3& s);
 
 	gaT3(const gaT3& t);
-	gaT3(const gaM3& r, const gaV3& t, const gaV3& s);
-	gaT3() { }
 
 	gaT3& SetIdentity();
 	gaV3 Transform(gaV3& v) const;
-	static gaM4 ToM4LH(const gaM3& r, const gaV3& t, const gaV3& s);
 	gaM4 ToM4LH();
-	static gaM4 ToM4RH(const gaM3& r, const gaV3& t, const gaV3& s);
+	static gaM4 ToM4LH(const gaM3& r, const gaV3& t, const gaV3& s);
 	gaM4 ToM4RH();
+	static gaM4 ToM4RH(const gaM3& r, const gaV3& t, const gaV3& s);
 
 	static const gaT3 ID;
 };
@@ -349,47 +349,47 @@ struct gaT3
 struct gaQ
 {
 	float x, y, z, w;
+	gaQ() { }
+	gaQ(const float* af);
+	gaQ(float fx, float fy, float fz, float fw);
+	gaQ(const gaQ& q);
+	gaQ(const gaM3& mat);
+	gaQ(const gaV3& axis, float radian);
 
 	gaQ(const gaV3* av);
-	gaQ(const gaV3& axis, float radian);
-	gaQ(const gaM3& mat);
-	gaQ(const gaQ& q);
-	gaQ(float fx, float fy, float fz, float fw);
-	gaQ(const float* af);
-	gaQ() { }
 
 	gaQ& SetZero();
-	gaQ& Set(const gaQ& q);
-	gaQ& Set(const gaV3& axis, float radian);
 	gaQ& Set(float fx, float fy, float fz, float fw);
+	gaQ& Set(const gaV3& axis, float radian);
+	gaQ& Set(const gaQ& q);
 
 	operator float*();
 	operator const float*() const;
-	float operator[](int i) const;
 	float& operator[](int i);
+	float operator[](int i) const;
 
 	gaQ& operator+=(const gaQ& q);
 	gaQ& operator-=(const gaQ& q);
-	gaQ& operator*=(float f);
 	gaQ& operator*=(const gaQ& q);
+	gaQ& operator*=(float f);
 	gaQ& operator/=(float f);
+	gaQ operator+() const;
 
 	gaQ operator+(const gaQ& q) const;
-	gaQ operator+() const;
-	gaQ operator-(const gaQ& q) const;
 	gaQ operator-() const;
-	gaV3 operator*(const gaV3& v) const;
-	gaQ operator*(float f) const;
+	gaQ operator-(const gaQ& q) const;
 	gaQ operator*(const gaQ& q) const;
+	gaQ operator*(float f) const;
+	gaV3 operator*(const gaV3& v) const;
 	gaQ operator/(float f) const;
 
 	bool operator==(const gaQ& q) const;
 	bool operator!=(const gaQ& q) const;
+	void FromRotationMatrix(const gaM3& mat);
 
 	void FromRotationMatrix(const gaV3* av);
-	void FromRotationMatrix(const gaM3& mat);
-	void ToRotationMatrix(gaV3* av) const;
 	void ToRotationMatrix(gaM3& mat) const;
+	void ToRotationMatrix(gaV3* av) const;
 	void FromAxisAngle(const gaV3& axis, float radian);
 	void ToAxisAngle(gaV3& axis, float& radian) const;
 	void FromTwoVectors(const gaV3& v0, const gaV3& v1);
@@ -416,9 +416,9 @@ struct gaQ
 struct gaP4
 {
 	float a, b, c, d;
+	gaP4() { }
 
 	gaP4(float fa, float fb, float fc, float fd);
-	gaP4() { }
 };
 
 struct gaM4
@@ -434,14 +434,14 @@ struct gaM4
 			float m41, m42, m43, m44;
 		};
 	};
+	gaM4() { }
+	gaM4(const float* af);
+	gaM4(const float af[4][4]);
+	gaM4(const gaM4& mat);
 
 	gaM4(float _11, float _12, float _13, float _14, float _21, float _22,
 		float _23, float _24, float _31, float _32, float _33, float _34,
 		float _41, float _42, float _43, float _44);
-	gaM4(const gaM4& mat);
-	gaM4(const float af[4][4]);
-	gaM4(const float* af);
-	gaM4() { }
 
 	void SetZero();
 	void SetIdentity();

@@ -92,7 +92,7 @@ bool CIntegrityCheck::ReportCharParts()
 					WBone* bone = puppet->FindMeshBone(NULL);
 					for (; bone; bone = puppet->FindMeshBone(bone))
 					{
-						w_mesh* mesh = bone->m_mesh;
+						w_mesh* mesh = bone->GetMesh();
 						for (int i = 0; mesh; ++i)
 						{
 							Log("\t\t* mesh%d : numVtx(%d), numIdx(%d), drawFlag(0x%08x), numMesh, drawFlag2(0x%08x)\n",

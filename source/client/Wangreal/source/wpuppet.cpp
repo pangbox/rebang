@@ -240,7 +240,7 @@ void WPuppet::Render(WView* view, bool transform, float value, bool light,
 		int flag = (light != false ? 1 : 0) | (shadow ? 0 : 2);
 		m_rootbone->Transform(m_mat, view, value, flag);
 	}
-	m_rootbone->Render(view, m_rootbone->m_light);
+	m_rootbone->Render(view, m_rootbone->GetLight());
 }
 
 void WPuppet::RenderHierarchy(WView* view, bool transform, float value,
@@ -317,15 +317,15 @@ WBoneSet* WPuppet::GetBones(const char* name, float time, int mode, char* bone,
 				}
 				else
 				{
-					for (WBone* child = found->m_child; child != 0;
-						child = child->m_next)
+					for (WBone* child = found->GetChild(); child != 0;
+						child = child->GetNext())
 						child->InsertBoneSetList(time - add->s, set, 1);
 				}
 			}
 			else
 			{
 				for (WBone* item = add->rootbone; item != 0;
-					item = item->m_next)
+					item = item->GetNext())
 					item->InsertBoneSetList(time - add->s, set, 1);
 			}
 			goto keyed;
@@ -338,7 +338,7 @@ WBoneSet* WPuppet::GetBones(const char* name, float time, int mode, char* bone,
 		{
 			found = m_rootbone->FindBone(bone, 0);
 			if (found != 0)
-				m_boneList.AddItem(found, found->m_name, false);
+				m_boneList.AddItem(found, found->GetBoneName(), false);
 		}
 		if ((mode & EXCEPTPARENT) == 0)
 		{
@@ -346,14 +346,14 @@ WBoneSet* WPuppet::GetBones(const char* name, float time, int mode, char* bone,
 		}
 		else
 		{
-			for (WBone* child = found->m_child; child != 0;
-				child = child->m_next)
+			for (WBone* child = found->GetChild(); child != 0;
+				child = child->GetNext())
 				child->InsertBoneSetList(time, set, 1);
 		}
 	}
 	else
 	{
-		for (WBone* item = m_rootbone; item != 0; item = item->m_next)
+		for (WBone* item = m_rootbone; item != 0; item = item->GetNext())
 			item->InsertBoneSetList(time, set, 1);
 	}
 keyed:
@@ -610,8 +610,8 @@ void WPuppet::HideBone(char* name)
 unsigned char WPuppet::GetAlpha(char* name)
 {
 	if (name != 0)
-		return FindBone(name)->m_alpha;
-	return m_rootbone->m_alpha;
+		return FindBone(name)->GetAlpha();
+	return m_rootbone->GetAlpha();
 }
 
 void WPuppet::SetAlpha(unsigned char alpha)
@@ -676,7 +676,7 @@ WBone* WPuppet::FindBone(const char* name)
 	{
 		bone = m_rootbone->FindBone(name, 0);
 		if (bone)
-			m_boneList.AddItem(bone, bone->m_name, false);
+			m_boneList.AddItem(bone, bone->GetBoneName(), false);
 	}
 	return bone;
 }
@@ -691,7 +691,7 @@ bool WPuppet::GetBoundBoxPlane(char* name, WPlane* plane)
 	w_bound_box* box = m_bbList.Find(name);
 	if (box)
 	{
-		MakePlaneEq(plane, box->info->aabb, &box->bone->m_matrix);
+		MakePlaneEq(plane, box->info->aabb, &box->bone->GetMatrix());
 		return true;
 	}
 	return false;
@@ -708,7 +708,7 @@ bool WPuppet::GetAlignBoundBoxPlane(char* name, WPlane* plane, Waabb* box)
 	{
 		WVector corner = WVector(bound->info->aabb.max.x,
 							 bound->info->aabb.max.y, bound->info->aabb.max.z) *
-			bound->bone->m_matrix;
+			bound->bone->GetMatrix();
 		aabb.min = aabb.max = corner;
 
 		for (int i = 1; i < 8; ++i)
@@ -720,7 +720,7 @@ bool WPuppet::GetAlignBoundBoxPlane(char* name, WPlane* plane, Waabb* box)
 			float x = (i & 1) != 0 ? bound->info->aabb.min.x
 								   : bound->info->aabb.max.x;
 			WVector vec;
-			vec = WVector(x, y, z) * bound->bone->m_matrix;
+			vec = WVector(x, y, z) * bound->bone->GetMatrix();
 			aabb += WVector(vec);
 		}
 
@@ -743,7 +743,7 @@ bool WPuppet::DotContact(char* name, const WVector& dot)
 		float z = box_v[i][2] ? box->info->aabb.max.z : box->info->aabb.min.z;
 		float y = box_v[i][1] ? box->info->aabb.max.y : box->info->aabb.min.y;
 		float x = box_v[i][0] ? box->info->aabb.max.x : box->info->aabb.min.x;
-		corner[i] = WVector(x, y, z) * box->bone->m_matrix;
+		corner[i] = WVector(x, y, z) * box->bone->GetMatrix();
 	}
 	for (int f = 0; f < 6; ++f)
 	{
@@ -775,7 +775,7 @@ WVector WPuppet::GetPivot(const char* name)
 
 WMatrix WPuppet::GetRootMatrix()
 {
-	return m_rootbone->m_localMat;
+	return m_rootbone->GetLocalMatrix();
 }
 
 WBone* WPuppet::FindBoneByTail(const char* tail)
@@ -811,7 +811,7 @@ void WPuppet::MakeTemporaryCenterBox(void)
 	if (m_bbList.Find("center") == 0)
 	{
 		box = m_bound;
-		SetBoundBox("center", &box, m_rootbone->m_name);
+		SetBoundBox("center", &box, m_rootbone->GetBoneName());
 		m_bHaveCenter = false;
 		if (m_BBox.bone != 0)
 		{
@@ -828,14 +828,14 @@ void WPuppet::MakeTemporaryCenterBox(void)
 
 void WPuppet::OptimizeBone(void)
 {
-	for (WBone* bone = m_rootbone; bone; bone = bone->m_next)
+	for (WBone* bone = m_rootbone; bone; bone = bone->GetNext())
 		ReduceBone(bone);
 }
 
 bool WPuppet::ReduceBone(WBone* bone)
 {
 	int reduced = CheckStaticBone(bone) ? 1 : 0;
-	WBone* child = bone->m_child;
+	WBone* child = bone->GetChild();
 	while (child != 0)
 	{
 		if (ReduceBone(child) == true)
@@ -844,7 +844,7 @@ bool WPuppet::ReduceBone(WBone* bone)
 		}
 		else
 		{
-			child = child->m_next;
+			child = child->GetNext();
 			reduced = false;
 		}
 	}
@@ -853,13 +853,13 @@ bool WPuppet::ReduceBone(WBone* bone)
 
 bool WPuppet::CheckStaticBone(WBone* bone)
 {
-	if (bone->HasAnimation() || bone->m_parent == 0)
+	if (bone->HasAnimation() || bone->GetParent() == 0)
 		return false;
 
 	for (w_motion_data* motion = m_mdList->Start(); motion != 0;
 		motion = m_mdList->Next())
 	{
-		if (strcmp(motion->applybone, bone->m_name) == 0)
+		if (strcmp(motion->applybone, bone->GetBoneName()) == 0)
 			return false;
 	}
 	for (w_bound_box* box = m_bbList.Start(); box != 0; box = m_bbList.Next())
@@ -874,8 +874,8 @@ bool WPuppet::CheckStaticBone(WBone* bone)
 
 WBone* WPuppet::MergeBone(WBone* target, WBone* source)
 {
-	WBone* next = source->m_next;
-	WBone* parent = source->m_parent;
+	WBone* next = source->GetNext();
+	WBone* parent = source->GetParent();
 	parent->ReleaseChild(source);
 
 	WSphere sphere;
@@ -1080,7 +1080,7 @@ void WPuppet::UpdateBSphere(void)
 	WBone* bone = m_BBox.bone;
 	if (bone)
 	{
-		WMatrix* matrix = &bone->m_matrix;
+		WMatrix* matrix = &bone->GetMatrix();
 		w_bound_box_info* info = m_BBox.info;
 		WVector min;
 		WVector max;
@@ -1109,7 +1109,7 @@ void WPuppet::SetPhysicsModel(const char* name, int model)
 	{
 		bone = m_rootbone->FindBone(name, 0);
 		if (bone != 0)
-			m_boneList.AddItem(bone, bone->m_name, false);
+			m_boneList.AddItem(bone, bone->GetBoneName(), false);
 	}
 	bone->SetPhysicsModel(model);
 	m_phybone += bone;
@@ -1124,7 +1124,7 @@ void WPuppet::RotateBone(char* name, float angle, int axis)
 		bone = m_rootbone->FindBone(key, 0);
 		if (bone == 0)
 			return;
-		m_boneList.AddItem(bone, bone->m_name, false);
+		m_boneList.AddItem(bone, bone->GetBoneName(), false);
 	}
 	bone->Rotate(angle, axis, *name != '@');
 }
@@ -1177,7 +1177,7 @@ void WPuppet::RenderBoundBox(const char* name, WView* view, unsigned long color,
 							: (float)(box->info->aabb.min.y - size),
 				box_v[i][2] ? (float)(size + box->info->aabb.max.z)
 							: (float)(box->info->aabb.min.z - size));
-			v[i] = p * box->bone->m_matrix;
+			v[i] = p * box->bone->GetMatrix();
 		}
 	}
 	for (int f = 0; f < 6; ++f)
@@ -1446,14 +1446,14 @@ WBone* WPuppet::LoadPET_Bone(cFile* file, int version)
 	}
 	delete[] mats;
 	delete[] bones;
-	for (WBone* previous = root; previous->m_next != 0;
-		previous = previous->m_next)
+	for (WBone* previous = root; previous->GetNext() != 0;
+		previous = previous->GetNext())
 	{
-		if (strstr(previous->m_next->GetBoneName(), "Bip") != 0 ||
-			strstr(previous->m_next->GetBoneName(), "Bone") != 0 ||
-			strstr(previous->m_next->GetBoneName(), "Dummy") != 0)
+		if (strstr(previous->GetNext()->GetBoneName(), "Bip") != 0 ||
+			strstr(previous->GetNext()->GetBoneName(), "Bone") != 0 ||
+			strstr(previous->GetNext()->GetBoneName(), "Dummy") != 0)
 		{
-			WBone* next = previous->m_next;
+			WBone* next = previous->GetNext();
 			previous->SetNext(0, true);
 			next->SetNext(root, true);
 			root = next;
@@ -1533,9 +1533,9 @@ bool WPuppet::AddMotion(const char* name, char* alias)
 	if (add->mdList == 0)
 	{
 		add->mdList = new WList<w_motion_data*>(2, 2);
-		w_motion_data* data =
-			(w_motion_data*)new char[strlen(motion) + strlen(motion) +
-				strlen(add->rootbone->m_name) + sizeof(w_motion_data) + 3];
+		w_motion_data* data = (w_motion_data*)new char[strlen(motion) +
+			strlen(motion) + strlen(add->rootbone->GetBoneName()) +
+			sizeof(w_motion_data) + 3];
 		data->s = add->s;
 		data->end = data->e = add->length + add->s;
 		data->option1 = 1;
@@ -1545,7 +1545,7 @@ bool WPuppet::AddMotion(const char* name, char* alias)
 		data->applybone = data->nextmotion + strlen(motion) + 1;
 		strcpy(data->name, motion);
 		data->nextmotion[0] = 0;
-		strcpy(data->applybone, add->rootbone->m_name);
+		strcpy(data->applybone, add->rootbone->GetBoneName());
 		add->mdList->AddItem(data, data->name, false);
 	}
 
@@ -2373,7 +2373,7 @@ void WPuppet::LoadPET_Mesh(cFile* file, WBone* root,
 			bone->SetBoneMesh(vertices + skins[i].iSVtxIdx, skins[i].nVtxs,
 				triangles + skins[i].iSTriIdx * 3, textures + skins[i].iSTriIdx,
 				bones + skins[i].iSTriIdx * 3, skins[i].nTris);
-			for (w_mesh* mesh = bone->m_mesh; mesh; mesh = mesh->next)
+			for (w_mesh* mesh = bone->GetMesh(); mesh; mesh = mesh->next)
 				strcpy(mesh->mpetName, m_petName);
 		}
 	}
@@ -2427,11 +2427,11 @@ void WPuppet::MergeRootMotion(WList<w_motion_data*>* list, WBone* bone)
 {
 	for (w_motion_data* data = list->Start(); data != 0; data = list->Next())
 	{
-		for (WBone* b = bone; b != 0; b = b->m_next)
+		for (WBone* b = bone; b != 0; b = b->GetNext())
 		{
 			if (data->applybone[0] == 0)
 				break;
-			if (strcmp(b->m_name, data->applybone) == 0)
+			if (strcmp(b->GetBoneName(), data->applybone) == 0)
 				data->applybone[0] = 0;
 		}
 	}
@@ -2504,7 +2504,7 @@ void WPuppet::xBuildTransfMatPtrList(void)
 void WPuppet::AttachMeshBone(WPuppet* other, int handle, int oldHandle)
 {
 	WBone* tail;
-	for (tail = m_rootbone; tail->m_next != 0; tail = tail->m_next)
+	for (tail = m_rootbone; tail->GetNext() != 0; tail = tail->GetNext())
 	{
 	}
 
@@ -2537,13 +2537,13 @@ void WPuppet::AttachMeshBone(WPuppet* other, int handle, int oldHandle)
 				if (list[i] == 0)
 					continue;
 				WBone* found = other->m_rootbone->FindBone(i);
-				WBone* mapped = m_boneList.Find(found->m_name);
+				WBone* mapped = m_boneList.Find(found->GetBoneName());
 				if (mapped == 0)
 				{
-					mapped = m_rootbone->FindBone(found->m_name, 0);
+					mapped = m_rootbone->FindBone(found->GetBoneName(), 0);
 					if (mapped == 0)
 						continue;
-					m_boneList.AddItem(mapped, mapped->m_name, false);
+					m_boneList.AddItem(mapped, mapped->GetBoneName(), false);
 				}
 				int id = mapped->GetID();
 				if (id < 0)
@@ -2563,13 +2563,13 @@ void WPuppet::DetachMeshBone(WPuppet* other)
 	{
 		WBone* found;
 		WBone* previous;
-		FindMeshBone(&found, &previous, bone->m_name);
+		FindMeshBone(&found, &previous, bone->GetBoneName());
 		if (found != 0)
 		{
 			if (previous != 0)
-				previous->SetNext(found->m_next, false);
+				previous->SetNext(found->GetNext(), false);
 			else
-				m_rootbone = found->m_next;
+				m_rootbone = found->GetNext();
 			found->SetNext(0, true);
 			delete found;
 		}
@@ -2597,20 +2597,21 @@ void WPuppet::ChangeTextureByHandle(int from, int to, WPuppet* other)
 	{
 		WBone* root = m_rootbone;
 		WBone* found = 0;
-		if (stricmp(root->m_name, bone->m_name) == 0)
+		if (stricmp(root->GetBoneName(), bone->GetBoneName()) == 0)
 		{
 			found = root;
 		}
 		else
 		{
-			while (root->m_next != 0)
+			while (root->GetNext() != 0)
 			{
-				if (stricmp(root->m_next->m_name, bone->m_name) == 0)
+				if (stricmp(root->GetNext()->GetBoneName(),
+						bone->GetBoneName()) == 0)
 				{
-					found = root->m_next;
+					found = root->GetNext();
 					break;
 				}
-				root = root->m_next;
+				root = root->GetNext();
 			}
 		}
 		if (found != 0)
@@ -2635,23 +2636,23 @@ void WPuppet::FindMeshBone(WBone** found, WBone** previous, const char* name)
 	if (previous)
 		*previous = 0;
 	WBone* bone = m_rootbone;
-	if (stricmp(bone->m_name, name) == 0)
+	if (stricmp(bone->GetBoneName(), name) == 0)
 	{
 		*found = bone;
 		return;
 	}
-	WBone* next = bone->m_next;
+	WBone* next = bone->GetNext();
 	while (next != 0)
 	{
-		if (stricmp(next->m_name, name) == 0)
+		if (stricmp(next->GetBoneName(), name) == 0)
 		{
-			*found = bone->m_next;
+			*found = bone->GetNext();
 			if (previous)
 				*previous = bone;
 			return;
 		}
-		bone = bone->m_next;
-		next = bone->m_next;
+		bone = bone->GetNext();
+		next = bone->GetNext();
 	}
 }
 
@@ -2660,27 +2661,27 @@ WBone* WPuppet::FindMeshBone(WBone* previous)
 	if (previous == 0)
 	{
 		WBone* first = m_rootbone;
-		while (first != 0 && first->m_mesh == 0)
-			first = first->m_next;
+		while (first != 0 && first->GetMesh() == 0)
+			first = first->GetNext();
 		return first;
 	}
 	WBone* bone = m_rootbone;
 	while (bone != 0 && bone != previous)
-		bone = bone->m_next;
+		bone = bone->GetNext();
 	if (bone != 0)
 	{
-		bone = bone->m_next;
-		while (bone != 0 && bone->m_mesh == 0)
-			bone = bone->m_next;
+		bone = bone->GetNext();
+		while (bone != 0 && bone->GetMesh() == 0)
+			bone = bone->GetNext();
 	}
 	return bone;
 }
 
 void WPuppet::UpdateMeshBonePtr(WPuppet* other)
 {
-	for (WBone* bone = m_rootbone; bone != 0; bone = bone->m_next)
+	for (WBone* bone = m_rootbone; bone != 0; bone = bone->GetNext())
 	{
-		if (bone->m_mesh != 0)
+		if (bone->GetMesh() != 0)
 			bone->ResetMeshBone(other->m_rootbone, false);
 	}
 }
@@ -2692,7 +2693,7 @@ w_face_animation* WPuppet::FindFaceAnim(char* name)
 
 void WPuppet::DisableFog(void)
 {
-	for (WBone* bone = m_rootbone; bone; bone = bone->m_next)
+	for (WBone* bone = m_rootbone; bone; bone = bone->GetNext())
 		bone->DisableFog();
 }
 
@@ -2708,7 +2709,7 @@ void WPuppet::ScaleBone(char* name, float scale)
 		bone = m_rootbone->FindBone(name, 0);
 		if (bone == 0)
 			return;
-		m_boneList.AddItem(bone, bone->m_name, false);
+		m_boneList.AddItem(bone, bone->GetBoneName(), false);
 	}
 	bone->SetScale(scale);
 }

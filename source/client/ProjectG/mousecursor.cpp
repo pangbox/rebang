@@ -139,7 +139,7 @@ void CMouseCursor::Reset(bool active)
 	memset(m_bArea, true, sizeof(m_bArea));
 }
 
-void CMouseCursor::Process(float dt)
+void CMouseCursor::Process(const float dt)
 {
 	if (!m_bShow)
 		return;

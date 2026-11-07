@@ -133,7 +133,7 @@ void CExtendedEffect::Update(CPetFrame* pet)
 				(*effect).sequence->SetActive(active, false);
 				WBone* bone = (*avatar).pet->GetBonePet()->FindBone(
 					(*effect).bone.c_str());
-				(*effect).sequence->Pos() = bone->m_matrix.pivot;
+				(*effect).sequence->Pos() = bone->GetMatrix().pivot;
 			}
 		}
 	}

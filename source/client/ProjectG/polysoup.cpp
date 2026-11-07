@@ -670,7 +670,7 @@ bool WPolySoup::Load(const char* filename, bool bOption)
 					mesh->vtxColorList[index] |= 0xff000000;
 
 				m_baseModel->tri[i].v[k] =
-					mesh->vecList[index] * root->m_matrix;
+					mesh->vecList[index] * root->GetMatrix();
 			}
 
 			WVector* v = m_baseModel->tri[i].v;
@@ -805,7 +805,8 @@ bool WPolySoup::Load(const char* filename, bool bOption)
 		unsigned long flags = 0;
 		if (model->type)
 			flags |= 4;
-		if ((model->flag & 0x10) || model->pet->m_boundSphere.radius > 128.0f)
+		if ((model->flag & 0x10) ||
+			model->pet->GetBoundSphere().radius > 128.0f)
 			flags |= 2;
 		if (model->flag & 8)
 			flags |= 1;
@@ -1646,10 +1647,10 @@ void WPolySoup::SetAdditionModel(const char* name, const WVector& pos)
 	w_bound_box* bb = model->pet->m_bbList.Find("char0");
 	if (bb)
 	{
-		model->obb = bb->bone->m_matrix;
+		model->obb = bb->bone->GetMatrix();
 		model->obb *= (bb->info->aabb.max - bb->info->aabb.min) * 0.5f +
 			WVector::ONE * 1.6f;
-		model->obb.center = bb->info->spherePivot * bb->bone->m_matrix;
+		model->obb.center = bb->info->spherePivot * bb->bone->GetMatrix();
 		g_view->DrawOBB(model->obb, 0xff00ff00);
 	}
 
@@ -1668,7 +1669,7 @@ void WPolySoup::SetAdditionModel(const char* name, const WVector& pos)
 	unsigned long flag = 0;
 	if (model->type)
 		flag |= 4;
-	if ((model->flag & 0x10) || model->pet->m_boundSphere.radius > 128.0f)
+	if ((model->flag & 0x10) || model->pet->GetBoundSphere().radius > 128.0f)
 		flag |= 2;
 	if (model->flag & 8)
 		flag |= 1;
@@ -1785,14 +1786,14 @@ void WPolySoup::MakeStatistics()
 	for (int i = 0; i < m_modelNum; i++)
 	{
 		sModel* model = m_model[i];
-		int faceNum = model->pet->m_faceNum;
+		int faceNum = model->pet->GetFaceNum();
 		int index = faceNum / 100;
 		if (index > 10)
 			index = 10;
 		count[index]++;
 
-		total += model->pet->m_faceNum;
-		maxFace = Max(model->pet->m_faceNum, maxFace);
+		total += model->pet->GetFaceNum();
+		maxFace = Max(model->pet->GetFaceNum(), maxFace);
 		minFace = Min(faceNum, minFace);
 	}
 
@@ -1817,13 +1818,13 @@ void WPolySoup::MakeStatistics()
 	int sum = 0;
 	for (int i = 0; i < m_modelNum; i++)
 	{
-		int faceNum = m_model[i]->pet->m_faceNum;
+		int faceNum = m_model[i]->pet->GetFaceNum();
 		sum += faceNum * faceNum;
 	}
 	int variance = (sum - m_modelNum * average * average) / (m_modelNum - 1);
 
 	fprintf(fp, "\n\xc7\xd5\xb0\xe8   : %d(%d)\n",
-		m_baseModel->pet->m_faceNum + total, m_modelNum);
+		m_baseModel->pet->GetFaceNum() + total, m_modelNum);
 	fprintf(fp, "\xc6\xf2\xb1\xd5\xb0\xaa : %d\n", average);
 	fprintf(fp, "\xc3\xd6\xbc\xd2\xb0\xaa : %d\n", minFace);
 	fprintf(fp, "\xc3\xd6\xb4\xeb\xb0\xaa : %d\n", maxFace);

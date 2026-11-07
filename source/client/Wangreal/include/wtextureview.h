@@ -103,6 +103,6 @@ public:
 	bool NeedToUpdate(const WMatrix& cam);
 
 private:
-	WPuppet* m_target;
+	const WPuppet* m_target;
 	float m_tolerance;
 };

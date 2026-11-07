@@ -14,8 +14,8 @@ struct EmptyRect
 class WRectManager
 {
 public:
-	WRectManager(int width, int height) { Clear(width, height); }
 	WRectManager() { }
+	WRectManager(int width, int height) { Clear(width, height); }
 	void Clear(int width, int height)
 	{
 		mem.Clear();

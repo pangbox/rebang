@@ -725,7 +725,7 @@ inline void CExhibition::ScriptProcess(const w_motion_data* pMotion, float from,
 				if (pPuppet->CheckFrameData(first, last, from2, to2))
 				{
 					for (int i = from2; i <= to2; ++i)
-						ParsePuppetScript(pPuppet->m_frame[i].data);
+						ParsePuppetScript(pPuppet->GetFrameData(i));
 				}
 			}
 		}

@@ -415,7 +415,7 @@ void CPetBody::ScriptProcess(const w_motion_data* motion, float from, float to)
 			if (m_pPet->CheckFrameData(first, last, start, end))
 			{
 				for (int i = start; i <= end; i++)
-					ParsePuppetScript(m_pPet->m_frame[i].data);
+					ParsePuppetScript(m_pPet->GetFrameData(i));
 			}
 		}
 	}
@@ -542,7 +542,7 @@ void CPetBody::ParsePuppetScript(const char* script)
 					WBone* pBone = m_pPet->FindBone(bone);
 					if (pBone)
 					{
-						attacher.mat[j] = &pBone->m_matrix;
+						attacher.mat[j] = &pBone->GetMatrix();
 					}
 					else
 					{
@@ -550,7 +550,7 @@ void CPetBody::ParsePuppetScript(const char* script)
 						if (box)
 						{
 							if (box->bone)
-								attacher.mat[j] = &box->bone->m_matrix;
+								attacher.mat[j] = &box->bone->GetMatrix();
 							attacher.pos[j] = &box->info->spherePivot;
 						}
 					}
@@ -742,7 +742,7 @@ void CPetBody::SetScale(float scale)
 
 	if (m_pPet)
 	{
-		m_pPet->m_mat.AxisScale(WVector(scale, scale, scale));
+		m_pPet->GetMatrix().AxisScale(WVector(scale, scale, scale));
 	}
 }
 
@@ -759,7 +759,7 @@ WMatrix CPetBody::GetMatrix(eBody body)
 	{
 	case BODY_HEAD:
 		mat = RotMat(m_lookAngle.x, 0) * RotMat(m_lookAngle.y, 1) * s_headMat *
-			m_pPet->FindBoneByTail("Head")->m_matrix;
+			m_pPet->FindBoneByTail("Head")->GetMatrix();
 		break;
 	case BODY_ROOT:
 		mat = m_pPet->GetMatrix();
@@ -778,7 +778,7 @@ void CPetBody::LookUpProcess(float dt)
 	if (m_pLookAt)
 	{
 		WVector dir =
-			*m_pLookAt - m_pPet->FindBoneByTail("Head")->m_matrix.pivot;
+			*m_pLookAt - m_pPet->FindBoneByTail("Head")->GetMatrix().pivot;
 		m_lookDest.x = Between(-0.34906584f,
 			atanf(dir.y / sqrtf(dir.x * dir.x + dir.z * dir.z)), g_PI / 4);
 
