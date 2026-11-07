@@ -87,7 +87,6 @@ struct sFindRival
 
 	bool operator()(sRivalData& rival) { return rival.oid == oid; }
 };
-ILNUM_FR
 
 enum eStateTrade
 {
@@ -755,7 +754,6 @@ bool SetCurMap(unsigned char map);
 unsigned char GetCurMap();
 bool IsCurMapSnow();
 
-ILNUM_SDC
 ILFILL3
 
 #include "golftask.h"

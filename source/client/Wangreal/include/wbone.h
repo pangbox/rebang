@@ -228,16 +228,17 @@ public:
 	void UpdatePhysicsModel(float delta, const WVector& accel);
 	struct w_bone_physic_link
 	{
+		int vtxnum;
+		WVector* pos;
+		WVector* vel;
+		WVector** list;
+
 		struct w_bone_physic_link_element
 		{
 			int offset;
 			float length;
 		};
 
-		int vtxnum;
-		WVector* pos;
-		WVector* vel;
-		WVector** list;
 		w_bone_physic_link_element* link;
 		int* linkoffset;
 	};

@@ -60,12 +60,12 @@ int CTextOut::Print(float x, float y, const char* text,
 	if (text == 0 || text[0] == '\0')
 		return 0;
 	_TEXTSET* set = GetTextSet(text, m_iFontSize);
-	set->lastRenderTick = timeGetTime();
+	set->lastrendertick = timeGetTime();
 	_DISPLAYLIST entry;
 	entry.set = set;
 	entry.x = x;
 	entry.y = y;
-	entry.renderState = renderState;
+	entry.rs = renderState;
 	entry.diffuse = diffuse;
 	m_DisplayList.push_back(entry);
 	return set->width;
@@ -111,18 +111,17 @@ void CTextOut::Flush(WView* view)
 		WRect target;
 		target.x = item.x;
 		target.y = item.y;
-		for (_IMAGESET* image = item.set->images; image != 0;
-			image = image->next)
+		for (_IMAGESET* image = item.set->ptr; image != 0; image = image->next)
 		{
 			source.x = (float)image->x / 256.0f;
 			source.y = (float)image->y / 256.0f;
-			source.w = (float)image->width / 256.0f;
-			source.h = (float)image->height / 256.0f;
-			target.w = (float)image->width;
-			target.h = (float)image->height;
-			DrawTexture(view, m_TextList[image->texture], source, target,
-				(int)item.renderState, item.diffuse, 0.0f, 0, true);
-			target.x += (float)image->width;
+			source.w = (float)image->w / 256.0f;
+			source.h = (float)image->h / 256.0f;
+			target.w = (float)image->w;
+			target.h = (float)image->h;
+			DrawTexture(view, m_TextList[image->idx], source, target,
+				(int)item.rs, item.diffuse, 0.0f, 0, true);
+			target.x += (float)image->w;
 		}
 	}
 	m_DisplayList.clear();
@@ -134,9 +133,9 @@ void CTextOut::Flush(WView* view)
 		list::multimap_str<_TEXTSET*>::iterator current = m_TextSet.begin();
 		while (current != m_TextSet.end())
 		{
-			if (now - (*current).second->lastRenderTick > 10000)
+			if (now - (*current).second->lastrendertick > 10000)
 			{
-				_IMAGESET* image = (*current).second->images;
+				_IMAGESET* image = (*current).second->ptr;
 				while (image != 0)
 				{
 					_IMAGESET* old = image;
@@ -164,7 +163,7 @@ CTextOut::_TEXTSET* CTextOut::GetTextSet(const char* text, int fontSize)
 			m_TextSet.upper_bound(text);
 		for (; match != limit; match++)
 		{
-			if ((*match).second->fontSize == fontSize)
+			if ((*match).second->fntsize == fontSize)
 				return (*match).second;
 		}
 	}
@@ -173,9 +172,9 @@ CTextOut::_TEXTSET* CTextOut::GetTextSet(const char* text, int fontSize)
 	_TEXTSET* set = (_TEXTSET*)new char[sizeof(_TEXTSET) + length];
 	set->valid = false;
 	set->width = 0;
-	set->fontSize = fontSize;
-	set->lastRenderTick = timeGetTime();
-	set->images = 0;
+	set->fntsize = fontSize;
+	set->lastrendertick = timeGetTime();
+	set->ptr = 0;
 	strcpy(set->text, text);
 	UpdateText(set);
 	m_TextSet.insert(std::make_pair(set->text, set));
@@ -188,14 +187,14 @@ void CTextOut::UpdateText(_TEXTSET* textset)
 	_IMAGESET* cur = 0;
 	int wlen;
 	_IMAGESET set;
-	set.texture = m_WorkTextureCnt;
+	set.idx = m_WorkTextureCnt;
 	set.x = m_WorkX;
-	set.height = 0;
+	set.h = 0;
 	int w = 0;
 	int h = 0;
 	wlen = 0;
 	set.y = m_WorkY[0];
-	m_pFontSet->ChangFontSize(textset->fontSize);
+	m_pFontSet->ChangFontSize(textset->fntsize);
 	const char* text = textset->text;
 	for (int i = 0; text[i] != '\0';)
 	{
@@ -218,11 +217,11 @@ void CTextOut::UpdateText(_TEXTSET* textset)
 
 		if (m_WorkX + w > 0x100)
 		{
-			set.width = m_WorkX - set.x;
-			if (set.width != 0)
+			set.w = m_WorkX - set.x;
+			if (set.w != 0)
 			{
 				_IMAGESET* image = new _IMAGESET;
-				wlen += set.width;
+				wlen += set.w;
 				*image = set;
 				image->next = 0;
 				if (cur == 0)
@@ -233,18 +232,18 @@ void CTextOut::UpdateText(_TEXTSET* textset)
 			}
 			m_WorkX = 0;
 			set.x = 0;
-			set.height = 0;
+			set.h = 0;
 			m_WorkY[0] = m_WorkY[1];
 			set.y = m_WorkY[0];
 		}
 
-		if (m_WorkY[0] + h > 0x100 || m_WorkY[0] + set.height > 0x100)
+		if (m_WorkY[0] + h > 0x100 || m_WorkY[0] + set.h > 0x100)
 		{
-			set.width = m_WorkX - set.x;
-			if (set.width != 0)
+			set.w = m_WorkX - set.x;
+			if (set.w != 0)
 			{
 				_IMAGESET* image = new _IMAGESET;
-				wlen += set.width;
+				wlen += set.w;
 				*image = set;
 				image->next = 0;
 				if (cur == 0)
@@ -255,8 +254,8 @@ void CTextOut::UpdateText(_TEXTSET* textset)
 			}
 			UpdateTexture();
 			UseNextTexture();
-			set.texture = m_WorkTextureCnt;
-			set.height = 0;
+			set.idx = m_WorkTextureCnt;
+			set.h = 0;
 			m_WorkX = 0;
 			set.x = 0;
 			m_WorkY[1] = 0;
@@ -269,18 +268,18 @@ void CTextOut::UpdateText(_TEXTSET* textset)
 			m_WorkImage.vram + m_WorkY[0] * pitch + m_WorkX * 4, pitch);
 		m_WorkX += w;
 		m_bUpdateTexture = true;
-		if (h > set.height)
+		if (h > set.h)
 		{
-			set.height = h;
+			set.h = h;
 			if (h + m_WorkY[0] > m_WorkY[1])
 				m_WorkY[1] = h + m_WorkY[0];
 		}
 	}
 
-	set.width = m_WorkX - set.x;
-	if (set.width != 0)
+	set.w = m_WorkX - set.x;
+	if (set.w != 0)
 	{
-		wlen += set.width;
+		wlen += set.w;
 		_IMAGESET* image = new _IMAGESET;
 		*image = set;
 		image->next = 0;
@@ -292,17 +291,17 @@ void CTextOut::UpdateText(_TEXTSET* textset)
 		m_bUpdateTexture = true;
 	}
 
-	_IMAGESET* old = textset->images;
+	_IMAGESET* old = textset->ptr;
 	while (old != 0)
 	{
 		_IMAGESET* image = old;
 		old = old->next;
 		delete image;
 	}
-	textset->images = root;
+	textset->ptr = root;
 	textset->valid = true;
 	textset->width = wlen;
-	textset->lastRenderTick = timeGetTime();
+	textset->lastrendertick = timeGetTime();
 }
 
 void CTextOut::Clear(void)
@@ -312,7 +311,7 @@ void CTextOut::Clear(void)
 		current != m_TextSet.end(); current++)
 	{
 		_TEXTSET* set = (*current).second;
-		_IMAGESET* image = set->images;
+		_IMAGESET* image = set->ptr;
 		while (image != 0)
 		{
 			_IMAGESET* old = image;
@@ -358,10 +357,10 @@ void CTextOut::UseNextTexture(void)
 	list::multimap_str<_TEXTSET*>::iterator current = m_TextSet.begin();
 	while (current != m_TextSet.end())
 	{
-		for (_IMAGESET* image = (*current).second->images; image != 0;
+		for (_IMAGESET* image = (*current).second->ptr; image != 0;
 			image = image->next)
 		{
-			if (image->texture == m_WorkTextureCnt)
+			if (image->idx == m_WorkTextureCnt)
 			{
 				(*current).second->valid = false;
 				break;

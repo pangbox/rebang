@@ -23,7 +23,9 @@ public:
 			*out = m_pcResBuf;
 		return GetToken(m_pcResBuf, separators, length);
 	}
-	int GetTokenNum(int pos, const char* separators, int length) const;
+	bool GetTokenWithoutFail(char* const out, const char* separators,
+		int length);
+	bool GetTokenWithoutFail(char** out, const char* separators, int length);
 	bool GetTokenFullSep(char* const out, const char* separators, int length);
 	bool GetTokenFullSep(char** out, const char* separators, int length)
 	{
@@ -37,6 +39,10 @@ public:
 			*out = m_pcResBuf;
 		return GetTokenFullSep(m_pcResBuf, separators, length);
 	}
+	int GetTokenNum(int pos, char separator) const;
+	int GetTokenNum(int pos, const char* separators, int length) const;
+	char GetChar();
+	int GetChange(char* const out);
 
 protected:
 	bool GetResultBuf();

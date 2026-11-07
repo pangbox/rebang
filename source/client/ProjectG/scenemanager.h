@@ -121,7 +121,6 @@ struct SceneElemRegister
 typedef std::list<SceneElement>::iterator SceneElementIter;
 typedef std::list<CustomElement>::iterator CustomElementIter;
 typedef std::list<TransparentElement>::iterator TransparentElementIter;
-ILNUM_SMI
 
 class CSceneManager : public CStackableSingleton<CSceneManager>
 {

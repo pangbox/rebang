@@ -26,11 +26,11 @@ public:
 private:
 	struct _IMAGESET
 	{
-		int texture;
+		int idx;
 		int x;
 		int y;
-		int width;
-		int height;
+		int w;
+		int h;
 		_IMAGESET* next;
 	};
 
@@ -38,9 +38,9 @@ private:
 	{
 		bool valid;
 		int width;
-		int fontSize;
-		unsigned long lastRenderTick;
-		_IMAGESET* images;
+		int fntsize;
+		unsigned long lastrendertick;
+		_IMAGESET* ptr;
 		char text[1];
 	};
 
@@ -67,7 +67,7 @@ private:
 		_TEXTSET* set;
 		float x;
 		float y;
-		unsigned long renderState;
+		unsigned long rs;
 		unsigned long diffuse;
 	};
 

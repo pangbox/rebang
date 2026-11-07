@@ -8,29 +8,6 @@
 #include <winsock2.h>
 #include <windows.h>
 #include "../Wangreal/include/wtypes.h"
-namespace ILNUM_WT
-{
-	typedef int t0;
-	typedef int t1;
-	typedef int t2;
-	typedef int t3;
-	typedef int t4;
-	typedef int t5;
-	typedef int t6;
-	typedef int t7;
-	typedef int t8;
-	typedef int t9;
-	typedef int t10;
-	typedef int t11;
-	typedef int t12;
-	typedef int t13;
-	typedef int t14;
-	typedef int t15;
-	typedef int t16;
-	typedef int t17;
-	typedef int t18;
-	typedef int t19;
-}
 #include <atlbase.h>
 #include <atlapp.h>
 extern WTL::CAppModule _Module;
@@ -126,9 +103,7 @@ ILFILLF2
 ILFILLTB
 #include "frtabbutton.h"
 #include "frgaugebar.h"
-ILNUM_GB
 #include "frwndmanager.h"
-ILNUM_G0
 #include "frgraphicinterface.h"
 #include "fremoticon.h"
 #include "fresh.h"
@@ -137,15 +112,12 @@ ILNUM_G0
 #include "soundmanager.h"
 #include "inputmanager.h"
 #include "networksystem.h"
-ILNUM_NET
 #include "networkmonitor.h"
 #include "ccrc32.h"
 // HACK
 template unsigned int std::vector<CRC_MT::sCRC_CHKTASK*>::size() const;
 #include "mainframe.h"
 #include "projectg.h"
-ILNUM_TB2
-ILNUM_GB2
 #include "frviewer.h"
 #include "../../shared/globalgamedefine.h"
 #include "../../shared/globalnetworkdefine.h"
@@ -155,8 +127,6 @@ ILNUM_GB2
 #include "taskmanager.h"
 #include "actor.h"
 #include "taskmain.h"
-ILNUM_SCENE
-
 // HACK: workaround for unsolved symbol ordering problems
 template void std::vector<WVector>::reserve(unsigned int);
 #include "shareddoc.h"

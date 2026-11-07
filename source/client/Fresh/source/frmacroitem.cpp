@@ -1,9 +1,7 @@
 #include "frmacroitem.h"
 #include "frelement.h"
 #include "frwndmanager.h"
-
-// HACK: stands in for an unknown erased inline use of __rtti_obj
-static __declspec(thread) int __rtti_tls_pad;
+#include "rtti.h"
 
 FrMacroItem::FrMacroItem()
 	: m_pOwner(0)
