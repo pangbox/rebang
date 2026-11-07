@@ -5034,12 +5034,13 @@ void WDirect3D8::UpdateShaderValue(int h)
 		D3DXMatrixMultiply(&temp, this->m_xLastWorldMatrix,
 			&this->m_xLastViewMatrix);
 		D3DXMatrixMultiply(&mat, &temp, &this->m_xLastProjMatrix);
-		this->m_fxParamPool.SetMatrix(fx.pEffect, WFxParamWorldViewProjection,
-			fx.param[0].handle, fx.param[0].isShared, mat);
+		this->m_fxParamPool.SetMatrix(fx.pEffect,
+			WVDFXPARAM_WORLDVIEWPROJECTION, fx.param[0].handle,
+			fx.param[0].isShared, mat);
 	}
 	if (fx.param[1].handle)
 	{
-		this->m_fxParamPool.SetMatrix(fx.pEffect, WFxParamWorld,
+		this->m_fxParamPool.SetMatrix(fx.pEffect, WVDFXPARAM_WORLD,
 			fx.param[1].handle, fx.param[1].isShared,
 			*(this->m_xLastWorldMatrix));
 	}
@@ -5048,22 +5049,22 @@ void WDirect3D8::UpdateShaderValue(int h)
 		D3DXMATRIX mat;
 		D3DXMatrixMultiply(&mat, this->m_xLastWorldMatrix,
 			&this->m_xLastViewMatrix);
-		this->m_fxParamPool.SetMatrix(fx.pEffect, WFxParamWorldView,
+		this->m_fxParamPool.SetMatrix(fx.pEffect, WVDFXPARAM_WORLDVIEW,
 			fx.param[2].handle, fx.param[2].isShared, mat);
 	}
 	if (fx.param[3].handle)
 	{
-		this->m_fxParamPool.SetMatrix(fx.pEffect, WFxParamPrevView,
+		this->m_fxParamPool.SetMatrix(fx.pEffect, WVDFXPARAM_PREV_VIEW,
 			fx.param[3].handle, fx.param[3].isShared, this->m_xPrevViewMatrix);
 	}
 	if (fx.param[4].handle)
 	{
-		this->m_fxParamPool.SetMatrix(fx.pEffect, WFxParamView,
+		this->m_fxParamPool.SetMatrix(fx.pEffect, WVDFXPARAM_VIEW,
 			fx.param[4].handle, fx.param[4].isShared, this->m_xPrevViewMatrix);
 	}
 	if (fx.param[5].handle)
 	{
-		this->m_fxParamPool.SetMatrix(fx.pEffect, WFxParamProjection,
+		this->m_fxParamPool.SetMatrix(fx.pEffect, WVDFXPARAM_PROJECTION,
 			fx.param[5].handle, fx.param[5].isShared, this->m_xLastProjMatrix);
 	}
 	if (fx.param[6].handle)
@@ -5071,7 +5072,7 @@ void WDirect3D8::UpdateShaderValue(int h)
 		D3DXMATRIX mat;
 		D3DXMatrixMultiply(&mat, &this->m_xLastViewMatrix,
 			&this->m_xLastProjMatrix);
-		this->m_fxParamPool.SetMatrix(fx.pEffect, WFxParamViewProjection,
+		this->m_fxParamPool.SetMatrix(fx.pEffect, WVDFXPARAM_VIEWPROJECTION,
 			fx.param[6].handle, fx.param[6].isShared, mat);
 	}
 	if (fx.param[7].handle)
@@ -5081,18 +5082,18 @@ void WDirect3D8::UpdateShaderValue(int h)
 		c.x = static_cast<float>(this->m_LastTFactor >> 16 & 0xFF) / 255.f;
 		c.y = static_cast<float>(this->m_LastTFactor >> 8 & 0xFF) / 255.f;
 		c.z = static_cast<float>(this->m_LastTFactor >> 0 & 0xFF) / 255.f;
-		this->m_fxParamPool.SetVector4(fx.pEffect, WFxParamConstColor,
+		this->m_fxParamPool.SetVector4(fx.pEffect, WVDFXPARAM_CONSTCOLOR,
 			fx.param[7].handle, fx.param[7].isShared, c);
 	}
 	if (fx.param[8].handle)
 	{
-		this->m_fxParamPool.SetVector4(fx.pEffect, WFxParamLightDiffuse,
+		this->m_fxParamPool.SetVector4(fx.pEffect, WVDFXPARAM_LIGHT_DIFFUSE,
 			fx.param[8].handle, fx.param[8].isShared,
 			*((const D3DXVECTOR4*)&this->m_xaLights[0].Diffuse));
 	}
 	if (fx.param[9].handle)
 	{
-		this->m_fxParamPool.SetVector4(fx.pEffect, WFxParamLightAmbient,
+		this->m_fxParamPool.SetVector4(fx.pEffect, WVDFXPARAM_LIGHT_AMBIENT,
 			fx.param[9].handle, fx.param[9].isShared,
 			*((const D3DXVECTOR4*)&this->m_xaLights[0].Ambient));
 	}
@@ -5101,7 +5102,7 @@ void WDirect3D8::UpdateShaderValue(int h)
 		D3DXVECTOR4 c(this->m_xaLights[0].Direction.x,
 			this->m_xaLights[0].Direction.y, this->m_xaLights[0].Direction.z,
 			1.0f);
-		this->m_fxParamPool.SetVector4(fx.pEffect, WFxParamLightDirection,
+		this->m_fxParamPool.SetVector4(fx.pEffect, WVDFXPARAM_LIGHT_DIRECTION,
 			fx.param[10].handle, fx.param[10].isShared, c);
 	}
 	if (fx.param[11].handle)
@@ -5111,7 +5112,7 @@ void WDirect3D8::UpdateShaderValue(int h)
 		c.y = this->m_LastFogEnd;
 		c.z = 0.0;
 		c.w = 1.0;
-		this->m_fxParamPool.SetVector4(fx.pEffect, WFxParamFogRange,
+		this->m_fxParamPool.SetVector4(fx.pEffect, WVDFXPARAM_FOG_RANGE,
 			fx.param[11].handle, fx.param[11].isShared, c);
 	}
 	if (fx.param[12].handle)
@@ -5120,7 +5121,7 @@ void WDirect3D8::UpdateShaderValue(int h)
 		c.x = static_cast<float>(this->m_fogColor >> 16 & 0xFF) / 255.f;
 		c.y = static_cast<float>(this->m_fogColor >> 8 & 0xFF) / 255.f;
 		c.z = static_cast<float>(this->m_fogColor >> 0 & 0xFF) / 255.f;
-		this->m_fxParamPool.SetVector3(fx.pEffect, WFxParamFogColor,
+		this->m_fxParamPool.SetVector3(fx.pEffect, WVDFXPARAM_FOG_COLOR,
 			fx.param[12].handle, fx.param[12].isShared, c);
 	}
 	if (fx.param[13].handle)
@@ -5131,7 +5132,7 @@ void WDirect3D8::UpdateShaderValue(int h)
 		c.x = mat.m[3][0];
 		c.y = mat.m[3][1];
 		c.z = mat.m[3][2];
-		this->m_fxParamPool.SetVector4(fx.pEffect, WFxParamCameraPosition,
+		this->m_fxParamPool.SetVector4(fx.pEffect, WVDFXPARAM_CAMERAPOSITION,
 			fx.param[13].handle, fx.param[13].isShared, c);
 	}
 	if (fx.param[14].handle)
@@ -5146,7 +5147,7 @@ void WDirect3D8::UpdateShaderValue(int h)
 		c.x = static_cast<float>(this->m_xdwDiffuse >> 16 & 0xFF) / 255.f;
 		c.y = static_cast<float>(this->m_xdwDiffuse >> 8 & 0xFF) / 255.f;
 		c.z = static_cast<float>(this->m_xdwDiffuse >> 0 & 0xFF) / 255.f;
-		this->m_fxParamPool.SetVector4(fx.pEffect, WFxParamMaterialColor,
+		this->m_fxParamPool.SetVector4(fx.pEffect, WVDFXPARAM_MATERIALCOLOR,
 			fx.param[17].handle, fx.param[17].isShared, c);
 	}
 }
@@ -5220,27 +5221,27 @@ bool WDirect3D8::CreateEffect(unsigned long flags)
 		WVDFXPARAMETERTYPE wvdFxParamType;
 		const char* semantic;
 	} paramList[21] = {
-		{ WFxParamWorldViewProjection,            "WVDFXPARAM_WORLDVIEWPROJECTION" },
-		{ WFxParamWorld,						  "WVDFXPARAM_WORLD"               },
-		{ WFxParamWorldView,                      "WVDFXPARAM_WORLDVIEW"           },
-		{ WFxParamPrevView,                       "WVDFXPARAM_PREV_VIEW"           },
-		{ WFxParamView,						   "WVDFXPARAM_VIEW"                },
-		{ WFxParamProjection,                     "WVDFXPARAM_PROJECTION"          },
-		{ WFxParamViewProjection,                 "WVDFXPARAM_VIEWPROJECTION"      },
-		{ WFxParamConstColor,                     "WVDFXPARAM_CONSTCOLOR"          },
-		{ WFxParamLightDiffuse,                   "WVDFXPARAM_LIGHT_DIFFUSE"       },
-		{ WFxParamLightAmbient,                   "WVDFXPARAM_LIGHT_AMBIENT"       },
-		{ WFxParamLightDirection,                 "WVDFXPARAM_LIGHT_DIRECTION"     },
-		{ WFxParamFogRange,                       "WVDFXPARAM_FOG_RANGE"           },
-		{ WFxParamFogColor,                       "WVDFXPARAM_FOG_COLOR"           },
-		{ WFxParamCameraPosition,                 "WVDFXPARAM_CAMERAPOSITION"      },
-		{ WFxParamSphericalHarmonicsCoefficients, "WVDFXPARAM_SHCOEFF"             },
-		{ WFxParamExtraTexture,                   "WVDFXPARAM_EXTRATEXTURE"        },
-		{ WFxParamRefTexture,                     "WVDFXPARAM_REFTEXTURE"          },
-		{ WFxParamMaterialColor,                  "WVDFXPARAM_MATERIALCOLOR"       },
-		{ WFxParamTextureTransform,               "WVDFXPARAM_TEXTURE_TRANSFORM"   },
-		{ WFxParamBlurUvOffset,                   "WVDFXPARAM_BLUR_UVOFFSET"       },
-		{ WFxParamShadowColor,                    "WVDFXPARAM_SHADOW_COLOR"        },
+		{ WVDFXPARAM_WORLDVIEWPROJECTION, "WVDFXPARAM_WORLDVIEWPROJECTION" },
+		{ WVDFXPARAM_WORLD,               "WVDFXPARAM_WORLD"               },
+		{ WVDFXPARAM_WORLDVIEW,           "WVDFXPARAM_WORLDVIEW"           },
+		{ WVDFXPARAM_PREV_VIEW,           "WVDFXPARAM_PREV_VIEW"           },
+		{ WVDFXPARAM_VIEW,                "WVDFXPARAM_VIEW"                },
+		{ WVDFXPARAM_PROJECTION,          "WVDFXPARAM_PROJECTION"          },
+		{ WVDFXPARAM_VIEWPROJECTION,      "WVDFXPARAM_VIEWPROJECTION"      },
+		{ WVDFXPARAM_CONSTCOLOR,          "WVDFXPARAM_CONSTCOLOR"          },
+		{ WVDFXPARAM_LIGHT_DIFFUSE,       "WVDFXPARAM_LIGHT_DIFFUSE"       },
+		{ WVDFXPARAM_LIGHT_AMBIENT,       "WVDFXPARAM_LIGHT_AMBIENT"       },
+		{ WVDFXPARAM_LIGHT_DIRECTION,     "WVDFXPARAM_LIGHT_DIRECTION"     },
+		{ WVDFXPARAM_FOG_RANGE,           "WVDFXPARAM_FOG_RANGE"           },
+		{ WVDFXPARAM_FOG_COLOR,           "WVDFXPARAM_FOG_COLOR"           },
+		{ WVDFXPARAM_CAMERAPOSITION,      "WVDFXPARAM_CAMERAPOSITION"      },
+		{ WVDFXPARAM_SHCOEFF,             "WVDFXPARAM_SHCOEFF"             },
+		{ WVDFXPARAM_EXTRATEXTURE,        "WVDFXPARAM_EXTRATEXTURE"        },
+		{ WVDFXPARAM_REFTEXTURE,          "WVDFXPARAM_REFTEXTURE"          },
+		{ WVDFXPARAM_MATERIALCOLOR,       "WVDFXPARAM_MATERIALCOLOR"       },
+		{ WVDFXPARAM_TEXTURE_TRANSFORM,   "WVDFXPARAM_TEXTURE_TRANSFORM"   },
+		{ WVDFXPARAM_BLUR_UVOFFSET,       "WVDFXPARAM_BLUR_UVOFFSET"       },
+		{ WVDFXPARAM_SHADOW_COLOR,        "WVDFXPARAM_SHADOW_COLOR"        },
 	};
 
 	D3DXMACRO macro[24];

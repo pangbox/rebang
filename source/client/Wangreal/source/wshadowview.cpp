@@ -257,10 +257,10 @@ WShadowViewHw::WShadowViewHw(unsigned char shadowDense)
 
 WShadowViewHw::~WShadowViewHw()
 {
-	if (GetResrcManager() && m_orgTexParam.m_rtTexInfo0.m_hTex)
+	if (GetResrcManager() && m_orgTexParam.m_rtTexInfo[0].m_hTex)
 	{
-		GetResrcManager()->Release(m_orgTexParam.m_rtTexInfo0.m_hTex);
-		m_orgTexParam.m_rtTexInfo0.m_hTex = 0;
+		GetResrcManager()->Release(m_orgTexParam.m_rtTexInfo[0].m_hTex);
+		m_orgTexParam.m_rtTexInfo[0].m_hTex = 0;
 	}
 	if (m_filteredTexView)
 	{
@@ -272,8 +272,8 @@ WShadowViewHw::~WShadowViewHw()
 void WShadowViewHw::SetTextureSize(int w, int h)
 {
 	SetViewport((float)w, (float)h);
-	m_orgTexParam.m_rtTexInfo0.m_needToClear = true;
-	m_orgTexParam.m_rtTexInfo0.m_clearClr = 0xffffffff;
+	m_orgTexParam.m_rtTexInfo[0].m_needToClear = true;
+	m_orgTexParam.m_rtTexInfo[0].m_clearClr = 0xffffffff;
 	m_orgTexParam.m_depthSurfInfo.m_surfUsage =
 		WRenderToTextureParam::DepthSurfInfo::USE_SHARED_SURFACE;
 	m_orgTexParam.m_depthSurfInfo.m_needToClear = true;
@@ -298,7 +298,7 @@ void WShadowViewHw::Clear(ulong clearColor, int mode)
 	UpdateCamera();
 
 	if (GetVideoDevice()->GetDeviceState() == W_VDEVSTATE_NORMAL &&
-		!m_orgTexParam.m_rtTexInfo0.m_hTex)
+		!m_orgTexParam.m_rtTexInfo[0].m_hTex)
 	{
 		Bitmap bitmap;
 		BITMAPINFO bi;
@@ -306,14 +306,14 @@ void WShadowViewHw::Clear(ulong clearColor, int mode)
 		bi.bmiHeader.biWidth = (int)GetWidth();
 		bi.bmiHeader.biHeight = (int)GetHeight();
 		bitmap.SetBITMAPINFO(&bi, 0);
-		m_orgTexParam.m_rtTexInfo0.m_hTex =
+		m_orgTexParam.m_rtTexInfo[0].m_hTex =
 			GetResrcManager()->UploadTexture(0, &bitmap, 0x14000, 0);
 	}
 
 	m_r2tBegun = false;
-	if (m_orgTexParam.m_rtTexInfo0.m_hTex > 0)
+	if (m_orgTexParam.m_rtTexInfo[0].m_hTex > 0)
 	{
-		m_r2tBegun = GetVideoDevice()->BeginRenderToTexture(&m_orgTexParam);
+		m_r2tBegun = GetVideoDevice()->BeginRenderToTexture(m_orgTexParam);
 		if (m_r2tBegun)
 			m_r2tBegun = GetVideoDevice()->BeginScene();
 	}
@@ -326,10 +326,10 @@ void WShadowViewHw::Render(WPuppet* pet, bool bTransform, float matscale,
 	{
 		WVideoDev* video = GetVideoDevice();
 		video->BeginUsingCustomRenderState();
-		if (video->IsSupportVs() && video->IsSupportPs())
+		if (video->IsSupportVS() && video->IsSupportPS())
 		{
 			video->SetCustomFxMacro(0x20000);
-			video->SetCustomFxParamVector4(WFxParamShadowColor,
+			video->SetCustomFxParamVector4(WVDFXPARAM_SHADOW_COLOR,
 				WVector4(m_fgColor / 255.0f, m_fgColor / 255.0f,
 					m_fgColor / 255.0f, 1.0f));
 		}
@@ -357,7 +357,7 @@ void WShadowViewHw::Render()
 	{
 		Flush(0);
 		GetVideoDevice()->EndScene();
-		GetVideoDevice()->EndRenderToTexture(&m_orgTexParam);
+		GetVideoDevice()->EndRenderToTexture(m_orgTexParam);
 		GetVideoDevice()->BeginScene();
 
 		float x = 0.0f, y = 0.0f;
@@ -391,7 +391,8 @@ void WShadowViewHw::Render()
 
 		m_filteredTexView->Begin();
 		m_filteredTexView->DrawPolygonFan(m_vl,
-			(m_orgTexParam.m_rtTexInfo0.m_hTex & 0x7ff) | 0x60300000, 0, true);
+			(m_orgTexParam.m_rtTexInfo[0].m_hTex & 0x7ff) | 0x60300000, 0,
+			true);
 
 		_WPOINT p[5];
 		p[0].x = 0.0f;
@@ -781,7 +782,7 @@ void WRecvViewHw::Render(WShadowView* shadowView, WPuppet* pPet)
 			WMatrix4 mView;
 			WMatrix4 mTexTransf = shadowView->xGetViewState().xmView *
 				shadowView->xGetViewState().xmProj * ms_uvConvMat;
-			if (!video->IsSupportVs() || !video->IsSupportPs())
+			if (!video->IsSupportVS() || !video->IsSupportPS())
 			{
 				SetWMatrix4FromWMatrix(mView, camera);
 				mTexTransf = mView * mTexTransf;
@@ -794,10 +795,10 @@ void WRecvViewHw::Render(WShadowView* shadowView, WPuppet* pPet)
 			video->SetCustomRenderState(WVDRS_DESTBLEND, 3);
 			video->SetCustomRenderState(WVDRS_ZWRITEENABLE, 0);
 			video->SetCustomRenderState(WVDRS_ZFUNC, 3);
-			if (video->IsSupportVs() && video->IsSupportPs())
+			if (video->IsSupportVS() && video->IsSupportPS())
 			{
 				video->SetCustomFxMacro(0x40000);
-				video->SetCustomFxParamMatrix(WFxParamTextureTransform,
+				video->SetCustomFxParamMatrix(WVDFXPARAM_TEXTURE_TRANSFORM,
 					mTexTransf);
 			}
 			else

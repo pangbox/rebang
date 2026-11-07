@@ -10,14 +10,14 @@ public:
 	int GetLen() const;
 	void MovePos(int pos);
 	bool IsOutOfToken() const;
-	bool GetToken(char** ppOut, const char* pcSep, int nSep);
 	bool GetToken(char* const pOut, const char* pcSep, int nSep);
-	bool GetTokenWithoutFail(char** ppOut, const char* pcSep, int nSep);
+	bool GetToken(char** ppOut, const char* pcSep, int nSep);
 	bool GetTokenWithoutFail(char* const pOut, const char* pcSep, int nSep);
-	bool GetTokenFullSep(char** ppOut, const char* pcSep, int nSep);
+	bool GetTokenWithoutFail(char** ppOut, const char* pcSep, int nSep);
 	bool GetTokenFullSep(char* const pOut, const char* pcSep, int nSep);
-	int GetTokenNum(int nPos, const char* pcSep, int nSep) const;
+	bool GetTokenFullSep(char** ppOut, const char* pcSep, int nSep);
 	int GetTokenNum(int nPos, char cSep) const;
+	int GetTokenNum(int nPos, const char* pcSep, int nSep) const;
 	char GetChar();
 	int GetChange(char* const pOut);
 

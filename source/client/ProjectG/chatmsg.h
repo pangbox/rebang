@@ -53,9 +53,9 @@ public:
 	{
 		return m_iState == CHAT_WIN_LEFT || m_iState == CHAT_WIN_RIGHT;
 	}
-	void Process(float);
-	void ProcessWindow(float);
-	void ProcessMacro(float);
+	void Process(const float);
+	void ProcessWindow(const float);
+	void ProcessMacro(const float);
 	void PrintInChatWindow();
 	void PrintInScreen();
 	void DrawChatWindow();
@@ -86,7 +86,7 @@ protected:
 	void InitFont();
 	void ProcessResultString();
 	void ProcessCompString();
-	void ProcessEditKey(float);
+	void ProcessEditKey(const float);
 	void ProcessResultString_JP();
 	void ProcessCompString_JP();
 	void OnMoveLeft();

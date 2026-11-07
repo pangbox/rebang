@@ -1538,7 +1538,7 @@ bool CProjectG::SetVideoDevice()
 	video->SetMainThreadId(m_threadId);
 	SetProc(video);
 	g_resrcmng->SetVideoReference(video);
-	m_refreshRate = (float)floor(video->GetMonitorSupportFps());
+	m_refreshRate = (float)floor(video->GetMonitorSupportFPS());
 	SetFPS(m_refreshRate);
 	return true;
 }

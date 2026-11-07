@@ -270,7 +270,7 @@ int FrElementDoc::LoadPic(const char* filename)
 		type = 0;
 	}
 
-	int filesize = file->m_nLen;
+	int filesize = file->Length();
 	BYTE* buf = new BYTE[filesize + 1];
 	file->Read(buf, filesize);
 	buf[filesize] = 0;

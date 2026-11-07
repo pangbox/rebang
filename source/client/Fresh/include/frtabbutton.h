@@ -17,8 +17,6 @@ struct TButtonItem
 	bool selected;
 };
 
-typedef std::list<TButtonItem*> TBUTTON_LIST;
-
 class FrTabButton : public FrWnd
 {
 public:
@@ -29,13 +27,15 @@ public:
 	virtual ~FrTabButton();
 	void Init(FrGuiItem& item, FrWndManager* pManager, FrWnd* pParent);
 	void ClearTab();
-	void AddTab(const char* imgNames[], unsigned long index, WSize* size);
 	void AddTab(const char* imgName, unsigned long index, WSize* size);
+	void AddTab(const char* imgNames[], unsigned long index, WSize* size);
 	void Select(unsigned long index);
 	void UnSelect(unsigned long index);
 	void SetSepWidth(float width) { m_sepWidth = width; }
 	TButtonItem* GetItemUnderCursor() { return m_underCursor; }
 	TButtonItem* GetSelected() { return m_selected; }
+
+	typedef std::list<TButtonItem*> TBUTTON_LIST;
 
 protected:
 	void Select(TButtonItem* i);

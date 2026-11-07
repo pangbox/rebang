@@ -13,8 +13,8 @@ public:
 	FrEmoticon(FrWndManager* pManager);
 	virtual ~FrEmoticon();
 	bool Init();
-	bool Draw(int icon, const WRect& dst, unsigned long diffuse, bool flip);
 	bool Draw(int icon, float x, float y, unsigned long diffuse, bool flip);
+	bool Draw(int icon, const WRect& dst, unsigned long diffuse, bool flip);
 	float PrintText(const WPoint& point, unsigned long style, const char* text,
 		unsigned long color);
 	float PrintText11(const WPoint& pos, unsigned long align, const char* text,

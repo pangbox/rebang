@@ -2,7 +2,7 @@
 #include "luascript.h"
 #include "luascriptmanager.h"
 #include "wresrcmng.h"
-#include "cfile.h"
+#include "westpak.h"
 #include "minatl.h"
 #include <windows.h>
 #include <time.h>

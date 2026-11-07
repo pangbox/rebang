@@ -14,10 +14,10 @@ public:
 	int Load(const char*, Bitmap*, unsigned long);
 	virtual void Render(WView*, const _WRECT&, const _WRECT&, int,
 		unsigned long, float, unsigned char);
-	void ArcClipRender(WView*, const _WRECT&, const _WRECT&, float, float, int,
-		unsigned long);
 	void RenderWithAxis(WView*, const _WRECT&, const _WRECT&, float, float,
 		float, int, unsigned long, unsigned char);
+	void ArcClipRender(WView*, const _WRECT&, const _WRECT&, float, float, int,
+		unsigned long);
 	void RenderWithShear(WView*, const _WRECT&, const _WRECT&, float, int,
 		unsigned long);
 	virtual void SetCoordMode(int coordMode) { m_coordMode = coordMode; }
@@ -40,10 +40,10 @@ public:
 		unsigned long);
 
 protected:
-	void DrawTexture(WView*, int, const _WRECT&, const _WRECT&, float, int,
-		unsigned long);
 	void DrawTexture(WView*, int, const _WRECT&, const _WRECT&, int,
 		unsigned long, float, unsigned char, bool);
+	void DrawTexture(WView*, int, const _WRECT&, const _WRECT&, float, int,
+		unsigned long);
 	void DrawTextureWithAxis(WView*, int, const _WRECT&, const _WRECT&, float,
 		float, float, int, unsigned long, unsigned char);
 	void DrawArcClipTexture(WView*, int, const _WRECT&, const _WRECT&, float,

@@ -988,9 +988,9 @@ void COption::SetVideoDevice(WVideoDev* videoDevice)
 	sOption::sbHwTnlSupport = caps != 0;
 	sOption::sbRtSupport = m_pVideoDev->SupportRenderTargetFormat();
 
-	sOption::sbVsSupport = m_pVideoDev->IsSupportVs();
-	sOption::sbPsSupport = m_pVideoDev->IsSupportPs();
-	sOption::sbMrtSupport = m_pVideoDev->IsSupportMrt();
+	sOption::sbVsSupport = m_pVideoDev->IsSupportVS();
+	sOption::sbPsSupport = m_pVideoDev->IsSupportPS();
+	sOption::sbMrtSupport = m_pVideoDev->IsSupportMRT();
 	sOption::sbClipPlaneSupport = m_pVideoDev->IsSupportClipPlane();
 
 	m_pVideoDev->Command(WX_VDEV_GET_CAPS, 1, (intptr_t)&caps);

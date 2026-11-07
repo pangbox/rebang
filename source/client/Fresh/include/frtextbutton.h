@@ -14,17 +14,6 @@ public:
 	static const WRTTI m_RTTI;
 	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
 
-	struct TButtonItem
-	{
-		std::string text;
-		float left;
-		float right;
-		bool underCursor;
-		bool selected;
-	};
-
-	typedef std::list<TButtonItem> TBUTTON_LIST;
-
 	FrTextButton();
 	virtual ~FrTextButton();
 	void Init(FrGuiItem& item, FrWndManager* pManager, FrWnd* pParent);
@@ -35,6 +24,17 @@ public:
 	const char* GetSelected();
 	void Select(int index);
 	void Unselect(int index);
+
+	struct TButtonItem
+	{
+		std::string text;
+		float left;
+		float right;
+		bool underCursor;
+		bool selected;
+	};
+
+	typedef std::list<TButtonItem> TBUTTON_LIST;
 
 protected:
 	void Select(TBUTTON_LIST::iterator it);

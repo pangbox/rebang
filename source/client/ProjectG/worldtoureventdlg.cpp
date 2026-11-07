@@ -441,9 +441,6 @@ void FrWorldTourEventGiftDlg::OnInitYesButton(int param)
 
 void FrWorldTourEventGiftDlg::OnLBDownYesButton()
 {
-	// HACK
-	if (0)
-		((FrWorldTourEventDlg*)0)->OnLBDownGiftButton();
 	WSendPacket packet((enumClientPacket)165);
 	packet.Encode4(MyGuid(false));
 	packet.Send(TO_GAME);

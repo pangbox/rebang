@@ -58,13 +58,6 @@ class FrWnd : public IObject, public FrCmdTarget
 	friend IObject* FrWndMakeInstance();
 
 public:
-	struct sToolTipData
-	{
-		int bFixWnd;
-		WPoint posFixWnd;
-		unsigned long style;
-	};
-
 	static const WRTTI m_RTTI;
 	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
 	virtual ~FrWnd();
@@ -75,17 +68,17 @@ public:
 		FrWnd* pParentWnd);
 	virtual void PreCreateWindow(FrWndManager* pManager, unsigned long dwStyle,
 		const WRect& rect, FrWnd* pParentWnd);
+	bool SendCmdToOwnerTarget(eFrCmd cmd, int var1, sFRESH_HANDLER* pHandler);
 	bool SendCmdToOwnerTarget(FrCmdTarget* pCmdTarget, eFrCmd cmd, int var1,
 		sFRESH_HANDLER* pHandler);
-	bool SendCmdToOwnerTarget(eFrCmd cmd, int var1, sFRESH_HANDLER* pHandler);
 	void SetOwner(FrCmdTarget* pOwner);
 	void AddChild(FrWnd* pChild);
 	FrWndManager* WndManager() const { return m_pWndManager; }
 	FrGraphicInterface* GDI() const;
 	FrEmoticon* Emo() const;
 	FrWnd* GetParent() const;
-	FrWnd* FindChild(const char* lpszWindowText);
 	FrWnd* FindChild(const FrWnd* pWnd);
+	FrWnd* FindChild(const char* lpszWindowText);
 	FrWnd* FindChildByName(const char* lpszWindowName);
 	FrWnd* FindChildByStyle(unsigned long style);
 	FrWnd* FindChildForm(const char* lpszWindowName);
@@ -96,20 +89,20 @@ public:
 	void EnumerateChildWindow(bool (*callback)(FrWnd*, void*), void* parm);
 	void GetClientRect(WRect& rect) const;
 	void SetClientRect(const WRect& rect);
-	void ClientToScreen(WPoint& point) const;
 	void ClientToScreen(WRect& rect) const;
-	void ScreenToClient(WPoint& point) const;
+	void ClientToScreen(WPoint& point) const;
 	void ScreenToClient(WRect& rect) const;
+	void ScreenToClient(WPoint& point) const;
 	virtual void MoveWindow(const WPoint& point);
 	void SetRect(const WRect& rect);
 	const WRect& GetRect() { return m_rect; }
 	void SetWindowTextA(const char* lpszText);
-	void GetWindowTextA(std::string& outText) const;
 	void GetWindowTextA(char* lpszTextBuf, unsigned int nBuffMax) const;
+	void GetWindowTextA(std::string& outText) const;
 	unsigned int GetWindowTextLengthA() const;
 	void SetWindowName(const char* lpszName);
-	void GetWindowName(std::string& outName) const;
 	void GetWindowName(char* lpszNameBuf, unsigned int nBuffMax) const;
+	void GetWindowName(std::string& outName) const;
 	unsigned int GetWindowNameLength() const;
 	void EnableToolTip(bool enable) { m_nFlags.Turn(FWF_TOOLTIPS, enable); }
 	bool IsEnableToolTip() const { return m_nFlags.GetFlag(FWF_TOOLTIPS); }
@@ -168,8 +161,8 @@ public:
 	void SetWheelFocus();
 
 protected:
-	FrWnd(FrWnd&);
 	FrWnd();
+	FrWnd(FrWnd&);
 	virtual void OnDraw();
 	virtual void OnProc(const float deltaTime) { }
 	virtual void OnResize() { }
@@ -217,6 +210,12 @@ protected:
 private:
 	std::string m_wndToolTip;
 	static FrToolTip* m_pToolTip;
+	struct sToolTipData
+	{
+		int bFixWnd;
+		WPoint posFixWnd;
+		unsigned long style;
+	};
 	sToolTipData* m_pToolTipData;
 	static FrToolTip* ToolTip();
 	static bool IsToolTipInstantiated() { return m_pToolTip != NULL; }

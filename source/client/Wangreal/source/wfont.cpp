@@ -514,7 +514,7 @@ int WFntFont::Load(const char* fntName)
 
 	if (file)
 	{
-		int len = file->m_nLen;
+		int len = file->Length();
 		if (m_font)
 		{
 			delete[] m_font;
@@ -835,7 +835,7 @@ int WFixedFont::Load(const char* fntName)
 	if (!file)
 		return 1;
 
-	int len = file->m_nLen - sizeof(w_fnthead);
+	int len = file->Length() - sizeof(w_fnthead);
 	if (m_font)
 	{
 		delete[] m_font;

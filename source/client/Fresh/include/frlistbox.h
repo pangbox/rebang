@@ -13,14 +13,6 @@ struct FrInputState;
 
 struct FrListItem
 {
-	FrListItem()
-		: pData(NULL), underCursor(false), selected(false)
-	{
-		noRBtnIdxList.clear();
-	}
-	~FrListItem() { noRBtnIdxList.clear(); }
-	void AddNoRBtnIdx(int idx) { noRBtnIdxList.push_back(idx); }
-
 	void* pData;
 	WPoint pos;
 	bool underCursor;
@@ -28,6 +20,14 @@ struct FrListItem
 	int no;
 	int idx;
 	std::list<int> noRBtnIdxList;
+
+	FrListItem()
+		: pData(NULL), underCursor(false), selected(false)
+	{
+		noRBtnIdxList.clear();
+	}
+	~FrListItem() { noRBtnIdxList.clear(); }
+	void AddNoRBtnIdx(int idx) { noRBtnIdxList.push_back(idx); }
 };
 
 class FrListBoxGreater
@@ -42,7 +42,7 @@ public:
 		return m_compare(left->pData, right->pData);
 	}
 
-private:
+protected:
 	bool (*m_compare)(const void*, const void*);
 };
 
@@ -79,22 +79,15 @@ public:
 		m_itemSize.h = h;
 	}
 	FrListItem* AddItem(void* data);
-	FrListItem* FindItem(void* data, int no);
-	FrListItem* FindItem(void* data);
 	FrListItem* FindItem(FrListItem* item);
+	FrListItem* FindItem(void* data);
+	FrListItem* FindItem(void* data, int no);
 	FrListItem* GetItem(int no);
-	void DelItem(void* data, int no);
-	void DelItem(void* data);
 	void DelItem(FrListItem* item);
+	void DelItem(void* data);
+	void DelItem(void* data, int no);
 	ITEM_LIST::iterator _DelItem(ITEM_LIST::iterator it);
 	void ClearItem();
-	template <class T>
-	void OrderItem(T function)
-	{
-		for (ITEM_LIST::iterator it = m_itemList.begin();
-			it != m_itemList.end(); ++it)
-			function((*it)->pData);
-	}
 	void SortItem(bool (*compare)(const void*, const void*));
 	void RecalcTopBottom();
 	void EnableScrollBar(bool enable);
@@ -107,6 +100,13 @@ public:
 	void ResetTopRow() { m_prevTopRow = -1; }
 	void SetMouseEvent(bool active);
 	int GetColCapacity() { return m_colCapacity; }
+	template <class T>
+	void OrderItem(T function)
+	{
+		for (ITEM_LIST::iterator it = m_itemList.begin();
+			it != m_itemList.end(); ++it)
+			function((*it)->pData);
+	}
 
 protected:
 	virtual void OnDraw();

@@ -78,13 +78,14 @@ public:
 	bool OnFreshMsg(const char* pName, eFrCmd cmd, int var1,
 		sFRESH_HANDLER* pHandler);
 
+private:
+	static sFRESH_ENTRY _MsgEntries[];
+
 protected:
+	static sFRESH_MSGMAP _MsgMap;
 	virtual const sFRESH_MSGMAP* GetMessageMap() const;
 	sFRESH_ENTRY* FindFreshEntry(sFRESH_ENTRY* pBegin, const char* pName,
 		eFrCmd cmd);
-
-	static sFRESH_MSGMAP _MsgMap;
-	static sFRESH_ENTRY _MsgEntries[];
 };
 
 #define DECLARE_FRESH_MSGMAP() \

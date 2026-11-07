@@ -4,7 +4,7 @@
 #include "frgraphicinterface.h"
 #include "frcursor.h"
 #include "wresrcmng.h"
-#include "cfile.h"
+#include "westpak.h"
 #include <stdio.h>
 #include <stdlib.h>
 

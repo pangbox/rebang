@@ -7,6 +7,29 @@
 
 extern Fresh* g_pFresh;
 
+static bool CompareIdDesc(const void* left, const void* right);
+
+static bool CompareLevelDesc(const void* left, const void* right)
+{
+	const sRoomUserInfo* a = (const sRoomUserInfo*)left;
+	const sRoomUserInfo* b = (const sRoomUserInfo*)right;
+	if (Doc()->m_curChannel.Type & 0x80)
+	{
+		if (a->ladderPoint > b->ladderPoint)
+			return true;
+		if (a->ladderPoint < b->ladderPoint)
+			return false;
+	}
+	else
+	{
+		if (a->level > b->level)
+			return true;
+		if (a->level < b->level)
+			return false;
+	}
+	return CompareIdDesc(left, right);
+}
+
 static bool CompareIdDesc(const void* left, const void* right)
 {
 	std::map<unsigned long, sBriefUserInfo>& users = Doc()->m_briefUserInfoMap;
@@ -80,30 +103,6 @@ static bool CompareStatusAsc(const void* left, const void* right)
 	return CompareIdDesc(left, right);
 }
 
-static bool CompareLevelDesc(const void* left, const void* right)
-{
-	// HACK
-	if (false)
-		new FrDtRoomDlg;
-	const sRoomUserInfo* a = (const sRoomUserInfo*)left;
-	const sRoomUserInfo* b = (const sRoomUserInfo*)right;
-	if (Doc()->m_curChannel.Type & 0x80)
-	{
-		if (a->ladderPoint > b->ladderPoint)
-			return true;
-		if (a->ladderPoint < b->ladderPoint)
-			return false;
-	}
-	else
-	{
-		if (a->level > b->level)
-			return true;
-		if (a->level < b->level)
-			return false;
-	}
-	return CompareIdDesc(left, right);
-}
-
 IMPLEMENT_OBJECT(FrDtRoomDlg, FrForm)
 
 BEGIN_FRESH_MSGMAP(FrDtRoomDlg, FrForm)
@@ -142,15 +141,8 @@ FrDtRoomDlg::FrDtRoomDlg()
 
 bool FrDtRoomDlg::OnInit()
 {
-	// HACK
-	if (false)
-		OnHeaderLBtnDown(eHEADER_LEVEL);
 	m_sortHeader = (eHeader)3;
-	if (m_pUserList)
-	{
-		m_sortHeader = eHEADER_LEVEL;
-		m_pUserList->SortItem(CompareLevelDesc);
-	}
+	OnHeaderLBtnDown(eHEADER_LEVEL);
 	return true;
 }
 

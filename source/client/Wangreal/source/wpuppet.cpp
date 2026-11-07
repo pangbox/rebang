@@ -1357,7 +1357,7 @@ struct WPuppet::w_pet_chunk
 int WPuppet::SeekChunkFromPET(cFile* fp, char* str)
 {
 	int pos = 0;
-	while (pos < fp->m_nLen)
+	while (pos < fp->Length())
 	{
 		fp->Seek(pos, 0);
 		w_pet_chunk chunk;

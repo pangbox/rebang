@@ -7,7 +7,7 @@
 #include "wpetfile.h"
 #include "wboneset.h"
 #include "wblockmodel.h"
-#include "cfile.h"
+#include "westpak.h"
 #include <list>
 #include <algorithm>
 #include "wxtnlbuffer.h"

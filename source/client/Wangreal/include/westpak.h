@@ -1,8 +1,27 @@
 #pragma once
 
-#include "cfile.h"
 #include "wlist.h"
 #include <windows.h>
+
+class cFile
+{
+public:
+	cFile()
+		: m_nLen(0)
+	{
+	}
+	virtual ~cFile() { }
+	virtual bool Open(const char* pFilename) { return 0; }
+	virtual int Read(void* data, int len) = 0;
+	virtual int GetByte() = 0;
+	virtual int Tell() = 0;
+	virtual void Seek(int pos, int pivot) = 0;
+	int Length() { return m_nLen; }
+	bool Scan(const char* format, ...);
+
+protected:
+	int m_nLen;
+};
 
 class cFileMap : public cFile
 {

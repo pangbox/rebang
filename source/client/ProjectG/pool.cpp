@@ -312,7 +312,7 @@ void CPoolReflective::Render(WView* view)
 		WMatrix4 m = view->xGetViewState().xmView *
 			view->xGetViewState().xmProj * WView::ms_uvConvMat;
 		dev->SetCustomFxMacro(0x10000);
-		dev->SetCustomFxParamMatrix(WFxParamTextureTransform, m);
+		dev->SetCustomFxParamMatrix(WVDFXPARAM_TEXTURE_TRANSFORM, m);
 	}
 
 	unsigned char alpha;

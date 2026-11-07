@@ -323,9 +323,7 @@ void FrHalloweenEventDlg::DrawMapImage()
 
 void FrHalloweenEventDlg::OnMapIconOwnerDraw()
 {
-	// HACK
-	if (0)
-		SetMapImageRect(MAP_BLUE_LAGOON, m_rect);
+	DrawMapImage();
 }
 
 void FrHalloweenEventDlg::OnCurrentItemOwnerDraw(int param)

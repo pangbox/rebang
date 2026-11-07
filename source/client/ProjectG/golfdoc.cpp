@@ -703,7 +703,7 @@ void CWaveInfo::Load(const char* filename)
 	int index;
 	sWave wave;
 
-	int len = file->m_nLen;
+	int len = file->Length();
 	file->Read(buf, len);
 	buf[len] = 0;
 
@@ -752,7 +752,7 @@ void CRiverInfo::Load(const char* filename)
 	int index;
 	sRiver river;
 
-	int len = file->m_nLen;
+	int len = file->Length();
 	file->Read(buf, len);
 	buf[len] = 0;
 

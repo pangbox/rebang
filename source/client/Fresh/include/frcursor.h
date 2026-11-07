@@ -4,6 +4,9 @@
 class FrCursor
 {
 public:
+	FrCursor();
+	virtual ~FrCursor();
+
 	enum eCursor
 	{
 		UNSELECT,
@@ -17,15 +20,13 @@ public:
 		INFO
 	};
 
-	FrCursor();
-	virtual ~FrCursor();
 	void Init();
 	void SetCursor(eCursor id);
 	int GetCursor();
 	void MoveCursor(const WPoint& point);
 	void ShowCursor(bool bShow);
 
-private:
+protected:
 	int m_cursorIndex;
 	bool m_bShow;
 };

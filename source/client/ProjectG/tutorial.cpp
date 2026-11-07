@@ -10,7 +10,7 @@
 #include "wind.h"
 #include "quadtree.h"
 #include "projectg.h"
-#include "cfile.h"
+#include "westpak.h"
 #include "../../shared/localize.h"
 #include "../../shared/sharedtables.h"
 
@@ -336,7 +336,7 @@ void CTutorial::OnLoad()
 
 	if (pFile)
 	{
-		int size = pFile->m_nLen;
+		int size = pFile->Length();
 		char* pBuffer = new char[size + 1];
 		memset(pBuffer, 0, size + 1);
 		pFile->Read(pBuffer, size);

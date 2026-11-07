@@ -15,30 +15,29 @@ public:
 	virtual ~Fresh();
 	bool Init(const char*, bool, const char*);
 	void ShutDown();
-	void OnProcess(float);
+	void OnProcess(const float);
 	void OnDisplay(bool);
+	bool OpenLayout(const char*, FrCmdTarget*, bool);
 	void CloseLayout();
-	const FreshBitmapMap& ListBres(std::string&);
-	void HidePrivacy(bool);
 	bool IsCurrentLayout(const char*) const;
 	const Bitmap* RegisterBitmap(const char*);
 	const Bitmap* GetBitmap(const char*);
-	bool OpenLayout(const char*, FrCmdTarget*, bool);
-	bool IsDesktopFocused() const;
 	FrDesktop* GetDesktop() const;
-	FrWndManager* GetManager() const { return manager; }
+	FrWndManager* GetManager() const { return m_pWndManager; }
+	bool IsDesktopFocused() const;
+	void Toggle(bool b) { m_bShow = b; }
+	bool IsVisible() const { return m_bShow; }
+	const FreshBitmapMap& ListBres(std::string&);
+	void HidePrivacy(bool);
 
-	void Toggle(bool b) { show = b; }
-	bool IsVisible() const { return show; }
-
-private:
-	FrElementDoc document;
-	FrWndManager* manager;
-	bool show;
-	std::string filename;
+protected:
+	FrElementDoc m_doc;
+	FrWndManager* m_pWndManager;
+	bool m_bShow;
+	std::string m_xmlFileName;
 };
 
 inline FrDesktop* Fresh::GetDesktop() const
 {
-	return manager->GetDesktop();
+	return m_pWndManager->GetDesktop();
 }

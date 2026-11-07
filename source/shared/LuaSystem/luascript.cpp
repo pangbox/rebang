@@ -2,7 +2,7 @@
 #include "luascriptmanager.h"
 #include "luatablehelper.h"
 #include "wresrcmng.h"
-#include "cfile.h"
+#include "westpak.h"
 #include "minatl.h"
 
 namespace lua_system

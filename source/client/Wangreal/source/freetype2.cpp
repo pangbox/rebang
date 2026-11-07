@@ -1,5 +1,5 @@
 #include "freetype2.h"
-#include "cfile.h"
+#include "westpak.h"
 #include "wmath.h"
 #include <new>
 #include <string.h>
@@ -34,7 +34,7 @@ bool CFreeType2::Load(const char* fname, int fntsize, int fontindex,
 		cFile* file = GetCFile(fname, 0x8000, 0);
 		if (file)
 		{
-			int length = file->m_nLen;
+			int length = file->Length();
 			m_pFileBuffer = new uchar[length];
 			file->Read(m_pFileBuffer, length);
 			CloseCFile(file);

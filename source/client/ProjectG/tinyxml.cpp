@@ -27,7 +27,7 @@ distribution.
 #include <ctype.h>
 #include <locale.h>
 #include "tinyxml.h"
-#include "../Wangreal/include/cfile.h"
+#include "../Wangreal/include/westpak.h"
 #include "../Wangreal/include/wmemblock.inl"
 #include "../Wangreal/include/wresrcmng.h"
 
@@ -759,10 +759,10 @@ bool TiXmlDocument::LoadFileEx( const char* filename )
 	cFile* file = g_resrcmng->GetCFile( filename, 0xffff );
 	if ( file )
 	{
-		int length = file->m_nLen;
+		int length = file->Length();
 		char* data = new char[ length + 1 ];
-		file->Read( data, file->m_nLen );
-		data[ file->m_nLen ] = 0;
+		file->Read( data, file->Length() );
+		data[ file->Length() ] = 0;
 		CloseCFile( file );
 
 		Clear();

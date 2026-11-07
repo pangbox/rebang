@@ -44,15 +44,15 @@ public:
 		x = p->x;
 		y = p->y;
 	}
-	void Offset(WPoint& p)
-	{
-		x += p.x;
-		y += p.y;
-	}
 	void Offset(float dx, float dy)
 	{
 		x += dx;
 		y += dy;
+	}
+	void Offset(WPoint& p)
+	{
+		x += p.x;
+		y += p.y;
 	}
 	int operator==(WPoint& _p) const { return (x == _p.x && y == _p.y); }
 	int operator!=(WPoint& _p) const { return !(x == _p.x && y == _p.y); }
@@ -66,9 +66,9 @@ public:
 		x -= p.x;
 		y -= p.y;
 	}
-	WPoint operator-() const { return WPoint(-x, -y); }
 	WPoint operator+(WPoint& p) const { return WPoint(x + p.x, y + p.y); }
 	WPoint operator-(WPoint& _p) const { return WPoint(x - _p.x, y - _p.y); }
+	WPoint operator-() const { return WPoint(-x, -y); }
 };
 
 class WSize : public _WSIZE
@@ -103,8 +103,8 @@ public:
 		h -= s.h;
 	}
 	WSize operator+(WSize& _s) const { return WSize(w + _s.w, h + _s.h); }
-	WSize operator-() const { return WSize(-w, -h); }
 	WSize operator-(WSize& s) const { return WSize(w - s.w, h - s.h); }
+	WSize operator-() const { return WSize(-w, -h); }
 };
 
 class WRect : public _WRECT
@@ -164,11 +164,11 @@ public:
 	{
 		return WRect(x + point.x, y + point.y, w, h);
 	}
+	WRect operator-(WRect& rect) const;
 	WRect operator-(WPoint& point) const
 	{
 		return WRect(x - point.x, y - point.y, w, h);
 	}
-	WRect operator-(WRect& rect) const;
 	WPoint TopLeft() const { return WPoint(x, y); }
 	WSize Size() const { return WSize(w, h); }
 	float Right() const { return w + x; }

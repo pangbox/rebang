@@ -12,7 +12,6 @@ public:
 	void Unlock();
 	void UnlockInThread(ULONG threadID);
 
-private:
 	ULONG m_threadID;
 	CRITICAL_SECTION m_criticalSection;
 	bool m_locked;

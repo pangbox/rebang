@@ -14,10 +14,10 @@ WTextureView::~WTextureView()
 {
 	for (int i = 0; i < 2; ++i)
 	{
-		if (GetResrcManager() && (&m_r2tParam.m_rtTexInfo0)[i].m_hTex)
+		if (GetResrcManager() && m_r2tParam.m_rtTexInfo[i].m_hTex)
 		{
-			GetResrcManager()->Release((&m_r2tParam.m_rtTexInfo0)[i].m_hTex);
-			(&m_r2tParam.m_rtTexInfo0)[i].m_hTex = 0;
+			GetResrcManager()->Release(m_r2tParam.m_rtTexInfo[i].m_hTex);
+			m_r2tParam.m_rtTexInfo[i].m_hTex = 0;
 		}
 	}
 	if (GetResrcManager() && m_r2tParam.m_depthSurfInfo.m_hTex)
@@ -48,12 +48,12 @@ void WTextureView::Begin()
 		if (GetWidth() != width || GetHeight() != height)
 			SetViewport(width, height);
 	}
-	if ((&m_r2tParam.m_rtTexInfo0)[0].m_hTex == 0)
+	if (m_r2tParam.m_rtTexInfo[0].m_hTex == 0)
 		CreateTexture();
 	video->EndScene();
 	m_r2tBegun = false;
-	if ((&m_r2tParam.m_rtTexInfo0)[0].m_hTex > 0)
-		m_r2tBegun = video->BeginRenderToTexture(&m_r2tParam);
+	if (m_r2tParam.m_rtTexInfo[0].m_hTex > 0)
+		m_r2tBegun = video->BeginRenderToTexture(m_r2tParam);
 	if (m_r2tBegun)
 		m_r2tBegun = video->BeginScene();
 }
@@ -64,7 +64,7 @@ void WTextureView::End()
 	if (m_r2tBegun)
 	{
 		video->EndScene();
-		video->EndRenderToTexture(&m_r2tParam);
+		video->EndRenderToTexture(m_r2tParam);
 	}
 	video->BeginScene();
 	m_r2tBegun = false;
@@ -101,14 +101,14 @@ void WTextureView::CreateTexture()
 		bi.bmiHeader.biHeight = height;
 		bi.bmiHeader.biBitCount = 24;
 		bitmap.SetBITMAPINFO(&bi, 0);
-		(&m_r2tParam.m_rtTexInfo0)[i].m_hTex = GetResrcManager()->UploadTexture(
-			0, &bitmap, m_texParam.m_rtTexInfo[i].m_texStyle, 0);
-		if ((&m_r2tParam.m_rtTexInfo0)[i].m_hTex > 0)
-			video->SetRenderTargetSizeInfo((&m_r2tParam.m_rtTexInfo0)[i].m_hTex,
+		m_r2tParam.m_rtTexInfo[i].m_hTex = GetResrcManager()->UploadTexture(0,
+			&bitmap, m_texParam.m_rtTexInfo[i].m_texStyle, 0);
+		if (m_r2tParam.m_rtTexInfo[i].m_hTex > 0)
+			video->SetRenderTargetSizeInfo(m_r2tParam.m_rtTexInfo[i].m_hTex,
 				m_texParam.m_rtTexInfo[i].m_sizeInfo);
-		(&m_r2tParam.m_rtTexInfo0)[i].m_needToClear =
+		m_r2tParam.m_rtTexInfo[i].m_needToClear =
 			m_texParam.m_rtTexInfo[i].m_needToClear;
-		(&m_r2tParam.m_rtTexInfo0)[i].m_clearClr =
+		m_r2tParam.m_rtTexInfo[i].m_clearClr =
 			m_texParam.m_rtTexInfo[i].m_clearClr;
 	}
 
@@ -166,8 +166,8 @@ bool WTextureImposterView::NeedToUpdate(const WMatrix& cam)
 	camMat.za = toTarget;
 	camMat.za.Normalize();
 
-	if ((&m_r2tParam.m_rtTexInfo0)[0].m_hTex > 0 &&
-		GetVideoDevice()->IsTextureFilled((&m_r2tParam.m_rtTexInfo0)[0].m_hTex))
+	if (m_r2tParam.m_rtTexInfo[0].m_hTex > 0 &&
+		GetVideoDevice()->IsTextureFilled(m_r2tParam.m_rtTexInfo[0].m_hTex))
 	{
 		float dist = camMat.za * GetLastCamera().za;
 		dist = Abs(dist);

@@ -2,7 +2,7 @@
 #include "luascript.h"
 #include "luatablehelper.h"
 #include "wresrcmng.h"
-#include "cfile.h"
+#include "westpak.h"
 #include "minatl.h"
 #include <algorithm>
 extern "C"

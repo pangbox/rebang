@@ -114,19 +114,15 @@ public:
 #endif
 
 	void Reset();
+	float Magnitude() const;
+	float SquareMagnitude() const;
+	WVector& Normalize();
 	void Negate();
 	WVector operator-() const;
-
-	WVector& Normalize();
 	void operator+=(const WVector& right);
-
-	float Magnitude() const;
-
-	float SquareMagnitude() const;
-
-	void operator*=(float scalar);
-	void operator/=(float scalar);
 	void operator-=(const WVector& other);
+	void operator*=(const float scalar);
+	void operator/=(const float scalar);
 };
 
 class WVector4
@@ -183,20 +179,20 @@ public:
 		float xz_, float yz_, float zz_);
 	WMatrix(const class WPlane& plane);
 
-	WMatrix& operator=(const WMatrix& other);
-	void operator=(const WQuat& quat);
+	void Rotate(float angle, char direct);
+	void Rotate(const WVector& rotation);
 	void Normalize();
 	void Debug();
 	void Reset();
 	void GetRotMatrix(WMatrix* result) const;
-	WMatrix operator~() const;
-	void operator*=(float right);
-	void operator*=(const WMatrix& right);
-	void operator/=(float right);
 	void AxisScale(WVector& scale);
 	void Transpose();
-	void Rotate(float angle, char direct);
-	void Rotate(const WVector& rotation);
+	WMatrix& operator=(const WMatrix& other);
+	void operator=(const WQuat& quat);
+	WMatrix operator~() const;
+	void operator*=(const WMatrix& right);
+	void operator*=(const float right);
+	void operator/=(const float right);
 };
 
 class WMatrix4
@@ -247,7 +243,7 @@ class WVector2D
 {
 public:
 	WVector2D() { }
-	WVector2D(float x_, float y_)
+	WVector2D(const float x_, const float y_)
 		: x(x_), y(y_)
 	{
 	}
@@ -259,8 +255,8 @@ public:
 	void Negate();
 	void operator+=(const WVector2D& v);
 	void operator-=(const WVector2D& v);
-	void operator*=(float f);
-	void operator/=(float f);
+	void operator*=(const float f);
+	void operator/=(const float f);
 #ifdef REBANG_LEGACY_CPP
 	WVector2D& operator=(const WVector2D& other);
 #endif
@@ -338,12 +334,12 @@ public:
 	WQuat(const WVector& axis, float angle);
 	WQuat(const float* v);
 
-	WQuat& operator=(const WQuat& other);
 	void Reset();
 	void Normalize();
 	void ConvertToAxisAngle(WVector* vector, float* theta);
 	void ConvertToRotationMatrix(WMatrix& rotation) const;
 	void SetFromAngles(float yaw, float pitch, float roll);
+	WQuat& operator=(const WQuat& other);
 	void operator=(const WMatrix& matrix);
 
 private:
@@ -379,8 +375,8 @@ public:
 	WVector max;
 
 	Waabb& operator=(const Waabb& box);
-	Waabb& operator+=(const Waabb& box);
 	Waabb& operator+=(const WVector& vector);
+	Waabb& operator+=(const Waabb& box);
 	void Reset()
 	{
 		min.Reset();
@@ -442,12 +438,12 @@ public:
 	WVector center;
 	WVector extend[3];
 
+	void operator+=(const WVector& vector);
 	void operator*=(float scale);
 	void operator*=(const WVector& scale);
-	void operator+=(const WVector& vector);
-	Wobb& operator=(const WMatrix& mat);
 	Wobb& operator=(const Wobb& obb);
 	Wobb& operator=(const Waabb& box);
+	Wobb& operator=(const WMatrix& mat);
 	bool IsInclude(const WVector& point) const;
 	bool IsIncludeObb(const Wobb& obb, const WVector& point) const;
 	void Normalize();

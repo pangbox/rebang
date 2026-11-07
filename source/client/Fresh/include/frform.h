@@ -67,8 +67,8 @@ public:
 	virtual bool Open(FRESH_PFN_RESULT pFnResult, unsigned long flag);
 	virtual bool Open(FRESH_PFN_RESULT pFnResult, const WPoint& pos,
 		unsigned long flag);
-	virtual bool Close(eFormRet result, bool bFade);
 	virtual bool Close(bool bFade);
+	virtual bool Close(eFormRet result, bool bFade);
 	void SetResultCallback(FRESH_PFN_RESULT pFnResult);
 	virtual void SetCaption(const char* caption);
 	virtual void SetDesc(const char* desc);

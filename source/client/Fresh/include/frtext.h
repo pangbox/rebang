@@ -34,12 +34,12 @@ public:
 
 	void RunTag(FrGraphicInterface* gdi);
 
-	std::string Text() const { return m_text; }
 	void Text(std::string text);
+	std::string Text() const { return m_text; }
 	bool IsTag() const;
 	eFrTOKENTYPE Type() const;
-	bool GetColorValue(unsigned long* color) const;
 	bool GetColorValue(unsigned long* color, unsigned long* outline) const;
+	bool GetColorValue(unsigned long* color) const;
 
 private:
 	void ComposeData(const std::string& text);
@@ -55,10 +55,6 @@ private:
 class FrTEXT
 {
 public:
-	typedef std::list<FrTextLine*> LTFRTXLINE;
-	typedef LTFRTXLINE::iterator LTFRTXLINE_I;
-	typedef LTFRTXLINE::const_iterator LTFRTXLINE_CI;
-
 	FrTEXT()
 		: m_option(FrTEXT_PRINT_ALL)
 	{
@@ -77,6 +73,10 @@ public:
 	void GetTokenList(std::list<FrTextToken>& list) const;
 	float GetWidthLong(FrGraphicInterface* gdi) const;
 	void Clear();
+
+	typedef std::list<FrTextLine*> LTFRTXLINE;
+	typedef LTFRTXLINE::iterator LTFRTXLINE_I;
+	typedef LTFRTXLINE::const_iterator LTFRTXLINE_CI;
 
 private:
 	eFrPRINTOPT m_option;

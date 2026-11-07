@@ -17,8 +17,8 @@ public:
 	virtual ~FrArea();
 
 	void Init(FrGuiItem& item, FrWndManager* pManager, FrWnd* pParent);
-	bool SetBgImg(const Bitmap* pBitmap);
 	bool SetBgImg(const char* name);
+	bool SetBgImg(const Bitmap* pBitmap);
 	const Bitmap* GetBgImg() { return m_pBitmap; }
 	void SetMouseEvent(bool active);
 	void EnableClipping(bool enable) { m_isClipping = enable; }

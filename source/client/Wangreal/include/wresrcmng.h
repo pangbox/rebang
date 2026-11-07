@@ -1,7 +1,7 @@
 #pragma once
 #include <windows.h>
 #include "wtypes.h"
-#include "cfile.h"
+#include "westpak.h"
 #include "wlist.h"
 #include "wlock.h"
 #include "wresource.h"
@@ -50,11 +50,6 @@ void __cdecl EnumFileList(WList<char*>* list);
 class WResourceManager
 {
 public:
-	struct w_match_filename
-	{
-		char fullname[1];
-	};
-
 	WResourceManager();
 	~WResourceManager();
 
@@ -166,6 +161,11 @@ private:
 	WSoundFx* CreateSoundFx(const char*, bool, bool, float);
 	bool ReloadOriginSoundFx(WSoundFx*);
 	void RestoreSoundFx(WSoundFx*);
+
+	struct w_match_filename
+	{
+		char fullname[1];
+	};
 
 	unsigned long m_nByteUsedTexture;
 	int m_blankTexture;

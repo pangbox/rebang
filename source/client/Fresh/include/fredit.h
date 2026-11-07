@@ -12,15 +12,15 @@ struct FrInputState;
 
 struct FrLine
 {
-	FrLine()
-		: bIncludeEnterLine(false)
-	{
-	}
-
 	std::string text;
 	bool marginAlign;
 	unsigned long animStart;
 	bool bIncludeEnterLine;
+
+	FrLine()
+		: bIncludeEnterLine(false)
+	{
+	}
 };
 
 class FrEdit : public FrWnd

@@ -63,7 +63,7 @@ ILFILLX2
 #include "wdevmng.h"
 #include "wxtnlbuffer.h"
 #include "xzip.h"
-#include "cfile.h"
+#include "westpak.h"
 #include "wreg.h"
 #include "bitmap.h"
 #include "wavi.h"
@@ -73,20 +73,17 @@ ILFILLX2
 #include "wflag.h"
 #include "pool.h"
 #include "wangrealapp.h"
-#include "westpak.h"
 #include "wblockmodel.h"
 #include "wboneset.h"
 #include "wmathutil.inl"
 #include "wpetfile.h"
 #include "wlocalize.h"
 #include "commonutil.h"
-ILNUM_CU1
 ILFILL0
 #include "exception.h"
 #include "objectfactory.h"
 #include "background.h"
 #include "w3danispr.h"
-ILNUM_WOV
 #include "woverlay.h"
 #include "singleton.h"
 #include <string>
@@ -96,24 +93,19 @@ ILNUM_WOV
 #include <algorithm>
 
 #include "basicdebug.h"
-ILNUM_CU
 
 #include "tinyxml.h"
 
 #include "../../shared/exceptionreport.h"
 #include "lock.hpp"
-ILNUM_PK
 #include "titles_client.h"
 ILFILLC
 #include "../../shared/classdefine.h"
 #include "chatmsg.h"
 #include "../../shared/errorcode.h"
 ILFILLEXC
-ILNUM_EXC2
 #include "tweaker.h"
-ILNUM_TWK
 #include "frelement.h"
-ILNUM_FGI
 #include "ucclibrary.h"
 #include "hackingmanager.h"
 #include "z_ilfill.h"
@@ -169,7 +161,6 @@ ILNUM_SCENE
 
 // HACK: workaround for unsolved symbol ordering problems
 template void std::vector<WVector>::reserve(unsigned int);
-template float Min<float>(float, float);
 #include "shareddoc.h"
 ILNUM_SD
 #include "uccmanager.h"

@@ -15,8 +15,8 @@ public:
 	void SetPalette(BYTE* pal);
 	void SetGrayPalette(BYTE* pal = 0);
 	virtual void Update() { }
-	void GetPixel(int x, int y, BYTE& r, BYTE& g, BYTE& b, BYTE& a) const;
 	void GetPixel(int x, int y, BYTE& r, BYTE& g, BYTE& b) const;
+	void GetPixel(int x, int y, BYTE& r, BYTE& g, BYTE& b, BYTE& a) const;
 	void SetPixel(int x, int y, BYTE r, BYTE g, BYTE b, BYTE a);
 	BYTE GetAlpha(int x, int y);
 	void SetAlpha(int x, int y, BYTE a);

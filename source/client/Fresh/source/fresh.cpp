@@ -3,7 +3,7 @@
 #include "frdesktop.h"
 
 Fresh::Fresh()
-	: manager(0), show(true)
+	: m_pWndManager(0), m_bShow(true)
 {
 }
 
@@ -14,87 +14,83 @@ Fresh::~Fresh()
 
 void Fresh::ShutDown()
 {
-	if (manager)
+	if (m_pWndManager)
 	{
-		delete manager;
-		manager = 0;
+		delete m_pWndManager;
+		m_pWndManager = 0;
 	}
 }
 
 bool Fresh::Init(const char* path, bool option, const char* name)
 {
-	if (!document.Load(path))
+	if (!m_doc.Load(path))
 		return false;
-	filename = path;
-	manager = new FrWndManager(&document);
-	manager->Init(name, option);
+	m_xmlFileName = path;
+	m_pWndManager = new FrWndManager(&m_doc);
+	m_pWndManager->Init(name, option);
 	return true;
 }
 
-void Fresh::OnProcess(float delta)
+void Fresh::OnProcess(const float delta)
 {
-	if (manager && show)
-		manager->Process(delta);
+	if (m_pWndManager && m_bShow)
+		m_pWndManager->Process(delta);
 }
 
 void Fresh::OnDisplay(bool option)
 {
-	if (manager && show)
-		manager->Display(option);
+	if (m_pWndManager && m_bShow)
+		m_pWndManager->Display(option);
+}
+
+bool Fresh::OpenLayout(const char* layout, FrCmdTarget* owner, bool first)
+{
+	if (!m_pWndManager)
+		return false;
+	CloseLayout();
+	return m_pWndManager->CreateLayout(layout, owner, first);
 }
 
 void Fresh::CloseLayout()
 {
-	if (manager)
-		manager->CloseLayout();
+	if (m_pWndManager)
+		m_pWndManager->CloseLayout();
+}
+
+bool Fresh::IsDesktopFocused() const
+{
+	if (!m_pWndManager)
+		return false;
+	FrDesktop* desktop = m_pWndManager->GetDesktop();
+	if (!desktop)
+		return false;
+	return desktop->m_nFlags.GetFlag(FWF_VIEWFOCUS);
 }
 
 const FreshBitmapMap& Fresh::ListBres(std::string& output)
 {
-	output = filename;
-	return document.GetBitmapList();
+	output = m_xmlFileName;
+	return m_doc.GetBitmapList();
 }
 
 void Fresh::HidePrivacy(bool hidden)
 {
-	manager->HidePrivacy(hidden);
+	m_pWndManager->HidePrivacy(hidden);
 }
 
 bool Fresh::IsCurrentLayout(const char* name) const
 {
-	const char* current = manager->GetLayoutID();
+	const char* current = m_pWndManager->GetLayoutID();
 	bool matches = stricmp(current, name) == 0;
 	return matches;
 }
 
 const Bitmap* Fresh::RegisterBitmap(const char* name)
 {
-	return manager->GetBitmap("", name);
+	return m_pWndManager->GetBitmap("", name);
 }
 
 const Bitmap* Fresh::GetBitmap(const char* name)
 {
-	return manager->GetBitmap("", name);
-}
-
-bool Fresh::OpenLayout(const char* name, FrCmdTarget* owner, bool option)
-{
-	// HACK: the exact reason why this is needed is unknown.
-	std::allocator<FrElement*> allocator;
-	if (!manager)
-		return false;
-	manager->CloseLayout();
-	return manager->CreateLayout(name, owner, option);
-}
-
-bool Fresh::IsDesktopFocused() const
-{
-	// HACK: the exact reason why this is needed is unknown.
-	std::allocator<FrElement*> allocator;
-	if (!manager)
-		return false;
-	FrDesktop* desktop = manager->GetDesktop();
-	if (!desktop)
-		return false;
-	return desktop->m_nFlags.GetFlag(8);
+	return m_pWndManager->GetBitmap("", name);
 }
