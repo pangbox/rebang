@@ -50,6 +50,25 @@ enum eFrStyle
 	FWS_NOWHEELEVENT = 0x800
 };
 
+enum eFrToolTipFrmStyle
+{
+	FRTS_DEFAULT = 0,
+	FRTS_RED = 1,
+	FRTS_PUPLE = 2,
+	FRTS_ORANGE = 3,
+	FRTS_MAX = 4,
+};
+
+enum eProcessMask
+{
+	FW_PROCESS = 1,
+	FW_MOUSE_MOVE = 2,
+	FW_LBUT_DOWN = 4,
+	FW_LBUT_UP = 8,
+	FW_RBUT_DOWN = 16,
+	FW_RBUT_UP = 32,
+};
+
 class FrWnd : public IObject, public FrCmdTarget
 {
 	// Not 100% sure if true.

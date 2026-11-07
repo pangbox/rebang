@@ -27,7 +27,7 @@ FrGraphicInterface::FrGraphicInterface(WView* pView)
 	m_pFont11 = g_resrcmng->GetFixedFont("fnt_\xb5\xb8\xbf\xf2\xc3\xbc_11.wft");
 	if (m_pFont11 != 0)
 		m_pFont11->SetMode(WFont::MASKED);
-	m_textStyle = 0;
+	m_textStyle = FrGDI::NONE;
 	m_textColor = 0xff000000;
 	m_textOutlineColor = 0xffffffff;
 	m_alpha = 1.0f;
@@ -133,15 +133,15 @@ float FrGraphicInterface::PrintText(const WPoint& point, unsigned long align,
 	float w;
 	switch (align)
 	{
-	case 0:
+	case FrGDI::ALIGN_LEFT:
 		p = point;
 		break;
-	case 1:
+	case FrGDI::ALIGN_CENTER:
 		w = m_pFont12->GetTextWidth(m_pView, text);
 		p.x = point.x - w * 0.5f;
 		p.y = point.y;
 		break;
-	case 2:
+	case FrGDI::ALIGN_RIGHT:
 		w = m_pFont12->GetTextWidth(m_pView, text);
 		p.x = point.x - w;
 		p.y = point.y;
@@ -149,11 +149,11 @@ float FrGraphicInterface::PrintText(const WPoint& point, unsigned long align,
 	}
 	switch (m_textStyle)
 	{
-	case 1:
+	case FrGDI::THICK:
 		m_pFont12->Print(m_pView, p.x + 1.0f, p.y, text, 0,
 			FrALPHA(m_textColor, m_alpha), pBitmap);
 		break;
-	case 2:
+	case FrGDI::OUTLINE:
 	{
 		static int opix[8][2] = {
 			{ 0,  -1 },
@@ -170,7 +170,7 @@ float FrGraphicInterface::PrintText(const WPoint& point, unsigned long align,
 				0, FrALPHA(m_textOutlineColor, m_alpha), pBitmap);
 	}
 	break;
-	case 4:
+	case FrGDI::SHADOW:
 		m_pFont12->Print(m_pView, p.x + 1.0f, p.y + 1.0f, text, 0,
 			FrALPHA(m_textOutlineColor, m_alpha), pBitmap);
 		break;
@@ -189,15 +189,15 @@ float FrGraphicInterface::PrintText11(const WPoint& point, unsigned long align,
 	float w;
 	switch (align)
 	{
-	case 0:
+	case FrGDI::ALIGN_LEFT:
 		p = point;
 		break;
-	case 1:
+	case FrGDI::ALIGN_CENTER:
 		w = m_pFont11->GetTextWidth(m_pView, text);
 		p.x = point.x - w * 0.5f;
 		p.y = point.y;
 		break;
-	case 2:
+	case FrGDI::ALIGN_RIGHT:
 		w = m_pFont11->GetTextWidth(m_pView, text);
 		p.x = point.x - w;
 		p.y = point.y;
@@ -205,11 +205,11 @@ float FrGraphicInterface::PrintText11(const WPoint& point, unsigned long align,
 	}
 	switch (m_textStyle)
 	{
-	case 1:
+	case FrGDI::THICK:
 		m_pFont11->Print(m_pView, p.x + 1.0f, p.y, text, 0,
 			FrALPHA(m_textColor, m_alpha), pBitmap);
 		break;
-	case 2:
+	case FrGDI::OUTLINE:
 	{
 		static int opix[8][2] = {
 			{ 0,  -1 },
@@ -226,7 +226,7 @@ float FrGraphicInterface::PrintText11(const WPoint& point, unsigned long align,
 				0, FrALPHA(m_textOutlineColor, m_alpha), pBitmap);
 	}
 	break;
-	case 4:
+	case FrGDI::SHADOW:
 		m_pFont11->Print(m_pView, p.x + 1.0f, p.y + 1.0f, text, 0,
 			FrALPHA(m_textOutlineColor, m_alpha), pBitmap);
 		break;
@@ -310,10 +310,10 @@ void FrGraphicInterface::PrintText(const WPoint& point, unsigned long align,
 	p = point;
 	switch (align)
 	{
-	case 1:
+	case FrGDI::ALIGN_CENTER:
 		p.x -= *width * 0.5f;
 		break;
-	case 2:
+	case FrGDI::ALIGN_RIGHT:
 		p.x -= *width;
 		break;
 	}
@@ -330,10 +330,10 @@ void FrGraphicInterface::PrintText(const WPoint& point, unsigned long align,
 				p.x = point.x;
 				switch (align)
 				{
-				case 1:
+				case FrGDI::ALIGN_CENTER:
 					p.x -= *width * 0.5f;
 					break;
-				case 2:
+				case FrGDI::ALIGN_RIGHT:
 					p.x -= *width;
 					break;
 				}
@@ -376,10 +376,10 @@ void FrGraphicInterface::PrintText11(const WPoint& point, unsigned long align,
 	p = point;
 	switch (align)
 	{
-	case 1:
+	case FrGDI::ALIGN_CENTER:
 		p.x -= *width * 0.5f;
 		break;
-	case 2:
+	case FrGDI::ALIGN_RIGHT:
 		p.x -= *width;
 		break;
 	}
@@ -396,10 +396,10 @@ void FrGraphicInterface::PrintText11(const WPoint& point, unsigned long align,
 				p.x = point.x;
 				switch (align)
 				{
-				case 1:
+				case FrGDI::ALIGN_CENTER:
 					p.x -= *width * 0.5f;
 					break;
-				case 2:
+				case FrGDI::ALIGN_RIGHT:
 					p.x -= *width;
 					break;
 				}

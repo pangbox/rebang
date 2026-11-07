@@ -8,7 +8,7 @@
 #include "fresh.h"
 #include "golftask.h"
 #include "actor.h"
-#include "frwndinl.h"
+#include "frwnd.h"
 
 extern Fresh* g_pFresh;
 

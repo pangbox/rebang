@@ -209,26 +209,26 @@ void FrWndManager::CheckSystemStatus()
 	if (m_istate.mousePos != m_istate.oldMousePos)
 	{
 		m_istate.oldMousePos = m_istate.mousePos;
-		m_istate.mouse |= 2;
+		m_istate.mouse |= FW_MOUSE_MOVE;
 	}
 
 	switch (g_input->GetButton(LEFT_BUTTON))
 	{
 	case 1:
-		m_istate.mouse |= 4;
+		m_istate.mouse |= FW_LBUT_DOWN;
 		break;
 	case 2:
-		m_istate.mouse |= 8;
+		m_istate.mouse |= FW_LBUT_UP;
 		break;
 	}
 
 	switch (g_input->GetButton(RIGHT_BUTTON))
 	{
 	case 1:
-		m_istate.mouse |= 0x10;
+		m_istate.mouse |= FW_RBUT_DOWN;
 		break;
 	case 2:
-		m_istate.mouse |= 0x20;
+		m_istate.mouse |= FW_RBUT_UP;
 		break;
 	}
 

@@ -157,7 +157,6 @@ private:
 };
 
 const float s_barGaugeStart = 105.0f;
-ILNUM_GDH
 const float s_barEnd = 500.0f;
 static const float s_barTextY = 8.0f;
 const float s_barStart = 140.0f;

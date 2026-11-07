@@ -141,8 +141,8 @@ FrToolTip::cToolTipFrame::~cToolTipFrame()
 
 void FrToolTip::cToolTipFrame::Init()
 {
-	m_Frames.reserve(4);
-	for (int iFrm = 0; iFrm < 4; ++iFrm)
+	m_Frames.reserve(FRTS_MAX);
+	for (int iFrm = 0; iFrm < FRTS_MAX; ++iFrm)
 	{
 		TOOLTIPFRM Frame(FRMIDX_MAX);
 		for (int i = 0; i < FRMIDX_MAX; ++i)
@@ -159,7 +159,7 @@ void FrToolTip::cToolTipFrame::Init()
 
 void FrToolTip::cToolTipFrame::SetStyle(unsigned long style)
 {
-	m_style = Between<unsigned long>(0, style, 3);
+	m_style = Between<unsigned long>(FRTS_DEFAULT, style, FRTS_MAX - 1);
 }
 
 void FrToolTip::cToolTipFrame::Render(const WRect& rc, unsigned long color)

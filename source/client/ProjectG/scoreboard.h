@@ -15,10 +15,6 @@ class FrTreasureGauge;
 class FrNextHole;
 class FrTreasureScore;
 class FrTreasureGift;
-namespace FrGDI
-{
-	enum eTextAlign;
-}
 
 class FrRankForm : public FrForm
 {

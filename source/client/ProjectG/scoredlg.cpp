@@ -340,7 +340,7 @@ void FrScoreDlg::OnHoleListOwnerDraw(int param)
 		if (i <= GetHoles() && Doc()->m_holePar[Doc()->m_holeOrder[i] - 1] > 0)
 		{
 			DrawDigit(gdi, MakeStr("%d", Doc()->m_holeOrder[i]), pos,
-				0xffffffff, (FrGDI::eTextAlign)1, false);
+				0xffffffff, FrGDI::ALIGN_CENTER, false);
 			pos.x += width / 9.0f;
 		}
 	}
@@ -376,13 +376,13 @@ void FrScoreDlg::OnParListOwnerDraw(int param)
 			total += Doc()->m_holePar[Doc()->m_holeOrder[i] - 1];
 			DrawDigit(gdi,
 				MakeStr("%d", Doc()->m_holePar[Doc()->m_holeOrder[i] - 1]), pos,
-				0xff9ff5b8, (FrGDI::eTextAlign)1, false);
+				0xff9ff5b8, FrGDI::ALIGN_CENTER, false);
 		}
 		pos.x += 38.0f;
 	}
 	DrawDigit(gdi, MakeStr("%d", total),
 		WPoint(offset + item->pos.x + 355.0f, pos.y), 0xff9ff5b8,
-		(FrGDI::eTextAlign)1, false);
+		FrGDI::ALIGN_CENTER, false);
 }
 
 void FrScoreDlg::OnGolferListInit(int param)
@@ -506,7 +506,7 @@ void FrScoreDlg::OnTotalListOwnerDraw(int param)
 	case 2:
 	{
 		DrawDigit(gdi, MakeStr("%I64d", rival->totalPang), pos, 0xffffffff,
-			(FrGDI::eTextAlign)1, false);
+			FrGDI::ALIGN_CENTER, false);
 		WPoint right;
 		right.x = width * 0.75f + item->pos.x;
 		right.y = pos.y;
@@ -514,7 +514,7 @@ void FrScoreDlg::OnTotalListOwnerDraw(int param)
 		if (rival->totalScore)
 			format = "%+I64d";
 		DrawDigit(gdi, MakeStr(format, rival->totalPang), right, 0xffffffff,
-			(FrGDI::eTextAlign)1, false);
+			FrGDI::ALIGN_CENTER, false);
 		break;
 	}
 	case 0:
@@ -531,7 +531,7 @@ void FrScoreDlg::OnTotalListOwnerDraw(int param)
 				score += rival->holeScore[Doc()->m_holeOrder[i] - 1];
 			}
 			DrawDigit(gdi, MakeStr("%d", strokes), pos, 0xffffffff,
-				(FrGDI::eTextAlign)1, false);
+				FrGDI::ALIGN_CENTER, false);
 			WPoint right;
 			right.x = width * 0.75f + item->pos.x;
 			right.y = pos.y;
@@ -539,12 +539,12 @@ void FrScoreDlg::OnTotalListOwnerDraw(int param)
 			if (rival->totalScore)
 				format = "%+d";
 			DrawDigit(gdi, MakeStr(format, score), right, 0xffffffff,
-				(FrGDI::eTextAlign)1, false);
+				FrGDI::ALIGN_CENTER, false);
 		}
 		else
 		{
 			DrawDigit(gdi, MakeStr("%d", rival->totalStroke), pos, 0xffffffff,
-				(FrGDI::eTextAlign)1, false);
+				FrGDI::ALIGN_CENTER, false);
 			WPoint right;
 			right.x = width * 0.75f + item->pos.x;
 			right.y = pos.y;
@@ -552,16 +552,16 @@ void FrScoreDlg::OnTotalListOwnerDraw(int param)
 			if (rival->totalScore)
 				format = "%+d";
 			DrawDigit(gdi, MakeStr(format, rival->totalScore), right,
-				0xffffffff, (FrGDI::eTextAlign)1, false);
+				0xffffffff, FrGDI::ALIGN_CENTER, false);
 		}
 		break;
 	}
 	case 3:
 		DrawDigit(gdi, MakeStr("%d", rival->guildPoint), pos, 0xffffffff,
-			(FrGDI::eTextAlign)1, false);
+			FrGDI::ALIGN_CENTER, false);
 		DrawDigit(gdi, MakeStr("%d", rival->guildPoint),
 			WPoint(width * 0.75f + item->pos.x, pos.y), 0xffffffff,
-			(FrGDI::eTextAlign)1, false);
+			FrGDI::ALIGN_CENTER, false);
 		break;
 	}
 }
@@ -731,7 +731,7 @@ void FrScoreDlg::DrawShot(FrListItem* item)
 				}
 				DrawDigit(gdi,
 					MakeStr("%d", rival->holeStroke[Doc()->m_holeOrder[i] - 1]),
-					pos, color, (FrGDI::eTextAlign)1, false);
+					pos, color, FrGDI::ALIGN_CENTER, false);
 			}
 			++count;
 		}
@@ -861,7 +861,7 @@ void FrScoreDlg::DrawPang(FrListItem* item)
 				DrawDigit(gdi,
 					MakeStr("%d",
 						(int)rival->holePang[Doc()->m_holeOrder[i] - 1]),
-					pos, 0xffe98919, (FrGDI::eTextAlign)1, true);
+					pos, 0xffe98919, FrGDI::ALIGN_CENTER, true);
 			}
 			++count;
 		}
@@ -956,13 +956,13 @@ void FrScoreDlg::DrawDigit(FrGraphicInterface* gdi, char* text, WPoint pos,
 	WRect rect;
 	switch (align)
 	{
-	case 0:
+	case FrGDI::ALIGN_LEFT:
 		rect.x = (float)(int)pos.x;
 		break;
-	case 1:
+	case FrGDI::ALIGN_CENTER:
 		rect.x = (float)(int)(pos.x - width * 0.5f);
 		break;
-	case 2:
+	case FrGDI::ALIGN_RIGHT:
 		rect.x = (float)(int)(pos.x - width);
 		break;
 	}

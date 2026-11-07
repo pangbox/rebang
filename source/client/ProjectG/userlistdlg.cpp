@@ -7,7 +7,7 @@
 #include "golftask.h"
 #include "actor.h"
 #include "frscrollbar.h"
-#include "frwndinl.h"
+#include "frwnd.h"
 #include "packet.h"
 #include "../../shared/localize.h"
 

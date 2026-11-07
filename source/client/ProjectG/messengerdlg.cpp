@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "messengerdlg.h"
 #include "messengerchatdlg.h"
 #include "buddymanager.h"

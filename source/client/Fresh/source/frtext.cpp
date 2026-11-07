@@ -2,14 +2,19 @@
 #include "frgraphicinterface.h"
 #include <stdlib.h>
 
-static const char g_FrTagChar[] = { 'c' };
+enum
+{
+	MAX_FRTAG_CHAR_SIZE = 1
+};
+
+static const char g_FrTagChar[MAX_FRTAG_CHAR_SIZE] = { 'c' };
 
 unsigned int StringExtractTagTextFindFirst(const std::string& src,
 	std::string& output)
 {
 	std::string szToken;
 	unsigned int first = src.length();
-	for (int i = 0; i < sizeof(g_FrTagChar); i++)
+	for (int i = 0; i < MAX_FRTAG_CHAR_SIZE; i++)
 	{
 		std::string szTagch = "\\";
 		szTagch += g_FrTagChar[i];
@@ -31,16 +36,16 @@ void FrTextToken::RunTag(FrGraphicInterface* pGDI)
 	switch (m_type)
 	{
 	case FrTEXT_TAG_STYLE_THICK:
-		pGDI->SetTextStyle(1);
+		pGDI->SetTextStyle(FrGDI::THICK);
 		break;
 	case FrTEXT_TAG_STYLE_NONE:
-		pGDI->SetTextStyle(0);
+		pGDI->SetTextStyle(FrGDI::NONE);
 		break;
 	case FrTEXT_TAG_STYLE_OUTLINE:
-		pGDI->SetTextStyle(2);
+		pGDI->SetTextStyle(FrGDI::OUTLINE);
 		break;
 	case FrTEXT_TAG_STYLE_SHADOW:
-		pGDI->SetTextStyle(4);
+		pGDI->SetTextStyle(FrGDI::SHADOW);
 		break;
 	case FrTEXT_TAG_COLOR1:
 	{

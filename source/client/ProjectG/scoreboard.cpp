@@ -1404,13 +1404,13 @@ void FrRankForm3::DrawDigit(FrGraphicInterface* gdi, char* text, WPoint pos,
 	WRect rect;
 	switch (align)
 	{
-	case 0:
+	case FrGDI::ALIGN_LEFT:
 		rect.x = (float)(int)pos.x;
 		break;
-	case 1:
+	case FrGDI::ALIGN_CENTER:
 		rect.x = (float)(int)(pos.x - width * 0.5f);
 		break;
-	case 2:
+	case FrGDI::ALIGN_RIGHT:
 		rect.x = (float)(int)(pos.x - width);
 		break;
 	}
@@ -1510,11 +1510,11 @@ void FrRankForm3::OnScoreInfoOwnerDraw()
 			0xffffffff, 0);
 
 	DrawDigit(pGDI, MakeStr("%d", m_score[0]),
-		WPoint(rect.x + 50.0f, rect.y + 3.0f), 0xffff0000, (FrGDI::eTextAlign)1,
+		WPoint(rect.x + 50.0f, rect.y + 3.0f), 0xffff0000, FrGDI::ALIGN_CENTER,
 		false);
 	DrawDigit(pGDI, MakeStr("%d", m_score[1]),
-		WPoint(rect.x + 240.0f, rect.y + 3.0f), 0xff0000ff,
-		(FrGDI::eTextAlign)1, false);
+		WPoint(rect.x + 240.0f, rect.y + 3.0f), 0xff0000ff, FrGDI::ALIGN_CENTER,
+		false);
 }
 
 void FrRankForm3::LoadBitmaps()
@@ -4358,7 +4358,7 @@ void FrScoreForm::OnHoleListOwnerDraw(int param)
 	for (int i = begin; i < end; ++i)
 	{
 		DrawDigit(gdi, MakeStr("%d", Doc()->m_holeOrder[i]), pos, 0xffffffff,
-			(FrGDI::eTextAlign)1, false);
+			FrGDI::ALIGN_CENTER, false);
 		pos.x = (float)(int)(pos.x + width / 9.0f);
 	}
 }
@@ -4407,7 +4407,7 @@ void FrScoreForm::OnParListOwnerDraw(int param)
 		total += GOLFDOC()->GetHoleData(Doc()->m_holeOrder[i]).par;
 		DrawDigit(gdi,
 			MakeStr("%d", GOLFDOC()->GetHoleData(Doc()->m_holeOrder[i]).par),
-			pos, 0xff9ff5b8, (FrGDI::eTextAlign)1, false);
+			pos, 0xff9ff5b8, FrGDI::ALIGN_CENTER, false);
 		pos.x = (float)(int)(pos.x + width / 9.0f);
 	}
 
@@ -4420,12 +4420,12 @@ void FrScoreForm::OnParListOwnerDraw(int param)
 	case GAME_TYPE_SKINS:
 		pos.x = (float)float2int(offset + item->pos.x + 473.0f);
 		DrawDigit(gdi, MakeStr("%d", total), pos, 0xff9ff5b8,
-			(FrGDI::eTextAlign)1, false);
+			FrGDI::ALIGN_CENTER, false);
 		break;
 	default:
 		pos.x = (float)(int)(offset + item->pos.x + 355.0f);
 		DrawDigit(gdi, MakeStr("%d", total), pos, 0xff9ff5b8,
-			(FrGDI::eTextAlign)1, false);
+			FrGDI::ALIGN_CENTER, false);
 		break;
 	}
 }
@@ -4975,25 +4975,25 @@ void FrScoreForm::OnTotalListOwnerDraw(int param)
 		{
 			if (index == PLAYER(GOLFDOC()->m_currentPlayer)->team)
 				DrawDigit(gdi, MakeStr("%I64d", m_totalPang), pos, 0xffffffff,
-					(FrGDI::eTextAlign)1, false);
+					FrGDI::ALIGN_CENTER, false);
 			else
 				DrawDigit(gdi, MakeStr("%d", (int)TEAM(index)->totalPang), pos,
-					0xffffffff, (FrGDI::eTextAlign)1, false);
+					0xffffffff, FrGDI::ALIGN_CENTER, false);
 		}
 		else if (Doc()->m_golfGame.gameType == GAME_TYPE_GUILD_MATCH)
 		{
 			DrawDigit(gdi,
 				MakeStr("%I64d", (int)GUILDMATCHUP(index)->totalPang), pos,
-				0xffffffff, (FrGDI::eTextAlign)1, false);
+				0xffffffff, FrGDI::ALIGN_CENTER, false);
 		}
 		else
 		{
 			if (index == GOLFDOC()->m_currentPlayer)
 				DrawDigit(gdi, MakeStr("%I64d", m_totalPang), pos, 0xffffffff,
-					(FrGDI::eTextAlign)1, false);
+					FrGDI::ALIGN_CENTER, false);
 			else
 				DrawDigit(gdi, MakeStr("%d", (int)PLAYER(index)->totalPang),
-					pos, 0xffffffff, (FrGDI::eTextAlign)1, false);
+					pos, 0xffffffff, FrGDI::ALIGN_CENTER, false);
 		}
 		break;
 
@@ -5005,22 +5005,22 @@ void FrScoreForm::OnTotalListOwnerDraw(int param)
 			break;
 	case 0:
 		if (Doc()->m_golfGame.gameType == GAME_TYPE_GUILD_MATCH)
-			DrawDigit(gdi, "?", pos, 0xffffffff, (FrGDI::eTextAlign)1, false);
+			DrawDigit(gdi, "?", pos, 0xffffffff, FrGDI::ALIGN_CENTER, false);
 		else
 			DrawDigit(gdi, MakeStr("%d", PLAYER(index)->totalStroke), pos,
-				0xffffffff, (FrGDI::eTextAlign)1, false);
+				0xffffffff, FrGDI::ALIGN_CENTER, false);
 		break;
 
 	case 5:
 		if (Doc()->m_golfGame.gameType == GAME_TYPE_GUILD_MATCH)
 			DrawDigit(gdi, MakeStr("%d", GUILDMATCHUP(index)->guildPoint), pos,
-				0xffffffff, (FrGDI::eTextAlign)1, false);
+				0xffffffff, FrGDI::ALIGN_CENTER, false);
 		else if (Doc()->m_golfGame.gameType == GAME_TYPE_TEAM)
 			DrawDigit(gdi, MakeStr("%d", TEAM(index)->score), pos, 0xffffffff,
-				(FrGDI::eTextAlign)1, false);
+				FrGDI::ALIGN_CENTER, false);
 		else
 			DrawDigit(gdi, MakeStr("%d", PLAYER(index)->totalStroke), pos,
-				0xffffffff, (FrGDI::eTextAlign)1, false);
+				0xffffffff, FrGDI::ALIGN_CENTER, false);
 		break;
 
 	case 2:
@@ -5035,7 +5035,7 @@ void FrScoreForm::OnTotalListOwnerDraw(int param)
 		for (int i = 0; i < (m_bFront9 ? 9 : 18); i++)
 			total += PLAYER(index)->putt[i];
 		DrawDigit(gdi, MakeStr("%d", total), pos, 0xffffffff,
-			(FrGDI::eTextAlign)1, false);
+			FrGDI::ALIGN_CENTER, false);
 		break;
 	}
 
@@ -5055,7 +5055,7 @@ void FrScoreForm::OnTotalListOwnerDraw(int param)
 		else
 			format = "%+d";
 		DrawDigit(gdi, MakeStr(format, PLAYER(index)->score), pos, 0xffffffff,
-			(FrGDI::eTextAlign)1, false);
+			FrGDI::ALIGN_CENTER, false);
 	}
 }
 
@@ -5217,7 +5217,7 @@ void FrScoreForm::DrawShot(FrListItem* item)
 				(!(GOLFDOC()->GameMode() & 0x22000) ||
 					GOLFDOC()->IsNetGameEnd()))
 			{
-				DrawDigit(gdi, "?", pos, 0xffffffff, (FrGDI::eTextAlign)1,
+				DrawDigit(gdi, "?", pos, 0xffffffff, FrGDI::ALIGN_CENTER,
 					false);
 			}
 			else
@@ -5227,7 +5227,7 @@ void FrScoreForm::DrawShot(FrListItem* item)
 					(GUILDMATCHUP(index)->oid != MyGuid(false) &&
 						i > GetHoleIndex(GOLFDOC()->m_currentHole) - 1))
 				{
-					DrawDigit(gdi, "?", pos, 0xffffffff, (FrGDI::eTextAlign)1,
+					DrawDigit(gdi, "?", pos, 0xffffffff, FrGDI::ALIGN_CENTER,
 						false);
 				}
 				else
@@ -5261,7 +5261,7 @@ void FrScoreForm::DrawShot(FrListItem* item)
 						break;
 					}
 					DrawDigit(gdi, MakeStr("%d", stroke), pos, color,
-						(FrGDI::eTextAlign)1, false);
+						FrGDI::ALIGN_CENTER, false);
 				}
 			}
 		}
@@ -5280,14 +5280,14 @@ void FrScoreForm::DrawShot(FrListItem* item)
 				(!(GOLFDOC()->GameMode() & 0x22000) ||
 					GOLFDOC()->IsNetGameEnd()))
 			{
-				DrawDigit(gdi, "-", pos, 0xffffffff, (FrGDI::eTextAlign)1,
+				DrawDigit(gdi, "-", pos, 0xffffffff, FrGDI::ALIGN_CENTER,
 					false);
 			}
 			else
 			{
 				if (!PLAYER(index)->stroke[Doc()->m_holeOrder[i] - 1])
 				{
-					DrawDigit(gdi, "-", pos, 0xffffffff, (FrGDI::eTextAlign)1,
+					DrawDigit(gdi, "-", pos, 0xffffffff, FrGDI::ALIGN_CENTER,
 						false);
 				}
 				else
@@ -5321,7 +5321,7 @@ void FrScoreForm::DrawShot(FrListItem* item)
 						break;
 					}
 					DrawDigit(gdi, MakeStr("%d", stroke), pos, color,
-						(FrGDI::eTextAlign)1, false);
+						FrGDI::ALIGN_CENTER, false);
 				}
 			}
 		}
@@ -5369,7 +5369,7 @@ void FrScoreForm::DrawVersus(FrListItem* item)
 		if (i == GetHoleIndex(GOLFDOC()->m_currentHole) - 1 &&
 			(GOLFDOC()->GameMode() & ~0x22000))
 		{
-			DrawDigit(gdi, "?", pos, 0xffffffff, (FrGDI::eTextAlign)1, false);
+			DrawDigit(gdi, "?", pos, 0xffffffff, FrGDI::ALIGN_CENTER, false);
 			continue;
 		}
 
@@ -5516,16 +5516,16 @@ void FrScoreForm::DrawPutt(FrListItem* item)
 			PLAYER(index)->state != 1 &&
 			(!(GOLFDOC()->GameMode() & 0x22000) || GOLFDOC()->IsNetGameEnd()))
 		{
-			DrawDigit(gdi, "-", pos, 0xffffffff, (FrGDI::eTextAlign)1, false);
+			DrawDigit(gdi, "-", pos, 0xffffffff, FrGDI::ALIGN_CENTER, false);
 		}
 		else
 		{
 			if (!PLAYER(index)->stroke[Doc()->m_holeOrder[i] - 1])
-				DrawDigit(gdi, "-", pos, 0xffffffff, (FrGDI::eTextAlign)1,
+				DrawDigit(gdi, "-", pos, 0xffffffff, FrGDI::ALIGN_CENTER,
 					false);
 			else
 				DrawDigit(gdi, MakeStr("%d", putt), pos, 0xff40c967,
-					(FrGDI::eTextAlign)1, false);
+					FrGDI::ALIGN_CENTER, false);
 		}
 	}
 }
@@ -5563,11 +5563,11 @@ void FrScoreForm::DrawPang(FrListItem* item)
 				pang = TEAM(index)->pang[Doc()->m_holeOrder[i] - 1];
 
 			if (!TEAM(index)->stroke[Doc()->m_holeOrder[i] - 1])
-				DrawDigit(gdi, "-", pos, 0xffffffff, (FrGDI::eTextAlign)1,
+				DrawDigit(gdi, "-", pos, 0xffffffff, FrGDI::ALIGN_CENTER,
 					false);
 			else
 				DrawDigit(gdi, MakeStr("%I64d", pang), pos, 0xffe98919,
-					(FrGDI::eTextAlign)1, true);
+					FrGDI::ALIGN_CENTER, true);
 		}
 	}
 	else if (Doc()->m_golfGame.gameType == 6)
@@ -5589,11 +5589,11 @@ void FrScoreForm::DrawPang(FrListItem* item)
 			if (!GUILDMATCHUP(index)->holeStroke[Doc()->m_holeOrder[i] - 1] ||
 				(GUILDMATCHUP(index)->oid != MyGuid(false) &&
 					i > GetHoleIndex(GOLFDOC()->m_currentHole) - 1))
-				DrawDigit(gdi, "?", pos, 0xffffffff, (FrGDI::eTextAlign)1,
+				DrawDigit(gdi, "?", pos, 0xffffffff, FrGDI::ALIGN_CENTER,
 					false);
 			else
 				DrawDigit(gdi, MakeStr("%d", pang), pos, 0xffe98919,
-					(FrGDI::eTextAlign)1, true);
+					FrGDI::ALIGN_CENTER, true);
 		}
 	}
 	else
@@ -5613,11 +5613,11 @@ void FrScoreForm::DrawPang(FrListItem* item)
 				pang = PLAYER(index)->pang[Doc()->m_holeOrder[i] - 1];
 
 			if (!PLAYER(index)->stroke[Doc()->m_holeOrder[i] - 1])
-				DrawDigit(gdi, "-", pos, 0xffffffff, (FrGDI::eTextAlign)1,
+				DrawDigit(gdi, "-", pos, 0xffffffff, FrGDI::ALIGN_CENTER,
 					false);
 			else
 				DrawDigit(gdi, MakeStr("%d", pang), pos, 0xffe98919,
-					(FrGDI::eTextAlign)1, true);
+					FrGDI::ALIGN_CENTER, true);
 		}
 	}
 }
@@ -5686,7 +5686,7 @@ void FrScoreForm::DrawSkins(FrListItem* item)
 				gdi->PrintText(pos, 1, MakeStr("%d", pang), NULL);
 				continue;
 			}
-			DrawDigit(gdi, "-", pos, 0xffffffff, (FrGDI::eTextAlign)1, false);
+			DrawDigit(gdi, "-", pos, 0xffffffff, FrGDI::ALIGN_CENTER, false);
 		}
 	}
 }
@@ -5723,13 +5723,13 @@ void FrScoreForm::DrawDigit(FrGraphicInterface* gdi, char* text, WPoint pos,
 	WRect rect;
 	switch (align)
 	{
-	case 0:
+	case FrGDI::ALIGN_LEFT:
 		rect.x = (float)(int)pos.x;
 		break;
-	case 1:
+	case FrGDI::ALIGN_CENTER:
 		rect.x = (float)(int)(pos.x - width * 0.5f);
 		break;
-	case 2:
+	case FrGDI::ALIGN_RIGHT:
 		rect.x = (float)(int)(pos.x - width);
 		break;
 	}

@@ -2,10 +2,6 @@
 
 #include "frform.h"
 
-namespace FrGDI
-{
-	enum eTextAlign;
-}
 #include "frgraphicinterface.h"
 struct sRivalData;
 class FrScoreDlg : public FrForm

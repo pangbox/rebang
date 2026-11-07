@@ -12,6 +12,35 @@ enum wUnitMode
 	W_UNIT_HEIGHT = 3
 };
 
+enum wCoordMode
+{
+	W_AF_LEFT = 0,
+	W_AF_CENTER = 2,
+	W_AF_RIGHT = 4,
+	W_AF_TOP = 0,
+	W_AF_MID = 32,
+	W_AF_BOTTOM = 64,
+	W_COORDINATES_RELATIVE = 256,
+	W_COORDINATES_ABSOLUTE = 512,
+	W_COORDINATES_FIXED_NUM = 1024,
+	W_SCALE_RELATIVE = 4096,
+	W_SCALE_ABSOLUTE = 8192,
+};
+
+enum wFlipFlag
+{
+	W_X_FLIP = 1,
+	W_Y_FLIP = 2,
+};
+
+enum wClipFlag
+{
+	W_LEFT = 1,
+	W_RIGHT = 2,
+	W_TOP = 4,
+	W_BOTTOM = 8,
+};
+
 struct _WPOINT
 {
 	float x, y;

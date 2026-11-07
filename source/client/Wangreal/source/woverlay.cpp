@@ -20,7 +20,7 @@ WOverlay::WOverlay(void)
 	  m_devTexWidth(0),
 	  m_devTexHeight(0),
 	  m_clipFlag(false),
-	  m_coordMode(0x2200)
+	  m_coordMode(W_COORDINATES_ABSOLUTE | W_SCALE_ABSOLUTE)
 {
 }
 
@@ -253,7 +253,7 @@ void WOverlay::DrawTexture(WView* pView, int tex, const _WRECT& src,
 	WRect _dest;
 	WRect _clipArea;
 
-	if (m_coordMode & 0x400)
+	if (m_coordMode & W_COORDINATES_FIXED_NUM)
 	{
 		_dest.x = floor(dst.x);
 		_dest.y = floor(dst.y);
@@ -330,7 +330,7 @@ void WOverlay::DrawTexture(WView* pView, int tex, const _WRECT& src,
 		}
 	}
 	float sx, sy, ex, ey;
-	if (m_coordMode & 0x400)
+	if (m_coordMode & W_COORDINATES_FIXED_NUM)
 	{
 		sx = _dest.x - 0.5f;
 		ex = sx + _dest.w;
@@ -339,7 +339,7 @@ void WOverlay::DrawTexture(WView* pView, int tex, const _WRECT& src,
 	}
 	for (int i = 0; i < 4; ++i)
 	{
-		if (m_coordMode & 0x400)
+		if (m_coordMode & W_COORDINATES_FIXED_NUM)
 		{
 			float px;
 			if (i & 1)
@@ -428,7 +428,7 @@ void WOverlay::DrawTextureWithAxis(WView* pView, int tex, const _WRECT& src,
 
 	for (int i = 0; i < 4; ++i)
 	{
-		if (m_coordMode & 0x400)
+		if (m_coordMode & W_COORDINATES_FIXED_NUM)
 		{
 			m_vtx[i].x = floorf((i & 1) ? dst.w + dst.x : dst.x) - 0.5f;
 			m_vtx[i].y = floorf((i & 2) ? dst.h + dst.y : dst.y) - 0.5f;
@@ -1012,41 +1012,41 @@ float WOverlay::GetUnit(WView* pView, float value, wUnitMode mode)
 	switch (mode)
 	{
 	case W_UNIT_XPOS:
-		if (m_coordMode & 0x100)
+		if (m_coordMode & W_COORDINATES_RELATIVE)
 		{
 			switch (m_coordMode & 6)
 			{
-			case 0:
+			case W_AF_LEFT:
 				return (pView->GetWidth() / 640.0f) * value;
-			case 2:
+			case W_AF_CENTER:
 				return (value + 320.0f) * (pView->GetWidth() / 640.0f);
-			case 4:
+			case W_AF_RIGHT:
 				return (value + 640.0f) * (pView->GetWidth() / 640.0f);
 			}
 		}
 		break;
 	case W_UNIT_YPOS:
-		if (m_coordMode & 0x100)
+		if (m_coordMode & W_COORDINATES_RELATIVE)
 		{
 			switch (m_coordMode & 0x60)
 			{
-			case 0:
+			case W_AF_TOP:
 				return (pView->GetHeight() / 480.0f) * value;
-			case 0x20:
+			case W_AF_MID:
 				return (value + 240.0f) * (pView->GetHeight() / 480.0f);
-			case 0x40:
+			case W_AF_BOTTOM:
 				return (value + 480.0f) * (pView->GetHeight() / 480.0f);
 			}
 		}
 		break;
 	case W_UNIT_WIDTH:
-		if (m_coordMode & 0x1000)
+		if (m_coordMode & W_SCALE_RELATIVE)
 		{
 			return (pView->GetWidth() / 640.0f) * value;
 		}
 		break;
 	case W_UNIT_HEIGHT:
-		if (m_coordMode & 0x1000)
+		if (m_coordMode & W_SCALE_RELATIVE)
 		{
 			return (pView->GetHeight() / 480.0f) * value;
 		}
@@ -1064,7 +1064,7 @@ WRect WOverlay::ConvertRect(WView* pView, const WRect& rc, int mode)
 	}
 	else
 	{
-		ox = (mode & 2 ? 0.5f : 1.0f) * pView->GetWidth();
+		ox = (mode & W_AF_CENTER ? 0.5f : 1.0f) * pView->GetWidth();
 	}
 
 	float oy;
@@ -1074,11 +1074,11 @@ WRect WOverlay::ConvertRect(WView* pView, const WRect& rc, int mode)
 	}
 	else
 	{
-		oy = (mode & 0x20 ? 0.5f : 1.0f) * pView->GetHeight();
+		oy = (mode & W_AF_MID ? 0.5f : 1.0f) * pView->GetHeight();
 	}
 
 	WRect ret;
-	if (mode & 0x100)
+	if (mode & W_COORDINATES_RELATIVE)
 	{
 		ret.x = (pView->GetWidth() * rc.x) / 640.0f + ox;
 		ret.y = (pView->GetHeight() * rc.y) / 480.0f + oy;
@@ -1089,7 +1089,7 @@ WRect WOverlay::ConvertRect(WView* pView, const WRect& rc, int mode)
 		ret.y = oy + rc.y;
 	}
 
-	if (mode & 0x1000)
+	if (mode & W_SCALE_RELATIVE)
 	{
 		ret.w = (pView->GetWidth() * rc.w) / 640.0f;
 		ret.h = (pView->GetHeight() * rc.h) / 480.0f;

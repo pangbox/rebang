@@ -1,6 +1,6 @@
 #include "minatl.h"
 #include "compounddlg.h"
-#include "frwndinl.h"
+#include "frwnd.h"
 #include "frarea.h"
 #include "frbutton.h"
 #include "frgaugebar.h"

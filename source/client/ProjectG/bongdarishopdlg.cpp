@@ -6,7 +6,7 @@
 #include "simpleoverlay.h"
 #include "taskmanager.h"
 #include "inputmanager.h"
-#include "frwndinl.h"
+#include "frwnd.h"
 #include "frscrollbar.h"
 #include "frdesktop.h"
 #include "mathconsts.h"

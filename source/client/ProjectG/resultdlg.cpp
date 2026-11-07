@@ -8,7 +8,7 @@
 #include "gmtoolkit.h"
 #include "levelupitemdlg.h"
 #include "../../shared/sharedtables.h"
-#include "frwndinl.h"
+#include "frwnd.h"
 #include "user_info.h"
 #include "userinfoform.h"
 #include "netresourcemanager.h"

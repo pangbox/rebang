@@ -790,19 +790,19 @@ void FrWnd::OnProcess(const float deltaTime, FrInputState& istate,
 	if (pCaptured == NULL && !bInClient)
 		return;
 
-	if (istate.mouse & 0x2)
+	if (istate.mouse & FW_MOUSE_MOVE)
 		OnMouseMove(istate.mousePos);
 
-	if (istate.mouse & 0x4)
+	if (istate.mouse & FW_LBUT_DOWN)
 	{
 		if (m_dblClickTimeout > -0.1f && m_dblClickPos == istate.mousePos)
 		{
 			m_dblClicked = true;
-			istate.mouse &= ~0x4;
+			istate.mouse &= ~FW_LBUT_DOWN;
 		}
 		else if (!OnLButtonDown(istate.mousePos))
 		{
-			istate.mouse &= ~0x4;
+			istate.mouse &= ~FW_LBUT_DOWN;
 			if (!m_dwStyle.GetFlag(FWS_NODBLCLICK))
 			{
 				m_dblClickTimeout = 0.5f;
@@ -819,29 +819,29 @@ void FrWnd::OnProcess(const float deltaTime, FrInputState& istate,
 		}
 	}
 
-	if (istate.mouse & 0x8)
+	if (istate.mouse & FW_LBUT_UP)
 	{
 		if (m_dblClicked)
 		{
 			OnDblClick(istate.mousePos);
-			istate.mouse &= ~0x8;
+			istate.mouse &= ~FW_LBUT_UP;
 			m_dblClickTimeout = -100.0f;
 			m_dblClicked = false;
 		}
 		else if (!OnLButtonUp(istate.mousePos))
-			istate.mouse &= ~0x8;
+			istate.mouse &= ~FW_LBUT_UP;
 	}
 
-	if (istate.mouse & 0x10)
+	if (istate.mouse & FW_RBUT_DOWN)
 	{
 		if (!OnRButtonDown(istate.mousePos))
-			istate.mouse &= ~0x10;
+			istate.mouse &= ~FW_RBUT_DOWN;
 	}
 
-	if (istate.mouse & 0x20)
+	if (istate.mouse & FW_RBUT_UP)
 	{
 		if (!OnRButtonUp(istate.mousePos))
-			istate.mouse &= ~0x20;
+			istate.mouse &= ~FW_RBUT_UP;
 	}
 }
 

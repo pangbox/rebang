@@ -21,7 +21,6 @@ ILPAIRSS0
 #include "z_ilfill.h"
 ILPAIRSS
 ILFILL2
-ILNUM_PSS
 #include "../../shared/localize.h"
 #include "hatmanager.h"
 #include "parttidlist.h"

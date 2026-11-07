@@ -87,7 +87,7 @@ ILFILLEXC
 #include "hackingmanager.h"
 #include "z_ilfill.h"
 ILFILL1
-#include "frwndinl.h"
+#include "frwnd.h"
 ILFILLF1
 #include "frframe.h"
 #include "frbutton.h"

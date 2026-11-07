@@ -2,6 +2,26 @@
 #include "../../Wangreal/include/wtypes.h"
 #include "../../Wangreal/include/woverlay.h"
 
+namespace FrGDI
+{
+	enum eTextStyleFlags
+	{
+		NONE = 0,
+		THICK = 1,
+		OUTLINE = 2,
+		SHADOW = 4,
+		ITALIC = 8,
+		ANTIALIASED = 16,
+	};
+
+	enum eTextAlign
+	{
+		ALIGN_LEFT = 0,
+		ALIGN_CENTER = 1,
+		ALIGN_RIGHT = 2,
+	};
+}
+
 class Bitmap;
 class TexCacheManager;
 class WFont;

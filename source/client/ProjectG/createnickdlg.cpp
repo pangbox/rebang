@@ -3,7 +3,7 @@
 
 #include "emoticondlg.h"
 #include "logoutdlg.h"
-#include "frwndinl.h"
+#include "frwnd.h"
 #include "fredit.h"
 #include "frbutton.h"
 #include "fresh.h"

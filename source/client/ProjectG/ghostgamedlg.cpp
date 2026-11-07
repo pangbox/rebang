@@ -2,7 +2,7 @@
 #include "ghostgamedlg.h"
 #include "inputmanager.h"
 #include "shareddoc.h"
-#include "frwndinl.h"
+#include "frwnd.h"
 #include "frviewer.h"
 #include "golfdoc.h"
 #include "../../shared/sharedtables.h"

@@ -1,7 +1,7 @@
 #include "minatl.h"
 #include "carddlg.h"
 #include "shareddoc.h"
-#include "frwndinl.h"
+#include "frwnd.h"
 #include "frlistbox.h"
 #include "frbutton.h"
 #include "fredit.h"

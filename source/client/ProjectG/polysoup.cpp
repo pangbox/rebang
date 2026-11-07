@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "wbone.h"
 #include "wxpuppet.h"
 #include "wpuppetutil.h"
