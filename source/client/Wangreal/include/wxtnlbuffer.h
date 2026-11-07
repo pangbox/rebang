@@ -79,46 +79,50 @@ void __fastcall xRender(WView* pView, WxBatchState* pState, WBone* pBone,
 
 class WxTnLBuffer
 {
-public:
-	WxTnLBuffer();
-	~WxTnLBuffer();
-
-	void xCopy(WxTnLBuffer** ppOut, WVideoDev* pVideo);
-	WxBatchGrp* xGetBatchGrps();
-	void xUpdateStaticBufferInfo(WBone* pSrc, WBone* pDst, int iIdx);
-	void xUpdateStaticBufferInfo(WPuppet** ppPets, int nPets);
-	void xUpdateMatrixIdx(unsigned char* pBuf, WxBatchGrp* pGrp,
-		WxBatch* pBatch, WBone* pBone, WPuppet* pPet);
-	void xUpdateMatrixIdx(WPuppet* pPet);
-	void xSetRootBone(WPuppet* pPet);
-	void xClear();
-	int xCreateBuffers(WVideoDev* pVideo, WPuppet* pPet);
-	int xCreateStaticBuffers(WVideoDev* pVideo, WPuppet** ppPets, int nPets);
-	void xRender(WView* pView);
-	int xFillBuffers();
-
-private:
-	void xUpdateBones(WBone* pBone);
-	void xGetMatchingBatches(WxBatchGrp** ppGrp, WxBatch** ppBatch, WxVb* pVb,
-		WxIb* pIb, WBone* pBone, w_mesh* pMesh, int nPets);
-	void xSortBatches();
-	void xCount(bool bVtxs, WxBatchGrp* pGrp, WxBatch* pBatch, WBone* pBone);
-	void xFillIndexBufferByBone(unsigned char* pBuf, WxBatchGrp* pGrp,
-		WxBatch* pBatch, WBone* pBone);
-	void xGetMatchingBuffers(WxVb** ppVb, WxIb** ppIb, w_mesh* pMesh);
-	int xAllocBuffers(int nCopies);
-	void xFillIndexBuffer(const WxIb& ib);
-	int xDetermineProperty(WBone* pBone, int nCopies, int iLightMode);
-	void xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
-		WxBatch* pBatch, w_mesh* pMesh);
-	void xFillVertexBufferByBone(unsigned char* pBuf, WxBatchGrp* pGrp,
-		WxBatch* pBatch, WBone* pBone);
-	void xFillVertexBuffer(const WxVb& vb);
-
+	enum
+	{
+		WX_BUF_CLONE = 1,
+		WX_BUF_STATIC = 2
+	};
 	int m_xiFlag;
 	WxVb* m_xpaVbs;
 	WxIb m_xaIbs[32];
 	WxBatchGrp* m_xpaBatchGrps;
 	WPuppet* m_xpPet;
 	WVideoDev* m_xpVideo;
+
+public:
+	WxTnLBuffer();
+	~WxTnLBuffer();
+	void xClear();
+	void xCopy(WxTnLBuffer** ppOut, WVideoDev* pVideo);
+	void xSetRootBone(WPuppet* pPet);
+	WxBatchGrp* xGetBatchGrps();
+	int xCreateBuffers(WVideoDev* pVideo, WPuppet* pPet);
+	int xCreateStaticBuffers(WVideoDev* pVideo, WPuppet** ppPets, int nPets);
+	int xFillBuffers();
+	void xUpdateStaticBufferInfo(WPuppet** ppPets, int nPets);
+	void xUpdateStaticBufferInfo(WBone* pSrc, WBone* pDst, int iIdx);
+	void xUpdateMatrixIdx(WPuppet* pPet);
+	void xUpdateMatrixIdx(unsigned char* pBuf, WxBatchGrp* pGrp,
+		WxBatch* pBatch, WBone* pBone, WPuppet* pPet);
+	void xRender(WView* pView);
+
+private:
+	void xUpdateBones(WBone* pBone);
+	int xDetermineProperty(WBone* pBone, int nCopies, int iLightMode);
+	void xSortBatches();
+	int xAllocBuffers(int nCopies);
+	void xCount(bool bVtxs, WxBatchGrp* pGrp, WxBatch* pBatch, WBone* pBone);
+	void xGetMatchingBuffers(WxVb** ppVb, WxIb** ppIb, w_mesh* pMesh);
+	void xGetMatchingBatches(WxBatchGrp** ppGrp, WxBatch** ppBatch, WxVb* pVb,
+		WxIb* pIb, WBone* pBone, w_mesh* pMesh, int nPets);
+	void xFillVertexBuffer(const WxVb& vb);
+	void xFillVertexBufferByBone(unsigned char* pBuf, WxBatchGrp* pGrp,
+		WxBatch* pBatch, WBone* pBone);
+	void xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
+		WxBatch* pBatch, w_mesh* pMesh);
+	void xFillIndexBuffer(const WxIb& ib);
+	void xFillIndexBufferByBone(unsigned char* pBuf, WxBatchGrp* pGrp,
+		WxBatch* pBatch, WBone* pBone);
 };

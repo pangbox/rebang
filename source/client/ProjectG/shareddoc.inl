@@ -461,6 +461,11 @@ inline __int64 MyOutsideCash()
 	return Doc()->m_cash;
 }
 
+inline __int64 MyBonusCash()
+{
+	return Doc()->m_bonusCash;
+}
+
 inline int GalleryMode()
 {
 	if (Doc()->m_myInfo.info.IsIdentity(2))

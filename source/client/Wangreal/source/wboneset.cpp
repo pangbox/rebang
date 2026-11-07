@@ -1,46 +1,11 @@
 #include "wboneset.h"
+#include "wmemblock.inl"
 
 WBoneKey WBoneSet::m_preAlloc[256];
 unsigned char WBoneSet::m_curAlloc;
 
-// HACK: Workaround to preserve original COMDAT order
-
-static void BlendBoneKey(WBoneKey* a, WBoneKey* b, WBoneKey* c, float fraction)
-{
-	if (b->flags & 1)
-		c->quat = (a->flags & 1) ? WQuaternionSlerp(a->quat, b->quat, fraction)
-								 : b->quat;
-	if (b->flags & 2)
-		c->pivot = (a->flags & 2) ? a->pivot + (b->pivot - a->pivot) * fraction
-								  : b->pivot;
-	if (b->flags & 4)
-		c->scale = (a->flags & 4)
-			? a->scale = (1 - fraction) * a->scale + fraction * b->scale
-			: b->scale;
-	c->flags = a->flags | b->flags;
-}
-
-template <>
-WBoneKey* WList<WBoneKey*>::Start()
-{
-	m_surf = m_list;
-	return Next();
-}
-
-template <>
-WList<WBoneKey*>::listinfo* WList<WBoneKey*>::Alloc()
-{
-	if (!m_idle)
-	{
-		listinfo* block = (listinfo*)g_mem.Alloc(m_blk_len * sizeof(listinfo));
-		m_pre_alloc = Link(m_pre_alloc, block);
-		for (int i = 1; i < m_blk_len; ++i)
-			m_idle = Link(m_idle, block + i);
-	}
-	listinfo* item = m_idle;
-	m_idle = Unlink(m_idle, item);
-	return item;
-}
+// HACK: Preserve the original template emission order.
+template WList<WBoneKey*>::listinfo* WList<WBoneKey*>::Alloc();
 
 void WBoneSet::AddBoneKey(char* name, WQuat* quat, WVector* pivot, float* scale,
 	int flags)
@@ -69,6 +34,21 @@ void WBoneSet::CopyFrom(WBoneSet* a)
 	m_keyList.Reset();
 	for (WBoneKey* key = a->m_keyList.Start(); key; key = a->m_keyList.Next())
 		AddBoneKey(key->name, &key->quat, &key->pivot, &key->scale, key->flags);
+}
+
+static void BlendBoneKey(WBoneKey* a, WBoneKey* b, WBoneKey* c, float fraction)
+{
+	if (b->flags & 1)
+		c->quat = (a->flags & 1) ? WQuaternionSlerp(a->quat, b->quat, fraction)
+								 : b->quat;
+	if (b->flags & 2)
+		c->pivot = (a->flags & 2) ? a->pivot + (b->pivot - a->pivot) * fraction
+								  : b->pivot;
+	if (b->flags & 4)
+		c->scale = (a->flags & 4)
+			? a->scale = (1 - fraction) * a->scale + fraction * b->scale
+			: b->scale;
+	c->flags = a->flags | b->flags;
 }
 
 void WBoneSet::Blend(WBoneSet* a, WBoneSet* b, float fraction)

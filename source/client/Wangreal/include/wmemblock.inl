@@ -30,29 +30,6 @@ inline void* WMemFillBlock::Alloc(int size)
 	return malloc(size);
 }
 
-inline void WMemFillBlock::Free(void* block)
-{
-	int offset = (int)((unsigned char*)block - m_ptr);
-	if (offset < 0 || offset >= m_size)
-	{
-		free(block);
-		return;
-	}
-	int level = 0;
-	int base = 0;
-	for (; level < m_level; ++level)
-	{
-		int span = m_num << (level + 2);
-		if (offset - base < span)
-		{
-			int slot = (offset - base) >> (level + 2);
-			m_mask[level][slot >> 5] &= ~(1 << (slot & 31));
-			return;
-		}
-		base += span;
-	}
-}
-
 inline int WMemFillBlock::FindSlot(unsigned long used)
 {
 	int slot = 0;

@@ -2,7 +2,6 @@
 
 #include <windows.h>
 
-#pragma optimize("a", on)
 class Bitmap
 {
 public:
@@ -51,4 +50,3 @@ private:
 	}
 	bool m_lock;
 };
-#pragma optimize("", on)

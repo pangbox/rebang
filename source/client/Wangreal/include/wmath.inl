@@ -8,16 +8,6 @@ inline int WisEqual(const WVector& left, const WVector& right, float epsilon)
 		return 0;
 }
 
-inline int operator==(const WVector& a, const WVector& b)
-{
-	return WisEqual(a, b, g_EPSILON);
-}
-
-inline int operator!=(const WVector& a, const WVector& b)
-{
-	return !(a == b);
-}
-
 inline WVector WVector::operator-() const
 {
 	return WVector(-x, -y, -z);
@@ -46,6 +36,16 @@ inline WVector operator/(const WVector& vector, float scalar)
 inline WVector operator*(float scalar, const WVector& vector)
 {
 	return vector * scalar;
+}
+
+inline int operator==(const WVector& a, const WVector& b)
+{
+	return WisEqual(a, b, g_EPSILON);
+}
+
+inline int operator!=(const WVector& a, const WVector& b)
+{
+	return !(a == b);
 }
 
 inline float operator*(const WVector& left, const WVector& right)
@@ -127,6 +127,13 @@ inline WVector& WVector::Normalize()
 	else
 		*this *= (float)((1.0f / (Magnitude())));
 	return *this;
+}
+
+inline void WVector::Negate()
+{
+	x = -x;
+	y = -y;
+	z = -z;
 }
 
 inline WVector operator*(const WVector& vector, const WMatrix& matrix)
@@ -246,13 +253,6 @@ inline void WMatrix::operator*=(float scalar)
 	za *= scalar;
 }
 
-#ifndef WANGREAL_DEVICE
-inline void WMatrix::operator*=(const WMatrix& right)
-{
-	*this = *this * right;
-}
-#endif
-
 inline WMatrix WMatrix::operator~() const
 {
 	WMatrix r;
@@ -276,6 +276,28 @@ inline WMatrix WMatrix::operator~() const
 	return r;
 }
 
+#ifndef WANGREAL_DEVICE
+inline void WMatrix::operator*=(const WMatrix& right)
+{
+	*this = *this * right;
+}
+#endif
+
+inline WMatrix::WMatrix(float xx_, float yx_, float zx_, float xy_, float yy_,
+	float zy_, float xz_, float yz_, float zz_)
+	: xx(xx_),
+	  yx(yx_),
+	  zx(zx_),
+	  xy(xy_),
+	  yy(yy_),
+	  zy(zy_),
+	  xz(xz_),
+	  yz(yz_),
+	  zz(zz_)
+{
+	xm = ym = zm = 0.0f;
+}
+
 inline WMatrix::WMatrix(const WPlane& source)
 {
 	WPlane plane = source;
@@ -294,6 +316,12 @@ inline WMatrix::WMatrix(const WPlane& source)
 	zm = -2 * plane.z * plane.dis;
 }
 
+inline void WMatrix::Reset()
+{
+	xx = yy = zz = 1.0f;
+	yx = zx = xy = zy = xz = yz = xm = ym = zm = 0.0f;
+}
+
 inline bool operator==(const WMatrix& left, const WMatrix& right)
 {
 	return WisEqual(left.xa, right.xa, 1.0e-5f) &&
@@ -305,66 +333,6 @@ inline bool operator==(const WMatrix& left, const WMatrix& right)
 inline bool operator!=(const WMatrix& left, const WMatrix& right)
 {
 	return !(left == right);
-}
-
-inline void __fastcall SetWMatrix4FromWMatrix(WMatrix4& d, const WMatrix& s)
-{
-	for (int i = 0; i < 3; ++i)
-	{
-		*(WVector*)d.m[i] = (&s.xa)[i];
-		d.m[i][3] = 0.0f;
-	}
-	*(WVector*)d.m[3] = s.pivot;
-	d.m[3][3] = 1.0f;
-}
-
-inline WMatrix4::WMatrix4(float p0, float p1, float p2, float p3, float p4,
-	float p5, float p6, float p7, float p8, float p9, float p10, float p11,
-	float p12, float p13, float p14, float p15)
-{
-	p[0] = p0;
-	p[1] = p1;
-	p[2] = p2;
-	p[3] = p3;
-	p[4] = p4;
-	p[5] = p5;
-	p[6] = p6;
-	p[7] = p7;
-	p[8] = p8;
-	p[9] = p9;
-	p[10] = p10;
-	p[11] = p11;
-	p[12] = p12;
-	p[13] = p13;
-	p[14] = p14;
-	p[15] = p15;
-}
-
-inline void WMatrix::Reset()
-{
-	xx = yy = zz = 1.0f;
-	yx = zx = xy = zy = xz = yz = xm = ym = zm = 0.0f;
-}
-
-inline WMatrix::WMatrix(float xx_, float yx_, float zx_, float xy_, float yy_,
-	float zy_, float xz_, float yz_, float zz_)
-	: xx(xx_),
-	  yx(yx_),
-	  zx(zx_),
-	  xy(xy_),
-	  yy(yy_),
-	  zy(zy_),
-	  xz(xz_),
-	  yz(yz_),
-	  zz(zz_)
-{
-	xm = ym = zm = 0.0f;
-}
-
-inline WMatrix4& WMatrix4::operator=(const WMatrix4& other)
-{
-	memcpy(this, &other, sizeof(WMatrix4));
-	return *this;
 }
 
 inline WMatrix4 operator*(const WMatrix4& a, const WMatrix4& b)
@@ -406,6 +374,45 @@ inline WMatrix4 operator*(const WMatrix4& a, const WMatrix4& b)
 	m.m[3][3] = a.m[3][0] * b.m[0][3] + a.m[3][1] * b.m[1][3] +
 		a.m[3][2] * b.m[2][3] + a.m[3][3] * b.m[3][3];
 	return m;
+}
+
+inline void __fastcall SetWMatrix4FromWMatrix(WMatrix4& d, const WMatrix& s)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		*(WVector*)d.m[i] = (&s.xa)[i];
+		d.m[i][3] = 0.0f;
+	}
+	*(WVector*)d.m[3] = s.pivot;
+	d.m[3][3] = 1.0f;
+}
+
+inline WMatrix4::WMatrix4(float p0, float p1, float p2, float p3, float p4,
+	float p5, float p6, float p7, float p8, float p9, float p10, float p11,
+	float p12, float p13, float p14, float p15)
+{
+	p[0] = p0;
+	p[1] = p1;
+	p[2] = p2;
+	p[3] = p3;
+	p[4] = p4;
+	p[5] = p5;
+	p[6] = p6;
+	p[7] = p7;
+	p[8] = p8;
+	p[9] = p9;
+	p[10] = p10;
+	p[11] = p11;
+	p[12] = p12;
+	p[13] = p13;
+	p[14] = p14;
+	p[15] = p15;
+}
+
+inline WMatrix4& WMatrix4::operator=(const WMatrix4& other)
+{
+	memcpy(this, &other, sizeof(WMatrix4));
+	return *this;
 }
 
 inline WVector2D operator*(float scale, const WVector2D& v)
@@ -471,6 +478,20 @@ inline void WVector2D::operator/=(float f)
 	y *= inv;
 }
 
+inline WVector2D& WVector2D::Normalize()
+{
+	if (WisZero(x) && WisZero(y))
+		*this *= 0.0f;
+	else
+		*this *= 1.0f / Magnitude();
+	return *this;
+}
+
+inline WVector4::WVector4(float x_, float y_, float z_, float w_)
+	: x(x_), y(y_), z(z_), w(w_)
+{
+}
+
 inline float operator*(const WPlane& plane, const WVector& vector)
 {
 	return plane.normal * vector + plane.dis;
@@ -480,6 +501,15 @@ inline float operator*(const WVector& vector, const WPlane& plane)
 {
 	const WVector& value = vector;
 	return plane.normal * value + plane.dis;
+}
+
+inline void WPlane::Normalize()
+{
+	float scale = 1.0f / sqrtf(x * x + y * y + z * z);
+	x *= scale;
+	y *= scale;
+	z *= scale;
+	dis *= scale;
 }
 
 inline WPlane::WPlane(const WVector& normal_, const WVector& point)
@@ -493,15 +523,6 @@ inline WPlane& WPlane::operator=(const WPlane& other)
 	normal = other.normal;
 	dis = other.dis;
 	return *this;
-}
-
-inline void WPlane::Normalize()
-{
-	float scale = 1.0f / sqrtf(x * x + y * y + z * z);
-	x *= scale;
-	y *= scale;
-	z *= scale;
-	dis *= scale;
 }
 
 inline float WDotProduct(const WQuat& left, const WQuat& right)
@@ -596,11 +617,28 @@ inline Waabb ExpandAABB(const Waabb& a, const Waabb& b)
 }
 #endif
 
-inline void Wobb::operator*=(const WVector& scale)
+inline Waabb& Waabb::operator=(const Waabb& box)
 {
-	extend[0] *= scale.x;
-	extend[1] *= scale.y;
-	extend[2] *= scale.z;
+	min = box.min;
+	max = box.max;
+	return *this;
+}
+
+inline Waabb& Waabb::operator+=(const WVector& vec)
+{
+	if (vec.x > 0.0f)
+		max.x += vec.x;
+	else
+		min.x += vec.x;
+	if (vec.y > 0.0f)
+		max.y += vec.y;
+	else
+		min.y += vec.y;
+	if (vec.z > 0.0f)
+		max.z += vec.z;
+	else
+		min.z += vec.z;
+	return *this;
 }
 
 inline void Wobb::operator+=(const WVector& vector)
@@ -610,28 +648,19 @@ inline void Wobb::operator+=(const WVector& vector)
 	center.z += vector.z;
 }
 
+inline void Wobb::operator*=(const WVector& scale)
+{
+	extend[0] *= scale.x;
+	extend[1] *= scale.y;
+	extend[2] *= scale.z;
+}
+
 inline Wobb& Wobb::operator=(const Wobb& obb)
 {
 	center = obb.center;
 	extend[0] = obb.extend[0];
 	extend[1] = obb.extend[1];
 	extend[2] = obb.extend[2];
-	return *this;
-}
-
-inline Waabb& Waabb::operator=(const Waabb& box)
-{
-	min = box.min;
-	max = box.max;
-	return *this;
-}
-
-inline Wobb& Wobb::operator=(const WMatrix& mat)
-{
-	center = mat.pivot;
-	extend[0] = mat.xa;
-	extend[1] = mat.ya;
-	extend[2] = mat.za;
 	return *this;
 }
 
@@ -644,6 +673,15 @@ inline Wobb& Wobb::operator=(const Waabb& box)
 	return *this;
 }
 
+inline Wobb& Wobb::operator=(const WMatrix& mat)
+{
+	center = mat.pivot;
+	extend[0] = mat.xa;
+	extend[1] = mat.ya;
+	extend[2] = mat.za;
+	return *this;
+}
+
 inline bool Wobb::IsInclude(const WVector& point) const
 {
 	WVector direction = point - center;
@@ -652,9 +690,4 @@ inline bool Wobb::IsInclude(const WVector& point) const
 		Abs(direction * extend[2]) <= (extend[2] * extend[2]))
 		return true;
 	return false;
-}
-
-inline WVector4::WVector4(float x_, float y_, float z_, float w_)
-	: x(x_), y(y_), z(z_), w(w_)
-{
 }

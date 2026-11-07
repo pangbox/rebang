@@ -992,7 +992,7 @@ sClubSet* CClub::AddClubSet(unsigned long tid)
 						   .Normalize();
 				const WVector& right = f.xa;
 				f.ya = WCrossProduct(f.za, right);
-				g.nearOne = f.ya * 10.f + f.pivot - pTarget->info->spherePivot;
+				g.nearone = f.ya * 10.f + f.pivot - pTarget->info->spherePivot;
 			}
 			else
 			{
@@ -1008,10 +1008,10 @@ sClubSet* CClub::AddClubSet(unsigned long tid)
 				f.za.z = 1.0f;
 				f.ya.y = 1.0f;
 				f.xa.x = 1.0f;
-				g.nearOne = f.ya * 10.f + f.pivot;
+				g.nearone = f.ya * 10.f + f.pivot;
 			}
-			g.nearOne.Negate();
-			g.nearOne.Normalize();
+			g.nearone.Negate();
+			g.nearone.Normalize();
 		}
 		m_clubSetList.push_back(pSet);
 	}

@@ -53,15 +53,3 @@ private:
 	unsigned long m_dwSleepTime;
 	std::vector<sCRC_CHKTASK*> m_work;
 };
-
-namespace
-{
-	struct _delete
-	{
-		template <typename T>
-		void operator()(const T* p) const
-		{
-			delete p;
-		}
-	};
-}

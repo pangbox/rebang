@@ -1,7 +1,4 @@
 #pragma once
-// clang-format off
-namespace ILNUM_WVIEW { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; } // n=16
-// clang-format on
 #include "wmath.h"
 #include "wtypes.h"
 #include "wresrcmng.h"
@@ -13,10 +10,25 @@ public:
 	enum PROJECTION_MODE
 	{
 		PERSPECTIVE = 0,
-		PARALLEL = 1
+		PARALLEL = 1,
+		NUM_PROJECTION_MODE = 2
 	};
 
 	WView();
+
+	enum UPDATE_MODE
+	{
+		BEGINESCENE = 1,
+		CLEARZBUFF = 2,
+		CLEARFRAME = 4
+	};
+
+	enum UPDATE_TRANSFORM
+	{
+		UPDATE_NONE = 0,
+		UPDATE_VIEW = 1,
+		UPDATE_PROJ = 2
+	};
 
 	virtual void BeginScene();
 	virtual void Clear(ulong flags, int color);
@@ -41,6 +53,7 @@ public:
 	void SetCamera(const WMatrix&);
 	const WMatrix& GetCamera() const { return camera; }
 	const WMatrix& GetInvCamera() const { return invcamera; }
+	bool InFrustum(WTVertex** vertices);
 	bool InFrustum(const WSphere& sphere);
 	bool InFrustum(const WVector& pos);
 	bool InFrustum(const Waabb& box);
@@ -117,37 +130,49 @@ protected:
 
 	void SetFOV_Unmodified(float);
 	void CheckViewAndProjTransformUpdateToVideo(void);
-	WVector Projection_Perspective(const WVector&);
-	WVector Projection_Parallel(const WVector&);
-	void Projection2_Perspective(WTVertex*, const WVector&);
-	void Projection2_Parallel(WTVertex*, const WVector&);
-	void GetScreen2World_Perspective(float, float, WVector&, WVector&);
-	void GetScreen2World_Parallel(float, float, WVector&, WVector&);
-	void UpdateProjectionTransform_Perspective(void);
-	void UpdateProjectionTransform_Parallel(void);
 	void UpdateViewTransform(void);
-	void UpdateCamera_Perspective(void);
-	void UpdateCamera_Parallel(void);
 	void ClipPlane(WTVertex*, const WTVertex*, const WTVertex*, int,
 		const WPlane&);
-
-	static WVector (WView::* ms_fnProjection[2])(const WVector&);
-	static void (WView::* ms_fnProjection2[2])(WTVertex*, const WVector&);
-	static void (WView::* ms_fnUpdateProjectionTransform[2])(void);
-	static void (WView::* ms_fnUpdateCamera[2])(void);
-	static void (
-		WView::* ms_fnGetScreen2World[2])(float, float, WVector&, WVector&);
 
 public:
 	static const WMatrix4 ms_uvConvMat;
 
-	__forceinline float GetWidth() const { return SCREEN_XS; }
-	__forceinline float GetHeight() const { return SCREEN_YS; }
+	typedef WVector (WView::*FnProjection)(const WVector&);
+
+protected:
+	WVector Projection_Perspective(const WVector&);
+	WVector Projection_Parallel(const WVector&);
+	static FnProjection ms_fnProjection[NUM_PROJECTION_MODE];
+
+	typedef void (WView::*FnProjection2)(WTVertex*, const WVector&);
+	void Projection2_Perspective(WTVertex*, const WVector&);
+	void Projection2_Parallel(WTVertex*, const WVector&);
+	static FnProjection2 ms_fnProjection2[NUM_PROJECTION_MODE];
+
+	typedef void (WView::*FnUpdateProjectionTransform)();
+	void UpdateProjectionTransform_Perspective(void);
+	void UpdateProjectionTransform_Parallel(void);
+	static FnUpdateProjectionTransform
+		ms_fnUpdateProjectionTransform[NUM_PROJECTION_MODE];
+
+	typedef void (WView::*FnUpdateCamera)();
+	void UpdateCamera_Perspective(void);
+	void UpdateCamera_Parallel(void);
+	static FnUpdateCamera ms_fnUpdateCamera[NUM_PROJECTION_MODE];
+
+	typedef void (WView::*FnGetScreen2World)(float, float, WVector&, WVector&);
+	void GetScreen2World_Perspective(float, float, WVector&, WVector&);
+	void GetScreen2World_Parallel(float, float, WVector&, WVector&);
+	static FnGetScreen2World ms_fnGetScreen2World[NUM_PROJECTION_MODE];
+
+public:
+	float GetWidth() const { return SCREEN_XS; }
+	float GetHeight() const { return SCREEN_YS; }
 	float GetRatio() const { return SCREEN_YS / SCREEN_XS; }
 	float GetClipNearValue() const { return clip_near; }
 	float GetClipFarValue() const { return clip_far; }
 	float GetFOV() const { return FOV * (SCREEN_YS / SCREEN_XS) * (4.f / 3.f); }
-	__forceinline WVideoDev* GetVideoDevice() const
+	WVideoDev* GetVideoDevice() const
 	{
 		WVideoDev* video = GetResrcManager()->video;
 		return video;
@@ -214,15 +239,10 @@ protected:
 	WView::PROJECTION_MODE m_projMode;
 	float m_scale;
 	WPlane frustumByCam[6];
-
-public:
-	__forceinline virtual ~WView();
 };
 
 class WViewOrth : public WView
 {
-public:
-	virtual ~WViewOrth() { }
 };
 
 WMatrix __cdecl MakeCameraMatrix(const WVector& eye, const WVector& at);

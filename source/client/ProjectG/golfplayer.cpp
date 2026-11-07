@@ -423,7 +423,7 @@ void CGolfPlayer::OnInit()
 	m_dir = 3.14159265f;
 	m_mat.Reset();
 	m_lightSet.ambient = ModifyColor(g_lightset.ambient, 1.0f);
-	m_lightSet.nearOne = g_lightset.nearOne;
+	m_lightSet.nearone = g_lightset.nearone;
 }
 
 void CGolfPlayer::InputProcess(float delta)
@@ -1951,7 +1951,7 @@ void CGolfPlayer::HandleMsg(const MsgObject& msg)
 					0, NULL, false),
 				m_petInfo[i].mat);
 
-			m_lightSet.nearOne = g_lightset.nearOne;
+			m_lightSet.nearone = g_lightset.nearone;
 			m_lightSet.ambient = ModifyColor(g_lightset.ambient, 1.0f);
 			SetLight();
 
@@ -2066,7 +2066,7 @@ void CGolfPlayer::HandleMsg(const MsgObject& msg)
 		CSceneManager::Instance()->SetVisible(
 			MakeStr("PLAYER_%d", 1 - MyIndex()), false);
 
-		m_lightSet.nearOne = g_lightset.nearOne;
+		m_lightSet.nearone = g_lightset.nearone;
 		m_lightSet.ambient = ModifyColor(g_lightset.ambient, 1.0f);
 		SetLight(MyIndex());
 
@@ -2152,7 +2152,7 @@ void CGolfPlayer::HandleMsg(const MsgObject& msg)
 			m_petInfo[MyIndex()].motion->s, m_petInfo[MyIndex()].motion->s,
 			MyIndex(), true, false);
 
-		m_lightSet.nearOne = g_lightset.nearOne;
+		m_lightSet.nearone = g_lightset.nearone;
 		m_lightSet.ambient = ModifyColor(g_lightset.ambient, 1.0f);
 		SetLight(MyIndex());
 
@@ -2259,7 +2259,7 @@ void CGolfPlayer::HandleMsg(const MsgObject& msg)
 			}
 		}
 
-		m_lightSet.nearOne = g_lightset.nearOne;
+		m_lightSet.nearone = g_lightset.nearone;
 		m_lightSet.ambient = ModifyColor(g_lightset.ambient, 1.0f);
 		SetLight(MyIndex());
 

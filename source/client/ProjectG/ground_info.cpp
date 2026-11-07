@@ -30,7 +30,7 @@ CBase::CBase()
 	m_light.type = 2;
 	m_light.ambient = 0x808080;
 	m_light.diffuse = 0xffffff;
-	m_light.nearOne = WVector(-1.f, -1.f, 1.f).Normalize();
+	m_light.nearone = WVector(-1.f, -1.f, 1.f).Normalize();
 	m_normal.Reset();
 	m_matrix.Reset();
 	m_vtx[0] = &m_vertices[0];

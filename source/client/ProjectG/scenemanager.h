@@ -92,11 +92,6 @@ struct CustomElement
 	}
 };
 
-struct RenderOrder
-{
-	bool operator()(const SceneElement& a, const SceneElement& b);
-};
-
 struct TransparentElement
 {
 	TransparentElement(WPuppet* pPuppet, Waabb* pBox, int texture, int numPolys)

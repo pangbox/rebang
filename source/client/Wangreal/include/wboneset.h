@@ -24,8 +24,7 @@ public:
 	void AddBoneKey(char* name, WQuat* quat, WVector* pivot, float* scale,
 		int flags);
 	void CopyFrom(WBoneSet* source);
-	__declspec(nothrow) void Blend(WBoneSet* first, WBoneSet* second,
-		float ratio);
+	void Blend(WBoneSet* first, WBoneSet* second, float ratio);
 
 private:
 	WList<WBoneKey*> m_keyList;

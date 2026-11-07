@@ -14,17 +14,7 @@ template <class T>
 class WList
 {
 public:
-	struct listinfo
-	{
-		T item;
-		char* keycode;
-		bool alloc;
-		listinfo* prev;
-		listinfo* next;
-		listinfo* hash;
-	};
-
-	__declspec(nothrow) WList(int len = 8, int hashNum = 0)
+	WList(int len = 8, int hashNum = 0)
 	{
 		m_hash_list = 0;
 		m_list = 0;
@@ -50,7 +40,7 @@ public:
 			m_hash_list = 0;
 		}
 	}
-	__declspec(nothrow) ~WList()
+	~WList()
 	{
 		while (m_pre_alloc)
 		{
@@ -71,21 +61,6 @@ public:
 #endif
 			m_hash_list = 0;
 		}
-	}
-	T Start()
-	{
-		m_surf = m_list;
-		return Next();
-	}
-	T Next()
-	{
-		if (m_surf)
-		{
-			T item = m_surf->item;
-			m_surf = m_surf->next == m_list ? 0 : m_surf->next;
-			return item;
-		}
-		return 0;
 	}
 	T Start(void*& pos) const
 	{
@@ -110,21 +85,6 @@ public:
 		}
 		return 0;
 	}
-	T End()
-	{
-		m_surf = m_list ? m_list->prev : 0;
-		return Prev();
-	}
-	T Prev()
-	{
-		if (m_surf)
-		{
-			T item = m_surf->item;
-			m_surf = m_surf == m_list ? 0 : m_surf->prev;
-			return item;
-		}
-		return 0;
-	}
 	T End(void*& pos) const
 	{
 		pos = m_list ? m_list->prev : 0;
@@ -145,6 +105,36 @@ public:
 				pos = info;
 				return info->item;
 			}
+		}
+		return 0;
+	}
+	T Start()
+	{
+		m_surf = m_list;
+		return Next();
+	}
+	T Next()
+	{
+		if (m_surf)
+		{
+			T item = m_surf->item;
+			m_surf = m_surf->next == m_list ? 0 : m_surf->next;
+			return item;
+		}
+		return 0;
+	}
+	T End()
+	{
+		m_surf = m_list ? m_list->prev : 0;
+		return Prev();
+	}
+	T Prev()
+	{
+		if (m_surf)
+		{
+			T item = m_surf->item;
+			m_surf = m_surf == m_list ? 0 : m_surf->prev;
+			return item;
 		}
 		return 0;
 	}
@@ -218,6 +208,16 @@ public:
 	void Report(char* name) const;
 	void operator+=(const T& item) { AddItem(item, 0, false); }
 	void operator-=(const T& item) { DelItem(item); }
+
+	struct listinfo
+	{
+		T item;
+		char* keycode;
+		bool alloc;
+		listinfo* prev;
+		listinfo* next;
+		listinfo* hash;
+	};
 
 protected:
 	void DelItem(const T& item)

@@ -12,6 +12,16 @@ namespace S5
 
 CLoginInfo* CLoginInfo::m_pInst = NULL;
 
+int NtreevLogin::Init()
+{
+	_sNtreevUserIdentity identity;
+	memset(&identity, 0, sizeof(identity));
+	SetNtreevUserIdentity((const char*)GetChannelingChecker()->GetMapData(),
+		identity);
+	Convert(&identity);
+	return TRUE;
+}
+
 void NtreevLogin::SetProvType()
 {
 	m_provType = 2;
@@ -28,6 +38,81 @@ void NtreevLogin::Convert(void* pIdentity)
 	m_birthDay = "19801129";
 	m_zipCode = "131-116";
 	m_gender = identity->sex == 'M' ? 0 : 1;
+}
+
+void NtreevLogin::SetNtreevUserIdentity(const char* data,
+	_sNtreevUserIdentity& identity)
+{
+	std::string text(data);
+	std::string name;
+	std::string value;
+	std::string::size_type end = 0;
+	do
+	{
+		std::string::size_type begin = text.find('|', end) + 1;
+		end = text.find('|', begin);
+		std::string field;
+		if (begin != std::string::npos)
+		{
+			if (end != std::string::npos)
+				field.assign(text.begin() + begin, text.begin() + end);
+			else
+				field.assign(text.begin() + begin, text.end());
+			std::string::size_type equals = field.find('=');
+			name.assign(field.begin(), field.begin() + equals);
+			value.assign(field.begin() + equals + 1, field.end());
+			if (_stricmp(name.c_str(), "LoginID") == 0)
+			{
+				strncpy(identity.loginId, value.c_str(), 50);
+				continue;
+			}
+			if (_stricmp(name.c_str(), "AuthKey") == 0)
+			{
+				strncpy(identity.authKey, value.c_str(), 64);
+				continue;
+			}
+			if (_stricmp(name.c_str(), "Sex") == 0)
+			{
+				identity.sex = value == "M" ? 0 : 1;
+				continue;
+			}
+			if (_stricmp(name.c_str(), "MemberNo") == 0)
+			{
+				identity.memberNo = atoi(value.c_str());
+				continue;
+			}
+			if (_stricmp(name.c_str(), "Age") == 0)
+			{
+				identity.age = atoi(value.c_str());
+				continue;
+			}
+			if (_stricmp(name.c_str(), "WardNo") == 0)
+			{
+				identity.wardNo = atoi(value.c_str());
+				continue;
+			}
+			if (_stricmp(name.c_str(), "CityCode") == 0)
+			{
+				identity.cityCode = atoi(value.c_str());
+				continue;
+			}
+			if (_stricmp(name.c_str(), "PCBangNo") == 0)
+			{
+				identity.pcBangNo = atoi(value.c_str());
+				continue;
+			}
+		}
+	} while (end != std::string::npos);
+}
+
+int NhnLogin::Init()
+{
+	_sNhnUserIdentity identity;
+	memset(&identity, 0, sizeof(identity));
+	SetNhnUserIdentity((const char*)GetChannelingChecker()->GetMapData(),
+		identity);
+	Convert(&identity);
+	return TRUE;
 }
 
 void NhnLogin::SetProvType()
@@ -53,6 +138,89 @@ void NhnLogin::SetSiteCookie(const char* cookie)
 const char* NhnLogin::GetSiteCookie() const
 {
 	return m_siteCookie.c_str();
+}
+
+void NhnLogin::SetNhnUserIdentity(const char* data, _sNhnUserIdentity& identity)
+{
+	std::string text(data);
+	std::string name;
+	std::string value;
+	std::string::size_type end = 0;
+	do
+	{
+		std::string::size_type begin = text.find('|', end) + 1;
+		end = text.find('|', begin);
+		std::string field;
+		if (begin !=
+			static_cast<const volatile std::string::size_type&>(
+				std::string::npos))
+		{
+			if (end != std::string::npos)
+				field.assign(text.begin() + begin, text.begin() + end);
+			else
+				field.assign(text.begin() + begin, text.end());
+			std::string::size_type equals = field.find('=');
+			name.assign(field.begin(), field.begin() + equals);
+			value.assign(field.begin() + equals + 1, field.end());
+			if (_stricmp(name.c_str(), "LoginID") == 0)
+			{
+				strncpy(identity.loginId, value.c_str(), 80);
+				continue;
+			}
+			if (_stricmp(name.c_str(), "AuthKey") == 0)
+			{
+				strncpy(identity.authKey, value.c_str(), 64);
+				continue;
+			}
+			if (_stricmp(name.c_str(), "SiteCookie") == 0)
+			{
+				strncpy(identity.siteCookie, value.c_str(), 1023);
+				continue;
+			}
+			if (_stricmp(name.c_str(), "Sex") == 0)
+			{
+				identity.sex = value == "M" ? 0 : 1;
+				continue;
+			}
+			if (_stricmp(name.c_str(), "MemberNo") == 0)
+			{
+				identity.memberNo = atoi(value.c_str());
+				continue;
+			}
+			if (_stricmp(name.c_str(), "Age") == 0)
+			{
+				identity.age = atoi(value.c_str());
+				continue;
+			}
+			if (_stricmp(name.c_str(), "WardNo") == 0)
+			{
+				identity.wardNo = atoi(value.c_str());
+				continue;
+			}
+			if (_stricmp(name.c_str(), "CityCode") == 0)
+			{
+				identity.cityCode = atoi(value.c_str());
+				continue;
+			}
+			if (_stricmp(name.c_str(), "PCBangNo") == 0)
+			{
+				identity.pcBangNo = atoi(value.c_str());
+				continue;
+			}
+			if (_stricmp(name.c_str(), "SiteMemberNo") == 0)
+			{
+				identity.siteMemberNo = _atoi64(value.c_str());
+				continue;
+			}
+			{
+				char site[32] = { 0 };
+				if (_stricmp(name.c_str(), "SiteCode") == 0)
+					strncpy(site, value.c_str(), 31);
+				if (strcmp(site, "NHN") == 0)
+					identity.provType = 4;
+			}
+		}
+	} while (end != std::string::npos);
 }
 
 void NhnLogin::Convert(void* pIdentity)
@@ -95,6 +263,42 @@ int CLoginInfo::Destroy()
 
 CLoginInfo::~CLoginInfo()
 {
+}
+
+int CLoginInfo::InitWebLogin(const char* cmdLine)
+{
+	std::string command(cmdLine);
+	if (command.find("-vwccnp") != std::string::npos)
+	{
+		ChannelingChecker checker;
+		checker.ChannelingCheck();
+		switch (checker.GetProvType())
+		{
+		case 2:
+			m_pLoginInfo = new NtreevLogin;
+			break;
+		case 4:
+			m_pLoginInfo = new NhnLogin;
+			break;
+		default:
+			m_pLoginInfo = NULL;
+			break;
+		}
+		if (m_pLoginInfo)
+			((BaseLoginInfo*)m_pLoginInfo)->DependChannelingChecker(&checker);
+	}
+	if (m_pLoginInfo)
+	{
+		if (m_pLoginInfo->Init())
+		{
+			m_pLoginInfo->SetProvType();
+			m_bWebLogin = TRUE;
+			return TRUE;
+		}
+		delete m_pLoginInfo;
+	}
+	m_pLoginInfo = new PangYaLogin;
+	return FALSE;
 }
 
 unsigned long CLoginInfo::ProvType() const
@@ -198,62 +402,6 @@ void CLoginInfo::SetProvType(unsigned long type)
 	m_pLoginInfo->ProvType(type);
 }
 
-inline FnTrim::FnTrim(const char* trimChars)
-	: m_trimChars(trimChars), m_result("")
-{
-}
-
-inline void FnTrim::operator()(char c)
-{
-	if (m_trimChars.find(c) == std::string::npos)
-		m_result += c;
-}
-
-inline FnTrim::~FnTrim()
-{
-}
-
-std::string cHttpNtreevAuthResult::GetExternalLink()
-{
-	return "";
-}
-
-int CLoginInfo::InitWebLogin(const char* cmdLine)
-{
-	std::string command(cmdLine);
-	if (command.find("-vwccnp") != std::string::npos)
-	{
-		ChannelingChecker checker;
-		checker.ChannelingCheck();
-		switch (checker.GetProvType())
-		{
-		case 2:
-			m_pLoginInfo = new NtreevLogin;
-			break;
-		case 4:
-			m_pLoginInfo = new NhnLogin;
-			break;
-		default:
-			m_pLoginInfo = NULL;
-			break;
-		}
-		if (m_pLoginInfo)
-			((BaseLoginInfo*)m_pLoginInfo)->DependChannelingChecker(&checker);
-	}
-	if (m_pLoginInfo)
-	{
-		if (m_pLoginInfo->Init())
-		{
-			m_pLoginInfo->SetProvType();
-			m_bWebLogin = TRUE;
-			return TRUE;
-		}
-		delete m_pLoginInfo;
-	}
-	m_pLoginInfo = new PangYaLogin;
-	return FALSE;
-}
-
 bool cHttpNtreevAuthResult::GetResult()
 {
 	std::string result = GetElement("result");
@@ -288,6 +436,21 @@ std::string cHttpNtreevAuthResult::GetElement(const char* tag)
 	return std::string(m_xml.begin() + begin, m_xml.begin() + end);
 }
 
+struct FnTrim
+{
+	FnTrim(const char* trimChars)
+		: m_trimChars(trimChars), m_result("")
+	{
+	}
+	void operator()(char c)
+	{
+		if (m_trimChars.find(c) == std::string::npos)
+			m_result += c;
+	}
+	std::string m_trimChars;
+	std::string m_result;
+};
+
 std::string cHttpNtreevAuthResult::GetFieldValue(const char* name)
 {
 	std::string arg = GetElement("arg");
@@ -308,170 +471,7 @@ std::string cHttpNtreevAuthResult::GetFieldValue(const char* name)
 	return "";
 }
 
-void NtreevLogin::SetNtreevUserIdentity(const char* data,
-	_sNtreevUserIdentity& identity)
+std::string cHttpNtreevAuthResult::GetExternalLink()
 {
-	std::string text(data);
-	std::string name;
-	std::string value;
-	std::string::size_type end = 0;
-	do
-	{
-		std::string::size_type begin = text.find('|', end) + 1;
-		end = text.find('|', begin);
-		std::string field;
-		if (begin != std::string::npos)
-		{
-			if (end != std::string::npos)
-				field.assign(text.begin() + begin, text.begin() + end);
-			else
-				field.assign(text.begin() + begin, text.end());
-			std::string::size_type equals = field.find('=');
-			name.assign(field.begin(), field.begin() + equals);
-			value.assign(field.begin() + equals + 1, field.end());
-			if (_stricmp(name.c_str(), "LoginID") == 0)
-			{
-				strncpy(identity.loginId, value.c_str(), 50);
-				continue;
-			}
-			if (_stricmp(name.c_str(), "AuthKey") == 0)
-			{
-				strncpy(identity.authKey, value.c_str(), 64);
-				continue;
-			}
-			if (_stricmp(name.c_str(), "Sex") == 0)
-			{
-				identity.sex = value == "M" ? 0 : 1;
-				continue;
-			}
-			if (_stricmp(name.c_str(), "MemberNo") == 0)
-			{
-				identity.memberNo = atoi(value.c_str());
-				continue;
-			}
-			if (_stricmp(name.c_str(), "Age") == 0)
-			{
-				identity.age = atoi(value.c_str());
-				continue;
-			}
-			if (_stricmp(name.c_str(), "WardNo") == 0)
-			{
-				identity.wardNo = atoi(value.c_str());
-				continue;
-			}
-			if (_stricmp(name.c_str(), "CityCode") == 0)
-			{
-				identity.cityCode = atoi(value.c_str());
-				continue;
-			}
-			if (_stricmp(name.c_str(), "PCBangNo") == 0)
-			{
-				identity.pcBangNo = atoi(value.c_str());
-				continue;
-			}
-		}
-	} while (end != std::string::npos);
-}
-
-void NhnLogin::SetNhnUserIdentity(const char* data, _sNhnUserIdentity& identity)
-{
-	std::string text(data);
-	std::string name;
-	std::string value;
-	std::string::size_type end = 0;
-	do
-	{
-		std::string::size_type begin = text.find('|', end) + 1;
-		end = text.find('|', begin);
-		std::string field;
-		if (begin !=
-			static_cast<const volatile std::string::size_type&>(
-				std::string::npos))
-		{
-			if (end != std::string::npos)
-				field.assign(text.begin() + begin, text.begin() + end);
-			else
-				field.assign(text.begin() + begin, text.end());
-			std::string::size_type equals = field.find('=');
-			name.assign(field.begin(), field.begin() + equals);
-			value.assign(field.begin() + equals + 1, field.end());
-			if (_stricmp(name.c_str(), "LoginID") == 0)
-			{
-				strncpy(identity.loginId, value.c_str(), 80);
-				continue;
-			}
-			if (_stricmp(name.c_str(), "AuthKey") == 0)
-			{
-				strncpy(identity.authKey, value.c_str(), 64);
-				continue;
-			}
-			if (_stricmp(name.c_str(), "SiteCookie") == 0)
-			{
-				strncpy(identity.siteCookie, value.c_str(), 1023);
-				continue;
-			}
-			if (_stricmp(name.c_str(), "Sex") == 0)
-			{
-				identity.sex = value == "M" ? 0 : 1;
-				continue;
-			}
-			if (_stricmp(name.c_str(), "MemberNo") == 0)
-			{
-				identity.memberNo = atoi(value.c_str());
-				continue;
-			}
-			if (_stricmp(name.c_str(), "Age") == 0)
-			{
-				identity.age = atoi(value.c_str());
-				continue;
-			}
-			if (_stricmp(name.c_str(), "WardNo") == 0)
-			{
-				identity.wardNo = atoi(value.c_str());
-				continue;
-			}
-			if (_stricmp(name.c_str(), "CityCode") == 0)
-			{
-				identity.cityCode = atoi(value.c_str());
-				continue;
-			}
-			if (_stricmp(name.c_str(), "PCBangNo") == 0)
-			{
-				identity.pcBangNo = atoi(value.c_str());
-				continue;
-			}
-			if (_stricmp(name.c_str(), "SiteMemberNo") == 0)
-			{
-				identity.siteMemberNo = _atoi64(value.c_str());
-				continue;
-			}
-			{
-				char site[32] = { 0 };
-				if (_stricmp(name.c_str(), "SiteCode") == 0)
-					strncpy(site, value.c_str(), 31);
-				if (strcmp(site, "NHN") == 0)
-					identity.provType = 4;
-			}
-		}
-	} while (end != std::string::npos);
-}
-
-int NtreevLogin::Init()
-{
-	_sNtreevUserIdentity identity;
-	memset(&identity, 0, sizeof(identity));
-	SetNtreevUserIdentity((const char*)GetChannelingChecker()->GetMapData(),
-		identity);
-	Convert(&identity);
-	return TRUE;
-}
-
-int NhnLogin::Init()
-{
-	_sNhnUserIdentity identity;
-	memset(&identity, 0, sizeof(identity));
-	SetNhnUserIdentity((const char*)GetChannelingChecker()->GetMapData(),
-		identity);
-	Convert(&identity);
-	return TRUE;
+	return "";
 }

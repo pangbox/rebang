@@ -55,6 +55,29 @@ void WxPuppet::xUpdateTnLBuffers(bool rebuild)
 	m_xpTnLBuf->xFillBuffers();
 }
 
+WPuppet* WxPuppet::MakeClone(bool needBuffer)
+{
+	w_share_pet_data shareData;
+	shareData.petName = m_petName;
+	shareData.rootbone = m_rootbone;
+	shareData.length = m_aniLen;
+	shareData.faceNum = m_faceNum;
+	shareData.numFramedata = m_framenum;
+	shareData.frame = m_frame;
+	shareData.bound = m_bound;
+	shareData.bbList = &m_bbList;
+	shareData.mdList = m_mdList;
+	shareData.fanimList = &m_fanimList;
+
+	WxPuppet* clone = new WxPuppet(needBuffer);
+	clone->m_iPetType = m_iPetType;
+	clone->m_rendMode = m_rendMode;
+	clone->Share(&shareData);
+	if (needBuffer && m_xpTnLBuf)
+		xShareTnLResources(clone);
+	return clone;
+}
+
 void WxPuppet::xShareTnLResources(WxPuppet* destination)
 {
 	// HACK: this is a workaround for an ordering issue for exactness
@@ -167,29 +190,4 @@ void WxStaticPuppetGrp::xUpdateCullFlag(WView* view)
 void WxStaticPuppetGrp::xRender(WView* view)
 {
 	m_xTnLBuf.xRender(view);
-}
-
-WPuppet* WxPuppet::MakeClone(bool needBuffer)
-{
-	// HACK: Force MakeClone to move below dtors
-	(void)&WList<int>::operator-=;
-	w_share_pet_data shareData;
-	shareData.petName = m_petName;
-	shareData.rootbone = m_rootbone;
-	shareData.length = m_aniLen;
-	shareData.faceNum = m_faceNum;
-	shareData.numFramedata = m_framenum;
-	shareData.frame = m_frame;
-	shareData.bound = m_bound;
-	shareData.bbList = &m_bbList;
-	shareData.mdList = m_mdList;
-	shareData.fanimList = &m_fanimList;
-
-	WxPuppet* clone = new WxPuppet(needBuffer);
-	clone->m_iPetType = m_iPetType;
-	clone->m_rendMode = m_rendMode;
-	clone->Share(&shareData);
-	if (needBuffer && m_xpTnLBuf)
-		xShareTnLResources(clone);
-	return clone;
 }

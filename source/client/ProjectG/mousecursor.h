@@ -4,6 +4,7 @@
 #include "singleton.h"
 
 class CGroundPropt;
+
 class CTextToolTip;
 class FrWnd;
 
@@ -14,15 +15,22 @@ public:
 	virtual ~CMouseCursor();
 	void Process(float dt);
 	void Display();
-	void Store();
-	void SetBoundArea(WRect* bound);
-	void SetCamMode(bool mode);
-	void SetHoleCup(float x, float y)
+	bool IsActive() { return m_active; }
+	void SetActive(bool active);
+	void Toggle(bool show) { m_bShow = show; }
+	void SetTempActive(bool active)
 	{
-		m_holecup.x = x;
-		m_holecup.y = y;
+		m_tempActive = active;
+		if (m_tempActive)
+		{
+			m_stopDuration = 0.0f;
+			m_show = true;
+		}
 	}
-	float RayTrace4Ground();
+	bool IsVisible() { return m_show; }
+	void Store();
+	void Reset(bool active);
+	void SetAutoHide(bool autoHide) { m_autoHide = autoHide; }
 
 	enum
 	{
@@ -39,14 +47,6 @@ public:
 		RM_ROTATE,
 		RM_ROTATE_NO,
 		MOUSE_MAX_NUM
-	};
-
-	enum eMode
-	{
-		SCREEN_LOBBY,
-		SCREEN_GAME,
-		SCREEN_CHAT,
-		SCREEN_TEST
 	};
 
 	enum
@@ -127,37 +127,43 @@ public:
 		AREA_MAX = 73
 	};
 
-	bool IsActive() { return m_active; }
-	void Toggle(bool show) { m_bShow = show; }
-	void SetTempActive(bool active)
+	enum eMode
 	{
-		m_tempActive = active;
-		if (m_tempActive)
-		{
-			m_stopDuration = 0.0f;
-			m_show = true;
-		}
-	}
-	bool IsVisible() { return m_show; }
-	void SetAutoHide(bool autoHide) { m_autoHide = autoHide; }
+		SCREEN_LOBBY,
+		SCREEN_GAME,
+		SCREEN_CHAT,
+		SCREEN_TEST
+	};
 
-	void Reset(bool active);
-	void SetActive(bool active);
-	void SetCursor(int cursor);
-	int GetCursor();
 	bool InArea(const WRect& rect);
-	void ForceMove(float x, float y, float duration);
-
+	void SetBoundArea(WRect* bound);
 	int GetArea() { return m_area; }
+	int GetButtonDownArea(eButton button);
 	bool IsInButtonDownArea(eButton button)
 	{
 		return m_buttonDownArea[button] == m_area;
 	}
+	int GetCursor();
+	void SetCursor(int cursor);
 	bool IsCamMode() { return m_camMode; }
+	void SetCamMode(bool mode);
 	void SetMode(int mode) { m_mode = mode; }
+	int GetMode();
+	void ForceMove(float x, float y, float duration);
 	void SetItemWindow(bool itemWindow) { m_itemWindow = itemWindow; }
+	void SetHoleCup(float x, float y)
+	{
+		m_holecup.x = x;
+		m_holecup.y = y;
+	}
 	void Enable(int area, bool enable) { m_bArea[area] = enable; }
+	bool IsEnable(int area);
+	bool GetTerrainToolTip();
 	void SetTerrainToolTip(bool tooltip) { m_bTerrainTooltip = tooltip; }
+	void SetGroundArea(WRect area);
+	float RayTrace4Ground();
+	WVector GetRay();
+	float GetRatio();
 
 private:
 	int CheckArea();
@@ -221,5 +227,5 @@ protected:
 	CTextToolTip* m_pTextTip;
 };
 // clang-format off
-namespace ILNUM_MC { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; typedef int t45; typedef int t46; typedef int t47; typedef int t48; typedef int t49; typedef int t50; typedef int t51; typedef int t52; typedef int t53; typedef int t54; typedef int t55; typedef int t56; typedef int t57; typedef int t58; } // n=59
+namespace ILNUM_MC { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; } // n=13
 // clang-format on

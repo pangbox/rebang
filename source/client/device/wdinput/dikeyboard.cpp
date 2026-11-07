@@ -1,4 +1,4 @@
-#include "winput.inl"
+#include "winput.h"
 #include "dikeyboard.h"
 
 int DirectInputKeyboard::ascii2scan[256];

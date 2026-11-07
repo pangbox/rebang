@@ -109,7 +109,7 @@ void WxBatch::xProcessShader(WView* pView)
 			xpMesh->myNormalList ? xpMesh->myNormalList : xpMesh->normList;
 
 		vLocalE = pView->GetCamera().pivot * mInv;
-		vLocalL = RotVec(pBone->m_light.nearOne, mInv).Normalize();
+		vLocalL = RotVec(pBone->m_light.nearone, mInv).Normalize();
 
 		for (i = 0; i < xnVtxs; i++, pData += nStride)
 		{
@@ -323,7 +323,7 @@ WxTnLBuffer::~WxTnLBuffer()
 
 void WxTnLBuffer::xClear()
 {
-	if ((m_xiFlag & 1) == 0 && m_xpaVbs)
+	if ((m_xiFlag & WX_BUF_CLONE) == 0 && m_xpaVbs)
 	{
 		m_xpaVbs->xClear(m_xpVideo);
 		if (m_xpaVbs)
@@ -336,7 +336,7 @@ void WxTnLBuffer::xClear()
 	int n = 32;
 	do
 	{
-		if (pIb->xnIdxs != 0 && (m_xiFlag & 1) == 0)
+		if (pIb->xnIdxs != 0 && (m_xiFlag & WX_BUF_CLONE) == 0)
 			m_xpVideo->xReleaseIndexBuffer(pIb->xhIb);
 		pIb->xnIdxs = 0;
 		pIb->xhIb = 0;
@@ -358,7 +358,7 @@ void WxTnLBuffer::xClear()
 void WxTnLBuffer::xCopy(WxTnLBuffer** ppOut, WVideoDev* pVideo)
 {
 	*ppOut = new WxTnLBuffer;
-	(*ppOut)->m_xiFlag |= m_xiFlag | 1;
+	(*ppOut)->m_xiFlag |= m_xiFlag | WX_BUF_CLONE;
 	(*ppOut)->m_xpVideo = pVideo;
 	(*ppOut)->m_xpaVbs = m_xpaVbs;
 	for (unsigned int i = 0; i < 32; ++i)
@@ -436,7 +436,7 @@ int WxTnLBuffer::xCreateBuffers(WVideoDev* pVideo, WPuppet* pPet)
 int WxTnLBuffer::xCreateStaticBuffers(WVideoDev* pVideo, WPuppet** ppPets,
 	int nPets)
 {
-	m_xiFlag |= 2;
+	m_xiFlag |= WX_BUF_STATIC;
 	m_xpPet = ppPets[0];
 	m_xpVideo = pVideo;
 	return xDetermineProperty(m_xpPet->GetRootBone(), nPets,
@@ -753,7 +753,7 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 	bool bTex0 = m_xpVideo->xHasVertexElem(dwFVF, WX_VELEM_TEX1);
 	bool bTex1 = m_xpVideo->xHasVertexElem(dwFVF, WX_VELEM_TEX2);
 	const WMatrix* pMat;
-	if ((m_xiFlag & 2) == 0)
+	if ((m_xiFlag & WX_BUF_STATIC) == 0)
 	{
 		if (strlen(pMesh->mpetName) != 0)
 			pList = &WPuppet::GetOrginalMatrixPtrList(pMesh->mpetName);
@@ -778,7 +778,7 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 	{
 		if (!(pMesh->xiDrawFlag2 & 0x1000))
 		{
-			if (!(m_xiFlag & 2))
+			if (!(m_xiFlag & WX_BUF_STATIC))
 				memcpy(pBuf + iOff, &pMesh->vecList[i], sizeof(WVector));
 			else
 				*(WVector*)(pBuf + iOff) = pMesh->vecList[i] * *pMat;
@@ -797,7 +797,7 @@ void WxTnLBuffer::xFillVertexBufferByMesh(unsigned char* pBuf, WxBatchGrp* pGrp,
 		{
 			if (!(pMesh->xiDrawFlag2 & 0x1000))
 			{
-				if (!(m_xiFlag & 2))
+				if (!(m_xiFlag & WX_BUF_STATIC))
 					memcpy(pBuf + iOff, &pNorm[i], sizeof(WVector));
 				else
 					*(WVector*)(pBuf + iOff) = pNorm[i] * mRot;
@@ -1076,7 +1076,7 @@ void WxTnLBuffer::xRender(WView* pView)
 {
 	WxBatchGrp* pGrp = m_xpaBatchGrps;
 	WxBatchState st;
-	if ((m_xiFlag & 2) != 0)
+	if ((m_xiFlag & WX_BUF_STATIC) != 0)
 	{
 		st.xmW.Reset();
 		st.xnmTransfs = 0;

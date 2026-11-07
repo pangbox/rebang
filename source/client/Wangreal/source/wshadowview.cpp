@@ -13,10 +13,6 @@ struct Edge
 	long dx;
 };
 
-__forceinline WView::~WView()
-{
-}
-
 WShadowView::WShadowView(unsigned char shadowDense)
 {
 	SetShadowDense(shadowDense);

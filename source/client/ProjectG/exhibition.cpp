@@ -585,10 +585,10 @@ void CExhibition::Animate()
 {
 	WVector lightDirection(0.f, -1.f, 1.f);
 	if (m_type == EXHIBIT_CHARACTER || m_type == EXHIBIT_CADDIE)
-		m_light.nearOne = RotVec(lightDirection, m_camMat);
+		m_light.nearone = RotVec(lightDirection, m_camMat);
 	else
-		m_light.nearOne = RotVec(WVector(1.f, -1.f, 1.f), m_camMat);
-	m_light.nearOne.Normalize();
+		m_light.nearone = RotVec(WVector(1.f, -1.f, 1.f), m_camMat);
+	m_light.nearone.Normalize();
 	switch (m_type)
 	{
 	case EXHIBIT_CHARACTER:

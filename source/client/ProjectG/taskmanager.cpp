@@ -17,7 +17,7 @@
 #include "contentsdoc.h"
 #include "criticalsection.h"
 #include "noticeboard.h"
-#include "matchingsystem.h"
+#include "dlgquickstartsetting.h"
 #include "frimagenoticedlg.h"
 #include "fx.h"
 #include "hatmanager.h"
@@ -75,7 +75,6 @@ extern bool g_bQuit;
 extern FrPointEventDlg* g_pPointEventDlg;
 extern CCommodityStatusManager g_CommodityStatusManager;
 extern int g_iRecvDisconCode;
-int IsAdministrator(unsigned long uid);
 void RequestUccInfo(sUserInfo& info);
 void RequestUccInfo(sCharacterInfo& info);
 void RequestUccInfo(ranktype::sRankUserInfo& info);
@@ -141,13 +140,6 @@ struct sLuckyPouchResult
 	unsigned long count;
 	int totalPang;
 	unsigned long reserved;
-};
-
-struct sIntrest
-{
-	char group[33];
-	unsigned char code;
-	char name[33];
 };
 
 #pragma pack(push, 1)

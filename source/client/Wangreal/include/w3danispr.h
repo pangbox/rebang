@@ -18,6 +18,8 @@ struct _WSPRITE
 class W3dAniSpr : public WResource
 {
 public:
+	W3dAniSpr();
+	virtual ~W3dAniSpr();
 	enum w_spr_align
 	{
 		CAMERA_XY_ALIGN,
@@ -28,8 +30,10 @@ public:
 		NO_ALIGN,
 	};
 
-	W3dAniSpr();
-	virtual ~W3dAniSpr();
+	int LoadSprite(const char* filename, int type);
+	int LoadSpritesInOneTexture(const char* filename, int type, float fSprSizeX,
+		float fSprSizeY);
+	int LoadTexture(int handle, float fSprSizeX, float fSprSizeY);
 	void SetPos(const WVector& position);
 	void SetRect(float width, float height, float pivotX, float pivotY);
 	void SetColor(const int color);
@@ -37,11 +41,10 @@ public:
 	void Render(WView* view, float angle, int type, int nSprNum);
 	void Render(WView* view, const WVector& angle, int type, int nSprNum);
 	void Render(WView* view, const WMatrix& rot, int type, int nSprNum);
-	int LoadSprite(const char* filename, int type);
-	int LoadSpritesInOneTexture(const char* filename, int type, float fSprSizeX,
-		float fSprSizeY);
-	int LoadTexture(int handle, float fSprSizeX, float fSprSizeY);
+	WVector* GetPos();
 	int GetSpriteNum() const { return m_nTotalSprite; }
+	float GetSpriteHeight() const;
+	float GetSpriteWidth() const;
 
 private:
 	void Rotate(float w, float h, float& rw, float& rh, float angle);

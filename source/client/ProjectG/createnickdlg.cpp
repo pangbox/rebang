@@ -1,16 +1,6 @@
 #include "minatl.h"
 #include "createnickdlg.h"
 
-void FrCreateNickDlg::SetCheckFlag(bool bCheck)
-{
-	m_bCheck = bCheck;
-}
-
-bool FrCreateNickDlg::GetCheckFlag() const
-{
-	return m_bCheck;
-}
-
 #include "emoticondlg.h"
 #include "logoutdlg.h"
 #include "frwndinl.h"
@@ -175,7 +165,7 @@ void FrCreateNickDlg::OnOKBtnUp()
 	if (!CheckNickByClient())
 		return;
 
-	if (IsLocalContent(S4_NT_NICKNAME_CHANGE) && !m_bCheck)
+	if (IsLocalContent(S4_NT_NICKNAME_CHANGE) && !GetCheckFlag())
 	{
 		NotifyErrorMsg(this,
 			"\xb4\xd0\xb3\xd7\xc0\xd3 \xc1\xdf\xba\xb9\xc3\xbc\xc5\xa9\xb8\xa6 \xc7\xd8\xc1\xd6\xbc\xbc\xbf\xe4!");
@@ -299,7 +289,7 @@ void FrCreateNickDlg::ReceiveCheckCode(int code)
 		break;
 	}
 
-	m_bCheck = bCheck;
+	SetCheckFlag(bCheck);
 	if (!bCheck)
 		NotifyErrorMsg(this,
 			"\xb4\xd0\xb3\xd7\xc0\xd3 \xc1\xdf\xba\xb9\xc3\xbc\xc5\xa9\xb8\xa6 \xc7\xd8\xc1\xd6\xbc\xbc\xbf\xe4!");

@@ -1443,7 +1443,7 @@ void FrMyWareHouse::OnListDraw(int param)
 		gdi->Print11(WPoint(origin.x + 80, origin.y + 17), 0, "%s",
 			data->name.c_str());
 		gdi->Line(origin, WPoint(origin.x + 235, origin.y), 0xff000000,
-			0xff000000);
+			0xff000000, 0);
 		gdi->SetTextColor(0xff000000, 0xffffffff);
 		gdi->SetTextStyle(0);
 		WRect hit(origin,

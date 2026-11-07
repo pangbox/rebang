@@ -19,7 +19,7 @@ CChatMsg::CChatMsg()
 {
 	for (int i = 0; i < 3; ++i)
 		m_pChatWindow[i] = NULL;
-	m_iState = 0;
+	m_iState = CHAT_WIN_CLOSED;
 	Init();
 }
 
@@ -98,7 +98,7 @@ void CChatMsg::ResetUiPosition()
 			m_pChatWindow[i]->SetClippingArea(&rect);
 
 	float pos;
-	if (m_iState == 3)
+	if (m_iState == CHAT_WIN_OPENED)
 		pos = x;
 	else
 		pos = x - 462.f;
@@ -162,7 +162,7 @@ void CChatMsg::SetAlwaysActive()
 	m_bActive = true;
 	m_bShowCaret = true;
 	m_fCaretTime = 0;
-	m_iState = 3;
+	m_iState = CHAT_WIN_OPENED;
 	m_rcChatWinDst[0].x = 91.f;
 	m_rcChatWinDst[1].x = m_rcChatWinDst[0].x + m_rcChatWinDst[0].w;
 	m_rcChatWinDst[2].x = m_rcChatWinDst[1].x + m_rcChatWinDst[1].w;
@@ -226,7 +226,7 @@ void CChatMsg::Process(float elapsed)
 		return;
 	ProcessResultString();
 	ProcessCompString();
-	if (m_iState != 3)
+	if (m_iState != CHAT_WIN_OPENED)
 		return;
 	m_fCaretTime += .01f;
 	if (m_fCaretTime > (m_bShowCaret ? .4f : .1f))
@@ -240,18 +240,18 @@ void CChatMsg::ProcessWindow(float elapsed)
 {
 	float x = IS_EXACTKINDOF(ntAvatarChatTask, AfxGetTask()) ? 70.f : 91.f;
 
-	if (m_iState == 2 || m_iState == 1)
+	if (m_iState == CHAT_WIN_LEFT || m_iState == CHAT_WIN_RIGHT)
 	{
-		if (m_iState == 2)
+		if (m_iState == CHAT_WIN_LEFT)
 		{
 			m_rcChatWinDst[0].x -= elapsed * 3000.f;
 			if (m_rcChatWinDst[0].x < x - 462.f)
 			{
 				m_rcChatWinDst[0].x = x - 462.f;
-				m_iState = 0;
+				m_iState = CHAT_WIN_CLOSED;
 			}
 		}
-		else if (m_iState == 1)
+		else if (m_iState == CHAT_WIN_RIGHT)
 		{
 			m_rcChatWinDst[0].x += elapsed * m_fVel;
 			if (m_rcChatWinDst[0].x > x)
@@ -263,7 +263,7 @@ void CChatMsg::ProcessWindow(float elapsed)
 			else if (m_fVel < 0)
 			{
 				m_rcChatWinDst[0].x = x;
-				m_iState = 3;
+				m_iState = CHAT_WIN_OPENED;
 				{
 					IActor* actor = AfxGetTask()->GetActor("GolfRule");
 					if (actor)
@@ -365,7 +365,7 @@ void CChatMsg::ProcessResultString()
 			m_iConsolCode = code;
 			if (m_szChat[0])
 				OnMoveLeft();
-			else if (m_iState == 3 &&
+			else if (m_iState == CHAT_WIN_OPENED &&
 				!g_pFresh->GetManager()->GetDesktop()->FindChildForm(
 					"emoticon"))
 				Close(true, true);
@@ -374,21 +374,21 @@ void CChatMsg::ProcessResultString()
 			m_iConsolCode = code;
 			if (m_szChat[0])
 				OnMoveRight();
-			else if (m_iState == 3 &&
+			else if (m_iState == CHAT_WIN_OPENED &&
 				!g_pFresh->GetManager()->GetDesktop()->FindChildForm(
 					"emoticon"))
 				Close(true, true);
 			break;
 		case 6:
 			m_iConsolCode = code;
-			if (!m_szChat[0] && m_iState == 3 &&
+			if (!m_szChat[0] && m_iState == CHAT_WIN_OPENED &&
 				!g_pFresh->GetManager()->GetDesktop()->FindChildForm(
 					"emoticon"))
 				Close(true, true);
 			break;
 		case 7:
 			m_iConsolCode = code;
-			if (!m_szChat[0] && m_iState == 3 &&
+			if (!m_szChat[0] && m_iState == CHAT_WIN_OPENED &&
 				!g_pFresh->GetManager()->GetDesktop()->FindChildForm(
 					"emoticon"))
 				Close(true, true);
@@ -455,7 +455,7 @@ void CChatMsg::ProcessResultString_JP()
 					m_iConsolCode = text[i];
 					if (m_szChat[0])
 						OnMoveLeft();
-					else if (m_iState == 3 &&
+					else if (m_iState == CHAT_WIN_OPENED &&
 						!g_pFresh->GetManager()->GetDesktop()->FindChildForm(
 							"emoticon"))
 						Close(true, true);
@@ -464,21 +464,21 @@ void CChatMsg::ProcessResultString_JP()
 					m_iConsolCode = text[i];
 					if (m_szChat[0])
 						OnMoveRight();
-					else if (m_iState == 3 &&
+					else if (m_iState == CHAT_WIN_OPENED &&
 						!g_pFresh->GetManager()->GetDesktop()->FindChildForm(
 							"emoticon"))
 						Close(true, true);
 					break;
 				case 6:
 					m_iConsolCode = text[i];
-					if (!m_szChat[0] && m_iState == 3 &&
+					if (!m_szChat[0] && m_iState == CHAT_WIN_OPENED &&
 						!g_pFresh->GetManager()->GetDesktop()->FindChildForm(
 							"emoticon"))
 						Close(true, true);
 					break;
 				case 7:
 					m_iConsolCode = text[i];
-					if (!m_szChat[0] && m_iState == 3 &&
+					if (!m_szChat[0] && m_iState == CHAT_WIN_OPENED &&
 						!g_pFresh->GetManager()->GetDesktop()->FindChildForm(
 							"emoticon"))
 						Close(true, true);
@@ -1138,7 +1138,7 @@ void CChatMsg::SetChatText(const char* text, bool keepCaret)
 
 void CChatMsg::DrawChatWindow()
 {
-	if (m_iState != 0 && g_pFresh->IsVisible())
+	if (m_iState != CHAT_WIN_CLOSED && g_pFresh->IsVisible())
 		for (int i = 0; i < 3; ++i)
 			if (m_pChatWindow[i])
 				m_pChatWindow[i]->Render(g_view, m_rcChatWinSrc[i],
@@ -1179,7 +1179,7 @@ void CChatMsg::Open(bool reset, bool unused)
 	SetActive(true, reset, unused);
 	m_bShowCaret = true;
 	m_fCaretTime = 0;
-	m_iState = 1;
+	m_iState = CHAT_WIN_RIGHT;
 	ReplaceBackupUiAlpha();
 	if (WNetworkSystem::Instance()->IsConnected(WNetworkSystem::NET_GAME))
 	{
@@ -1195,9 +1195,9 @@ void CChatMsg::Open(bool reset, bool unused)
 void CChatMsg::Close(bool reset, bool unused)
 {
 	SetActive(false, reset, unused);
-	if (m_iState != 0)
+	if (m_iState != CHAT_WIN_CLOSED)
 	{
-		m_iState = 2;
+		m_iState = CHAT_WIN_LEFT;
 		m_fVel = 3000.f;
 	}
 

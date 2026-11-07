@@ -1,31 +1,10 @@
 #include "stdafx.h"
 #include "miles.h"
 #include "mss.h"
+#include "wevent.h"
 
 cFile* WMilesSoundSystem::g_files[16];
 int WMilesSoundSystem::g_offset[16];
-
-class WSyncEvent
-{
-public:
-	WSyncEvent();
-	~WSyncEvent();
-
-private:
-	HANDLE m_handle;
-	int m_count;
-};
-
-WSyncEvent::WSyncEvent()
-	: m_handle(NULL), m_count(0)
-{
-}
-
-WSyncEvent::~WSyncEvent()
-{
-	if (m_handle)
-		CloseHandle(m_handle);
-}
 
 static WSyncEvent soundEvent;
 

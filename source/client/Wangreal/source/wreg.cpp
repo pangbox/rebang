@@ -4,12 +4,22 @@
 #include <string.h>
 #include <stdlib.h>
 
+WRegistry::WRegistry()
+{
+	SetLocation("HKEY_CURRENT_USER\\Software\\Ntreev\\PangYa");
+}
+
 WRegistry::~WRegistry()
 {
 }
 
 void WRegistry::SetLocation(const char* loc)
 {
+	struct w_reg_pair
+	{
+		HKEY key;
+		char* name;
+	};
 	static w_reg_pair list[] = {
 		{ HKEY_CURRENT_USER,   "HKEY_CURRENT_USER"   },
 		{ HKEY_CLASSES_ROOT,   "HKEY_CLASSES_ROOT"   },
@@ -214,9 +224,4 @@ void WRegistry::Write(char* field, DWORD value)
 	RegSetValueEx(hkey, field, 0, REG_DWORD, reinterpret_cast<BYTE*>(&value),
 		sizeof(value));
 	RegCloseKey(hkey);
-}
-
-WRegistry::WRegistry()
-{
-	SetLocation("HKEY_CURRENT_USER\\Software\\Ntreev\\PangYa");
 }

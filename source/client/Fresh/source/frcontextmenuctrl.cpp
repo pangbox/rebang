@@ -156,11 +156,13 @@ void FrContextMenuCtrl::OnDraw()
 		{
 			float y = (it->top + it->bottom) * 0.5f + m_rect.y;
 			GDI()->Line(WPoint(m_rect.x + 3.0f, y), WPoint(m_rect.x + 15.0f, y),
-				0xfff3f3f3, 0xfff3f3f3);
+				0xfff3f3f3, 0xfff3f3f3, 0);
 			GDI()->Line(WPoint(m_rect.x + 15.0f, y),
-				WPoint(m_rect.x + m_rect.w - 15.0f, y), 0xfff3f3f3, 0xfff3f3f3);
+				WPoint(m_rect.x + m_rect.w - 15.0f, y), 0xfff3f3f3, 0xfff3f3f3,
+				0);
 			GDI()->Line(WPoint(m_rect.x + m_rect.w - 15.0f, y),
-				WPoint(m_rect.x + m_rect.w - 3.0f, y), 0xfff3f3f3, 0xfff3f3f3);
+				WPoint(m_rect.x + m_rect.w - 3.0f, y), 0xfff3f3f3, 0xfff3f3f3,
+				0);
 		}
 		else
 		{

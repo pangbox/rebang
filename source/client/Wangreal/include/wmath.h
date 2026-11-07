@@ -63,28 +63,6 @@ inline float RadianDelta(float a, float b)
 	return RadianNormalizePI(a - b);
 }
 
-class WVector2D
-{
-public:
-	WVector2D() { }
-	WVector2D(float x_, float y_)
-		: x(x_), y(y_)
-	{
-	}
-	void Reset();
-	void operator+=(const WVector2D& v);
-	float SquareMagnitude() const;
-	float Magnitude() const;
-	WVector2D& Normalize();
-	void operator*=(float f);
-	void operator/=(float f);
-#ifdef REBANG_LEGACY_CPP
-	WVector2D& operator=(const WVector2D& other);
-#endif
-	float x;
-	float y;
-};
-
 class WMatrix;
 class WQuat;
 
@@ -101,6 +79,15 @@ public:
 		};
 		float p[3];
 	};
+
+	static const WVector ONE;
+	static const WVector ZERO;
+	static const WVector UNIT_POS_X;
+	static const WVector UNIT_POS_Y;
+	static const WVector UNIT_POS_Z;
+	static const WVector UNIT_NEG_X;
+	static const WVector UNIT_NEG_Y;
+	static const WVector UNIT_NEG_Z;
 
 	WVector() DEFAULT_IMPL;
 
@@ -127,12 +114,7 @@ public:
 #endif
 
 	void Reset();
-	void Negate()
-	{
-		x = -x;
-		y = -y;
-		z = -z;
-	}
+	void Negate();
 	WVector operator-() const;
 
 	WVector& Normalize();
@@ -145,15 +127,6 @@ public:
 	void operator*=(float scalar);
 	void operator/=(float scalar);
 	void operator-=(const WVector& other);
-
-	static const WVector ONE;
-	static const WVector ZERO;
-	static const WVector UNIT_POS_X;
-	static const WVector UNIT_POS_Y;
-	static const WVector UNIT_POS_Z;
-	static const WVector UNIT_NEG_X;
-	static const WVector UNIT_NEG_Y;
-	static const WVector UNIT_NEG_Z;
 };
 
 class WVector4
@@ -171,39 +144,12 @@ public:
 		float p[4];
 	};
 
+	static const WVector4 ONE;
+	static const WVector4 ZERO;
+
 	WVector4() { }
 
 	WVector4(float x_, float y_, float z_, float w_);
-
-	static const WVector4 ONE;
-	static const WVector4 ZERO;
-};
-
-class Waabb;
-
-class Wobb
-{
-public:
-#ifdef WANGREAL_DEVICE
-	Wobb();
-#else
-	Wobb() { }
-#endif
-#ifndef WANGREAL_DEVICE
-	Wobb(const Wobb& obb) { *this = obb; }
-#endif
-
-	WVector center;
-	WVector extend[3];
-
-	Wobb(const WMatrix& mat);
-
-	void operator*=(const WVector& scale);
-	void operator+=(const WVector& vector);
-	Wobb& operator=(const WMatrix& mat);
-	Wobb& operator=(const Wobb& obb);
-	Wobb& operator=(const Waabb& box);
-	bool IsInclude(const WVector& point) const;
 };
 
 class WMatrix
@@ -228,26 +174,29 @@ public:
 		float p[12];
 	};
 
+	static const WMatrix IDENTITY;
+	static const WMatrix ZERO;
+
 	WMatrix() { }
-	WMatrix(const class WPlane& plane);
 
 	WMatrix(float xx_, float yx_, float zx_, float xy_, float yy_, float zy_,
 		float xz_, float yz_, float zz_);
+	WMatrix(const class WPlane& plane);
 
 	WMatrix& operator=(const WMatrix& other);
 	void operator=(const WQuat& quat);
 	void Normalize();
+	void Debug();
 	void Reset();
 	void GetRotMatrix(WMatrix* result) const;
 	WMatrix operator~() const;
 	void operator*=(float right);
 	void operator*=(const WMatrix& right);
+	void operator/=(float right);
 	void AxisScale(WVector& scale);
+	void Transpose();
 	void Rotate(float angle, char direct);
 	void Rotate(const WVector& rotation);
-
-	static const WMatrix IDENTITY;
-	static const WMatrix ZERO;
 };
 
 class WMatrix4
@@ -269,17 +218,20 @@ public:
 		struct
 		{
 			float xx, yx, zx;
-			unsigned char gapC[4];
+			unsigned long : 32;
 			float xy, yy, zy;
-			unsigned char gap1C[4];
+			unsigned long : 32;
 			float xz, yz, zz;
-			unsigned char gap2C[4];
+			unsigned long : 32;
 			float xm, ym, zm;
 		};
 
 		float m[4][4];
 		float p[16];
 	};
+
+	static const WMatrix4 IDENTITY;
+	static const WMatrix4 ZERO;
 
 	WMatrix4() { }
 
@@ -288,16 +240,33 @@ public:
 		float p13, float p14, float p15);
 
 	WMatrix4& operator=(const WMatrix4& other);
-
-	static const WMatrix4 IDENTITY;
-	static const WMatrix4 ZERO;
+	void operator*=(const WMatrix4& other);
 };
 
-#ifdef WANGREAL_DEVICE
-inline Wobb::Wobb()
+class WVector2D
 {
-}
+public:
+	WVector2D() { }
+	WVector2D(float x_, float y_)
+		: x(x_), y(y_)
+	{
+	}
+	WVector2D(const float* v);
+	void Reset();
+	float Magnitude() const;
+	float SquareMagnitude() const;
+	WVector2D& Normalize();
+	void Negate();
+	void operator+=(const WVector2D& v);
+	void operator-=(const WVector2D& v);
+	void operator*=(float f);
+	void operator/=(float f);
+#ifdef REBANG_LEGACY_CPP
+	WVector2D& operator=(const WVector2D& other);
 #endif
+	float x;
+	float y;
+};
 
 class WPlane
 {
@@ -325,17 +294,6 @@ public:
 	};
 
 	WPlane() { }
-	void Normalize();
-
-	WPlane(const WVector& normal_, const WVector& point);
-
-	WPlane(const WVector& normal_, float dis_)
-	{
-		x = normal_.x;
-		y = normal_.y;
-		z = normal_.z;
-		dis = dis_;
-	}
 
 	WPlane(float x_, float y_, float z_, float dis_)
 	{
@@ -345,21 +303,18 @@ public:
 		dis = dis_;
 	}
 
-	WPlane& operator=(const WPlane& other);
-};
-
-class WSphere
-{
-public:
-	WSphere() { }
-	WSphere(const WVector& position, float length)
+	WPlane(const WVector& normal_, float dis_)
 	{
-		pos = position;
-		radius = length;
+		x = normal_.x;
+		y = normal_.y;
+		z = normal_.z;
+		dis = dis_;
 	}
 
-	WVector pos;
-	float radius;
+	WPlane(const WVector& normal_, const WVector& point);
+	void Normalize();
+
+	WPlane& operator=(const WPlane& other);
 };
 
 class WQuat
@@ -380,6 +335,9 @@ public:
 		w = w_;
 	}
 
+	WQuat(const WVector& axis, float angle);
+	WQuat(const float* v);
+
 	WQuat& operator=(const WQuat& other);
 	void Reset();
 	void Normalize();
@@ -390,6 +348,20 @@ public:
 
 private:
 	void SetFromAxisAngle(const WVector& vector, float theta);
+};
+
+class WSphere
+{
+public:
+	WSphere() { }
+	WSphere(const WVector& position, float length)
+	{
+		pos = position;
+		radius = length;
+	}
+
+	WVector pos;
+	float radius;
 };
 
 class Waabb
@@ -415,17 +387,18 @@ public:
 		max.Reset();
 	}
 	void Default();
-	bool IsInclude(const Waabb& box) const
-	{
-		if (box.min.x >= min.x && box.max.x <= max.x && box.min.y >= min.y &&
-			box.max.y <= max.y && box.min.z >= min.z && box.max.z <= max.z)
-			return true;
-		return false;
-	}
 	bool IsInclude(const WVector& vector) const
 	{
 		if (min.x <= vector.x && vector.x <= max.x && min.y <= vector.y &&
 			vector.y <= max.y && min.z <= vector.z && vector.z <= max.z)
+			return true;
+		return false;
+	}
+	bool IsInclude(const WSphere& sphere) const;
+	bool IsInclude(const Waabb& box) const
+	{
+		if (box.min.x >= min.x && box.max.x <= max.x && box.min.y >= min.y &&
+			box.max.y <= max.y && box.min.z >= min.z && box.max.z <= max.z)
 			return true;
 		return false;
 	}
@@ -459,10 +432,26 @@ public:
 	}
 };
 
-inline Wobb::Wobb(const WMatrix& mat)
+class Wobb
 {
-	*this = mat;
-}
+public:
+	Wobb() { }
+	Wobb(const Wobb& obb) { *this = obb; }
+	Wobb(const WMatrix& mat) { *this = mat; }
+
+	WVector center;
+	WVector extend[3];
+
+	void operator*=(float scale);
+	void operator*=(const WVector& scale);
+	void operator+=(const WVector& vector);
+	Wobb& operator=(const WMatrix& mat);
+	Wobb& operator=(const Wobb& obb);
+	Wobb& operator=(const Waabb& box);
+	bool IsInclude(const WVector& point) const;
+	bool IsIncludeObb(const Wobb& obb, const WVector& point) const;
+	void Normalize();
+};
 
 int WisEqual(const WVector& left, const WVector& right, float epsilon);
 Waabb operator+(const Waabb& box, const WVector& vector);

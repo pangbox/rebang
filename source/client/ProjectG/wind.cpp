@@ -37,7 +37,7 @@ CWind::CWind()
 	m_light.type = 2;
 	m_light.ambient = 0xffffff;
 	m_light.diffuse = 0xffffff;
-	m_light.nearOne = WVector(0, -1, 1).Normalize();
+	m_light.nearone = WVector(0, -1, 1).Normalize();
 	m_pFx = NULL;
 }
 

@@ -32,8 +32,3 @@ namespace S5
 		DECLARE_FRESH_MSGMAP()
 	};
 }
-
-inline void FrWnd::EnableToolTip(bool enable)
-{
-	m_nFlags.Turn(FWF_TOOLTIPS, enable);
-}

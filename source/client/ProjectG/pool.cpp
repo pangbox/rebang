@@ -331,10 +331,10 @@ void CPoolReflective::Render(WView* view)
 	{
 		WVector pos;
 		pos.y = m_area.max.y;
-		sun = max(-g_lightset.nearOne * WVector::UNIT_POS_Y, 0.0f);
+		sun = max(-g_lightset.nearone * WVector::UNIT_POS_Y, 0.0f);
 		float spec =
 			max(((view->GetCamera().pivot - m_area.GetCenter()).Normalize() -
-					g_lightset.nearOne)
+					g_lightset.nearone)
 						.Normalize() *
 					WVector::UNIT_POS_Y,
 				0.0f);
@@ -373,16 +373,16 @@ void CPoolReflective::Render(WView* view)
 
 					m_vtx[k].SetPosition(v->pos);
 
-					sun = max(-g_lightset.nearOne * v->normal, 0.0f);
+					sun = max(-g_lightset.nearone * v->normal, 0.0f);
 					float spec =
 						(((view->GetCamera().pivot - v->pos).Normalize() -
-							 g_lightset.nearOne)
+							 g_lightset.nearone)
 									.Normalize() *
 								v->normal >
 							0.0f)
 						? PoolSpecularDot(v->normal, v->normal,
 							  ((view->GetCamera().pivot - v->pos).Normalize() -
-								  g_lightset.nearOne)
+								  g_lightset.nearone)
 								  .Normalize())
 						: 0.0f;
 					float squaredSpec = spec * spec;

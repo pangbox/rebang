@@ -83,7 +83,7 @@ public:
 
 	void SubState(unsigned long state) { SetState(m_state & ~state); }
 
-	void SetHeadIcon(int icon);
+	void SetHeadIcon(int icon) { m_headIcon = icon; }
 
 private:
 	void SendMove(const WVector& pos, bool bForce);

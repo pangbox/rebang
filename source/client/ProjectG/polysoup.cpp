@@ -494,7 +494,7 @@ bool WPolySoup::Load(const char* filename, bool bOption)
 		case 1:
 			sscanf(point->option.c_str(), "%x %x %x", &g_lightset.diffuse,
 				&g_lightset.ambient, &g_lightset.ambient2);
-			g_lightset.nearOne = point->pos;
+			g_lightset.nearone = point->pos;
 			break;
 		case 3:
 			GOLFDOC()->SetDay(false);
@@ -622,8 +622,8 @@ bool WPolySoup::Load(const char* filename, bool bOption)
 
 	if (g_lightset.type == 2)
 	{
-		g_lightset.nearOne *= -1.0f;
-		g_lightset.nearOne.Normalize();
+		g_lightset.nearone *= -1.0f;
+		g_lightset.nearone.Normalize();
 	}
 
 	sBgModel bgModel;
@@ -1765,40 +1765,6 @@ static void Barycentric(float* u, float* v, const WVector* p, const WVector* a,
 		(d[2].y * d[1].x - d[2].x * d[1].y);
 	*v = (d[1].x * d[0].y - d[1].y * d[0].x) /
 		(d[2].y * d[1].x - d[2].x * d[1].y);
-}
-
-// HACK!
-namespace ILNUM_POLYSTATS
-{
-	ILNUM_EXC2
-	typedef int t0;
-	typedef int t1;
-	typedef int t2;
-	typedef int t3;
-	typedef int t4;
-	typedef int t5;
-	typedef int t6;
-	typedef int t7;
-	typedef int t8;
-	typedef int t9;
-	typedef int t10;
-	typedef int t11;
-	typedef int t12;
-	typedef int t13;
-	typedef int t14;
-	typedef int t15;
-	typedef int t16;
-	typedef int t17;
-	typedef int t18;
-	typedef int t19;
-	typedef int t20;
-	typedef int t21;
-	typedef int t22;
-	typedef int t23;
-	typedef int t24;
-	typedef int t25;
-	typedef int t26;
-	typedef int t27;
 }
 
 void WPolySoup::MakeStatistics()
@@ -3660,7 +3626,7 @@ void WPolySoup::DigHolecup(std::vector<sCupVtx>& cup,
 			WSingleton<CSharedDoc>::Instance()->m_pGolfDoc->GetHoleData().pin) *
 		inv;
 	bottom = cup[0].pos.y - 1.0f;
-	light = RotVec(g_lightset.nearOne, inv) * -1.0f;
+	light = RotVec(g_lightset.nearone, inv) * -1.0f;
 	light.Normalize();
 
 	int i;

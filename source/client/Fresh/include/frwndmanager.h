@@ -29,8 +29,6 @@ struct FrInputState
 	CChatMsg* im;
 };
 
-// HACK!
-#pragma optimize("a", on)
 class FrWndManager
 {
 public:
@@ -58,7 +56,7 @@ public:
 	FrWnd* GetModalForm();
 	FrWnd* DoCreate(FrGuiItem& item, FrWndManager* pManager, FrWnd* pParent,
 		FrCmdTarget* pOwner);
-	__forceinline FrDesktop* GetDesktop() { return this->m_pDesktop; }
+	FrDesktop* GetDesktop() { return this->m_pDesktop; }
 	unsigned int& RefIndex() { return m_nRefIndex; }
 	FrGraphicInterface* GetGDI() { return m_pDevice; }
 	const WPoint& GetMousePos() const { return m_istate.mousePos; }
@@ -74,7 +72,7 @@ public:
 	void SetCursor(int hCursor) { m_cursorIndex = hCursor; }
 	int GetCursor() { return m_cursorIndex; }
 	void MoveCursor(FrWnd* pParent, const char* name);
-	__forceinline const char* GetLayoutID() { return this->m_layoutID.c_str(); }
+	const char* GetLayoutID() { return this->m_layoutID.c_str(); }
 	bool SetCapture(FrWnd* pWnd);
 	FrWnd* GetCapture() { return m_pCaptured; }
 	bool ReleaseCapture(FrWnd* pWnd);
@@ -101,8 +99,8 @@ public:
 	FrInputState* GetInputState();
 	void IME_ShowCandWindow(FrEdit* pFocusedEdit, WPoint& caretPos);
 	std::list<FrWnd*>& GetTopWndList() { return m_topmostList; }
-	__forceinline void HidePrivacy(bool hide) { this->m_hidePrivacy = hide; }
-	__forceinline bool HidePrivacy() { return this->m_hidePrivacy; }
+	void HidePrivacy(bool hide) { this->m_hidePrivacy = hide; }
+	bool HidePrivacy() { return this->m_hidePrivacy; }
 
 protected:
 	void CheckSystemStatus();
@@ -127,4 +125,3 @@ protected:
 	WPoint m_caretPos;
 	bool m_hidePrivacy;
 };
-#pragma optimize("", on)

@@ -363,20 +363,7 @@ struct WRenderToTextureParam
 #endif
 };
 
-#ifdef WANGREAL_DEVICE
 #include "wdevice.h"
-#else
-class WProc;
-
-class WDevice
-{
-public:
-	virtual ~WDevice();
-	virtual char* GetDeviceName();
-	virtual char* EnumModeName();
-	virtual WProc* ExternProc();
-};
-#endif
 
 struct WTVertex
 {
@@ -668,29 +655,5 @@ protected:
 	float m_clip_near_scale;
 };
 
-class WInputDev : public WDevice
-{
-public:
-	virtual ~WInputDev();
-	virtual bool InitDevice(HWND window, bool active);
-	virtual void SetActive(bool active);
-	virtual void Reset();
-	virtual void Update(unsigned long time);
-	virtual int GetState(int type, int index);
-	virtual unsigned long GetEventTime(int index);
-	virtual bool IsAlphaNumericMode();
-	virtual void SetAlphaNumericMode(bool enabled);
-	virtual void SetAlphaNumericMode();
-	virtual bool IsUpdated();
-	virtual unsigned long GetLastInputTime();
-	virtual void ResetInputTime();
-	virtual void SetState(int type, int value);
-	virtual void SetOpenStatus(bool open);
-	virtual WInputDev* MakeClone(char* mode, HWND window);
-
-protected:
-	bool active;
-	bool bUpdated;
-	unsigned long dwLastInputTime;
-};
+#include "winput.h"
 #endif

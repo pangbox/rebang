@@ -140,7 +140,7 @@ void CPetBody::Display()
 				std::vector<sLightSet>::iterator it;
 				for (it = m_localLight.begin(); it != m_localLight.end(); it++)
 				{
-					it->light.nearOne = RotVec(it->pos, m_leanMat);
+					it->light.nearone = RotVec(it->pos, m_leanMat);
 					m_pPet->UpdateLightSource(&it->light, true, NULL);
 				}
 			}
@@ -187,15 +187,15 @@ void CPetBody::SetLight()
 			GetPVS().GetShadowIntensity(
 				WVector(m_pos.x, m_pPet->GetBoundBox().max.y, m_pos.z)));
 		m_light.ambient = g_lightset.ambient;
-		m_light.nearOne = g_lightset.nearOne;
+		m_light.nearone = g_lightset.nearone;
 	}
 	else
 	{
 		m_light.diffuse = 0xffffff;
 		m_light.ambient = 0xffffff;
 		m_light.type = 2;
-		m_light.nearOne = WVector(0.0f, -1.0f, 1.0f);
-		m_light.nearOne.Normalize();
+		m_light.nearone = WVector(0.0f, -1.0f, 1.0f);
+		m_light.nearone.Normalize();
 	}
 }
 

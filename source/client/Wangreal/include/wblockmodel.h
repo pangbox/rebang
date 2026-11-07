@@ -45,6 +45,7 @@ private:
 	int PositionDecision(int);
 	static bool ColTestRough(const WVector&, const WVector&, float,
 		const Waabb&);
+	static bool ColTestRough(const Waabb&, const Waabb&);
 	static float CollTest(const WVector&, const WVector&, float, WPlane*,
 		WConvexArea*, float);
 	bool IsConvex(const WVector*, int, WPlane*);

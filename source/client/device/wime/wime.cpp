@@ -1,4 +1,4 @@
-#include "winput.inl"
+#include "winput.h"
 #include "wime.h"
 
 #include <string.h>

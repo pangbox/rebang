@@ -10,6 +10,36 @@
 #include "binstr.h"
 #include <process.h>
 
+namespace
+{
+	struct _ValidId
+	{
+		bool bInvalid;
+
+		_ValidId()
+			: bInvalid(false)
+		{
+		}
+		void operator()(char c)
+		{
+			if (!isalnum(c))
+				bInvalid = true;
+		}
+	};
+
+	class cNTAUTHPARAM
+	{
+	public:
+		cNTAUTHPARAM(const std::string& _id, const std::string& _pwd)
+			: id(_id), pwd(_pwd)
+		{
+		}
+
+		std::string id;
+		std::string pwd;
+	};
+}
+
 extern Fresh* g_pFresh;
 
 extern bool g_bQuit;

@@ -4,6 +4,9 @@
 
 class WxPuppet : public WPuppet
 {
+	bool m_xbNeedTnLBuf;
+	WxTnLBuffer* m_xpTnLBuf;
+
 public:
 	WxPuppet(bool needBuffer);
 	virtual ~WxPuppet();
@@ -21,13 +24,14 @@ private:
 	void xReleaseTnLBuffer();
 	void xShareTnLResources(WxPuppet* destination);
 	void xUpdateTnLResources();
-
-	bool m_xbNeedTnLBuf;
-	WxTnLBuffer* m_xpTnLBuf;
 };
 
 class WxStaticPuppetGrp : public WResource
 {
+	int m_xnPets;
+	WPuppet** m_xpapPets;
+	WxTnLBuffer m_xTnLBuf;
+
 public:
 	WxStaticPuppetGrp();
 	virtual ~WxStaticPuppetGrp();
@@ -38,8 +42,4 @@ public:
 
 private:
 	void xReleaseTnLBuffer();
-
-	int m_xnPets;
-	WPuppet** m_xpapPets;
-	WxTnLBuffer m_xTnLBuf;
 };

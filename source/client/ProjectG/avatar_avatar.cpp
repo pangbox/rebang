@@ -119,7 +119,7 @@ ntAvatar::ntAvatar(CQuadTree& pvs, const sSlotInfo& slotInfo,
 
 	m_light.type = 2;
 	m_light.ambient = ModifyColor(g_lightset.ambient, 1.0f);
-	m_light.nearOne = g_lightset.nearOne;
+	m_light.nearone = g_lightset.nearone;
 
 	m_fxBox.Init(g_resrcmng);
 	m_fxBox.SetCamera(&g_camera);
@@ -1206,12 +1206,12 @@ void ntAvatar::Render()
 			if (WSingleton<ntAvatarManager>::Instance()->m_pPickedAvatar ==
 				this)
 			{
-				m_light.nearOne = g_lightset.nearOne;
+				m_light.nearone = g_lightset.nearone;
 				m_light.diffuse = m_light.ambient = 0xFFFFFFFF;
 			}
 			else
 			{
-				m_light.nearOne = g_lightset.nearOne;
+				m_light.nearone = g_lightset.nearone;
 				m_light.ambient = ModifyColor(g_lightset.ambient, 1.0f);
 				m_light.diffuse = ModifyColor(g_lightset.diffuse,
 					GetPVS().GetShadowIntensity(pos));

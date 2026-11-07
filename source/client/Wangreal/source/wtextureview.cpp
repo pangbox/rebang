@@ -10,10 +10,6 @@ WTextureView::WTextureView()
 	m_bDisableFog = true;
 }
 
-__forceinline WView::~WView()
-{
-}
-
 WTextureView::~WTextureView()
 {
 	for (int i = 0; i < 2; ++i)

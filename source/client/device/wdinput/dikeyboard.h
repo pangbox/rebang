@@ -1,5 +1,6 @@
 #pragma once
 #include <winput.h>
+#include <wproc.h>
 #include <dinput.h>
 
 class DirectInputKeyboard : public WInputDev, public WProc

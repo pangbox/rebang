@@ -1,11 +1,11 @@
 #include "baseobject.h"
 
-void BaseObject::SetConstructionCallback(Callback fn)
+void BaseObject::SetConstructionCallback(ConstructionCallback fn)
 {
 	ms_fnConstruct = fn;
 }
 
-void BaseObject::SetDestructionCallback(Callback fn)
+void BaseObject::SetDestructionCallback(DestructionCallback fn)
 {
 	ms_fnDestruct = fn;
 }
@@ -39,5 +39,5 @@ void BaseObject::SetLeakHint(const char* hint)
 
 int BaseObject::ms_nextId = 0;
 int BaseObject::ms_count = 0;
-BaseObject::Callback BaseObject::ms_fnConstruct = 0;
-BaseObject::Callback BaseObject::ms_fnDestruct = 0;
+BaseObject::ConstructionCallback BaseObject::ms_fnConstruct = 0;
+BaseObject::DestructionCallback BaseObject::ms_fnDestruct = 0;

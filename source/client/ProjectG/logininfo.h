@@ -330,12 +330,3 @@ inline int IsPcBang()
 {
 	return LOGININFO()->IsPcBang();
 }
-
-struct FnTrim
-{
-	FnTrim(const char* trimChars);
-	void operator()(char c);
-	~FnTrim();
-	std::string m_trimChars;
-	std::string m_result;
-};

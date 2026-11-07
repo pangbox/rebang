@@ -238,6 +238,18 @@ void CRC_MT::GetWork(std::vector<sCRC_CHKTASK*>& work)
 	work.assign(m_work.begin(), m_work.end());
 }
 
+namespace
+{
+	struct _delete
+	{
+		template <typename T>
+		void operator()(const T* p) const
+		{
+			delete p;
+		}
+	};
+}
+
 __declspec(noinline) void CRC_MT::Reset()
 {
 	m_hThread = NULL;

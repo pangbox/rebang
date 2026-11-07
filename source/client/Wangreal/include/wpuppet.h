@@ -140,6 +140,14 @@ public:
 
 	void SetRenderMode(int mode);
 	void SetLightLine(float value);
+	enum
+	{
+		W_PUPPET_LIGHT_COLOR_PER_VERTEX = 0x01000000,
+		W_PUPPET_CHECK_SHADOW = 0x02000000,
+		W_LIGHT_SELFILLUM = 0x04000000,
+		W_LIGHT_ADD = 0x08000000,
+		W_LIGHT_SELFCOLOR_MASK = 0x00ffffff
+	};
 	void SetLightMode(unsigned long mode) { m_lightmode = mode; }
 	void UpdateLightSource(WScene* scene);
 	void RenderHierarchy(WView* view, bool transform, float value, float scale);
@@ -201,6 +209,13 @@ public:
 	bool AddMotion(const char* name, char* alias);
 	void DelAddMotion(const char* name);
 	void ClearAddMotion();
+	enum w_get_bone_flag
+	{
+		FIXEDPIVOT = 1,
+		ADDFORCE = 2,
+		EXCEPTPARENT = 4,
+		EX_PONYTAIL = 8
+	};
 	WBoneSet* GetBones(const char* name, float time, int mode, char* bone,
 		bool flag);
 	WVector GetDeltaVec(float time);
@@ -219,10 +234,7 @@ public:
 	void CalcBound(bool reset, WPuppet* puppet, bool mode, char* name,
 		Waabb* box);
 	const Waabb& GetBoundBox() { return m_bound; }
-	__forceinline const WSphere& GetBoundSphere() const
-	{
-		return m_boundSphere;
-	}
+	const WSphere& GetBoundSphere() const { return m_boundSphere; }
 	const char* GetPuppetName() const { return m_petName; }
 	void UpdateBound(bool transform, bool flag);
 	void UpdateBSphere();
@@ -263,7 +275,7 @@ private:
 	void LoadPET_Frame(cFile* file);
 	WList<w_motion_data*>* LoadPET_Motion(cFile* file, float scale);
 	void LoadPET_Collision(cFile* file);
-	static int SeekChunkFromPET(cFile* file, char* tag);
+	static int SeekChunkFromPET(cFile* fp, char* str);
 	void GetDirectory(char* path, char* directory);
 	void GetName(char* path, char* name);
 	void FixNormal();
@@ -287,6 +299,14 @@ public:
 	WList<WBone*> m_phybone;
 	WMatrix m_mat;
 	WList<w_motion_addition*> m_addedMotionList;
+	enum
+	{
+		LOAD_BONE = 1,
+		LOAD_ANIMATIONDATA = 2,
+		LOAD_TEXTURE_MESH_FACEANIMATION = 4,
+		LOAD_MISC_DATA = 8,
+		LOAD_ALL = 15
+	};
 	int m_rendMode;
 	bool m_bClone;
 	bool m_bHaveCenter;
@@ -327,4 +347,6 @@ protected:
 		}
 	};
 	static std::map<std::string, w_original_matrix_set> ms_xOrginalMatrixList;
+
+	struct w_pet_chunk;
 };

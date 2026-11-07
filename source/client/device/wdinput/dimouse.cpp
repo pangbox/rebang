@@ -1,4 +1,4 @@
-#include "winput.inl"
+#include "winput.h"
 #include "dimouse.h"
 #include <windows.h>
 #include <stddef.h>

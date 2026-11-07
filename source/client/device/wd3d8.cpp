@@ -7437,9 +7437,9 @@ void WDirect3D8::xSetLight(unsigned long index, const LightSet& wLight)
 	}
 
 	if (wLight.type == this->m_xaWLights[index].type &&
-		wLight.nearOne.x == this->m_xaWLights[index].nearOne.x &&
-		wLight.nearOne.y == this->m_xaWLights[index].nearOne.y &&
-		wLight.nearOne.z == this->m_xaWLights[index].nearOne.z &&
+		wLight.nearone.x == this->m_xaWLights[index].nearone.x &&
+		wLight.nearone.y == this->m_xaWLights[index].nearone.y &&
+		wLight.nearone.z == this->m_xaWLights[index].nearone.z &&
 		wLight.diffuse == this->m_xaWLights[index].diffuse &&
 		wLight.ambient == this->m_xaWLights[index].ambient)
 	{
@@ -7449,9 +7449,9 @@ void WDirect3D8::xSetLight(unsigned long index, const LightSet& wLight)
 	this->FlushRenderPrimitive();
 
 	this->m_xaWLights[index].type = wLight.type;
-	this->m_xaWLights[index].nearOne.x = wLight.nearOne.x;
-	this->m_xaWLights[index].nearOne.y = wLight.nearOne.y;
-	this->m_xaWLights[index].nearOne.z = wLight.nearOne.z;
+	this->m_xaWLights[index].nearone.x = wLight.nearone.x;
+	this->m_xaWLights[index].nearone.y = wLight.nearone.y;
+	this->m_xaWLights[index].nearone.z = wLight.nearone.z;
 	this->m_xaWLights[index].diffuse = wLight.diffuse;
 	this->m_xaWLights[index].ambient = wLight.ambient;
 
@@ -7472,15 +7472,15 @@ void WDirect3D8::xSetLight(unsigned long index, const LightSet& wLight)
 
 	if (wLight.type == 2)
 	{
-		this->m_xaLights[index].Direction.x = wLight.nearOne.x;
-		this->m_xaLights[index].Direction.y = wLight.nearOne.y;
-		this->m_xaLights[index].Direction.z = wLight.nearOne.z;
+		this->m_xaLights[index].Direction.x = wLight.nearone.x;
+		this->m_xaLights[index].Direction.y = wLight.nearone.y;
+		this->m_xaLights[index].Direction.z = wLight.nearone.z;
 	}
 	else
 	{
-		this->m_xaLights[index].Position.x = wLight.nearOne.x;
-		this->m_xaLights[index].Position.y = wLight.nearOne.y;
-		this->m_xaLights[index].Position.z = wLight.nearOne.z;
+		this->m_xaLights[index].Position.x = wLight.nearone.x;
+		this->m_xaLights[index].Position.y = wLight.nearone.y;
+		this->m_xaLights[index].Position.z = wLight.nearone.z;
 	}
 
 	if (!index)

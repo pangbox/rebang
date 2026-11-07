@@ -5608,7 +5608,7 @@ float CQuadTree::GetShadowIntensity(const WVector& pos)
 	if (!COption::Instance()->vIsShadowmapEnabled() || !GOLFDOC()->m_bDay)
 		return 1.0f;
 
-	WVector dir = g_lightset.nearOne;
+	WVector dir = g_lightset.nearone;
 	dir.y = 0.0f;
 	dir.Normalize();
 	dir *= -320.0f;
@@ -5651,7 +5651,7 @@ float CQuadTree::GetShadowIntensity(const WVector& pos)
 		box.max =
 			WVector(size.x * 0.75f, size.y * 0.5f, size.z * 0.75f) + model->pos;
 
-		float t = RayIntersectAABBSolid(box, pos, g_lightset.nearOne * -320.0f,
+		float t = RayIntersectAABBSolid(box, pos, g_lightset.nearone * -320.0f,
 			NULL, 0.0f);
 		if (t < intensity)
 			intensity = t;

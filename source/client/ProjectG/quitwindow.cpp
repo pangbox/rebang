@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #include "quitwindow.h"
 
-inline bool CQuitWindow::HasOptionWindow()
-{
-	return m_pOptionDlg ? true : false;
-}
-
 #include "mousecursor.h"
 #include "optiondlg.h"
 #include "messengerdlg.h"

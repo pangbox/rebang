@@ -9,7 +9,7 @@ static int g_foffset = 0;
 
 WView::WView(void)
 {
-	update = 3;
+	update = UPDATE_VIEW | UPDATE_PROJ;
 	FOV = 1.1780972f;
 	clip_near = 6.3999996f;
 	clip_far = 1600.0f;
@@ -31,19 +31,15 @@ WView::WView(void)
 	m_bDisableFog = false;
 	m_isReflective = false;
 	m_xViewState.xLight.type = 2;
-	m_xViewState.xLight.nearOne = WVector::UNIT_NEG_Z;
+	m_xViewState.xLight.nearone = WVector::UNIT_NEG_Z;
 	m_xViewState.xmView = WMatrix4::IDENTITY;
 	m_xViewState.xmProj = WMatrix4::ZERO;
-	update |= 2;
+	update |= UPDATE_PROJ;
 	m_xNeedToUpdateViewTransfToVideo = true;
 	m_xNeedToUpdateProjTransfToVideo = true;
 	m_projMode = PERSPECTIVE;
 	m_scale = 1.0f;
 	UpdateCamera();
-}
-
-__forceinline WView::~WView()
-{
 }
 
 void WView::SetClip(float n, float f, bool toVideo)
@@ -63,7 +59,7 @@ void WView::SetClip(float n, float f, bool toVideo)
 			video->m_clip_near_scale = clip_near_scale;
 		}
 	}
-	update |= 2;
+	update |= UPDATE_PROJ;
 }
 
 void WView::Render(void)
@@ -83,7 +79,7 @@ void WView::SetPrevCamera(const WMatrix& cam)
 
 void WView::SetCamera(const WMatrix& cam)
 {
-	update |= 1;
+	update |= UPDATE_VIEW;
 	lastcam = cam;
 }
 
@@ -113,12 +109,12 @@ void WView::SetViewport(float w, float h)
 	SCREEN_XS = w;
 	SCREEN_YS = h;
 	m_clipArea = WRect(0.0f, 0.0f, w, h);
-	update |= 2;
+	update |= UPDATE_PROJ;
 }
 
 void WView::SetFOV(float fov)
 {
-	update |= 2;
+	update |= UPDATE_PROJ;
 	FOV = SCREEN_XS / SCREEN_YS * fov * 0.75f;
 }
 
@@ -430,7 +426,7 @@ void WView::BeginScene(void)
 			SetViewport((float)video->GetWidth(), (float)video->GetHeight());
 		}
 	}
-	update |= 3;
+	update |= UPDATE_VIEW | UPDATE_PROJ;
 	UpdateCamera();
 }
 
@@ -448,14 +444,14 @@ void WView::SetClippingArea(const WRect& rc)
 	if (video)
 		video->SetViewPort((int)m_clipArea.x, (int)m_clipArea.y,
 			(int)m_clipArea.w, (int)m_clipArea.h);
-	update |= 2;
+	update |= UPDATE_PROJ;
 }
 
 void WView::SetScreenCenter(float cx, float cy)
 {
 	if (cx != m_center_x || cy != m_center_y)
 	{
-		update |= 2;
+		update |= UPDATE_PROJ;
 		m_center_x = cx;
 		m_center_y = cy;
 	}
@@ -505,7 +501,7 @@ void WView::DrawIndexedTrianglesDirect(WTVertex* pv, int nv, unsigned short* pi,
 
 void WView::SetFOV_Unmodified(float fov)
 {
-	update |= 2;
+	update |= UPDATE_PROJ;
 	FOV = fov;
 }
 
@@ -642,7 +638,7 @@ void WView::xScaleProjMat(int index, int div)
 	float t = (float)(index / div) * step - 0.5f;
 	top = t;
 	bottom = t + step;
-	update |= 2;
+	update |= UPDATE_PROJ;
 }
 
 void WView::xDrawIndexedTriangles(const WxBatchState& state)
@@ -659,7 +655,7 @@ void WView::xDrawIndexedTriangles(const WxBatchState& state)
 
 void WView::SetScale(float scale)
 {
-	update |= 2;
+	update |= UPDATE_PROJ;
 	m_scale = scale;
 }
 
@@ -688,7 +684,7 @@ void WView::SetProjectionMode(PROJECTION_MODE mode)
 	{
 		m_projMode = mode;
 		m_xViewState.xmProj = WMatrix4::ZERO;
-		update |= 2;
+		update |= UPDATE_PROJ;
 	}
 }
 
@@ -768,7 +764,7 @@ void WView::Projection2_Parallel(WTVertex* out, const WVector& v)
 
 void WView::UpdateCamera_Perspective(void)
 {
-	if (update != 0)
+	if (update != UPDATE_NONE)
 	{
 		camera = lastcam;
 		scalex = SCREEN_XS * 0.5f;
@@ -835,7 +831,7 @@ void WView::UpdateCamera_Perspective(void)
 
 void WView::UpdateCamera_Parallel(void)
 {
-	if (update != 0)
+	if (update != UPDATE_NONE)
 	{
 		camera = lastcam;
 		invcamera = ~camera;
@@ -915,9 +911,9 @@ void WView::GetScreen2World_Parallel(float sx, float sy, WVector& pos,
 
 void WView::UpdateProjectionTransform_Perspective(void)
 {
-	if (!(update & 2))
+	if (!(update & UPDATE_PROJ))
 		return;
-	update &= ~2;
+	update &= ~UPDATE_PROJ;
 	float halfw = GetWidth() * 0.5f;
 	float halfh = GetHeight() * 0.5f;
 	float clipl = (m_clipArea.x - halfw) / GetWidth();
@@ -942,9 +938,9 @@ void WView::UpdateProjectionTransform_Perspective(void)
 
 void WView::UpdateProjectionTransform_Parallel(void)
 {
-	if (!(update & 2))
+	if (!(update & UPDATE_PROJ))
 		return;
-	update &= ~2;
+	update &= ~UPDATE_PROJ;
 	float halfw = GetWidth() * 0.5f;
 	float halfh = GetHeight() * 0.5f;
 	float clipl = (m_clipArea.x - halfw) / GetWidth();
@@ -969,27 +965,31 @@ void WView::UpdateProjectionTransform_Parallel(void)
 
 void WView::UpdateViewTransform(void)
 {
-	if ((update & 1) != 0)
+	if ((update & UPDATE_VIEW) != 0)
 	{
-		update &= ~1;
+		update &= ~UPDATE_VIEW;
 		SetWMatrix4FromWMatrix(m_xViewState.xmView, invcamera);
 		m_xNeedToUpdateViewTransfToVideo = true;
 	}
 }
 
-WVector (WView::* WView::ms_fnProjection[2])(
-	const WVector&) = { &WView::Projection_Perspective,
-	&WView::Projection_Parallel };
-void (WView::* WView::ms_fnProjection2[2])(WTVertex*,
-	const WVector&) = { &WView::Projection2_Perspective,
-	&WView::Projection2_Parallel };
-void (WView::* WView::ms_fnUpdateProjectionTransform[2])(
-	void) = { &WView::UpdateProjectionTransform_Perspective,
-	&WView::UpdateProjectionTransform_Parallel };
-void (WView::* WView::ms_fnUpdateCamera[2])(
-	void) = { &WView::UpdateCamera_Perspective, &WView::UpdateCamera_Parallel };
-void (WView::* WView::ms_fnGetScreen2World[2])(float, float, WVector&,
-	WVector&) = { &WView::GetScreen2World_Perspective,
-	&WView::GetScreen2World_Parallel };
+WView::FnProjection WView::ms_fnProjection[WView::NUM_PROJECTION_MODE] = {
+	&WView::Projection_Perspective, &WView::Projection_Parallel
+};
+WView::FnProjection2 WView::ms_fnProjection2[WView::NUM_PROJECTION_MODE] = {
+	&WView::Projection2_Perspective, &WView::Projection2_Parallel
+};
+WView::FnUpdateProjectionTransform
+	WView::ms_fnUpdateProjectionTransform[WView::NUM_PROJECTION_MODE] = {
+		&WView::UpdateProjectionTransform_Perspective,
+		&WView::UpdateProjectionTransform_Parallel
+	};
+WView::FnUpdateCamera WView::ms_fnUpdateCamera[WView::NUM_PROJECTION_MODE] = {
+	&WView::UpdateCamera_Perspective, &WView::UpdateCamera_Parallel
+};
+WView::FnGetScreen2World
+	WView::ms_fnGetScreen2World[WView::NUM_PROJECTION_MODE] = {
+		&WView::GetScreen2World_Perspective, &WView::GetScreen2World_Parallel
+	};
 const WMatrix4 WView::ms_uvConvMat(0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f,
 	0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f);

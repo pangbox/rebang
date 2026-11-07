@@ -47,9 +47,12 @@ public:
 	int GetNumBytes() { return m_iNumBytes; }
 	void Open(bool, bool);
 	void Close(bool, bool);
-	bool IsOpened() { return m_iState == 3; }
-	bool IsClosed() { return m_iState == 0; }
-	bool IsOpenning() { return m_iState == 2 || m_iState == 1; }
+	bool IsOpened() { return m_iState == CHAT_WIN_OPENED; }
+	bool IsClosed() { return m_iState == CHAT_WIN_CLOSED; }
+	bool IsOpenning()
+	{
+		return m_iState == CHAT_WIN_LEFT || m_iState == CHAT_WIN_RIGHT;
+	}
 	void Process(float);
 	void ProcessWindow(float);
 	void ProcessMacro(float);
@@ -100,6 +103,14 @@ protected:
 	void WriteCharacter(int);
 
 protected:
+	enum
+	{
+		CHAT_WIN_CLOSED,
+		CHAT_WIN_RIGHT,
+		CHAT_WIN_LEFT,
+		CHAT_WIN_OPENED
+	};
+
 	bool m_bPrinted;
 	bool m_bCaretMove;
 	int m_nMaxBytes;

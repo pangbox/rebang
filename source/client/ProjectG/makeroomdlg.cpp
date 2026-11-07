@@ -6,6 +6,24 @@
 #include "inputmanager.h"
 #include "mathconsts.h"
 
+namespace nsInvalidCheck
+{
+	struct _invalidPwd
+	{
+		bool bInvalid;
+
+		_invalidPwd()
+			: bInvalid(false)
+		{
+		}
+		void operator()(char c)
+		{
+			if (c == ' ')
+				bInvalid = true;
+		}
+	};
+}
+
 extern Fresh* g_pFresh;
 extern CInputManager* g_input;
 

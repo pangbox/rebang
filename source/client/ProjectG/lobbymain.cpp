@@ -1,4 +1,3 @@
-typedef char z_rivit[sizeof(std::vector<sRivalData>::iterator)];
 #include "exhibition.h"
 #include "clientsetting.h"
 #include "invitedlg.h"
@@ -34,6 +33,7 @@ class FrMailBoxDlg;
 #include "familymain.h"
 #include "rankinginfo.h"
 #include "logindlg.h"
+#include "logininfo.h"
 #include "detailedroominfodlg.h"
 #include "scoredlg.h"
 #include "passworddlg.h"
@@ -79,24 +79,6 @@ inline int Abs(int value)
 {
 	return value > 0 ? value : -value;
 }
-
-class ILoginInfo;
-
-class CLoginInfo
-{
-public:
-	static CLoginInfo* Instance();
-	int IsWebLogin() const { return m_bWebLogin; }
-	int IsPcBang() const;
-
-private:
-	virtual ~CLoginInfo();
-
-	ILoginInfo* m_pLoginInfo;
-	int m_bWebLogin;
-};
-
-#include "intrusion.h"
 
 class cTopEventIcon
 {

@@ -8,8 +8,6 @@ class FrCmdTarget;
 class FrWndManager;
 class FrDesktop;
 
-// HACK!
-#pragma optimize("a", on)
 class Fresh
 {
 public:
@@ -39,7 +37,6 @@ private:
 	bool show;
 	std::string filename;
 };
-#pragma optimize("", on)
 
 inline FrDesktop* Fresh::GetDesktop() const
 {

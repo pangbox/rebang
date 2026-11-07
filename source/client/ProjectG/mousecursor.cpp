@@ -8,19 +8,12 @@
 #include "frgroupbox.h"
 #include "frdesktop.h"
 #include "projectg.h"
+#include "realmyroomtask.h"
 #include "wresrcmng.h"
 #include "../../shared/localize.h"
 
 extern WMatrix g_camera;
 extern Fresh* g_pFresh;
-bool IsMyTurn(bool check);
-extern "C" float __fastcall floorf(float value);
-
-class CRealMyRoomTask
-{
-public:
-	static const WRTTI m_RTTI;
-};
 
 class CGroundPropt
 {

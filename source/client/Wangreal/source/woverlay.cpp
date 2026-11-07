@@ -2,7 +2,7 @@
 #include "woverlay.h"
 #include <stdio.h>
 
-WTVertex* WOverlay::m_vtxList[10];
+WTVertex* WOverlay::m_vtxList[9];
 WTVertex WOverlay::m_vtx[4];
 
 WTVertex* WOverlay::m_vl[5] = {

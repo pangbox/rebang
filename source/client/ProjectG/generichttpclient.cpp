@@ -556,7 +556,9 @@ const char* GenericHTTPClient::QueryHTTPResponseHeader()
 
 inline void ILHTTP::Pad::f1()
 {
-	ILFILL4 ILFILL4 v += 1;
+	ILFILL4 v += 1;
+	v += 1;
+	v += 1;
 }
 
 const char* GenericHTTPClient::QueryHTTPResponse()

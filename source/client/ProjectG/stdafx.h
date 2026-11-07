@@ -11,6 +11,25 @@
 namespace ILNUM_WT
 {
 	typedef int t0;
+	typedef int t1;
+	typedef int t2;
+	typedef int t3;
+	typedef int t4;
+	typedef int t5;
+	typedef int t6;
+	typedef int t7;
+	typedef int t8;
+	typedef int t9;
+	typedef int t10;
+	typedef int t11;
+	typedef int t12;
+	typedef int t13;
+	typedef int t14;
+	typedef int t15;
+	typedef int t16;
+	typedef int t17;
+	typedef int t18;
+	typedef int t19;
 }
 #include <atlbase.h>
 #include <atlapp.h>
@@ -50,9 +69,7 @@ ILFILLX2
 #include "wavi.h"
 #include "wpuppet.h"
 #include "wview.h"
-ILNUM_WF0
 #include "wfont.h"
-ILNUM_WF1
 #include "wflag.h"
 #include "pool.h"
 #include "wangrealapp.h"
@@ -61,13 +78,11 @@ ILNUM_WF1
 #include "wboneset.h"
 #include "wmathutil.inl"
 #include "wpetfile.h"
-ILNUM_SND0
 #include "wlocalize.h"
 #include "commonutil.h"
 ILNUM_CU1
 ILFILL0
 #include "exception.h"
-ILNUM_EXC
 #include "objectfactory.h"
 #include "background.h"
 #include "w3danispr.h"
@@ -87,14 +102,12 @@ ILNUM_CU
 
 #include "../../shared/exceptionreport.h"
 #include "lock.hpp"
-#include "packet.h"
 ILNUM_PK
 #include "titles_client.h"
 ILFILLC
 #include "../../shared/classdefine.h"
 #include "chatmsg.h"
 #include "../../shared/errorcode.h"
-#include "clientsocket.h"
 ILFILLEXC
 ILNUM_EXC2
 #include "tweaker.h"
@@ -120,7 +133,6 @@ ILFILLF2
 #include "frcombobox.h"
 #include "frarea.h"
 ILFILLTB
-ILNUM_TB0
 #include "frtabbutton.h"
 #include "frgaugebar.h"
 ILNUM_GB
@@ -129,17 +141,8 @@ ILNUM_G0
 #include "frgraphicinterface.h"
 #include "fremoticon.h"
 #include "fresh.h"
-// HACK: packet.h belongs here
-inline WSendPacket::WSendPacket(enumClientPacket type)
-	: WMemBlock(0x40)
-{
-	InitPacket(type);
-}
-inline WSendPacket::WSendPacket(int type)
-	: WMemBlock(0x40)
-{
-	InitPacket(type);
-}
+#include "packet.h"
+#include "clientsocket.h"
 #include "soundmanager.h"
 #include "inputmanager.h"
 ILNUM_G1

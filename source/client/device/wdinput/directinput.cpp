@@ -1,4 +1,4 @@
-#include "winput.inl"
+#include "winput.h"
 #include "directinput.h"
 #include "dimouse.h"
 #include "dikeyboard.h"

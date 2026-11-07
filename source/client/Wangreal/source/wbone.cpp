@@ -138,7 +138,7 @@ WBone::WBone()
 	m_moveVec.Reset();
 	m_matrix.Reset();
 	m_light.type = 2;
-	m_light.nearOne = WVector::UNIT_NEG_Y;
+	m_light.nearone = WVector::UNIT_NEG_Y;
 	m_bound_aabb = Waabb(WVector::ZERO, WVector(0.0001f, 0.0001f, 0.0001f));
 	m_vtxColor = 0xffffffff;
 	CountVtxBuff(1);
@@ -617,20 +617,20 @@ WVector WBone::GetKeyPos(float time)
 	do
 	{
 		mid = (low + high) >> 1;
-		if (m_keyPos[mid].time >= time)
+		if (m_keyPos[mid].t >= time)
 			high = mid;
 		else
 			low = mid + 1;
 	} while (low < high);
-	if (m_keyPos[mid].time != time)
+	if (m_keyPos[mid].t != time)
 	{
-		if (mid != 0 || m_keyPos[0].time < time)
+		if (mid != 0 || m_keyPos[0].t < time)
 		{
 			int index = mid;
-			if (m_keyPos[mid].time > time)
+			if (m_keyPos[mid].t > time)
 				index = mid - 1;
-			float rate = (time - m_keyPos[index].time) /
-				(m_keyPos[high].time - m_keyPos[index].time);
+			float rate = (time - m_keyPos[index].t) /
+				(m_keyPos[high].t - m_keyPos[index].t);
 			return (m_keyPos[high].pos - m_keyPos[index].pos) * rate +
 				m_keyPos[index].pos;
 		}
@@ -650,18 +650,18 @@ WQuat WBone::GetKeyRot(float time)
 	do
 	{
 		mid = (low + high) >> 1;
-		if (m_keyRot[mid].time >= time)
+		if (m_keyRot[mid].t >= time)
 			high = mid;
 		else
 			low = mid + 1;
 	} while (low < high);
-	if (m_keyRot[mid].time != time && (mid != 0 || m_keyRot[0].time < time))
+	if (m_keyRot[mid].t != time && (mid != 0 || m_keyRot[0].t < time))
 	{
 		int index = mid;
-		if (m_keyRot[mid].time > time)
+		if (m_keyRot[mid].t > time)
 			index = mid - 1;
-		float rate = (time - m_keyRot[index].time) /
-			(m_keyRot[high].time - m_keyRot[index].time);
+		float rate =
+			(time - m_keyRot[index].t) / (m_keyRot[high].t - m_keyRot[index].t);
 		return WQuaternionSlerp(m_keyRot[index].rot, m_keyRot[high].rot, rate);
 	}
 	return m_keyRot[mid].rot;
@@ -788,25 +788,25 @@ void WBone::SetKeyframe(w_keyframe* frame, float end, float start)
 	{
 		if (key->q != 0)
 		{
-			m_keyRot[rot].time = key->t - start;
+			m_keyRot[rot].t = key->t - start;
 			m_keyRot[rot].rot = *key->q;
 			++rot;
 		}
 		if (key->v != 0)
 		{
-			m_keyPos[pos].time = key->t - start;
+			m_keyPos[pos].t = key->t - start;
 			m_keyPos[pos].pos = *key->v;
 			++pos;
 		}
 	}
 	if (rot != 0 && rot != m_keyRotNum)
 	{
-		m_keyRot[rot].time = end - start;
+		m_keyRot[rot].t = end - start;
 		m_keyRot[rot].rot = m_keyRot[rot - 1].rot;
 	}
 	if (pos != 0 && pos != m_keyPosNum)
 	{
-		m_keyPos[pos].time = end - start;
+		m_keyPos[pos].t = end - start;
 		m_keyPos[pos].pos = m_keyPos[pos - 1].pos;
 	}
 }
@@ -880,8 +880,8 @@ int WBone::OptimizeRotKey(float (*range)[2], int count, w_keyframe_rot** out)
 	{
 		if (i > 0 && i < m_keyRotNum - 1)
 		{
-			float t = (m_keyRot[i].time - m_keyRot[prev].time) /
-				(m_keyRot[i + 1].time - m_keyRot[prev].time);
+			float t = (m_keyRot[i].t - m_keyRot[prev].t) /
+				(m_keyRot[i + 1].t - m_keyRot[prev].t);
 			rot = WQuaternionSlerp(m_keyRot[prev].rot, m_keyRot[i + 1].rot, t);
 			if (QUATEQU(rot, m_keyRot[i].rot))
 			{
@@ -919,8 +919,8 @@ int WBone::OptimizePosKey(float (*range)[2], int count, w_keyframe_pos** out)
 	{
 		if (i > 0 && i < m_keyPosNum - 1)
 		{
-			float t = (m_keyPos[i].time - m_keyPos[prev].time) /
-				(m_keyPos[i + 1].time - m_keyPos[prev].time);
+			float t = (m_keyPos[i].t - m_keyPos[prev].t) /
+				(m_keyPos[i + 1].t - m_keyPos[prev].t);
 			pos = (m_keyPos[i + 1].pos - m_keyPos[prev].pos) * t +
 				m_keyPos[prev].pos;
 			if (VECEQU(pos, m_keyPos[i].pos))
@@ -1953,7 +1953,7 @@ void WBone::CalcLight_Point(LightSet* lig, int lightmode, WScene* scene)
 	WVector vLocLightPos, vLightDir;
 	float t;
 	int i, k;
-	vLocLightPos = lig->nearOne * ~m_matrix;
+	vLocLightPos = lig->nearone * ~m_matrix;
 
 	for (; mesh != 0; mesh = mesh->next)
 	{
@@ -2002,7 +2002,7 @@ void WBone::CalcLight_Point(LightSet* lig, int lightmode, WScene* scene)
 				fTotal += mesh->blendWeightList[k];
 			}
 			vN.Normalize();
-			vLightDir = (lig->nearOne - v).Normalize();
+			vLightDir = (lig->nearone - v).Normalize();
 			t = (float)(vLightDir * vN) * 255.0f;
 			if ((mesh->xiDrawFlag2 & 0x400) != 0 && t < 0.0f)
 				t = t * -1.0f;
@@ -2025,7 +2025,7 @@ void WBone::CalcLight_Point(LightSet* lig, int lightmode, WScene* scene)
 			v = mesh->boneList[i]->Transform(mesh->vecList[i]);
 			vN = RotVec(mesh->normList[i], mesh->boneList[i]->GetMatrix());
 			vN.Normalize();
-			vLightDir = (lig->nearOne - v).Normalize();
+			vLightDir = (lig->nearone - v).Normalize();
 			t = vLightDir * vN * 255.0f;
 			if ((mesh->xiDrawFlag2 & 0x400) != 0 && t < 0.0f)
 				t = t * -1.0f;
@@ -2089,14 +2089,14 @@ void WBone::CalcLight_Directional_Per_Bone(LightSet* lig, int lightmode,
 	WVector vLocLightDir;
 	if (m_flag.GetFlag(4))
 	{
-		vWorLightDir = lig->nearOne - m_matrix.pivot;
+		vWorLightDir = lig->nearone - m_matrix.pivot;
 		vWorLightDir = vWorLightDir.Normalize() * 255.0f;
 		vLocLightDir = RotVec(vWorLightDir, ~m_matrix);
 		vLocLightDir = vLocLightDir.Normalize() * 255.0f;
 	}
 	else
 	{
-		vLocLightDir = RotVec(lig->nearOne - m_matrix.pivot, ~m_matrix);
+		vLocLightDir = RotVec(lig->nearone - m_matrix.pivot, ~m_matrix);
 		vLocLightDir.Normalize();
 	}
 
@@ -2225,9 +2225,9 @@ void WBone::CalcLight_Directional(LightSet* lig, int lightmode, WScene* scene)
 	int i, k;
 	ulong c;
 	if (m_flag.GetFlag(4))
-		vWorLightDir = lig->nearOne * -255.0f;
+		vWorLightDir = lig->nearone * -255.0f;
 
-	vLocLightDir = RotVec(lig->nearOne * -1.0f, ~m_matrix);
+	vLocLightDir = RotVec(lig->nearone * -1.0f, ~m_matrix);
 	vLocLightDir = vLocLightDir.Normalize() * 255.0f;
 
 	for (mesh = m_mesh; mesh != 0; mesh = mesh->next)
@@ -2489,9 +2489,9 @@ void WBone::CalcHilightCoord(WView* view, const LightSet& light, w_mesh* mesh)
 		normList = mesh->myBlendedNormalList ? mesh->myBlendedNormalList
 											 : mesh->blendedNormalList;
 		vLocalE = view->GetCamera().pivot;
-		vLocalL = light.nearOne;
+		vLocalL = light.nearone;
 		vLocalL.Normalize();
-		const WVector* direction = &light.nearOne;
+		const WVector* direction = &light.nearone;
 		const WVector* camera = &view->GetCamera().pivot;
 		int k = 0;
 		for (i = 0; i < mesh->blendedRigidNum; ++i)
@@ -2673,7 +2673,7 @@ void WBone::Render(WView* view, const LightSet& light)
 
 	if (IsVisible() && !m_flag.GetFlag(INVISIBLE) && !IsHidden())
 	{
-		vWorLightDir = light.nearOne * -1.0f;
+		vWorLightDir = light.nearone * -1.0f;
 		vLocLightDir = RotVec(vWorLightDir, ~GetMatrix());
 		vLocEyePos = view->GetCamera().pivot * ~GetMatrix();
 
@@ -3313,7 +3313,7 @@ int WBone::SaveAnimationKey(FILE* file, int id, float (*range)[2], int count)
 			fwrite(&posNum, 4, 1, file);
 			for (i = 0; i < posNum; ++i)
 			{
-				fwrite(&posKeys[i].time, 4, 1, file);
+				fwrite(&posKeys[i].t, 4, 1, file);
 				fwrite(&posKeys[i].pos.x, 4, 1, file);
 				fwrite(&posKeys[i].pos.y, 4, 1, file);
 				fwrite(&posKeys[i].pos.z, 4, 1, file);
@@ -3322,7 +3322,7 @@ int WBone::SaveAnimationKey(FILE* file, int id, float (*range)[2], int count)
 			w_keyframe_rot* rot = rotKeys;
 			for (i = 0; i < rotNum; ++i)
 			{
-				fwrite(&rot[i].time, 4, 1, file);
+				fwrite(&rot[i].t, 4, 1, file);
 				fwrite(&rot[i].rot.x, 4, 1, file);
 				fwrite(&rot[i].rot.y, 4, 1, file);
 				fwrite(&rot[i].rot.z, 4, 1, file);
@@ -3385,12 +3385,12 @@ float WBone::LoadAnimationKey(cFile* fp)
 		m_keyFlag |= 2;
 		for (i = 0; i < m_keyPosNum; ++i)
 		{
-			fp->Read(&m_keyPos[i].time, 4);
+			fp->Read(&m_keyPos[i].t, 4);
 			fp->Read(&m_keyPos[i].pos.x, 4);
 			fp->Read(&m_keyPos[i].pos.y, 4);
 			fp->Read(&m_keyPos[i].pos.z, 4);
-			if (t < m_keyPos[i].time)
-				t = m_keyPos[i].time;
+			if (t < m_keyPos[i].t)
+				t = m_keyPos[i].t;
 		}
 	}
 	fp->Read(&m_keyRotNum, 4);
@@ -3400,15 +3400,15 @@ float WBone::LoadAnimationKey(cFile* fp)
 		m_keyRot = new w_keyframe_rot[m_keyRotNum];
 		for (i = 0; i < m_keyRotNum; ++i)
 		{
-			fp->Read(&m_keyRot[i].time, 4);
+			fp->Read(&m_keyRot[i].t, 4);
 			fp->Read(&rot.x, 4);
 			fp->Read(&rot.y, 4);
 			fp->Read(&rot.z, 4);
 			fp->Read(&rot.w, 4);
 			rot.Normalize();
 			m_keyRot[i].rot = rot;
-			if (t < m_keyRot[i].time)
-				t = m_keyRot[i].time;
+			if (t < m_keyRot[i].t)
+				t = m_keyRot[i].t;
 		}
 	}
 	fp->Read(&n, 4);
@@ -3822,9 +3822,9 @@ void WBone::ReplaceKeyframe(WBone* bone, float time)
 		{
 			m_keyRotNum = 2;
 			m_keyRot = new w_keyframe_rot[2];
-			m_keyRot[0].time = 0;
+			m_keyRot[0].t = 0;
 			m_keyRot[0].rot = qSrc;
-			m_keyRot[1].time = time;
+			m_keyRot[1].t = time;
 			m_keyRot[1].rot = qSrc;
 			m_keyFlag |= 1;
 			m_flag.Disable(0x40);
@@ -3850,9 +3850,9 @@ void WBone::ReplaceKeyframe(WBone* bone, float time)
 			return;
 		m_keyPosNum = 2;
 		m_keyPos = new w_keyframe_pos[2];
-		m_keyPos[0].time = 0;
+		m_keyPos[0].t = 0;
 		m_keyPos[0].pos = vSrc;
-		m_keyPos[1].time = time;
+		m_keyPos[1].t = time;
 		m_keyPos[1].pos = vSrc;
 	}
 	m_keyFlag |= 2;
@@ -4133,14 +4133,14 @@ WBone::w_normalmerge::w_normalmerge(WPuppet& puppet)
 
 void WBone::w_normalmerge::AddVertex(w_mesh* mesh, int index)
 {
-	std::vector<P>& plist = m_wlist[mesh->weightList[index]];
+	PLIST& plist = m_wlist[mesh->weightList[index]];
 	P* p = Find(plist, mesh->vecList[index]);
 	if (p == 0)
 	{
 		plist.push_back(P(mesh->vecList[index]));
 		p = &*plist.rbegin();
 	}
-	std::vector<N>& nlist = p->m_meshList[mesh];
+	NLIST& nlist = p->m_meshList[mesh];
 	N* n = Find(nlist, mesh->normList[index]);
 	if (n == 0)
 	{
@@ -4152,25 +4152,24 @@ void WBone::w_normalmerge::AddVertex(w_mesh* mesh, int index)
 
 void WBone::w_normalmerge::MergeNormal(void)
 {
-	std::map<float, std::vector<P> >::const_iterator w;
+	WLIST::const_iterator w;
 	for (w = m_wlist.begin(); w != m_wlist.end(); w++)
 	{
-		std::vector<P>::const_iterator p;
+		PLIST::const_iterator p;
 		for (p = (*w).second.begin(); p != (*w).second.end(); p++)
 		{
-			std::map<w_mesh*, std::vector<N> >::const_iterator m;
+			MLIST::const_iterator m;
 			for (m = (*p).m_meshList.begin(); m != (*p).m_meshList.end(); m++)
 			{
 				w_mesh* mesh = (*m).first;
 				if (mesh->myNormalList == 0)
 					continue;
-				std::vector<N>::const_iterator n;
+				NLIST::const_iterator n;
 				for (n = (*m).second.begin(); n != (*m).second.end(); n++)
 				{
 					int index = *(*n).m_idxList.begin();
 					bool merged = false;
-					std::map<w_mesh*, std::vector<N> >::const_iterator other =
-						m;
+					MLIST::const_iterator other = m;
 					for (other++; other != (*p).m_meshList.end(); other++)
 					{
 						w_mesh* mesh2 = (*other).first;
@@ -4178,7 +4177,7 @@ void WBone::w_normalmerge::MergeNormal(void)
 							continue;
 						if (stricmp(mesh->mpetName, mesh2->mpetName) == 0)
 							continue;
-						std::vector<N>::const_iterator n2;
+						NLIST::const_iterator n2;
 						for (n2 = (*other).second.begin();
 							n2 != (*other).second.end(); n2++)
 						{
@@ -4203,10 +4202,10 @@ void WBone::w_normalmerge::MergeNormal(void)
 
 void WBone::w_normalmerge::NormalizeMergedNormals(void)
 {
-	std::map<float, std::vector<P> >::const_iterator w;
-	std::vector<P>::const_iterator p;
-	std::map<w_mesh*, std::vector<N> >::const_iterator m;
-	std::vector<N>::const_iterator n;
+	WLIST::const_iterator w;
+	PLIST::const_iterator p;
+	MLIST::const_iterator m;
+	NLIST::const_iterator n;
 
 	for (w = m_wlist.begin(); w != m_wlist.end(); w++)
 	{
@@ -4241,13 +4240,13 @@ void WBone::w_normalmerge::ApplyToBlendedNormalList(void)
 	float weight;
 	std::list<w_mesh*> meshList;
 
-	std::map<float, std::vector<P> >::const_iterator w;
+	WLIST::const_iterator w;
 	for (w = m_wlist.begin(); w != m_wlist.end(); w++)
 	{
-		std::vector<P>::const_iterator p;
+		PLIST::const_iterator p;
 		for (p = (*w).second.begin(); p != (*w).second.end(); p++)
 		{
-			std::map<w_mesh*, std::vector<N> >::const_iterator m;
+			MLIST::const_iterator m;
 			for (m = (*p).m_meshList.begin(); m != (*p).m_meshList.end(); m++)
 			{
 				mesh = (*m).first;
@@ -4296,12 +4295,12 @@ void WBone::w_normalmerge::ApplyToBlendedNormalList(void)
 	}
 }
 
-WBone::w_normalmerge::P* __fastcall WBone::w_normalmerge::Find(
-	std::vector<P>& plist, const WVector& p)
+WBone::w_normalmerge::P* __fastcall WBone::w_normalmerge::Find(PLIST& plist,
+	const WVector& p)
 {
-	std::vector<P>::iterator it;
+	PLIST::iterator it;
 	it = plist.begin();
-	std::vector<P>::iterator last = plist.end();
+	PLIST::iterator last = plist.end();
 	while (it != last)
 	{
 		if (WisEqual((*it).m_p, p, 0.001f))
@@ -4311,12 +4310,12 @@ WBone::w_normalmerge::P* __fastcall WBone::w_normalmerge::Find(
 	return 0;
 }
 
-WBone::w_normalmerge::N* __fastcall WBone::w_normalmerge::Find(
-	std::vector<N>& nlist, const WVector& n)
+WBone::w_normalmerge::N* __fastcall WBone::w_normalmerge::Find(NLIST& nlist,
+	const WVector& n)
 {
-	std::vector<N>::iterator it;
+	NLIST::iterator it;
 	it = nlist.begin();
-	std::vector<N>::iterator last = nlist.end();
+	NLIST::iterator last = nlist.end();
 	while (it != last)
 	{
 		if (WisEqual((*it).m_n, n, 0.001f))

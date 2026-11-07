@@ -1,11 +1,3 @@
-// HACK!
-namespace
-{
-	typedef int t0;
-	typedef int t1;
-	typedef int t2;
-}
-
 #include "minatl.h"
 #include "detailedroominfodlg.h"
 #include "passworddlg.h"

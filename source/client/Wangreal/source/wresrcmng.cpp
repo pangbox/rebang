@@ -93,7 +93,7 @@ void WResourceManager::Unlock(rmlType_t type)
 
 void WResourceManager::UnlockAllByThread(unsigned long threadID)
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < RML_COUNT; i++)
 		m_lock[i].UnlockInThread(threadID);
 }
 
@@ -1818,10 +1818,6 @@ WxStaticPuppetGrp* WResourceManager::xGetStaticPuppetGrp(int nSPets,
 
 	delete grp;
 	return 0;
-}
-
-__forceinline WView::~WView()
-{
 }
 
 #include "wmemblock.inl"

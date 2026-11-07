@@ -111,8 +111,8 @@ public:
 	void GetWindowName(std::string& outName) const;
 	void GetWindowName(char* lpszNameBuf, unsigned int nBuffMax) const;
 	unsigned int GetWindowNameLength() const;
-	void EnableToolTip(bool enable);
-	bool IsEnableToolTip() const;
+	void EnableToolTip(bool enable) { m_nFlags.Turn(FWF_TOOLTIPS, enable); }
+	bool IsEnableToolTip() const { return m_nFlags.GetFlag(FWF_TOOLTIPS); }
 	void SetToolTipText(const std::string& text);
 	std::string GetToolTipText() const { return m_wndToolTip; }
 	void SetFixTooltipWnd(const WPoint& pos);

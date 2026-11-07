@@ -228,7 +228,7 @@ void WPuppet::UpdateLightSource(LightSet* light, bool enable, WScene* scene)
 	m_rootbone->SetLight(light);
 	int mode = m_lightmode;
 	if (enable)
-		mode = mode | 0x8000000;
+		mode = mode | W_LIGHT_ADD;
 	m_rootbone->CalcLight(light, true, mode, scene);
 }
 
@@ -311,7 +311,7 @@ WBoneSet* WPuppet::GetBones(const char* name, float time, int mode, char* bone,
 			if (bone != 0)
 			{
 				WBone* found = add->rootbone->FindBone(bone, 0);
-				if ((mode & 4) == 0)
+				if ((mode & EXCEPTPARENT) == 0)
 				{
 					found->InsertBoneSetList(time - add->s, set, 1);
 				}
@@ -340,7 +340,7 @@ WBoneSet* WPuppet::GetBones(const char* name, float time, int mode, char* bone,
 			if (found != 0)
 				m_boneList.AddItem(found, found->m_name, false);
 		}
-		if ((mode & 4) == 0)
+		if ((mode & EXCEPTPARENT) == 0)
 		{
 			found->InsertBoneSetList(time, set, 1);
 		}
@@ -357,7 +357,7 @@ WBoneSet* WPuppet::GetBones(const char* name, float time, int mode, char* bone,
 			item->InsertBoneSetList(time, set, 1);
 	}
 keyed:
-	if (mode & 1)
+	if (mode & FIXEDPIVOT)
 	{
 		WBoneKey* key = set->FindBoneKey(m_rootbone->GetBoneMotionName());
 		if (key != 0 && (key->flags & 2) != 0)
@@ -1348,20 +1348,26 @@ void WPuppet::ApplyFaceAnimation(char* name, float time)
 	}
 }
 
-int WPuppet::SeekChunkFromPET(cFile* file, char* tag)
+struct WPuppet::w_pet_chunk
+{
+	char id[4];
+	unsigned long length;
+};
+
+int WPuppet::SeekChunkFromPET(cFile* fp, char* str)
 {
 	int pos = 0;
-	while (pos < file->m_nLen)
+	while (pos < fp->m_nLen)
 	{
-		file->Seek(pos, 0);
-		char head[8];
-		file->Read(head, 8);
-		if (memcmp(tag, head, 4) == 0)
+		fp->Seek(pos, 0);
+		w_pet_chunk chunk;
+		fp->Read(&chunk, sizeof(chunk));
+		if (memcmp(str, chunk.id, 4) == 0)
 		{
-			file->Seek(pos + 8, 0);
+			fp->Seek(pos + sizeof(chunk), 0);
 			return 1;
 		}
-		pos += *(int*)(head + 4) + 8;
+		pos += chunk.length + sizeof(chunk);
 	}
 	return 0;
 }
@@ -1841,48 +1847,50 @@ void WPuppet::LoadPET_Collision(cFile* file)
 	}
 }
 
-void WPuppet::LoadPET_Frame(cFile* file)
+void WPuppet::LoadPET_Frame(cFile* fp)
 {
-	char name[1024];
-	char text[4][1024];
-	int count;
-	int check;
-	if (SeekChunkFromPET(file, "FRAM") == 0)
+	char buffer[4][1024];
+	int data[2];
+	int framenum;
+	unsigned long size;
+	int offset;
+	int framecheck;
+	char framedata[1024];
+	int n;
+	if (SeekChunkFromPET(fp, "FRAM") == 0)
 		return;
-	file->Read(&count, 4);
-	if (count <= 0)
+	fp->Read(&offset, 4);
+	if (offset <= 0)
 		return;
-	if (count > 10000)
+	if (offset > 10000)
 		return;
-	m_framenum = count;
+	m_framenum = offset;
 	m_frame = (w_share_pet_data::w_frame*)g_mem.Alloc(m_framenum * 12);
-	for (int i = 0; i < count; ++i)
+	for (n = 0; n < offset; ++n)
 	{
-		int length;
-		int num;
-		int head[2];
-		file->Read(&head[0], 4);
-		num = head[0];
-		char* line = text[0];
+		fp->Read(&data[0], 4);
+		framenum = data[0];
+		char* line = buffer[0];
 		for (int k = 0; k < 3; ++k)
 		{
 			memset(line, 0, 1024);
-			file->Read(&length, 4);
-			file->Read(line, length);
+			fp->Read(&size, 4);
+			fp->Read(line, size);
 			line += 1024;
 		}
-		memset(name, 0, 1024);
-		memcpy(name, text[0], strlen(text[0]) < 1024 ? strlen(text[0]) : 1024);
-		if (count <= 1 && strcmp(name, "") == 0)
+		memset(framedata, 0, 1024);
+		memcpy(framedata, buffer[0],
+			strlen(buffer[0]) < 1024 ? strlen(buffer[0]) : 1024);
+		if (offset <= 1 && strcmp(framedata, "") == 0)
 			return;
-		file->Read(&check, 4);
-		if (check == 0)
-			check = -1;
-		m_frame[i].num = num;
-		m_frame[i].check = check;
-		m_frame[i].data = (char*)g_mem.Alloc((int)strlen(name) + 1);
-		strcpy(m_frame[i].data, name);
-		char* found = strstr(m_frame[i].data, "msg");
+		fp->Read(&framecheck, 4);
+		if (framecheck == 0)
+			framecheck = -1;
+		m_frame[n].num = framenum;
+		m_frame[n].check = framecheck;
+		m_frame[n].data = (char*)g_mem.Alloc((int)strlen(framedata) + 1);
+		strcpy(m_frame[n].data, framedata);
+		char* found = strstr(m_frame[n].data, "msg");
 		while (found != 0)
 		{
 			int c = 0;

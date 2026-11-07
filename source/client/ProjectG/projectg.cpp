@@ -19,7 +19,7 @@
 #include "messengerdlg.h"
 #include "gmtoolkit.h"
 #include "replaydlg.h"
-#include "matchingsystem.h"
+#include "dlgquickstartsetting.h"
 #include "pangfbi.h"
 #include "eventthread.h"
 #include "messagemanager.h"

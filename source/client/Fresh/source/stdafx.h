@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <objbase.h>
 
+#include <algorithm>
 #include <list>
 #include <math.h>
 // HACK!
@@ -171,19 +172,6 @@ namespace
 			v += 1;
 			v += 1;
 			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
 		}
 	};
 }
@@ -194,8 +182,6 @@ namespace
 #include "../../Wangreal/include/woverlay.h"
 #include "../../Wangreal/include/wfont.h"
 #include "inputmanager.h"
-// HACK: This just exists to push IL offsets. It is unused.
-#include <algorithm>
 
 // HACK! TU IL filler for frform.cpp and frwnd.cpp
 // clang-format off

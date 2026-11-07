@@ -9,9 +9,9 @@ const WVector WVector::UNIT_NEG_Y(0.0f, -1.0f, 0.0f);
 const WVector WVector::UNIT_NEG_Z(0.0f, 0.0f, -1.0f);
 const WMatrix WMatrix::IDENTITY(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 	1.0f);
-__declspec(align(8)) const WMatrix4 WMatrix4::IDENTITY(1.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-__declspec(align(8)) const WVector4 WVector4::ONE(1.0f, 1.0f, 1.0f, 1.0f);
+const WMatrix4 WMatrix4::IDENTITY(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+const WVector4 WVector4::ONE(1.0f, 1.0f, 1.0f, 1.0f);
 
 float* costable = 0;
 float* sqrttable = 0;
@@ -19,25 +19,22 @@ float* acostable = 0;
 const WVector WVector::ZERO(0.0f, 0.0f, 0.0f);
 const WMatrix WMatrix::ZERO(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 	0.0f);
-__declspec(align(8)) const WMatrix4 WMatrix4::ZERO(0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-__declspec(align(8)) const WVector4 WVector4::ZERO(0.0f, 0.0f, 0.0f, 0.0f);
+const WMatrix4 WMatrix4::ZERO(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+const WVector4 WVector4::ZERO(0.0f, 0.0f, 0.0f, 0.0f);
 
-Waabb& Waabb::operator+=(const WVector& vector)
+void WMatrix::Rotate(float angle, char direct)
 {
-	if (vector.x > 0.0f)
-		max.x += vector.x;
+	if (direct >= 3)
+		*this = RotMat(angle, direct - 3) * *this;
 	else
-		min.x += vector.x;
-	if (vector.y > 0.0f)
-		max.y += vector.y;
-	else
-		min.y += vector.y;
-	if (vector.z > 0.0f)
-		max.z += vector.z;
-	else
-		min.z += vector.z;
-	return *this;
+		*this = *this * RotMat(angle, direct);
+}
+
+void WMatrix::Rotate(const WVector& rotation)
+{
+	*this = *this *
+		(RotMat(rotation.x, 0) * RotMat(rotation.y, 1) * RotMat(rotation.z, 2));
 }
 
 void WMatrix::Normalize()
@@ -98,28 +95,22 @@ void WQuat::SetFromAxisAngle(const WVector& vector, float theta)
 	w = (float)cos(halfTheta);
 }
 
-void WQuat::ConvertToAxisAngle(WVector* vector, float* theta)
+void WQuat::ConvertToAxisAngle(WVector* v, float* fTheta)
 {
-	float cosine;
-	*(unsigned long*)&cosine = *(unsigned long*)&w;
+	float cosine = w;
 	float angle = (float)acos((double)cosine);
-	*theta = 2.0f * angle;
-	float absoluteTheta;
-	if (*(unsigned long*)theta & 0x80000000)
-		absoluteTheta = -*theta;
-	else
-		absoluteTheta = *theta;
-	if (absoluteTheta < g_EPSILON)
+	*fTheta = 2.0f * angle;
+	if (WisZero(*fTheta))
 	{
-		vector->x = 1.0f;
-		vector->y = 0.0f;
-		vector->z = 0.0f;
+		v->x = 1.0f;
+		v->y = 0.0f;
+		v->z = 0.0f;
 		return;
 	}
-	float sinValue = 1.0f / (float)sin(*theta * 0.5f);
-	vector->x = sinValue * x;
-	vector->y = sinValue * y;
-	vector->z = sinValue * z;
+	float sinValue = 1.0f / (float)sin(*fTheta * 0.5f);
+	v->x = sinValue * x;
+	v->y = sinValue * y;
+	v->z = sinValue * z;
 }
 
 void WQuat::ConvertToRotationMatrix(WMatrix& rotation) const
@@ -258,28 +249,14 @@ WVector __fastcall MinPointLineSegment(WVector& vp, WVector& va, WVector& vb,
 	return vdiff;
 }
 
-void __cdecl UninitMath()
-{
-}
-
-void WMatrix::Rotate(float angle, char direct)
-{
-	if (direct >= 3)
-		*this = RotMat(angle, direct - 3) * *this;
-	else
-		*this = *this * RotMat(angle, direct);
-}
-
-void WMatrix::Rotate(const WVector& rotation)
-{
-	*this = *this *
-		(RotMat(rotation.x, 0) * RotMat(rotation.y, 1) * RotMat(rotation.z, 2));
-}
-
 void __cdecl InitMath()
 {
 	// HACK: symbol ordering workaround...
 	Abs(0.0f);
+}
+
+void __cdecl UninitMath()
+{
 }
 
 float __cdecl CalcDeltaAngle(const WVector& v1, const WVector& v2)
@@ -304,10 +281,9 @@ float __cdecl CalcDeltaAngle(const WVector& v1, const WVector& v2)
 	*(unsigned long*)&vb.x = xBits.bits;
 	*(unsigned long*)&vb.y = yBits.bits;
 	*(unsigned long*)&vb.z = zBits.bits;
-	float la = (float)sqrt(va.x * va.x + va.y * va.y + va.z * va.z);
-	float lb = (float)sqrt(vb.x * vb.x + vb.y * vb.y + vb.z * vb.z);
-	if ((*(unsigned long*)&la & 0x80000000 ? -la : la) < g_EPSILON ||
-		(*(unsigned long*)&lb & 0x80000000 ? -lb : lb) < g_EPSILON)
+	float la = va.Magnitude();
+	float lb = vb.Magnitude();
+	if (WisZero(la) || WisZero(lb))
 		return 0.0f;
 	float angle = acosf(Between<float>(-1.0f, va * vb / (la * lb), 1.0f));
 	return v2.x * v1.z - v2.z * v1.x > 0.0f ? angle : -angle;
@@ -326,12 +302,7 @@ float __fastcall WCollisionTest(const Waabb& origin, const WVector& vec,
 	float t2;
 	for (int i = 0; i < 3; i++)
 	{
-		float absoluteComponent;
-		if (*(unsigned long*)&vec.p[i] & 0x80000000)
-			absoluteComponent = -vec.p[i];
-		else
-			absoluteComponent = vec.p[i];
-		if (absoluteComponent < g_EPSILON)
+		if (WisZero(vec.p[i]))
 			continue;
 		if (vec.p[i] > 0.0f)
 			t2 = 1.0f - (area.max.p[i] - target.min.p[i]) / vec.p[i];
@@ -346,12 +317,7 @@ float __fastcall WCollisionTest(const Waabb& origin, const WVector& vec,
 
 	if (direct >= 3 || t >= 1.0f)
 		return 1.0f;
-	float absoluteT;
-	if (*(unsigned long*)&t & 0x80000000)
-		absoluteT = -t;
-	else
-		absoluteT = t;
-	if ((Abs(t), absoluteT) < g_EPSILON)
+	if (WisZero(t))
 		return 0.0f;
 
 	WVector gap;

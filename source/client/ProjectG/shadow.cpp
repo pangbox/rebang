@@ -209,12 +209,12 @@ bool CShadow::Setup(WView* view, const LightSet& light, const WSphere& bsphere,
 	if (light.type == 2)
 	{
 		dist = bsphere.radius + 1000000.0f;
-		WVector eye = bsphere.pos - light.nearOne * dist;
+		WVector eye = bsphere.pos - light.nearone * dist;
 		cam = MakeCameraMatrix(eye, bsphere.pos);
 	}
 	else
 	{
-		cam = MakeCameraMatrix(light.nearOne, bsphere.pos);
+		cam = MakeCameraMatrix(light.nearone, bsphere.pos);
 		dist = WVector::UNIT_POS_Z * (bsphere.pos * ~cam);
 	}
 

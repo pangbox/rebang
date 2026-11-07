@@ -17,7 +17,7 @@ public:
 	void CreateOptionWindow();
 	bool IsActive();
 
-	bool HasOptionWindow();
+	bool HasOptionWindow() { return m_pOptionDlg ? true : false; }
 
 protected:
 	bool OnQuitFormResult(int result, FrForm* pForm);

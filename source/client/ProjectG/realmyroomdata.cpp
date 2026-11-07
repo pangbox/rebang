@@ -1,7 +1,6 @@
 #include "minatl.h"
 #include "ntavatar.h"
 #include "realmyroomdata.h"
-#include "realmyroommain.h"
 #include "actor.h"
 #include "commonutil.h"
 #include "fresh.h"

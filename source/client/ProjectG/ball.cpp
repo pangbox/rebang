@@ -115,7 +115,7 @@ void CBall::OnInit()
 	m_matrix.Reset();
 	m_down = 0;
 	m_downStart = -1;
-	m_light.nearOne = g_lightset.nearOne;
+	m_light.nearone = g_lightset.nearone;
 }
 
 CBall::sBall* CBall::AddBall(unsigned long typeId)

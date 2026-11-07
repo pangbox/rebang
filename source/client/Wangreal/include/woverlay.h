@@ -63,12 +63,13 @@ protected:
 	unsigned int m_texHeight;
 	unsigned int m_devTexWidth;
 	unsigned int m_devTexHeight;
+
+private:
 	WRect m_clipArea;
 	bool m_clipFlag;
 	int m_coordMode;
 
-private:
 	static WTVertex m_vtx[4];
 	static WTVertex* m_vl[5];
-	static WTVertex* m_vtxList[10];
+	static WTVertex* m_vtxList[9];
 };

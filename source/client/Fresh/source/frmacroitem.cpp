@@ -1,51 +1,9 @@
-#include <list>
-#include <string>
+#include "frmacroitem.h"
+#include "frelement.h"
+#include "frwndmanager.h"
 
 // HACK: stands in for an unknown erased inline use of __rtti_obj
 static __declspec(thread) int __rtti_tls_pad;
-
-class FrCmdTarget;
-class FrWnd;
-class FrWndManager;
-
-class FrGuiItem
-{
-public:
-	char unknown_00[8];
-	std::string m_resource;
-};
-
-class FrElementMacroItem
-{
-public:
-	char unknown_00[0x24];
-	std::list<FrGuiItem*> m_guiList;
-};
-
-class FrElementDoc
-{
-public:
-	FrElementMacroItem* GetMacroItem(const std::string& name);
-};
-
-class FrWndManager
-{
-public:
-	FrElementDoc* GetDocument() const;
-	FrWnd* DoCreate(FrGuiItem& item, FrWndManager* manager, FrWnd* parent,
-		FrCmdTarget* owner);
-};
-
-class FrMacroItem
-{
-public:
-	FrMacroItem();
-	void SetOwner(FrCmdTarget* owner);
-	void Init(FrGuiItem& item, FrWndManager* manager, FrWnd* parent);
-
-private:
-	FrCmdTarget* m_pOwner;
-};
 
 FrMacroItem::FrMacroItem()
 	: m_pOwner(0)

@@ -144,21 +144,3 @@ protected:
 
 	DECLARE_FRESH_MSGMAP()
 };
-
-namespace nsInvalidCheck
-{
-	struct _invalidPwd
-	{
-		bool bInvalid;
-
-		_invalidPwd()
-			: bInvalid(false)
-		{
-		}
-		void operator()(char c)
-		{
-			if (c == ' ')
-				bInvalid = true;
-		}
-	};
-}

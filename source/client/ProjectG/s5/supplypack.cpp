@@ -5,26 +5,7 @@
 #include "../../shared/sharedtables.h"
 #include "minatl.h"
 
-inline WVector2D& WVector2D::Normalize()
-{
-	if (WisZero(x) && WisZero(y))
-		*this *= 0.0f;
-	else
-		*this *= 1.0f / Magnitude();
-	return *this;
-}
-
 extern Fresh* g_pFresh;
-
-inline bool FrWnd::IsEnableToolTip() const
-{
-	return m_nFlags.GetFlag(1);
-}
-
-inline void FrWnd::EnableToolTip(bool enable)
-{
-	m_nFlags.Turn(1, enable);
-}
 
 class CFontAnimation
 {

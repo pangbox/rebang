@@ -25,7 +25,6 @@ struct _WRECT
 	float x, y, w, h;
 };
 
-#pragma optimize("a", on)
 class WPoint : public _WPOINT
 {
 public:
@@ -35,80 +34,42 @@ public:
 		this->x = x;
 		this->y = y;
 	}
-	WPoint(WPoint& p);
-	WPoint(WPoint* p);
-	void Offset(WPoint& p);
-	void Offset(float dx, float dy);
-	int operator==(WPoint& _p) const;
-	int operator!=(WPoint& _p) const;
-	void operator+=(WPoint& p);
-	void operator-=(WPoint& p);
-	WPoint operator-() const;
-	WPoint operator+(WPoint& p) const;
-	WPoint operator-(WPoint& _p) const;
+	WPoint(WPoint& p)
+	{
+		x = p.x;
+		y = p.y;
+	}
+	WPoint(WPoint* p)
+	{
+		x = p->x;
+		y = p->y;
+	}
+	void Offset(WPoint& p)
+	{
+		x += p.x;
+		y += p.y;
+	}
+	void Offset(float dx, float dy)
+	{
+		x += dx;
+		y += dy;
+	}
+	int operator==(WPoint& _p) const { return (x == _p.x && y == _p.y); }
+	int operator!=(WPoint& _p) const { return !(x == _p.x && y == _p.y); }
+	void operator+=(WPoint& p)
+	{
+		x += p.x;
+		y += p.y;
+	}
+	void operator-=(WPoint& p)
+	{
+		x -= p.x;
+		y -= p.y;
+	}
+	WPoint operator-() const { return WPoint(-x, -y); }
+	WPoint operator+(WPoint& p) const { return WPoint(x + p.x, y + p.y); }
+	WPoint operator-(WPoint& _p) const { return WPoint(x - _p.x, y - _p.y); }
 };
-
-#pragma optimize("", on)
-inline WPoint::WPoint(WPoint& p)
-{
-	x = p.x;
-	y = p.y;
-}
-
-inline WPoint::WPoint(WPoint* p)
-{
-	x = p->x;
-	y = p->y;
-}
-
-inline void WPoint::Offset(WPoint& p)
-{
-	x += p.x;
-	y += p.y;
-}
-
-inline void WPoint::Offset(float dx, float dy)
-{
-	x += dx;
-	y += dy;
-}
-
-inline int WPoint::operator==(WPoint& _p) const
-{
-	return (x == _p.x && y == _p.y);
-}
-
-inline int WPoint::operator!=(WPoint& _p) const
-{
-	return !(x == _p.x && y == _p.y);
-}
-
-inline void WPoint::operator+=(WPoint& p)
-{
-	x += p.x;
-	y += p.y;
-}
-
-inline void WPoint::operator-=(WPoint& p)
-{
-	x -= p.x;
-	y -= p.y;
-}
-
-inline WPoint WPoint::operator-() const
-{
-	return WPoint(-x, -y);
-}
-
-inline WPoint WPoint::operator+(WPoint& p) const
-{
-	return WPoint(x + p.x, y + p.y);
-}
-
-inline WPoint WPoint::operator-(WPoint& _p) const
-{
-	return WPoint(x - _p.x, y - _p.y);
-}
 
 class WSize : public _WSIZE
 {
@@ -149,8 +110,7 @@ public:
 class WRect : public _WRECT
 {
 public:
-	__forceinline WRect() { }
-
+	WRect() { }
 	template <class Width, class Height>
 	WRect(float x, float y, Width width, Height height)
 	{
@@ -159,6 +119,8 @@ public:
 		this->w = width;
 		this->h = height;
 	}
+	template <class Width, class Height>
+	WRect(const WPoint& pt, Width width, Height height);
 	template <>
 	WRect(float x, float y, float width, float height)
 	{
@@ -167,6 +129,8 @@ public:
 		this->w = width;
 		this->h = height;
 	}
+	template <>
+	WRect(const WPoint& pt, float width, float height);
 	WRect(const WRect& rect)
 	{
 		x = rect.x;
@@ -181,17 +145,6 @@ public:
 		w = rect.w;
 		h = rect.h;
 	}
-	WRect operator+(WPoint& point) const;
-	WRect operator-(WPoint& point) const;
-	WRect operator+(WRect& rect) const;
-	float Right() const { return w + x; }
-	float Bottom() const { return h + y; }
-	int operator!=(WRect& rect) const
-	{
-		return !(x == rect.x && y == rect.y && w == rect.w && h == rect.h);
-	}
-	bool IsInRect(const WPoint& point);
-	bool IsInRect(float x, float y);
 	WRect(const WPoint& pt, const WSize& size)
 	{
 		x = pt.x;
@@ -199,21 +152,50 @@ public:
 		w = size.w;
 		h = size.h;
 	}
-	template <class Width, class Height>
-	WRect(const WPoint& pt, Width width, Height height);
-
+	int operator==(WRect& rect) const;
+	int operator!=(WRect& rect) const
+	{
+		return !(x == rect.x && y == rect.y && w == rect.w && h == rect.h);
+	}
+	void operator+=(WSize& size);
+	void operator-=(WSize& size);
+	WRect operator+(WRect& rect) const;
+	WRect operator+(WPoint& point) const
+	{
+		return WRect(x + point.x, y + point.y, w, h);
+	}
+	WRect operator-(WPoint& point) const
+	{
+		return WRect(x - point.x, y - point.y, w, h);
+	}
+	WRect operator-(WRect& rect) const;
 	WPoint TopLeft() const { return WPoint(x, y); }
 	WSize Size() const { return WSize(w, h); }
+	float Right() const { return w + x; }
+	float Bottom() const { return h + y; }
+	bool IsInRect(float x, float y)
+	{
+		if (x >= this->x && this->x + w >= x && y >= this->y &&
+			this->y + h >= y)
+			return true;
+		return false;
+	}
+	bool IsInRect(const WPoint& point)
+	{
+		if (point.x >= x && point.x <= x + w && point.y >= y &&
+			point.y <= y + h)
+			return true;
+		return false;
+	}
 };
 
-inline WRect WRect::operator+(WPoint& point) const
+template <class Width, class Height>
+inline WRect::WRect(const WPoint& pt, Width width, Height height)
 {
-	return WRect(x + point.x, y + point.y, w, h);
-}
-
-inline WRect WRect::operator-(WPoint& point) const
-{
-	return WRect(x - point.x, y - point.y, w, h);
+	x = pt.x;
+	y = pt.y;
+	w = (float)width;
+	h = (float)height;
 }
 
 template <>
@@ -228,27 +210,4 @@ inline WRect::WRect(const WPoint& pt, float width, float height)
 inline WRect WRect::operator+(WRect& rect) const
 {
 	return WRect(x + rect.x, y + rect.y, w + rect.w, h + rect.h);
-}
-
-template <class Width, class Height>
-inline WRect::WRect(const WPoint& pt, Width width, Height height)
-{
-	x = pt.x;
-	y = pt.y;
-	w = (float)width;
-	h = (float)height;
-}
-
-inline bool WRect::IsInRect(float x, float y)
-{
-	if (x >= this->x && this->x + w >= x && y >= this->y && this->y + h >= y)
-		return true;
-	return false;
-}
-
-inline bool WRect::IsInRect(const WPoint& point)
-{
-	if (point.x >= x && point.x <= x + w && point.y >= y && point.y <= y + h)
-		return true;
-	return false;
 }

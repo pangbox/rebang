@@ -31,14 +31,14 @@ FrEmoticon::FrEmoticon(FrWndManager* pManager)
 
 FrEmoticon::~FrEmoticon()
 {
-	std::vector<sEmoticon*>::iterator e;
+	EMOTICONLIST_itr e;
 	for (e = m_Emoticons.begin(); e != m_Emoticons.end(); e++)
 	{
 		(*e)->Frames.clear();
 		delete *e;
 	}
 	m_Emoticons.clear();
-	std::map<std::string, WOverlay*>::iterator i;
+	RESMAP_itr i;
 	for (i = m_ResMap.begin(); i != m_ResMap.end(); i++)
 		if (g_resrcmng && (*i).second)
 		{
@@ -71,8 +71,7 @@ void FrEmoticon::SetClippingArea(WRect* clip)
 {
 	m_pManager->GetGDI()->SetClippingArea(clip);
 	m_overlay->SetClippingArea(clip);
-	for (std::map<std::string, WOverlay*>::iterator i = m_ResMap.begin();
-		i != m_ResMap.end(); i++)
+	for (RESMAP_itr i = m_ResMap.begin(); i != m_ResMap.end(); i++)
 		i->second->SetClippingArea(clip);
 }
 
@@ -417,7 +416,7 @@ bool FrEmoticon::LoadXml(const char* FileName)
 			TiXmlElement* Anim = AnimNode->ToElement();
 			std::string Res = Anim->Attribute("res");
 			ParseAnimFrame(Anim->Attribute("frame"), Emoticon->Frames);
-			std::map<std::string, WOverlay*>::iterator i = m_ResMap.find(Res);
+			RESMAP_itr i = m_ResMap.find(Res);
 			if (i == m_ResMap.end())
 			{
 				WOverlay* overlay = g_resrcmng->GetOverlay(Res.c_str(), 0);

@@ -31,7 +31,8 @@ enum rmlType_t
 {
 	RML_TEXTURE_LOADING = 0,
 	RML_BITMAP_LOADING = 1,
-	RML_PUPPET_LOADING = 2
+	RML_PUPPET_LOADING = 2,
+	RML_COUNT = 3
 };
 
 struct w_texlist
@@ -88,6 +89,8 @@ public:
 	void Release(WResource* resrc);
 	void Release(WPuppet* puppet, bool bForceDeleteOrigin);
 	void Release(int texhandle);
+	void Release(WSoundFx* sound);
+	void Release(WStreamSFX* stream);
 	void Release(WFont* font);
 	void Release(WTitleFont* font);
 	void ReleaseAllPets();
@@ -176,7 +179,7 @@ private:
 	WResrcCache<WFont*> fontList;
 	WList<WSoundFx*> voiceList;
 	WList<WResource*> originList;
-	WLock m_lock[3];
+	WLock m_lock[RML_COUNT];
 
 	friend class WView;
 	friend class WOverlay;

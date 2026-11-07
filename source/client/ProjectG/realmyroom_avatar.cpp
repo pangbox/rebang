@@ -124,7 +124,7 @@ CRealMyRoom_Avatar::CRealMyRoom_Avatar(const sSlotInfo& slotInfo,
 
 	m_light.type = 2;
 	m_light.ambient = ModifyColor(g_lightset.ambient, 1.0f);
-	m_light.nearOne = g_lightset.nearOne;
+	m_light.nearone = g_lightset.nearone;
 	m_fxBox.Init(g_resrcmng);
 	m_fxBox.SetCamera(&g_camera);
 	m_fxBox.m_frameTime = 100.0f / 3.0f;
@@ -138,11 +138,6 @@ CRealMyRoom_Avatar::~CRealMyRoom_Avatar()
 	m_texPartList.clear();
 
 	m_fxBox.ClearAll(false);
-}
-
-void CRealMyRoom_Avatar::SetHeadIcon(int headIcon)
-{
-	m_headIcon = headIcon;
 }
 
 bool CRealMyRoom_Avatar::IsTargetPositionChanged(bool bChanged)
@@ -689,9 +684,9 @@ void CRealMyRoom_Avatar::Process(float elapsed)
 
 	if (CRealMyRoom_AvatarManager::Instance()->m_pMyAvatar == this &&
 		(CSharedDoc::Instance()->m_myInfo.info.dwFlagBlock & 8))
-		m_headIcon = 3;
+		SetHeadIcon(3);
 	else
-		m_headIcon = -1;
+		SetHeadIcon(-1);
 
 	m_prevState = m_state;
 	ProcessMotion(elapsed);
@@ -961,12 +956,12 @@ void CRealMyRoom_Avatar::Render()
 		{
 			if (CRealMyRoom_AvatarManager::Instance()->m_pPickedAvatar == this)
 			{
-				m_light.nearOne = g_lightset.nearOne;
+				m_light.nearone = g_lightset.nearone;
 				m_light.diffuse = m_light.ambient = 0xffffffff;
 			}
 			else
 			{
-				m_light.nearOne = g_lightset.nearOne;
+				m_light.nearone = g_lightset.nearone;
 				m_light.ambient = 0xffd2d2d2;
 				m_light.diffuse = ModifyColor(g_lightset.diffuse,
 					GetPVS().GetShadowIntensity(pos));

@@ -18,8 +18,8 @@ class FrCreateNickDlg : public FrForm
 	void SetNick(const char* nick);
 	void ReceiveCheckCode(int code);
 
-	void SetCheckFlag(bool bCheck);
-	bool GetCheckFlag() const;
+	void SetCheckFlag(bool bCheck) { m_bCheck = bCheck; }
+	bool GetCheckFlag() const { return m_bCheck; }
 
 protected:
 	void OnEmoticonInit(int param);

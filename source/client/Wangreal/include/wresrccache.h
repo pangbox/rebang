@@ -7,26 +7,12 @@ template <class T>
 class WResrcCache
 {
 public:
-	struct w_origin
-	{
-		T resource;
-		int count;
-		int checkflag;
-		char name[1];
-	};
-
-	struct w_cache
-	{
-		w_origin* origin;
-		T resource;
-	};
-
-	__declspec(nothrow) WResrcCache()
+	WResrcCache()
 		: resrcList(32, 32), originList(16, 32)
 	{
 	}
 
-	__declspec(nothrow) ~WResrcCache()
+	~WResrcCache()
 	{
 		w_origin* origin = originList.Start();
 		while (origin)
@@ -41,6 +27,8 @@ public:
 			cache = resrcList.Next();
 		}
 	}
+
+	T FindResource(const char* name);
 
 	T FirstOrigin()
 	{
@@ -66,6 +54,9 @@ public:
 		return 0;
 	}
 
+	T FirstResource(const char* name);
+	T FirstResource(T resource);
+
 	T NextResource()
 	{
 		w_cache* cache = resrcList.Next();
@@ -74,6 +65,9 @@ public:
 		return 0;
 	}
 
+	T NextResource(const char* name);
+	T NextResource(T resource);
+
 	T FindOrigin(const char* name)
 	{
 		w_origin* origin = originList.Find(name);
@@ -81,6 +75,11 @@ public:
 			return origin->resource;
 		return 0;
 	}
+
+	T FindOrigin(T resource);
+	bool IsOrigin(T resource);
+	const char* GetOriginName(T resource);
+	const char* GetName(T resource);
 
 	char* FindIdleOrigin(char* first, int count)
 	{
@@ -162,7 +161,20 @@ private:
 		originList.AddItem(origin, origin->name, false);
 	}
 
-public:
+	struct w_origin
+	{
+		T resource;
+		int count;
+		int checkflag;
+		char name[1];
+	};
+
+	struct w_cache
+	{
+		w_origin* origin;
+		T resource;
+	};
+
 	WList<w_cache*> resrcList;
 	WList<w_origin*> originList;
 };

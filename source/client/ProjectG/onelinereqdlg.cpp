@@ -16,11 +16,6 @@
 extern Fresh* g_pFresh;
 extern WView* g_view;
 
-inline __int64 MyBonusCash()
-{
-	return Doc()->m_bonusCash;
-}
-
 IMPLEMENT_OBJECT(FrOnelineReqDlg, FrForm)
 
 BEGIN_FRESH_MSGMAP(FrOnelineReqDlg, FrForm)

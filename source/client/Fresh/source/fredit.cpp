@@ -731,7 +731,7 @@ void FrEdit::OnDraw()
 			ps.y = m_topMargin + (float)yPos + m_rect.y;
 			pe.y =
 				GDI()->GetFontHeight() + (float)m_topMargin + yPos + m_rect.y;
-			GDI()->Line(ps, pe, m_dwCaretColor, m_dwCaretColor2);
+			GDI()->Line(ps, pe, m_dwCaretColor, m_dwCaretColor2, 0);
 		}
 		emo->SetAnim(false);
 	}

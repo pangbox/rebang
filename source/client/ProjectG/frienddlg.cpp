@@ -9,11 +9,10 @@
 #include "frwndmanager.h"
 #include "frgraphicinterface.h"
 #include "fresh.h"
+#include "binstr.h"
 #include "mathconsts.h"
 
 extern Fresh* g_pFresh;
-
-int __cdecl mbscut(char* dest, const char* src, unsigned int len);
 
 IMPLEMENT_OBJECT(FrFriendDlg, FrForm)
 

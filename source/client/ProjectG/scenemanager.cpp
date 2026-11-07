@@ -559,10 +559,13 @@ void CSceneManager::DropTest(void)
 	GolfBall().m_pos = PLAYER(GOLFDOC()->m_currentPlayer)->pos;
 }
 
-bool RenderOrder::operator()(const SceneElement& a, const SceneElement& b)
+struct RenderOrder
 {
-	return a.m_type < b.m_type;
-}
+	bool operator()(const SceneElement& a, const SceneElement& b)
+	{
+		return a.m_type < b.m_type;
+	}
+};
 
 void CSceneManager::Prerender(WView* pView)
 {
@@ -1087,14 +1090,6 @@ void CSceneManager::Render_RenderWaterStuff(WView* pView)
 	}
 }
 
-struct Greater
-{
-	WVector m_dir;
-
-	Greater(const WVector& dir);
-	bool operator()(const TransparentElement& a, const TransparentElement& b);
-};
-
 unsigned char CSceneManager::OverlapCamera(WView* pView,
 	const SceneElement& elem)
 {
@@ -1151,19 +1146,23 @@ unsigned char CSceneManager::OverlapCamera(WView* pView,
 	return (unsigned char)(ratio * 255.0f);
 }
 
-Greater::Greater(const WVector& dir)
-	: m_dir(dir)
+struct Greater
 {
-}
+	WVector m_dir;
 
-bool Greater::operator()(const TransparentElement& a,
-	const TransparentElement& b)
-{
-	const WVector& pa = a.m_pPuppet->GetBoundSphere().pos;
-	const WVector& pb = b.m_pPuppet->GetBoundSphere().pos;
-	return pa.x * m_dir.x + pa.y * m_dir.y + pa.z * m_dir.z >
-		pb.x * m_dir.x + pb.y * m_dir.y + pb.z * m_dir.z;
-}
+	Greater(const WVector& dir)
+		: m_dir(dir)
+	{
+	}
+
+	bool operator()(const TransparentElement& a, const TransparentElement& b)
+	{
+		const WVector& pa = a.m_pPuppet->GetBoundSphere().pos;
+		const WVector& pb = b.m_pPuppet->GetBoundSphere().pos;
+		return pa.x * m_dir.x + pa.y * m_dir.y + pa.z * m_dir.z >
+			pb.x * m_dir.x + pb.y * m_dir.y + pb.z * m_dir.z;
+	}
+};
 
 void CSceneManager::Render_RenderBillboardGroup(WView* pView)
 {

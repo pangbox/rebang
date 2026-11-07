@@ -2,15 +2,6 @@
 #include "christamseventdlg.h"
 #include "wresrcmng.h"
 
-inline WVector2D& WVector2D::Normalize()
-{
-	if (WisZero(x) && WisZero(y))
-		*this *= 0.0f;
-	else
-		*this *= 1.0f / Magnitude();
-	return *this;
-}
-
 extern Fresh* g_pFresh;
 
 IMPLEMENT_OBJECT(FrChristmasEventDlg, FrForm)
