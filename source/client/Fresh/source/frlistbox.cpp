@@ -8,21 +8,7 @@
 #include "chatmsg.h"
 #include "commonutil.h"
 
-IObject* FrListBoxMakeInstance()
-{
-	return new FrListBox;
-}
-
-struct __sFrListBox
-{
-	__sFrListBox()
-	{
-		ObjectFactory().AddObjectFunctor(FrListBoxMakeInstance, "FrListBox");
-	}
-};
-
-const WRTTI FrListBox::m_RTTI("FrListBox", &FrWnd::m_RTTI);
-static __sFrListBox __implFrListBox;
+IMPLEMENT_OBJECT(FrListBox, FrWnd)
 
 BEGIN_FRESH_MSGMAP(FrListBox, FrWnd)
 END_FRESH_MSGMAP()

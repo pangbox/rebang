@@ -11,11 +11,9 @@ class WPuppet;
 
 class GroundItem : public IObject, public NetSyncable
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-	friend IObject* GroundItemMakeInstance();
+	DECLARE_OBJECT(GroundItem)
 
+public:
 	GroundItem();
 	GroundItem(GroundItemMan* pMan, unsigned long id, GIMMICK_ITEM_TYPE type,
 		FieldItem::eDisposeTextureType texType, const char* modelName,

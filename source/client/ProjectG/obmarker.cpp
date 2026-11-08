@@ -4,8 +4,6 @@
 #include "quadtree.h"
 #include "w3dspr.h"
 
-unsigned char GetCurMap();
-
 CMarker::CMarker()
 	: m_sprite(NULL)
 {

@@ -29,8 +29,6 @@ const localContentType_t S4_RANGE_BUFF = (localContentType_t)0x70;
 extern WMatrix g_camera;
 extern Fresh* g_pFresh;
 
-void PerformPowerBarSetting();
-bool IsMyTurn(bool check);
 sPlayerData* PLAYER(unsigned char index);
 
 char* clubName[] = { "1W", "2W", "3W", "4W", "5W", "2I", "3I", "4I", "5I", "6I",

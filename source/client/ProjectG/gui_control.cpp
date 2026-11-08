@@ -53,8 +53,6 @@ extern Fresh* g_pFresh;
 
 extern WMatrix g_camera;
 
-float Random(float min, float max, int seed);
-
 IMPLEMENT_ACTOR(CScreen, IActor)
 
 CScreen::CScreen(void)

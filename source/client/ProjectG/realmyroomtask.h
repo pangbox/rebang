@@ -7,10 +7,7 @@ class CRealMyRoom_AvatarBurden;
 
 class CRealMyRoomTask : public CTask
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-	friend IObject* CRealMyRoomTaskMakeInstance();
+	DECLARE_OBJECT(CRealMyRoomTask)
 
 protected:
 	CRealMyRoomTask();

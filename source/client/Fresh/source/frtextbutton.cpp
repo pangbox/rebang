@@ -26,22 +26,7 @@
 #include "frcursor.h"
 #include "../../../shared/token.h"
 
-IObject* FrTextButtonMakeInstance()
-{
-	return new FrTextButton;
-}
-
-struct __sFrTextButton
-{
-	__sFrTextButton()
-	{
-		ObjectFactory().AddObjectFunctor(FrTextButtonMakeInstance,
-			"FrTextButton");
-	}
-};
-
-const WRTTI FrTextButton::m_RTTI("FrTextButton", &FrWnd::m_RTTI);
-static __sFrTextButton __implFrTextButton;
+IMPLEMENT_OBJECT(FrTextButton, FrWnd)
 
 FrTextButton::FrTextButton()
 {

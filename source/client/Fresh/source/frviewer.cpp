@@ -8,20 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-IObject* FrViewerMakeInstance()
-{
-	return new FrViewer;
-}
-
-struct __sFrViewer
-{
-	__sFrViewer()
-	{
-		ObjectFactory().AddObjectFunctor(FrViewerMakeInstance, "FrViewer");
-	}
-};
-const WRTTI FrViewer::m_RTTI("FrViewer", &FrWnd::m_RTTI);
-static __sFrViewer __implFrViewer;
+IMPLEMENT_OBJECT(FrViewer, FrWnd)
 
 FrViewer::FrViewer()
 {

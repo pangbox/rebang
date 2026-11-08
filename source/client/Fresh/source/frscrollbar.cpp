@@ -4,22 +4,7 @@
 #include "frgraphicinterface.h"
 #include "wutil.h"
 
-IObject* FrScrollBarMakeInstance()
-{
-	return new FrScrollBar;
-}
-
-struct __sFrScrollBar
-{
-	__sFrScrollBar()
-	{
-		ObjectFactory().AddObjectFunctor(FrScrollBarMakeInstance,
-			"FrScrollBar");
-	}
-};
-
-const WRTTI FrScrollBar::m_RTTI("FrScrollBar", &FrWnd::m_RTTI);
-static __sFrScrollBar __implFrScrollBar;
+IMPLEMENT_OBJECT(FrScrollBar, FrWnd)
 
 FrScrollBar::FrScrollBar()
 {

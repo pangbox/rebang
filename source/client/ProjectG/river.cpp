@@ -41,8 +41,6 @@ CRiver::~CRiver()
 	}
 }
 
-const char* __fastcall GetCurMapName();
-
 void CRiver::ReadAttribute(const char* name)
 {
 	int index[2] = { -1, -1 };

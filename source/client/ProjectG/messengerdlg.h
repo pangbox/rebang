@@ -62,11 +62,9 @@ struct sChatSlot
 
 class FrMessengerDlg : public FrForm
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-	friend IObject* FrMessengerDlgMakeInstance();
+	DECLARE_OBJECT(FrMessengerDlg)
 
+public:
 	FrMessengerDlg();
 
 	virtual bool Close(bool bResult);

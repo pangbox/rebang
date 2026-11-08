@@ -155,8 +155,6 @@ extern int causticAlpha;
 extern WInputDev* g_ime;
 extern Fresh* g_pFresh;
 
-void PerformPowerBarSetting();
-
 int _POSTMSG(const void* pSender, const char* pTarget, int msg, int param1,
 	int param2, int param3, unsigned long param4)
 {

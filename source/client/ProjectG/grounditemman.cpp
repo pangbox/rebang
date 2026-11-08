@@ -7,23 +7,7 @@
 #include "wresrcmng.h"
 #include "mathconsts.h"
 
-IObject* GroundItemManMakeInstance()
-{
-	return new GroundItemMan;
-}
-
-struct __impGroundItemMan
-{
-	__impGroundItemMan()
-	{
-		ObjectFactory().AddObjectFunctor(GroundItemManMakeInstance,
-			"GroundItemMan");
-		ActorFactory().AddActorClass("GroundItemMan");
-	}
-};
-
-const WRTTI GroundItemMan::m_RTTI("GroundItemMan", &NetSyncActor::m_RTTI);
-static __impGroundItemMan __implGroundItemMan;
+IMPLEMENT_ACTOR(GroundItemMan, NetSyncActor)
 
 unsigned int GroundItemMan::ms_initCnt = 0;
 

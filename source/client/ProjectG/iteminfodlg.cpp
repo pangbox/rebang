@@ -3,9 +3,6 @@
 #include "uccmanager.h"
 #include "../../shared/localize.h"
 
-bool IsAngelWing(unsigned long typeId);
-bool IsMannerPlayer();
-
 extern Fresh* g_pFresh;
 
 IMPLEMENT_OBJECT(FrItemInfoDlg, FrForm)

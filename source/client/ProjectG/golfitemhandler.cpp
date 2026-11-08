@@ -8,7 +8,6 @@
 static const float WARNING_RATE = 80.0f;
 
 extern Fresh* g_pFresh;
-unsigned char GetCurMap();
 
 using namespace _gateway;
 

@@ -9,8 +9,6 @@
 #include "netresourcemanager.h"
 #include "../../shared/localize.h"
 
-sItemInfo* GetMyItemInfo(unsigned long id);
-
 extern Fresh* g_pFresh;
 
 IMPLEMENT_OBJECT(FrSpCardUseDlg, FrForm)

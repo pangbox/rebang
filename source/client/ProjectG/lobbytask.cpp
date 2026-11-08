@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "ggc_wrapper.h"
 
 #include "networksystem.h"
 #include <windows.h>
@@ -42,7 +43,6 @@ void RequestUccInfo(sRoomSlot& slot);
 
 extern HWND g_hwnd;
 
-void _GGC_SendUserID(const char* userId);
 extern int g_iRecvPacketType;
 
 void RecvRSS(int)

@@ -2,8 +2,6 @@
 #include "golfdoc.h"
 #include "clock.h"
 
-bool IsMyTurn(bool bCheck);
-
 IMPLEMENT_ACTOR(CClock, IActor)
 
 CClock::CClock()

@@ -59,8 +59,6 @@ static const char* g_faceTexture[10][4] = {
 
 #include "balloontext.h"
 
-unsigned long ModifyColor(unsigned long color, float factor);
-
 CRealMyRoom_Avatar::CRealMyRoom_Avatar(const sSlotInfo& slotInfo,
 	const sCharacterInfo& charInfo, CRealMyRoomMain* pMain)
 	: m_bones(true), m_prevBones(true)

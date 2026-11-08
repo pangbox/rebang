@@ -35,7 +35,6 @@
 #include "jukeboxdlg.h"
 #include "shadow.h"
 
-int WisZero(const float& value, float epsilon);
 extern Fresh* g_pFresh;
 bool g_SALoadingState = false;
 extern WMatrix g_camera;
@@ -46,8 +45,6 @@ extern LightSet g_lightset;
 static const char s_commands[5][64] = { "\xb0\xc5\xc0\xce",
 	"\xbf\xd5\xb8\xd3\xb8\xae", "\xb1\xa4\xbc\xd3", "\xb9\xdd\xc2\xa6\xc0\xcc",
 	"" };
-
-float Random(float min, float max, int seed);
 
 IMPLEMENT_ACTOR(ntAvatarChatMain, CTaskMain)
 

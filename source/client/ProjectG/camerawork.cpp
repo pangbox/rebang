@@ -28,8 +28,6 @@ static char s_scriptCmd[1024];
 
 extern WMatrix g_camera;
 
-float Random(float min, float max, int seed);
-
 sCameraSelectionData puttTable[] = {
 	{ 1,  false, false },
 	{ 1,  false, false },

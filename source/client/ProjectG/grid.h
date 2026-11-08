@@ -10,9 +10,7 @@ protected:
 
 public:
 	virtual ~CGrid() { }
-	static const WRTTI m_RTTI;
-	friend IObject* CGridMakeInstance();
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(CGrid)
 
 	virtual void OnPreLoadInit();
 	virtual void OnLoad();

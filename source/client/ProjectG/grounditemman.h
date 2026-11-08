@@ -17,10 +17,9 @@ class GroundItemMan : public NetSyncActor, public CRenderFuncPtr
 	friend class GroundItem;
 	friend class CPangInfo;
 
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(GroundItemMan)
 
+public:
 	GroundItemMan();
 	virtual ~GroundItemMan();
 

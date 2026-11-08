@@ -62,7 +62,6 @@ extern int g_iSendFailType;
 extern int g_iRecvDisconCode;
 extern int g_iSendPacketType;
 extern int g_iRecvPacketType;
-bool IsMyTurn(bool bCheck);
 void RequestUccInfo(sUserInfo& info);
 extern const char* ball_stop_replay_data_name;
 
@@ -4968,7 +4967,6 @@ void CGolfRule::DispatchMatchItems()
 	}
 }
 
-bool IsMyTurn(bool bTeam);
 extern Fresh* g_pFresh;
 
 void CGolfRule::ChangeGameMode(unsigned long mode)
@@ -9353,8 +9351,6 @@ void CGolfRule::DoDebugCamera(float delta)
 	g_camera = MakeCameraMatrix(m_cameraPos, m_cameraTarget);
 }
 
-bool IsMyTurn(bool check);
-
 void CGolfRule::DoStand(float delta)
 {
 	if (Doc()->m_userInfo[GOLFDOC()->m_currentPlayer].info.dwIdentity & 1)
@@ -10502,7 +10498,6 @@ bool CGolfRule::StandViewClick()
 	return false;
 }
 
-bool IsMyTurn(bool check);
 extern Fresh* g_pFresh;
 
 bool CGolfRule::TopViewClick()
@@ -11559,8 +11554,6 @@ WMatrix CGolfRule::BankCamera(float angle)
 {
 	return RotMat(angle, 2) * g_camera;
 }
-
-bool IsMyTurn(bool bCheck);
 
 void CGolfRule::Replay(bool bAuto)
 {

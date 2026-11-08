@@ -90,8 +90,6 @@ namespace
 	}
 }
 
-int WisZero(const float& f, float eps);
-
 bool IsGameType(unsigned char type)
 {
 	return Doc()->m_golfGame.gameType == type ? true : false;

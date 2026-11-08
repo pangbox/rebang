@@ -7,20 +7,7 @@
 
 typedef std::map<std::string, std::string> FrParamMap;
 
-IObject* FrGaugeBarMakeInstance()
-{
-	return new FrGaugeBar;
-}
-
-struct __sFrGaugeBar
-{
-	__sFrGaugeBar()
-	{
-		ObjectFactory().AddObjectFunctor(FrGaugeBarMakeInstance, "FrGaugeBar");
-	}
-};
-const WRTTI FrGaugeBar::m_RTTI("FrGaugeBar", &FrWnd::m_RTTI);
-static __sFrGaugeBar __implFrGaugeBar;
+IMPLEMENT_OBJECT(FrGaugeBar, FrWnd)
 
 FrGaugeBar::FrGaugeBar()
 {
@@ -199,21 +186,7 @@ void FrGaugeBar::OnDraw()
 	}
 }
 
-IObject* FrGaugeBarExMakeInstance()
-{
-	return new FrGaugeBarEx;
-}
-
-struct __sFrGaugeBarEx
-{
-	__sFrGaugeBarEx()
-	{
-		ObjectFactory().AddObjectFunctor(FrGaugeBarExMakeInstance,
-			"FrGaugeBarEx");
-	}
-};
-const WRTTI FrGaugeBarEx::m_RTTI("FrGaugeBarEx", &FrGaugeBar::m_RTTI);
-static __sFrGaugeBarEx __implFrGaugeBarEx;
+IMPLEMENT_OBJECT(FrGaugeBarEx, FrGaugeBar)
 
 BEGIN_FRESH_MSGMAP(FrGaugeBarEx, FrGaugeBar)
 ON_FRESH_VV("left", FRCMD_LBUTTONDOWN, FrGaugeBarEx::OnLLButtonDown)
@@ -433,21 +406,7 @@ void FrGaugeBarEx::MoveWindow(const WPoint& point)
 	m_barRect.y = (float)m_thickness + m_gaugeRect.y;
 }
 
-IObject* FrGaugeBarImageMakeInstance()
-{
-	return new FrGaugeBarImage;
-}
-
-struct __sFrGaugeBarImage
-{
-	__sFrGaugeBarImage()
-	{
-		ObjectFactory().AddObjectFunctor(FrGaugeBarImageMakeInstance,
-			"FrGaugeBarImage");
-	}
-};
-const WRTTI FrGaugeBarImage::m_RTTI("FrGaugeBarImage", &FrGaugeBar::m_RTTI);
-static __sFrGaugeBarImage __implFrGaugeBarImage;
+IMPLEMENT_OBJECT(FrGaugeBarImage, FrGaugeBar)
 
 FrGaugeBarImage::FrGaugeBarImage()
 {

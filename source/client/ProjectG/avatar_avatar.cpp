@@ -19,7 +19,6 @@
 
 extern Fresh* g_pFresh;
 const char* GetStrConst(const char* pSrc, char* pDest);
-float Random(float min, float max, int seed);
 
 // clang-format off
 static const char* s_faceTextures[10][4] = {

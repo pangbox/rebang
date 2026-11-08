@@ -1,19 +1,6 @@
 #include "frgroupbox.h"
 
-struct __sFrGroupBox
-{
-	__sFrGroupBox();
-};
-
-IObject* FrGroupBoxMakeInstance()
-{
-	return new FrGroupBox;
-}
-
-__sFrGroupBox::__sFrGroupBox()
-{
-	ObjectFactory().AddObjectFunctor(FrGroupBoxMakeInstance, "FrGroupBox");
-}
+IMPLEMENT_OBJECT(FrGroupBox, FrWnd)
 
 FrGroupBox::FrGroupBox()
 {
@@ -46,7 +33,3 @@ void FrGroupBox::Init(FrGuiItem& item, FrWndManager* manager, FrWnd* parent)
 			manager->DoCreate(**it, manager, this, m_pOwner);
 	}
 }
-
-const WRTTI FrGroupBox::m_RTTI("FrGroupBox", &FrWnd::m_RTTI);
-
-static __sFrGroupBox __implFrGroupBox;

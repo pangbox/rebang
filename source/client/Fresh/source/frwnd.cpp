@@ -16,18 +16,7 @@ typedef std::list<FrWnd*> FRWNDLIST;
 
 FrToolTip* FrWnd::m_pToolTip = NULL;
 
-IObject* FrWndMakeInstance()
-{
-	return new FrWnd;
-}
-
-struct __sFrWnd
-{
-	__sFrWnd() { ObjectFactory().AddObjectFunctor(FrWndMakeInstance, "FrWnd"); }
-};
-
-const WRTTI FrWnd::m_RTTI("FrWnd", &IObject::m_RTTI);
-static __sFrWnd __implFrWnd;
+IMPLEMENT_OBJECT(FrWnd, IObject)
 
 FrWnd::FrWnd()
 	: m_nFlags(0),

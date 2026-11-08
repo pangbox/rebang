@@ -17,21 +17,7 @@ bool FrForm::ms_bHasTail = true;
 bool FrForm::ms_bExclusive = false;
 WPoint FrForm::ms_oldPos;
 
-IObject* FrFormMakeInstance()
-{
-	return new FrForm;
-}
-
-struct __sFrForm
-{
-	__sFrForm()
-	{
-		ObjectFactory().AddObjectFunctor(FrFormMakeInstance, "FrForm");
-	}
-};
-
-const WRTTI FrForm::m_RTTI("FrForm", &FrWnd::m_RTTI);
-static __sFrForm __implFrForm;
+IMPLEMENT_OBJECT(FrForm, FrWnd)
 
 BEGIN_FRESH_MSGMAP(FrForm, FrCmdTarget)
 ON_FRESH_VV("ok", FRCMD_LBUTTONUP, FrForm::OnFreshOkay)

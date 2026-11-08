@@ -7,21 +7,7 @@
 #include "frelement.h"
 #include "frgraphicinterface.h"
 
-IObject* FrAreaMakeInstance()
-{
-	return new FrArea;
-}
-
-struct __sFrArea
-{
-	__sFrArea()
-	{
-		ObjectFactory().AddObjectFunctor(FrAreaMakeInstance, "FrArea");
-	}
-};
-
-const WRTTI FrArea::m_RTTI("FrArea", &FrWnd::m_RTTI);
-static __sFrArea __implFrArea;
+IMPLEMENT_OBJECT(FrArea, FrWnd)
 
 FrArea::FrArea()
 	: m_pBitmap(NULL)

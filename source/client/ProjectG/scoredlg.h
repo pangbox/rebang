@@ -3,6 +3,7 @@
 #include "frform.h"
 
 #include "frgraphicinterface.h"
+class FrArea;
 struct sRivalData;
 class FrScoreDlg : public FrForm
 {
@@ -101,3 +102,5 @@ protected:
 
 	DECLARE_FRESH_MSGMAP()
 };
+
+void ResizeScoreBar23(FrArea* bar2, FrArea* bar3, float x, float w);

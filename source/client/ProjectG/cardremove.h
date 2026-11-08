@@ -4,10 +4,9 @@
 
 class FrCardRemove : public FrForm
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrCardRemove)
 
+public:
 	FrCardRemove();
 	virtual ~FrCardRemove();
 
@@ -50,10 +49,9 @@ protected:
 
 class FrCardRemoveConfirm : public FrForm
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrCardRemoveConfirm)
 
+public:
 	FrCardRemoveConfirm();
 	virtual ~FrCardRemoveConfirm();
 
@@ -80,10 +78,9 @@ public:
 
 class FrCardRemoveResult : public FrForm
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrCardRemoveResult)
 
+public:
 	enum eRESULT
 	{
 		RESULT_ERROR,

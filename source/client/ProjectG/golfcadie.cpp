@@ -37,8 +37,6 @@ extern unsigned long g_CurrentTime;
 extern LightSet g_lightset;
 extern WMatrix g_camera;
 
-int WisZero(const float& value, float eps);
-
 // HACK!
 static const float constants[3] = { 3.1415927410125732f, 0.01745329238474369f,
 	3.4028234663852886e+38f };

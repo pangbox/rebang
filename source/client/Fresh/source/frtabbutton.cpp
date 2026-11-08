@@ -26,22 +26,7 @@
 #include "commonutil.h"
 #include "../../../shared/token.h"
 
-IObject* FrTabButtonMakeInstance()
-{
-	return new FrTabButton;
-}
-
-struct __sFrTabButton
-{
-	__sFrTabButton()
-	{
-		ObjectFactory().AddObjectFunctor(FrTabButtonMakeInstance,
-			"FrTabButton");
-	}
-};
-
-const WRTTI FrTabButton::m_RTTI("FrTabButton", &FrWnd::m_RTTI);
-static __sFrTabButton __implFrTabButton;
+IMPLEMENT_OBJECT(FrTabButton, FrWnd)
 
 FrTabButton::FrTabButton()
 {

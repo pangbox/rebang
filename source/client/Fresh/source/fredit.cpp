@@ -15,21 +15,7 @@
 #include "commonutil.h"
 #include "../../../shared/token.h"
 
-IObject* FrEditMakeInstance()
-{
-	return new FrEdit;
-}
-
-struct __sFrEdit
-{
-	__sFrEdit()
-	{
-		ObjectFactory().AddObjectFunctor(FrEditMakeInstance, "FrEdit");
-	}
-};
-
-const WRTTI FrEdit::m_RTTI("FrEdit", &FrWnd::m_RTTI);
-static __sFrEdit __implFrEdit;
+IMPLEMENT_OBJECT(FrEdit, FrWnd)
 
 extern int __fastcall float2int(float);
 

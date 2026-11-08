@@ -10,21 +10,7 @@
 #include "wpuppet.h"
 #include "mathconsts.h"
 
-IObject* GroundItemMakeInstance()
-{
-	return new GroundItem;
-}
-
-struct __sGroundItem
-{
-	__sGroundItem()
-	{
-		ObjectFactory().AddObjectFunctor(GroundItemMakeInstance, "GroundItem");
-	}
-};
-
-const WRTTI GroundItem::m_RTTI("GroundItem", &IObject::m_RTTI);
-static __sGroundItem __implGroundItem;
+IMPLEMENT_OBJECT(GroundItem, IObject)
 
 unsigned int GroundItem::ms_initCnt = 0;
 bool GroundItem::ms_greenItemJackpot = false;

@@ -1,9 +1,8 @@
 #include "mainframe.h"
+#include "ggc_wrapper.h"
 
 extern WMatrix g_camera;
 extern bool g_bQuit;
-
-int _GGC_CheckGameMon();
 
 static float s_lastGameMonCheck;
 

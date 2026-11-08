@@ -749,6 +749,7 @@ public:
 };
 
 int OnlinePlay();
+void PerformPowerBarSetting();
 bool SetCurMap(unsigned char map);
 unsigned char GetCurMap();
 bool IsCurMapSnow();

@@ -31,8 +31,6 @@
 
 extern Fresh* g_pFresh;
 
-void ResizeScoreBar23(FrArea* bar2, FrArea* bar3, float x, float w);
-
 const char* SCORE_PPL_DIR = "./score_ppl";
 bool ApproachRankCompare(const void* a, const void* b)
 {

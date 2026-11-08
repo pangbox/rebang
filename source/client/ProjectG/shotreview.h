@@ -23,10 +23,7 @@ public:
 
 class ShotReview : public IActor, public CRenderFuncPtr
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-	friend IObject* ShotReviewMakeInstance();
+	DECLARE_OBJECT(ShotReview)
 
 protected:
 	ShotReview();

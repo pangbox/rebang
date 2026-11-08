@@ -10,9 +10,7 @@ protected:
 
 public:
 	virtual ~CGuideLine() { }
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-	friend IObject* CGuideLineMakeInstance();
+	DECLARE_OBJECT(CGuideLine)
 	virtual void OnPreLoadInit();
 	virtual void OnLoad();
 	virtual void OnInit();

@@ -6,21 +6,7 @@
 #include "frgraphicinterface.h"
 #include "fremoticon.h"
 
-IObject* FrFrameMakeInstance()
-{
-	return new FrFrame;
-}
-
-struct __sFrFrame
-{
-	__sFrFrame()
-	{
-		ObjectFactory().AddObjectFunctor(FrFrameMakeInstance, "FrFrame");
-	}
-};
-
-const WRTTI FrFrame::m_RTTI("FrFrame", &FrWnd::m_RTTI);
-static __sFrFrame __implFrFrame;
+IMPLEMENT_OBJECT(FrFrame, FrWnd)
 
 FrFrame::FrFrame()
 	: m_pItem(NULL), m_pFrame(NULL)

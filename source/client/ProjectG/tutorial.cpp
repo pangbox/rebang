@@ -20,9 +20,6 @@ extern WMatrix g_camera;
 extern CInputManager* g_input;
 extern bool g_bQuit;
 
-char* MakeStr(const char* format, ...);
-bool SetCurMap(unsigned char map);
-
 IMPLEMENT_ACTOR(CTutorial, CTaskMain)
 
 struct sTutorialInfo

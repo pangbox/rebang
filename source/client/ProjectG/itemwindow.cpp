@@ -11,8 +11,6 @@
 #include "cardsystem.h"
 #include "wbone.h"
 
-void PerformPowerBarSetting();
-
 inline CItemWindow::~CItemWindow()
 {
 }

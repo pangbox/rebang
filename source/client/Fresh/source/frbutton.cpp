@@ -8,21 +8,7 @@
 #include "frcursor.h"
 #include "capturedbg.h"
 
-IObject* FrButtonMakeInstance()
-{
-	return new FrButton;
-}
-
-struct __sFrButton
-{
-	__sFrButton()
-	{
-		ObjectFactory().AddObjectFunctor(FrButtonMakeInstance, "FrButton");
-	}
-};
-
-const WRTTI FrButton::m_RTTI("FrButton", &FrWnd::m_RTTI);
-static __sFrButton __implFrButton;
+IMPLEMENT_OBJECT(FrButton, FrWnd)
 
 FrButton::FrButton()
 {

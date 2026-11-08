@@ -5,21 +5,7 @@
 #include "frgraphicinterface.h"
 #include "commonutil.h"
 
-IObject* FrStaticMakeInstance()
-{
-	return new FrStatic;
-}
-
-struct __sFrStatic
-{
-	__sFrStatic()
-	{
-		ObjectFactory().AddObjectFunctor(FrStaticMakeInstance, "FrStatic");
-	}
-};
-
-const WRTTI FrStatic::m_RTTI("FrStatic", &FrWnd::m_RTTI);
-static __sFrStatic __implFrStatic;
+IMPLEMENT_OBJECT(FrStatic, FrWnd)
 
 FrStatic::FrStatic()
 {

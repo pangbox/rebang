@@ -12,21 +12,7 @@
 #include "chatmsg.h"
 #include "commonutil.h"
 
-IObject* FrComboBoxMakeInstance()
-{
-	return new FrComboBox;
-}
-
-struct __sFrComboBox
-{
-	__sFrComboBox()
-	{
-		ObjectFactory().AddObjectFunctor(FrComboBoxMakeInstance, "FrComboBox");
-	}
-};
-
-const WRTTI FrComboBox::m_RTTI("FrComboBox", &FrEdit::m_RTTI);
-static __sFrComboBox __implFrComboBox;
+IMPLEMENT_OBJECT(FrComboBox, FrEdit)
 
 BEGIN_FRESH_MSGMAP(FrComboBox, FrEdit)
 ON_FRESH_VV("unfold", FRCMD_LBUTTONUP, FrComboBox::OnUnfold)
@@ -334,22 +320,7 @@ void FrComboBox::Enable(bool enable)
 		m_pButton->Enable(enable);
 }
 
-IObject* FrComboCtlExMakeInstance()
-{
-	return new FrComboCtlEx;
-}
-
-struct __sFrComboCtlEx
-{
-	__sFrComboCtlEx()
-	{
-		ObjectFactory().AddObjectFunctor(FrComboCtlExMakeInstance,
-			"FrComboCtlEx");
-	}
-};
-
-const WRTTI FrComboCtlEx::m_RTTI("FrComboCtlEx", &FrWnd::m_RTTI);
-static __sFrComboCtlEx __implFrComboCtlEx;
+IMPLEMENT_OBJECT(FrComboCtlEx, FrWnd)
 
 BEGIN_FRESH_MSGMAP(FrComboCtlEx, FrEdit)
 ON_FRESH_VV("unfold", FRCMD_LBUTTONUP, FrComboCtlEx::OnUnfold)

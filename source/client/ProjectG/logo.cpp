@@ -3,8 +3,6 @@
 #include "golfdoc.h"
 #include "logo.h"
 
-unsigned char GetCurMap();
-
 IMPLEMENT_ACTOR(CLogo, IActor)
 CLogo::CLogo()
 	: m_pLogo(NULL)

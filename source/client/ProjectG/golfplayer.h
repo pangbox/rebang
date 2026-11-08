@@ -17,9 +17,7 @@ class CGolfPlayer : public IActor
 {
 public:
 	virtual ~CGolfPlayer() { }
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-	friend IObject* CGolfPlayerMakeInstance();
+	DECLARE_OBJECT(CGolfPlayer)
 
 	virtual void OnPreLoadInit();
 	virtual void OnLoad();

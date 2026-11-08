@@ -7,21 +7,7 @@
 #include "background.h"
 #include "wresrcmng.h"
 
-IObject* FrDesktopMakeInstance()
-{
-	return new FrDesktop;
-}
-
-struct __sFrDesktop
-{
-	__sFrDesktop()
-	{
-		ObjectFactory().AddObjectFunctor(FrDesktopMakeInstance, "FrDesktop");
-	}
-};
-
-const WRTTI FrDesktop::m_RTTI("FrDesktop", &FrWnd::m_RTTI);
-static __sFrDesktop __implFrDesktop;
+IMPLEMENT_OBJECT(FrDesktop, FrWnd)
 
 FrDesktop::FrDesktop()
 	: m_pBackGround(NULL), m_bShow(false)

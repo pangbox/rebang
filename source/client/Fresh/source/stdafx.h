@@ -193,7 +193,7 @@ namespace
 		struct TuPad \
 		{ \
 			int v; \
-			void g() { FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 } \
+			void g() { FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 v += 1; v += 1; } \
 		}; \
 	}
 #define FRESH_TU_ILFILL_FRWND \
@@ -202,7 +202,7 @@ namespace
 		struct TuPad \
 		{ \
 			int v; \
-			void g() { FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; } \
+			void g() { FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; } \
 		}; \
 	}
 // clang-format on
