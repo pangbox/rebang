@@ -71,7 +71,11 @@ public:
 		WCrypticValue<float> barSpeed;
 	};
 
-	CClub();
+	CClub()
+		: m_pClub(NULL), m_clubList(16, 8)
+	{
+		Init();
+	}
 	~CClub();
 	float GetAirNightLuckyRange(char* name);
 	float GetAirNightLuckyPower(char* name);

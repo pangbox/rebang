@@ -14,12 +14,11 @@ const float g_HUGE = 3.402823466e+38f;
 const float g_EPSILON = 0.00001f;
 const float g_CM_TO_WU = 0.32f;
 
-// This is a placeholder; there were probably inlines that used these
-// constants, but we have not recovered them yet.
+// This is a placeholder; there was probably an inline that used this
+// constant, but we have not recovered it yet.
 inline void InstantiateWangrealMathInlines()
 {
-	(void)(g_PI, g_2_PI, g_PI_DIV_2);
-	(void)(g_HUGE, g_EPSILON, g_CM_TO_WU);
+	(void)(g_CM_TO_WU);
 }
 
 inline float Wabs(const float& value)
@@ -390,7 +389,14 @@ public:
 			return true;
 		return false;
 	}
-	bool IsInclude(const WSphere& sphere) const;
+	bool IsInclude(const WSphere& sphere) const
+	{
+		Waabb box(sphere.pos, sphere.pos);
+		WVector radius(sphere.radius, sphere.radius, sphere.radius);
+		box.min -= radius;
+		box.max += radius;
+		return IsInclude(box);
+	}
 	bool IsInclude(const Waabb& box) const
 	{
 		if (box.min.x >= min.x && box.max.x <= max.x && box.min.y >= min.y &&
@@ -400,8 +406,8 @@ public:
 	}
 	void Clear()
 	{
-		min = WVector(3.402823466e+38f, 3.402823466e+38f, 3.402823466e+38f);
-		max = WVector(-3.402823466e+38f, -3.402823466e+38f, -3.402823466e+38f);
+		min = WVector(g_HUGE, g_HUGE, g_HUGE);
+		max = WVector(-g_HUGE, -g_HUGE, -g_HUGE);
 	}
 	void AddPoint(const WVector& vector)
 	{

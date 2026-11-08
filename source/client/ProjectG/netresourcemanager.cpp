@@ -10,12 +10,6 @@
 #include "commonutil.h"
 #include <process.h>
 
-std::string GenerateTextureName_F(unsigned long, const char*);
-std::string GenerateTextureName_B(unsigned long, const char*);
-bool UnzipUccClothes(unsigned char*, unsigned long, Bitmap*, Bitmap*, Bitmap*,
-	sUccHeader*);
-bool LoadWarningClothes(unsigned int, Bitmap*, Bitmap*, Bitmap*);
-
 void G_CreateDirectory(const char* name)
 {
 	std::string path = name;

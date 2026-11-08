@@ -23,8 +23,6 @@
 #include "panggiftdlg.h"
 
 extern Fresh* g_pFresh;
-void RequestUccInfo(sCharacterInfo& character);
-void RequestUccInfo(sMailIncludeItem& item);
 
 IMPLEMENT_OBJECT(CRealMyRoomTask, CTask)
 

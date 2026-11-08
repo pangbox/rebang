@@ -21,10 +21,18 @@ enum eApproachMissionType
 
 enum eApproachPrizeType
 {
+	APPROACH_PRIZE_A = 0,
+	APPROACH_PRIZE_B = 1,
+	APPROACH_PRIZE_C = 2,
+	APPROACH_PRIZE_D = 3,
 };
 
 enum eApproachWinnerType
 {
+	WINNER_TYPE_NULL = 0,
+	WINNER_TYPE_A = 1,
+	WINNER_TYPE_B = 2,
+	WINNER_TYPE_ALL = 3,
 };
 
 #pragma pack(push, 1)

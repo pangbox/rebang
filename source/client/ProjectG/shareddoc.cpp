@@ -3345,5 +3345,3 @@ void PerformPowerBarSetting()
 	if (pScreen)
 		pScreen << MsgObject(NULL, 0xa1, (int)&pos, 0, 0, 0, 0);
 }
-
-ILFILLTU_SHAREDDOC

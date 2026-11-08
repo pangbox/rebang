@@ -7,8 +7,6 @@
 #include "mathconsts.h"
 #include <float.h>
 
-int CalcPowerPenalty(int upgrade);
-
 CStatBar::CStatBar(float gap, float height)
 {
 	m_gap = gap;

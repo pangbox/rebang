@@ -23,10 +23,6 @@ extern Fresh* g_pFresh;
 #include "dlgquickstartsetting.h"
 #include "messengerdlg.h"
 #include "ucclibrary.h"
-void RequestUccInfo(sCharacterInfo& character);
-void RequestUccInfo(sUserInfo& user);
-void RequestUccInfo(sUserInfoTime& user);
-void RequestUccInfo(sRoomSlot& slot);
 #include "intrusion.h"
 #include "mousecursor.h"
 #include "projectg.h"

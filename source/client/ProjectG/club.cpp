@@ -41,12 +41,6 @@ float bar_speed[17] = { 460.0f, 460.0f, 460.0f, 460.0f, 460.0f, 440.0f, 440.0f,
 float ground_accuracy[15] = { 8.0f, 8.0f, 0.0f, 1.0f, 5.0f, 5.0f, 5.0f, 5.0f,
 	5.0f, 0.0f, 0.0f, 5.0f, 0.0f, 1.0f, 0.0f };
 
-CClub::CClub()
-	: m_pClub(NULL), m_clubList(16, 8)
-{
-	Init();
-}
-
 CClub& GolfClub()
 {
 	static CClub s_club;

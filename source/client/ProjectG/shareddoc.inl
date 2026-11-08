@@ -157,6 +157,11 @@ inline unsigned char GetGameType()
 	return Doc()->m_golfGame.gameType;
 }
 
+inline bool IsGameType(unsigned char type)
+{
+	return Doc()->m_golfGame.gameType == type ? true : false;
+}
+
 inline void SetGameType(unsigned char gameType)
 {
 	Doc()->m_golfGame.gameType = gameType;

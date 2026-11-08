@@ -62,7 +62,6 @@ extern int g_iSendFailType;
 extern int g_iRecvDisconCode;
 extern int g_iSendPacketType;
 extern int g_iRecvPacketType;
-void RequestUccInfo(sUserInfo& info);
 extern const char* ball_stop_replay_data_name;
 
 ILFILLTU_GOLFRULE3

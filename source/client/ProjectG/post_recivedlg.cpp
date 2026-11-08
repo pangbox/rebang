@@ -7,7 +7,6 @@
 #include <algorithm>
 
 extern Fresh* g_pFresh;
-const Bitmap* GetUccItemIcon(unsigned long typeId, const char* uccIndex);
 
 IMPLEMENT_OBJECT(CPost_ReciveDlg, FrForm)
 BEGIN_FRESH_MSGMAP(CPost_ReciveDlg, FrForm)

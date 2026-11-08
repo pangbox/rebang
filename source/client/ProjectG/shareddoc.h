@@ -15,11 +15,9 @@ typedef std::list<unsigned long>::iterator GUID_LIST_IT;
 typedef std::map<unsigned long, unsigned char>::iterator INDEX_MAP_IT;
 typedef std::auto_ptr<std::string>::element_type AUTOSTRING_ELEM;
 #include "z_ilfill.h"
-ILPAIRSS0
 #include "polysoup.h"
 #include "golfdoc.h"
 #include "z_ilfill.h"
-ILPAIRSS
 ILFILL2
 #include "../../shared/localize.h"
 #include "hatmanager.h"

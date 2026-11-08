@@ -393,3 +393,5 @@ public:
 	bool IsNonVisibleItem(unsigned long typeId);
 	bool IsSubScriptionCoupon(unsigned long typeId);
 };
+
+int CalcPowerPenalty(int upgrade);

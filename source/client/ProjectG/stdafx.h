@@ -96,7 +96,6 @@ ILFILLF1
 #include "fredit.h"
 #include "frform.h"
 #include "frdesktop.h"
-ILFILLF2
 #include "frlistbox.h"
 #include "frcombobox.h"
 #include "frarea.h"
@@ -133,6 +132,8 @@ template void std::vector<WVector>::reserve(unsigned int);
 #include "uccmanager.h"
 #include "frtext.h"
 #include "wtemplate.h"
+#include <sstream>
+#include <fstream>
 
 // HACK: the PCH seems to instantiate these somewhere - it hasn't been recovered yet
 template const char& std::string::const_iterator::operator*() const;

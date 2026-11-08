@@ -14,8 +14,6 @@
 #include "mathconsts.h"
 #include <stdio.h>
 
-int CalcPowerPenalty(int upgrade);
-
 IMPLEMENT_OBJECT(CGolfDoc, CTaskDoc)
 
 std::stack<CGolfDoc*, std::list<CGolfDoc*> > CGolfDoc::m_GolfDocInstanceStack;

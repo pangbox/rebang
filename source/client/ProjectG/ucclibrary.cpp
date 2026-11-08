@@ -9,14 +9,6 @@
 
 extern Fresh* g_pFresh;
 
-bool UnzipUccClothes(unsigned char* data, unsigned long size, Bitmap* front,
-	Bitmap* back, Bitmap* icon, sUccHeader* header);
-void SetBrightness(sRGBA& color, sRGBA& brightness, sRGBA& result);
-
-std::string GenerateTextureName_F(unsigned long typeId, const char* index);
-std::string GenerateTextureName_B(unsigned long typeId, const char* index);
-void RequestUccInfo(sCharacterInfo& character);
-
 bool NoDrawArea(const Bitmap*, int, int, int, int);
 sRGBA GetAverageColor(const Bitmap*, int, int, int, int, bool);
 

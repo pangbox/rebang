@@ -24,7 +24,7 @@ public:
 		m_du = du;
 		m_dv = dv;
 	}
-	bool IsLoaded();
+	bool IsLoaded() { return m_pSplash != NULL; }
 
 protected:
 	WSplash* m_pSplash;

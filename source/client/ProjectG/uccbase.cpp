@@ -6,11 +6,6 @@
 #include "wresrcmng.h"
 #include <list>
 
-std::string GenerateTextureName_F(unsigned long, const char*);
-std::string GenerateTextureName_B(unsigned long, const char*);
-void MixColor(sRGBA&, sRGBA&, sRGBA&);
-void SetBrightness(sRGBA&, sRGBA&, sRGBA&);
-
 static int drawCount;
 
 void CDrawHistory::Add(Bitmap* before, Bitmap* after, IPoint min, IPoint max)

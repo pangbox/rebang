@@ -35,8 +35,6 @@
 #include "gatewayactor.h"
 
 extern Fresh* g_pFresh;
-void RequestUccInfo(sCharacterInfo& character);
-void RequestUccInfo(sUserInfo& user);
 
 extern int g_iRecvPacketType;
 

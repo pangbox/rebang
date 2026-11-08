@@ -63,8 +63,6 @@ extern WFont* g_font;
 void InitSingletonClasses();
 void DeleteSingletonClasses();
 void ExecuteStartMode();
-void InitPakedFile();
-bool InitPakedFile2();
 void __cdecl ReleasePAK();
 bool __stdcall GetCRCCheckList(
 	std::list<std::pair<std::string, unsigned long> >& list);

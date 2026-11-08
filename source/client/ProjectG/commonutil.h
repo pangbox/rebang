@@ -46,6 +46,9 @@ void SaveJPG(const char* filename, const Bitmap* bitmap, int quality);
 void SaveBMP(const char* filename, const Bitmap* bitmap);
 std::string GetMyComputerName();
 
+void InitPakedFile();
+bool InitPakedFile2();
+
 template <class T>
 void sequence_delete(T first, T last)
 {

@@ -37,7 +37,7 @@ public:
 	void Text(std::string text);
 	std::string Text() const { return m_text; }
 	bool IsTag() const;
-	eFrTOKENTYPE Type() const;
+	eFrTOKENTYPE Type() const { return m_type; }
 	bool GetColorValue(unsigned long* color, unsigned long* outline) const;
 	bool GetColorValue(unsigned long* color) const;
 

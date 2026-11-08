@@ -4,9 +4,6 @@
 #include "netresourcemanager.h"
 
 extern WResourceManager* g_resrcmng;
-bool IsSameClothes(unsigned long first, unsigned long second);
-std::string GenerateTextureName_F(unsigned long typeId, const char* uccIndex);
-std::string GenerateTextureName_B(unsigned long typeId, const char* uccIndex);
 
 CUccManager* UccManager()
 {

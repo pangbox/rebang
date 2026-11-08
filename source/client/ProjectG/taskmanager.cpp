@@ -74,11 +74,8 @@ extern bool g_bQuit;
 extern FrPointEventDlg* g_pPointEventDlg;
 extern CCommodityStatusManager g_CommodityStatusManager;
 extern int g_iRecvDisconCode;
-void RequestUccInfo(sUserInfo& info);
-void RequestUccInfo(sCharacterInfo& info);
 void RequestUccInfo(ranktype::sRankUserInfo& info);
 void RecvRSS0(int);
-void __cdecl TextOut(WView* view, float x, float y, const char* format, ...);
 
 // clang-format off
 static const struct
@@ -1094,7 +1091,7 @@ int CTask::OnPacketCommon(WReceivedPacket& packet)
 				"bongdari_shop");
 			if (!pWnd)
 			{
-				FrForm* pForm = DYNAMIC_CAST(FrForm, pWnd);
+				DYNAMIC_CAST(FrForm, pWnd);
 			}
 			else
 				((FrBongdariShopDlg*)pWnd)->Clear();
@@ -1355,8 +1352,7 @@ int CTask::OnPacketCommon(WReceivedPacket& packet)
 		}
 		break;
 	case 0x42:
-		LogOut(0, "CTask::OnPacketCommon %d %d %d %d %d\n", type, type, type,
-			type, type);
+		LogOut(0, "CTask::OnPacketCommon %d %d\n", type, g_iRecvPacketType);
 		{
 			switch (packet.Decode1())
 			{
@@ -9726,9 +9722,7 @@ int CTask::OnPacketCommon(WReceivedPacket& packet)
 	}
 	case 0x18b:
 	{
-		if (IsLocalContent((localContentType_t)0x79))
-		{
-		}
+		IsLocalContent((localContentType_t)0x79);
 		break;
 	}
 	case 0x198:

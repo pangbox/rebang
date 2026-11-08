@@ -87,8 +87,8 @@ struct _Rectangle
 	void Nomalize();
 	bool IsIncluded(const _Coordinates<T>& c) const;
 	bool IsIntersect(const _Rectangle<T>& rc) const;
-	T Height() const { return bottom - top; }
-	T Width() const { return right - left; }
+	T Height() const;
+	T Width() const;
 	_Coordinates<T> GetSize() const;
 	_Coordinates<T> GetCenterCoord() const;
 

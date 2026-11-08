@@ -41,10 +41,10 @@ public:
 	void Render(WView* view, float angle, int type, int nSprNum);
 	void Render(WView* view, const WVector& angle, int type, int nSprNum);
 	void Render(WView* view, const WMatrix& rot, int type, int nSprNum);
-	WVector* GetPos();
+	WVector* GetPos() { return &pos; }
 	int GetSpriteNum() const { return m_nTotalSprite; }
-	float GetSpriteHeight() const;
-	float GetSpriteWidth() const;
+	float GetSpriteHeight() const { return h2 - h1; }
+	float GetSpriteWidth() const { return w2 - w1; }
 
 private:
 	void Rotate(float w, float h, float& rw, float& rh, float angle);

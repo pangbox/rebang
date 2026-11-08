@@ -26,7 +26,7 @@ public:
 	{
 		return (this->m_flag & flag) ? true : false;
 	}
-	unsigned long Get() const;
+	unsigned long Get() const { return m_flag; }
 	operator unsigned long() const { return m_flag; }
 
 protected:

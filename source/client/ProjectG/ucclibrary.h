@@ -173,3 +173,25 @@ std::string GetMaskFilename(const char* filename);
 bool ZipUccClothes(Bitmap* front, Bitmap* back, Bitmap* icon,
 	const char* filename);
 void Convert32to24(Bitmap* source, Bitmap* dest, const Bitmap* mask);
+
+void RequestUccInfo(sUserInfoTime& user);
+void RequestUccInfo(sUserInfo& user);
+void RequestUccInfo(sRoomSlot& slot);
+void RequestUccInfo(ranktype::sRankUserInfo& user);
+void RequestUccInfo(sCharacterInfo& character);
+void RequestUccInfo(sMailIncludeItem& item);
+
+std::string GenerateTextureName_F(unsigned long typeId, const char* index);
+std::string GenerateTextureName_B(unsigned long typeId, const char* index);
+
+const Bitmap* GetUccItemIcon(unsigned long typeId, const char* index);
+const char* GetUccItemName(unsigned long typeId, const char* index);
+bool IsSameClothes(unsigned long first, unsigned long second);
+
+bool UnzipUccClothes(unsigned char* data, unsigned long size, Bitmap* front,
+	Bitmap* back, Bitmap* icon, sUccHeader* header);
+bool LoadWarningClothes(unsigned int type, Bitmap* front, Bitmap* back,
+	Bitmap* icon);
+
+void MixColor(sRGBA& first, sRGBA& second, sRGBA& result);
+void SetBrightness(sRGBA& color, sRGBA& brightness, sRGBA& result);

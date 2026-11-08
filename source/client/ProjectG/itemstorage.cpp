@@ -28,8 +28,6 @@ extern Fresh* g_pFresh;
 #include "../../shared/localize.h"
 #include "uccmanager.h"
 #include "ucclibrary.h"
-const Bitmap* GetUccItemIcon(unsigned long typeId, const char* index);
-const char* GetUccItemName(unsigned long typeId, const char* index);
 #include "taskmanager.h"
 #include "binstr.h"
 

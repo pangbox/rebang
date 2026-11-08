@@ -114,3 +114,5 @@ protected:
 	CRC_MT m_crc;
 	WMatrix m_prevCamera;
 };
+
+void __cdecl TextOut(WView* view, float x, float y, const char* format, ...);

@@ -90,11 +90,6 @@ namespace
 	}
 }
 
-bool IsGameType(unsigned char type)
-{
-	return Doc()->m_golfGame.gameType == type ? true : false;
-}
-
 bool CFontInfo::m_loaded;
 
 WList<CFontInfo::sFontInfo*> CFontInfo::m_fontList(4, 4);

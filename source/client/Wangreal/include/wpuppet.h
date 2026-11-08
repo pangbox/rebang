@@ -183,7 +183,7 @@ public:
 	void DelAddMotion(const char* name);
 	void ClearAddMotion();
 	void OptimizeBone();
-	bool HaveCenterBoundBox();
+	bool HaveCenterBoundBox() { return m_bHaveCenter; }
 	bool GetBoundBoxPlane(char* name, WPlane* plane);
 	bool GetAlignBoundBoxPlane(char* name, WPlane* plane, Waabb* box);
 	bool DotContact(char* name, const WVector& dot);
@@ -193,7 +193,7 @@ public:
 	w_motion_data* FindMotionData(const char* name);
 	int GetMotionCountIncludeName(const char* include, const char* exclude);
 	w_motion_data* GetFirstMotionData() { return m_mdList->Start(); }
-	w_motion_data* GetNextMotionData();
+	w_motion_data* GetNextMotionData() { return m_mdList->Next(); }
 	w_motion_addition* GetFirstAddedMotionList();
 	w_motion_addition* GetNextAddedMotionList();
 	void GetBoneName(char** names, int& count);
@@ -210,7 +210,7 @@ public:
 	unsigned int GetFrameCount() { return m_framenum; }
 	char* GetFrameData(int index) { return m_frame[index].data; }
 	float GetFrameDataTime(int index) { return m_frame[index].num / 30.0f; }
-	bool GetFrameCheck(int);
+	bool GetFrameCheck(int index) { return m_frame[index].check != 0; }
 	WMatrix& GetMatrix() { return m_mat; }
 	const WMatrix& GetCamMatrix(char* name);
 	float GetCamFOV(char* name, WBoneSet* set);
@@ -241,11 +241,11 @@ public:
 	void UpdateBSphere();
 	const WSphere& GetBoundSphere() const { return m_boundSphere; }
 	void LockBoneSetPos(unsigned char pos) { ms_lockedBoneSetPos = pos; }
-	unsigned char GetBoneSetPos() const;
+	unsigned char GetBoneSetPos() const { return ms_boneSetPos; }
 	void RenderBoundBox(const char* name, WView* view, unsigned long color,
 		float size);
 	const char* GetPuppetName() const { return m_petName; }
-	int GetRenderMode() const;
+	int GetRenderMode() const { return m_rendMode; }
 
 protected:
 	void SetDefaultFaceAnimation();

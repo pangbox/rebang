@@ -96,7 +96,7 @@ public:
 		float limit, unsigned long emoDiffuse);
 	float PrintText11(const WPoint& pos, unsigned long align, const char* text,
 		float limit, unsigned long emoDiffuse);
-	FrInputState* GetInputState();
+	FrInputState* GetInputState() { return &m_istate; }
 	void IME_ShowCandWindow(FrEdit* pFocusedEdit, WPoint& caretPos);
 	std::list<FrWnd*>& GetTopWndList() { return m_topmostList; }
 	void HidePrivacy(bool hide) { this->m_hidePrivacy = hide; }

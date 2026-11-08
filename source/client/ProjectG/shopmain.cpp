@@ -543,9 +543,6 @@ void CShopMain::TurnOffItemStatus()
 
 bool PartCompare(const void* left, const void* right);
 
-std::string GenerateTextureName_F(unsigned long typeId, const char* uccIndex);
-std::string GenerateTextureName_B(unsigned long typeId, const char* uccIndex);
-
 bool PartCompare(const void* left, const void* right)
 {
 	if (left == NULL)

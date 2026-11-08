@@ -8,8 +8,6 @@
 #include "taskmanager.h"
 #include "golfdoc.h"
 
-std::string GenerateTextureName_F(unsigned long, const char*);
-std::string GenerateTextureName_B(unsigned long, const char*);
 int g_iIndexWigColor[10] = { 16, 16, 16, 16, 16, 20, 14, 16, 16, 16 };
 
 CPartList::CPartList()

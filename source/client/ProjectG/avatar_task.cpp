@@ -15,7 +15,6 @@
 #include "clientsetting.h"
 
 extern Fresh* g_pFresh;
-void RequestUccInfo(sCharacterInfo& character);
 
 static const char* s_gatewayClass = "CGatewayActor";
 static const char* s_gatewayName = "Gateway";

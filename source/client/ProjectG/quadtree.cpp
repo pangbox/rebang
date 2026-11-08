@@ -4040,8 +4040,6 @@ void CQuadTree::CommitResponse(CGolfBall& ball, const sColResponse& response,
 	}
 }
 
-void __cdecl TextOut(WView* view, float x, float y, const char* format, ...);
-
 void CQuadTree::Display()
 {
 	WTVertex v[3];

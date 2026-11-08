@@ -9,7 +9,7 @@ public:
 	~WRegistry();
 
 	void SetLocation(const char* loc);
-	void PassCode(int code);
+	void PassCode(int code) { m_code = code; }
 	bool __cdecl Read(char* field, char* buffer, int len);
 	int __cdecl Scan(char* field, char* fmt, ...);
 	void __cdecl Write(char* field, const char* format, ...);

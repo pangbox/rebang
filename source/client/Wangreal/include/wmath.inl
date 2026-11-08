@@ -253,6 +253,14 @@ inline void WMatrix::operator*=(float scalar)
 	za *= scalar;
 }
 
+inline void WMatrix::operator/=(float scalar)
+{
+	float inv = 1.0f / scalar;
+	xa *= inv;
+	ya *= inv;
+	za *= inv;
+}
+
 inline WMatrix WMatrix::operator~() const
 {
 	WMatrix r;
@@ -320,6 +328,19 @@ inline void WMatrix::Reset()
 {
 	xx = yy = zz = 1.0f;
 	yx = zx = xy = zy = xz = yz = xm = ym = zm = 0.0f;
+}
+
+inline void WMatrix::Transpose()
+{
+	float xy_ = xy;
+	float xz_ = xz;
+	float yz_ = yz;
+	xy = yx;
+	yx = xy_;
+	xz = zx;
+	zx = xz_;
+	yz = zy;
+	zy = yz_;
 }
 
 inline bool operator==(const WMatrix& left, const WMatrix& right)
@@ -415,6 +436,12 @@ inline WMatrix4& WMatrix4::operator=(const WMatrix4& other)
 	return *this;
 }
 
+inline WVector2D::WVector2D(const float* v)
+{
+	x = v[0];
+	y = v[1];
+}
+
 inline WVector2D operator*(float scale, const WVector2D& v)
 {
 	return WVector2D(scale * v.x, scale * v.y);
@@ -435,6 +462,11 @@ inline WVector2D operator-(const WVector2D& a, const WVector2D& b)
 	return WVector2D(a.x - b.x, a.y - b.y);
 }
 
+inline void WMatrix4::operator*=(const WMatrix4& other)
+{
+	*this = *this * other;
+}
+
 inline void WVector2D::Reset()
 {
 	x = y = 0.0f;
@@ -450,6 +482,12 @@ inline float WVector2D::SquareMagnitude() const
 	return x * x + y * y;
 }
 
+inline void WVector2D::Negate()
+{
+	x = -x;
+	y = -y;
+}
+
 #ifdef REBANG_LEGACY_CPP
 inline WVector2D& WVector2D::operator=(const WVector2D& other)
 {
@@ -463,6 +501,12 @@ inline void WVector2D::operator+=(const WVector2D& v)
 {
 	x += v.x;
 	y += v.y;
+}
+
+inline void WVector2D::operator-=(const WVector2D& v)
+{
+	x -= v.x;
+	y -= v.y;
 }
 
 inline void WVector2D::operator*=(float f)
@@ -580,6 +624,19 @@ inline WQuat WQuaternionSlerp(const WQuat& from, const WQuat& to, float t)
 	}
 }
 
+inline WQuat::WQuat(const WVector& axis, float angle)
+{
+	SetFromAxisAngle(axis, angle);
+}
+
+inline WQuat::WQuat(const float* v)
+{
+	x = v[0];
+	y = v[1];
+	z = v[2];
+	w = v[3];
+}
+
 inline WQuat& WQuat::operator=(const WQuat& other)
 {
 	memcpy(this, &other, sizeof(WQuat));
@@ -641,11 +698,25 @@ inline Waabb& Waabb::operator+=(const WVector& vec)
 	return *this;
 }
 
+inline Waabb& Waabb::operator+=(const Waabb& box)
+{
+	AddPoint(box.min);
+	AddPoint(box.max);
+	return *this;
+}
+
 inline void Wobb::operator+=(const WVector& vector)
 {
 	center.x += vector.x;
 	center.y += vector.y;
 	center.z += vector.z;
+}
+
+inline void Wobb::operator*=(float scale)
+{
+	extend[0] *= scale;
+	extend[1] *= scale;
+	extend[2] *= scale;
 }
 
 inline void Wobb::operator*=(const WVector& scale)
@@ -690,4 +761,11 @@ inline bool Wobb::IsInclude(const WVector& point) const
 		Abs(direction * extend[2]) <= (extend[2] * extend[2]))
 		return true;
 	return false;
+}
+
+inline void Wobb::Normalize()
+{
+	extend[0].Normalize();
+	extend[1].Normalize();
+	extend[2].Normalize();
 }
