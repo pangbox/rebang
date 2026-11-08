@@ -12,11 +12,7 @@ namespace ILFILL_CARDBOOK
 	struct Pad
 	{
 		int v;
-		void g()
-		{
-			ILFILL64 ILFILL64 ILFILL64 ILFILL16 ILFILL16 v += 1;
-			v += 1;
-		}
+		void g() { ILFILL64 ILFILL64 ILFILL64 ILFILL16 ILFILL16 }
 	};
 }
 

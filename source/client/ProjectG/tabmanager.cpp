@@ -9,16 +9,6 @@ CTabManager::~CTabManager()
 {
 }
 
-sTabElement* CTabManager::Find(int id)
-{
-	for (unsigned int i = 0; i < m_tabs.size(); ++i)
-	{
-		if (m_tabs[i].id == id)
-			return &m_tabs[i];
-	}
-	return NULL;
-}
-
 void CTabManager::Add(int id, ...)
 {
 	sTabElement* tab = Find(id);
@@ -39,6 +29,16 @@ void CTabManager::Add(int id, ...)
 		window = va_arg(args, FrWnd**);
 	}
 	va_end(args);
+}
+
+sTabElement* CTabManager::Find(int id)
+{
+	for (unsigned int i = 0; i < m_tabs.size(); ++i)
+	{
+		if (m_tabs[i].id == id)
+			return &m_tabs[i];
+	}
+	return NULL;
 }
 
 void CTabManager::Open(int id)

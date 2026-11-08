@@ -4292,8 +4292,8 @@ static int FillIndices(D3DPRIMITIVETYPE primitiveType,
 }
 
 void WDirect3D8::FillVertex(unsigned char* dest, const unsigned char* src,
-	int xLastVertexDecl, int numVertices, int vertexStreamZeroStride,
-	const D3DXMATRIX* m)
+	int xLastVertexDecl, int NumVertices, int VertexStreamZeroStride,
+	const D3DXMATRIX* tm)
 {
 	int off = 0;
 	const int& positionType = xLastVertexDecl & D3DFVF_POSITION_MASK;
@@ -4301,98 +4301,80 @@ void WDirect3D8::FillVertex(unsigned char* dest, const unsigned char* src,
 	{
 		__m128 m11;
 		{
-			const float (&p)[4] = m->m[0];
+			const float (&p)[4] = tm->m[0];
 			m11 = _mm_set_ps(p[3], p[2], p[1], p[0]);
 		}
 		__m128 m21;
 		{
-			const float (&p)[4] = m->m[1];
+			const float (&p)[4] = tm->m[1];
 			m21 = _mm_set_ps(p[3], p[2], p[1], p[0]);
 		}
 		__m128 m31;
 		{
-			const float (&p)[4] = m->m[2];
+			const float (&p)[4] = tm->m[2];
 			m31 = _mm_set_ps(p[3], p[2], p[1], p[0]);
 		}
 		__m128 m41;
 		{
-			const float (&p)[4] = m->m[3];
+			const float (&p)[4] = tm->m[3];
 			m41 = _mm_set_ps(p[3], p[2], p[1], p[0]);
 		}
 		if (xLastVertexDecl & D3DFVF_NORMAL)
 		{
-			for (int i = 0; i < numVertices; i++, off += vertexStreamZeroStride)
+			for (int i = 0; i < NumVertices; i++, off += VertexStreamZeroStride)
 			{
 				float* positionOut = (float*)(dest + off);
 				const float* p =
-					(const float*)(src + i * vertexStreamZeroStride);
-				float _d1_p0 = p[0];
-				__m128 _d1_v0 = _mm_set_ps1(_d1_p0);
-				__m128 _d1_prod0 = _mm_mul_ps(_d1_v0, m11);
-				float _d1_p1 = p[1];
-				__m128 _d1_v1 = _mm_set_ps1(_d1_p1);
-				__m128 _d1_prod1 = _mm_mul_ps(_d1_v1, m21);
-				float _d1_p2 = p[2];
-				__m128 _d1_v2 = _mm_set_ps1(_d1_p2);
-				__m128 _d1_prod2 = _mm_mul_ps(_d1_v2, m31);
+					(const float*)(src + i * VertexStreamZeroStride);
+				__m128 _d1_prod0 = _mm_mul_ps(_mm_set_ps1(p[0]), m11);
+				__m128 _d1_prod1 = _mm_mul_ps(_mm_set_ps1(p[1]), m21);
+				__m128 _d1_prod2 = _mm_mul_ps(_mm_set_ps1(p[2]), m31);
 				__m128 _d1_sum9 = _mm_add_ps(m41, _d1_prod0);
 				__m128 _d1_sum10 = _mm_add_ps(_d1_sum9, _d1_prod1);
 				__m128 _d1 = _mm_add_ps(_d1_sum10, _d1_prod2);
-				float _d2_p0 = p[3];
-				__m128 _d2_v0 = _mm_set_ps1(_d2_p0);
-				__m128 _d2_prod0 = _mm_mul_ps(_d2_v0, m11);
-				float _d2_p1 = p[4];
-				__m128 _d2_v1 = _mm_set_ps1(_d2_p1);
-				__m128 _d2_prod1 = _mm_mul_ps(_d2_v1, m21);
-				float _d2_p2 = p[5];
-				__m128 _d2_v2 = _mm_set_ps1(_d2_p2);
-				__m128 _d2_prod2 = _mm_mul_ps(_d2_v2, m31);
+				__m128 _d2_prod0 = _mm_mul_ps(_mm_set_ps1(p[3]), m11);
+				__m128 _d2_prod1 = _mm_mul_ps(_mm_set_ps1(p[4]), m21);
+				__m128 _d2_prod2 = _mm_mul_ps(_mm_set_ps1(p[5]), m31);
 				__m128 _d2_sum9 = _mm_add_ps(_d2_prod0, _d2_prod1);
 				__m128 _d2 = _mm_add_ps(_d2_sum9, _d2_prod2);
 				DWORD x = *(const volatile DWORD*)&_d1.m128_f32[0];
-				((float*)(dest + i * vertexStreamZeroStride))[1] =
+				((float*)(dest + i * VertexStreamZeroStride))[1] =
 					_d1.m128_f32[1];
 				*(DWORD*)positionOut = x;
 				positionOut[2] = _d1.m128_f32[2];
 				positionOut[3] = _d2.m128_f32[0];
 				positionOut[4] = _d2.m128_f32[1];
 				positionOut[5] = _d2.m128_f32[2];
-				memcpy(dest + off + 24, src + i * vertexStreamZeroStride + 24,
-					vertexStreamZeroStride - 24);
+				memcpy(dest + off + 24, src + i * VertexStreamZeroStride + 24,
+					VertexStreamZeroStride - 24);
 			}
 		}
 		else
 		{
-			for (int i = 0; i < numVertices; i++, off += vertexStreamZeroStride)
+			for (int i = 0; i < NumVertices; i++, off += VertexStreamZeroStride)
 			{
 				float* positionOut = (float*)(dest + off);
 				const float* p =
-					(const float*)(src + i * vertexStreamZeroStride);
-				float _d_p0 = p[0];
-				__m128 _d_v0 = _mm_set_ps1(_d_p0);
-				__m128 _d_prod0 = _mm_mul_ps(_d_v0, m11);
-				float _d_p1 = p[1];
-				__m128 _d_v1 = _mm_set_ps1(_d_p1);
-				__m128 _d_prod1 = _mm_mul_ps(_d_v1, m21);
-				float _d_p2 = p[2];
-				__m128 _d_v2 = _mm_set_ps1(_d_p2);
-				__m128 _d_prod2 = _mm_mul_ps(_d_v2, m31);
+					(const float*)(src + i * VertexStreamZeroStride);
+				__m128 _d_prod0 = _mm_mul_ps(_mm_set_ps1(p[0]), m11);
+				__m128 _d_prod1 = _mm_mul_ps(_mm_set_ps1(p[1]), m21);
+				__m128 _d_prod2 = _mm_mul_ps(_mm_set_ps1(p[2]), m31);
 				__m128 _d_sum9 = _mm_add_ps(m41, _d_prod0);
 				__m128 _d_sum10 = _mm_add_ps(_d_sum9, _d_prod1);
 				__m128 _d = _mm_add_ps(_d_sum10, _d_prod2);
 				DWORD x = *(const volatile DWORD*)&_d.m128_f32[0];
-				((float*)(dest + i * vertexStreamZeroStride))[1] =
+				((float*)(dest + i * VertexStreamZeroStride))[1] =
 					_d.m128_f32[1];
 				*(DWORD*)positionOut = x;
 				positionOut[2] = _d.m128_f32[2];
-				memcpy(dest + off + 12, src + i * vertexStreamZeroStride + 12,
-					vertexStreamZeroStride - 12);
+				memcpy(dest + off + 12, src + i * VertexStreamZeroStride + 12,
+					VertexStreamZeroStride - 12);
 			}
 		}
 	}
 	else if (positionType == D3DFVF_XYZRHW)
 	{
-		memcpy(dest, src, vertexStreamZeroStride * numVertices);
+		memcpy(dest, src, VertexStreamZeroStride * NumVertices);
 	}
 	else if (xLastVertexDecl & D3DFVF_NORMAL)
 	{
@@ -4401,9 +4383,9 @@ void WDirect3D8::FillVertex(unsigned char* dest, const unsigned char* src,
 			{
 				int srcOff = 0;
 				const BYTE* walk = src;
-				for (int i = 0; i < numVertices; i++,
-						 walk += vertexStreamZeroStride,
-						 off += vertexStreamZeroStride - 16)
+				for (int i = 0; i < NumVertices; i++,
+						 walk += VertexStreamZeroStride,
+						 off += VertexStreamZeroStride - 16)
 				{
 					do
 					{
@@ -4417,21 +4399,21 @@ void WDirect3D8::FillVertex(unsigned char* dest, const unsigned char* src,
 					D3DXVECTOR3 v[4] = { D3DXVECTOR3(), D3DXVECTOR3(),
 						D3DXVECTOR3(), D3DXVECTOR3() };
 					D3DXVec3TransformCoord(&v[0], position,
-						&m[src[srcOff + 24]]);
+						&tm[src[srcOff + 24]]);
 					D3DXVec3TransformNormal(&n[0], normal,
-						&m[src[srcOff + 24]]);
+						&tm[src[srcOff + 24]]);
 					D3DXVec3TransformCoord(&v[1], position,
-						&m[src[srcOff + 25]]);
+						&tm[src[srcOff + 25]]);
 					D3DXVec3TransformNormal(&n[1], normal,
-						&m[src[srcOff + 25]]);
+						&tm[src[srcOff + 25]]);
 					D3DXVec3TransformCoord(&v[2], position,
-						&m[src[srcOff + 26]]);
+						&tm[src[srcOff + 26]]);
 					D3DXVec3TransformNormal(&n[2], normal,
-						&m[src[srcOff + 26]]);
+						&tm[src[srcOff + 26]]);
 					D3DXVec3TransformCoord(&v[3], position,
-						&m[src[srcOff + 27]]);
+						&tm[src[srcOff + 27]]);
 					D3DXVec3TransformNormal(&n[3], normal,
-						&m[src[srcOff + 27]]);
+						&tm[src[srcOff + 27]]);
 					*(D3DXVECTOR3*)(dest + off) =
 						v[0] * *(const float*)(src + srcOff + 12) +
 						v[1] * *(const float*)(src + srcOff + 16) +
@@ -4449,81 +4431,81 @@ void WDirect3D8::FillVertex(unsigned char* dest, const unsigned char* src,
 								*(const float*)(src + srcOff + 16) -
 								*(const float*)(src + srcOff + 20));
 					memcpy(dest + off + 24, walk + 40,
-						vertexStreamZeroStride - 40);
+						VertexStreamZeroStride - 40);
 				}
 			}
 		}
 		else if (positionType == 10)
 		{
-			for (int i = 0; i < numVertices;
-				i++, off += vertexStreamZeroStride - 12)
+			for (int i = 0; i < NumVertices;
+				i++, off += VertexStreamZeroStride - 12)
 			{
 				const D3DXVECTOR3* position =
-					(const D3DXVECTOR3*)(src + i * vertexStreamZeroStride);
+					(const D3DXVECTOR3*)(src + i * VertexStreamZeroStride);
 				const D3DXVECTOR3* normal =
-					(const D3DXVECTOR3*)(src + i * vertexStreamZeroStride + 24);
+					(const D3DXVECTOR3*)(src + i * VertexStreamZeroStride + 24);
 				const float* weights =
-					(const float*)(src + i * vertexStreamZeroStride + 12);
+					(const float*)(src + i * VertexStreamZeroStride + 12);
 				D3DXVECTOR3 v[3];
 				D3DXVECTOR3 n[3];
 				D3DXVec3TransformCoord(&v[0], position,
-					&m[src[i * vertexStreamZeroStride + 20]]);
+					&tm[src[i * VertexStreamZeroStride + 20]]);
 				D3DXVec3TransformNormal(&n[0], normal,
-					&m[src[i * vertexStreamZeroStride + 20]]);
+					&tm[src[i * VertexStreamZeroStride + 20]]);
 				D3DXVec3TransformCoord(&v[1], position,
-					&m[src[i * vertexStreamZeroStride + 21]]);
+					&tm[src[i * VertexStreamZeroStride + 21]]);
 				D3DXVec3TransformNormal(&n[1], normal,
-					&m[src[i * vertexStreamZeroStride + 21]]);
+					&tm[src[i * VertexStreamZeroStride + 21]]);
 				D3DXVec3TransformCoord(&v[2], position,
-					&m[src[i * vertexStreamZeroStride + 22]]);
+					&tm[src[i * VertexStreamZeroStride + 22]]);
 				D3DXVec3TransformNormal(&n[2], normal,
-					&m[src[i * vertexStreamZeroStride + 22]]);
+					&tm[src[i * VertexStreamZeroStride + 22]]);
 				*(D3DXVECTOR3*)(dest + off) = v[0] * weights[0] +
 					v[1] * weights[1] + v[2] * (1.0f - weights[0] - weights[1]);
 				*(D3DXVECTOR3*)(dest + off + 12) = n[0] * weights[0] +
 					n[1] * weights[1] + n[2] * (1.0f - weights[0] - weights[1]);
-				memcpy(dest + off + 24, src + i * vertexStreamZeroStride + 36,
-					vertexStreamZeroStride - 36);
+				memcpy(dest + off + 24, src + i * VertexStreamZeroStride + 36,
+					VertexStreamZeroStride - 36);
 			}
 		}
 		else if (positionType == 8)
 		{
 			const BYTE* walk = src;
-			for (int i = 0; i < numVertices; i++,
-					 walk += vertexStreamZeroStride,
-					 off += vertexStreamZeroStride - 8)
+			for (int i = 0; i < NumVertices; i++,
+					 walk += VertexStreamZeroStride,
+					 off += VertexStreamZeroStride - 8)
 			{
 				const D3DXVECTOR3* position = (const D3DXVECTOR3*)(walk);
 				const D3DXVECTOR3* normal = (const D3DXVECTOR3*)(walk + 20);
 				const float* weights = (const float*)(walk + 12);
 				D3DXVECTOR3 v[2];
 				D3DXVECTOR3 n[2];
-				D3DXVec3TransformCoord(&v[0], position, &m[walk[16]]);
-				D3DXVec3TransformNormal(&n[0], normal, &m[walk[16]]);
-				D3DXVec3TransformCoord(&v[1], position, &m[walk[17]]);
-				D3DXVec3TransformNormal(&n[1], normal, &m[walk[17]]);
+				D3DXVec3TransformCoord(&v[0], position, &tm[walk[16]]);
+				D3DXVec3TransformNormal(&n[0], normal, &tm[walk[16]]);
+				D3DXVec3TransformCoord(&v[1], position, &tm[walk[17]]);
+				D3DXVec3TransformNormal(&n[1], normal, &tm[walk[17]]);
 				*(D3DXVECTOR3*)(dest + off) =
 					v[0] * weights[0] + v[1] * (1.0f - weights[0]);
 				*(D3DXVECTOR3*)(dest + off + 12) =
 					n[0] * weights[0] + n[1] * (1.0f - weights[0]);
-				memcpy(dest + off + 24, walk + 32, vertexStreamZeroStride - 32);
+				memcpy(dest + off + 24, walk + 32, VertexStreamZeroStride - 32);
 			}
 		}
 		else if (positionType == 6)
 		{
 			const BYTE* walk = src;
-			for (int i = 0; i < numVertices; i++,
-					 walk += vertexStreamZeroStride,
-					 off += vertexStreamZeroStride - 4)
+			for (int i = 0; i < NumVertices; i++,
+					 walk += VertexStreamZeroStride,
+					 off += VertexStreamZeroStride - 4)
 			{
 				const D3DXVECTOR3* position = (const D3DXVECTOR3*)(walk);
 				const D3DXVECTOR3* normal = (const D3DXVECTOR3*)(walk + 16);
 				const float* weights = (const float*)(walk + 12);
 				D3DXVec3TransformCoord((D3DXVECTOR3*)(dest + off), position,
-					&m[walk[12]]);
+					&tm[walk[12]]);
 				D3DXVec3TransformNormal((D3DXVECTOR3*)(dest + off + 12), normal,
-					&m[walk[12]]);
-				memcpy(dest + off + 24, walk + 28, vertexStreamZeroStride - 28);
+					&tm[walk[12]]);
+				memcpy(dest + off + 24, walk + 28, VertexStreamZeroStride - 28);
 			}
 		}
 	}
@@ -4533,33 +4515,32 @@ void WDirect3D8::FillVertex(unsigned char* dest, const unsigned char* src,
 		{
 			{
 				int srcOff = 0;
-				if (*(volatile int*)&numVertices > srcOff)
+				if (*(volatile int*)&NumVertices > srcOff)
 				{
-					const BYTE* position;
-					*(const BYTE* volatile*)&position = src;
-					for (int i = 0; i < numVertices;
-						srcOff += vertexStreamZeroStride,
-							 position += vertexStreamZeroStride, i++,
-							 off += vertexStreamZeroStride - 16)
+					const BYTE* position = src;
+					for (int i = 0; i < NumVertices;
+						srcOff += VertexStreamZeroStride,
+							 position += VertexStreamZeroStride, i++,
+							 off += VertexStreamZeroStride - 16)
 					{
 						D3DXVECTOR3 v[4] = { D3DXVECTOR3(), D3DXVECTOR3(),
 							D3DXVECTOR3(), D3DXVECTOR3() };
 						D3DXVec3TransformCoord(&v[0],
 							(const D3DXVECTOR3*)(*(
 								const BYTE* volatile*)&position),
-							&m[src[srcOff + 24]]);
+							&tm[src[srcOff + 24]]);
 						D3DXVec3TransformCoord(&v[1],
 							(const D3DXVECTOR3*)(*(
 								const BYTE* volatile*)&position),
-							&m[src[srcOff + 25]]);
+							&tm[src[srcOff + 25]]);
 						D3DXVec3TransformCoord(&v[2],
 							(const D3DXVECTOR3*)(*(
 								const BYTE* volatile*)&position),
-							&m[src[srcOff + 26]]);
+							&tm[src[srcOff + 26]]);
 						D3DXVec3TransformCoord(&v[3],
 							(const D3DXVECTOR3*)(*(
 								const BYTE* volatile*)&position),
-							&m[src[srcOff + 27]]);
+							&tm[src[srcOff + 27]]);
 						*(D3DXVECTOR3*)(dest + off) =
 							v[0] * *(const float*)(src + srcOff + 12) +
 							v[1] * *(const float*)(src + srcOff + 16) +
@@ -4570,64 +4551,64 @@ void WDirect3D8::FillVertex(unsigned char* dest, const unsigned char* src,
 									*(const float*)(src + srcOff + 20));
 						memcpy(dest + off + 12,
 							(*(const BYTE* volatile*)&position) + 28,
-							vertexStreamZeroStride - 28);
+							VertexStreamZeroStride - 28);
 					}
 				}
-				if (srcOff == numVertices * vertexStreamZeroStride)
+				if (srcOff == NumVertices * VertexStreamZeroStride)
 					return;
 			}
 		}
 		else if (positionType == 10)
 		{
-			for (int i = 0; i < numVertices;
-				i++, off += vertexStreamZeroStride - 12)
+			for (int i = 0; i < NumVertices;
+				i++, off += VertexStreamZeroStride - 12)
 			{
 				const D3DXVECTOR3* position =
-					(const D3DXVECTOR3*)(src + i * vertexStreamZeroStride);
+					(const D3DXVECTOR3*)(src + i * VertexStreamZeroStride);
 				const float* weights =
-					(const float*)(src + i * vertexStreamZeroStride + 16);
+					(const float*)(src + i * VertexStreamZeroStride + 16);
 				D3DXVECTOR3 v[3];
 				D3DXVec3TransformCoord(&v[0], position,
-					&m[src[i * vertexStreamZeroStride + 20]]);
+					&tm[src[i * VertexStreamZeroStride + 20]]);
 				D3DXVec3TransformCoord(&v[1], position,
-					&m[src[i * vertexStreamZeroStride + 21]]);
+					&tm[src[i * VertexStreamZeroStride + 21]]);
 				D3DXVec3TransformCoord(&v[2], position,
-					&m[src[i * vertexStreamZeroStride + 22]]);
+					&tm[src[i * VertexStreamZeroStride + 22]]);
 				*(D3DXVECTOR3*)(dest + off) = v[0] * weights[-1] +
 					v[1] * weights[0] +
 					v[2] * (1.0f - weights[-1] - weights[0]);
-				memcpy(dest + off + 12, src + i * vertexStreamZeroStride + 24,
-					vertexStreamZeroStride - 24);
+				memcpy(dest + off + 12, src + i * VertexStreamZeroStride + 24,
+					VertexStreamZeroStride - 24);
 			}
 		}
 		else if (positionType == 8)
 		{
 			const BYTE* walk = src;
-			for (int i = 0; i < numVertices; i++,
-					 walk += vertexStreamZeroStride,
-					 off += vertexStreamZeroStride - 8)
+			for (int i = 0; i < NumVertices; i++,
+					 walk += VertexStreamZeroStride,
+					 off += VertexStreamZeroStride - 8)
 			{
 				const D3DXVECTOR3* position = (const D3DXVECTOR3*)(walk);
 				const float* weights = (const float*)(walk + 12);
 				D3DXVECTOR3 v[2];
-				D3DXVec3TransformCoord(&v[0], position, &m[walk[16]]);
-				D3DXVec3TransformCoord(&v[1], position, &m[walk[17]]);
+				D3DXVec3TransformCoord(&v[0], position, &tm[walk[16]]);
+				D3DXVec3TransformCoord(&v[1], position, &tm[walk[17]]);
 				*(D3DXVECTOR3*)(dest + off) =
 					v[0] * weights[0] + v[1] * (1.0f - weights[0]);
-				memcpy(dest + off + 12, walk + 20, vertexStreamZeroStride - 20);
+				memcpy(dest + off + 12, walk + 20, VertexStreamZeroStride - 20);
 			}
 		}
 		else if (positionType == 6)
 		{
 			const BYTE* walk = src + 4;
-			for (int i = 0; i < numVertices; walk += vertexStreamZeroStride,
-					 off += vertexStreamZeroStride - 4, i++)
+			for (int i = 0; i < NumVertices; walk += VertexStreamZeroStride,
+					 off += VertexStreamZeroStride - 4, i++)
 			{
 				const D3DXVECTOR3* position = (const D3DXVECTOR3*)(walk - (4));
 				const float* weights = (const float*)(walk + 8);
 				D3DXVec3TransformCoord((D3DXVECTOR3*)(dest + off), position,
-					&m[walk[8]]);
-				memcpy(dest + off + 12, walk + 12, vertexStreamZeroStride - 16);
+					&tm[walk[8]]);
+				memcpy(dest + off + 12, walk + 12, VertexStreamZeroStride - 16);
 			}
 		}
 	}

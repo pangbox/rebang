@@ -75,7 +75,6 @@ void CMascot::OnLoad()
 	}
 }
 
-#pragma optimize("a", on)
 int CMascot::ChangeMascotMsgInTex(const char* msg,
 	const IFF_STRUCT::sMascot* pMascot, WPuppet* pPuppet, const char* texName)
 {
@@ -119,7 +118,6 @@ int CMascot::ChangeMascotMsgInTex(const char* msg,
 	}
 	return 0;
 }
-#pragma optimize("", on)
 
 void CMascot::OnReload()
 {

@@ -13,6 +13,14 @@ CIntegrityCheck::~CIntegrityCheck()
 {
 }
 
+bool CIntegrityCheck::Report(const char* filename)
+{
+	m_fp = fopen(filename, "wt");
+	ReportCharParts();
+	fclose(m_fp);
+	return true;
+}
+
 void CIntegrityCheck::Log(const char* format, ...)
 {
 	char buffer[2048];
@@ -175,13 +183,5 @@ bool CIntegrityCheck::ReportCharParts()
 	std::map<unsigned long, WPuppet*>::iterator puppetIt;
 	for (puppetIt = puppets.begin(); puppetIt != puppets.end(); puppetIt++)
 		g_resrcmng->Release((*puppetIt).second, true);
-	return true;
-}
-
-bool CIntegrityCheck::Report(const char* filename)
-{
-	m_fp = fopen(filename, "wt");
-	ReportCharParts();
-	fclose(m_fp);
 	return true;
 }

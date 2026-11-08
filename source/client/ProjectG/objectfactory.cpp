@@ -11,14 +11,10 @@ IObject::~IObject()
 {
 }
 
-void CObjectFactory::AddObjectType(IObject* object, const char* name)
+CObjectFactory& ObjectFactory()
 {
-	m_objectTypeList[name] = object;
-}
-
-void CObjectFactory::AddObjectFunctor(IObject* (*function)(), const char* name)
-{
-	m_objectFuncList[name] = function;
+	static CObjectFactory factory;
+	return factory;
 }
 
 void CObjectFactory::Reset()
@@ -31,8 +27,12 @@ void CObjectFactory::Reset()
 	m_objectFuncList.erase(m_objectFuncList.begin(), m_objectFuncList.end());
 }
 
-CObjectFactory& ObjectFactory()
+void CObjectFactory::AddObjectType(IObject* object, const char* name)
 {
-	static CObjectFactory factory;
-	return factory;
+	m_objectTypeList[name] = object;
+}
+
+void CObjectFactory::AddObjectFunctor(IObject* (*function)(), const char* name)
+{
+	m_objectFuncList[name] = function;
 }

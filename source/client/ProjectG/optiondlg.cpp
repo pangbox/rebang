@@ -216,6 +216,7 @@ FrOptionDlg::sMacroTab::sMacroTab()
 }
 
 IMPLEMENT_OBJECT(FrChangeNickDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrChangeNickDlg, FrForm)
 ON_FRESH_VI("sprice", FRCMD_INIT, FrChangeNickDlg::OnPriceStaticInit)
 ON_FRESH_VI("price", FRCMD_INIT, FrChangeNickDlg::OnPriceInit)
@@ -432,6 +433,7 @@ bool FrChangeNickDlg::OnChangeNickConfirmDlgResult(int result, FrForm* form)
 }
 
 IMPLEMENT_OBJECT(FrOptionDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrOptionDlg, FrForm)
 ON_FRESH_VI("ok", FRCMD_INIT, FrOptionDlg::OnOkBtnInit)
 ON_FRESH_VI("game", FRCMD_INIT, FrOptionDlg::OnGameTabInit)
@@ -770,11 +772,6 @@ void FrOptionDlg::gOnNickEditInit(int param)
 	}
 }
 
-bool FrOptionDlg::gOnNickEditEnterKey(int param)
-{
-	return false;
-}
-
 void FrOptionDlg::gOnChangeNickBtnInit(int param)
 {
 	m_gameTab.m_pChangeNickBtn = DYNAMIC_CAST(FrButton, (FrWnd*)param);
@@ -864,6 +861,11 @@ void FrOptionDlg::gOnChangeNickBtnUp()
 			form->Open(NULL, 3);
 		}
 	}
+}
+
+bool FrOptionDlg::gOnNickEditEnterKey(int param)
+{
+	return false;
 }
 
 void FrOptionDlg::gOnSchoolStaticInit(int param)

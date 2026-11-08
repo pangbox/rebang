@@ -11,6 +11,7 @@ struct gaQ;
 struct gaMath
 {
 	static int Sign(int iValue);
+
 	static float Sign(float fValue);
 	static float Sin(float fValue);
 	static float Cos(float fValue);

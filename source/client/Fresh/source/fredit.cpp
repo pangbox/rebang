@@ -481,6 +481,21 @@ void FrEdit::MakePassword(const char* text, std::string& out)
 	}
 }
 
+void FrEdit::OnProc(float deltaTime)
+{
+	m_caret += m_caretDelta * deltaTime;
+	if (m_caret > 0.4f)
+	{
+		m_caret = 0.4f;
+		m_caretDelta = -1;
+	}
+	else if (m_caret < -0.1f)
+	{
+		m_caret = -0.1f;
+		m_caretDelta = 1;
+	}
+}
+
 void FrEdit::OnDraw()
 {
 	FrWnd::OnDraw();
@@ -736,21 +751,6 @@ void FrEdit::OnDraw()
 		emo->SetAnim(false);
 	}
 	GDI()->SetClippingArea(NULL);
-}
-
-void FrEdit::OnProc(float deltaTime)
-{
-	m_caret += m_caretDelta * deltaTime;
-	if (m_caret > 0.4f)
-	{
-		m_caret = 0.4f;
-		m_caretDelta = -1;
-	}
-	else if (m_caret < -0.1f)
-	{
-		m_caret = -0.1f;
-		m_caretDelta = 1;
-	}
 }
 
 void FrEdit::OnResize()

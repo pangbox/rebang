@@ -81,6 +81,43 @@ void CNoticeBoard::Process(float delta)
 	}
 }
 
+void CNoticeBoard::Display()
+{
+	if (m_pBoardLeft && m_pBoardMiddle && m_pBoardRight)
+	{
+		float alpha = (m_boardPosY + 50.0f) * 0.02f;
+		if (!WisEqual(alpha, 0.0f, g_EPSILON))
+		{
+			WRect src(0, 0, 1, 1);
+			WRect dst(g_view->GetWidth() * 0.5f - 150.0f - 20.0f, m_boardPosY,
+				m_pBoardLeft->GetWidth(), m_pBoardLeft->GetHeight());
+			m_pBoardLeft->Render(g_view, src, dst, 0, 0xa0ffffff, 0, 0);
+			dst.x += dst.w;
+			dst.w = 300.0f - m_pBoardRight->GetWidth() + 20.0f;
+			dst.h = (float)m_pBoardMiddle->GetHeight();
+			m_pBoardMiddle->Render(g_view, src, dst, 0, 0xa0ffffff, 0, 0);
+			dst.x += dst.w;
+			dst.w = (float)m_pBoardRight->GetWidth();
+			dst.h = (float)m_pBoardRight->GetHeight();
+			m_pBoardRight->Render(g_view, src, dst, 0, 0xa0ffffff, 0, 0);
+		}
+	}
+	if (m_curNotice != m_noticeList.end())
+	{
+		sNotice* notice = *m_curNotice;
+		if (m_pFont)
+		{
+			WRect clip(g_view->GetWidth() * 0.5f - 150.0f, 0.0f, 300.0f, 40);
+			m_pFont->SetClippingArea(&clip);
+			int x = (int)m_textPosX;
+			m_pFont->Print(g_view, (float)x, 7.0f, notice->text.c_str(),
+				0x80000, notice->color, NULL);
+			m_pFont->Flush(g_view);
+			m_pFont->SetClippingArea(NULL);
+		}
+	}
+}
+
 bool CNoticeBoard::GetColornText(const char* src, std::string& text,
 	unsigned long& color)
 {
@@ -119,43 +156,6 @@ bool CNoticeBoard::GetColornText(const char* src, std::string& text,
 		}
 	}
 	return false;
-}
-
-void CNoticeBoard::Display()
-{
-	if (m_pBoardLeft && m_pBoardMiddle && m_pBoardRight)
-	{
-		float alpha = (m_boardPosY + 50.0f) * 0.02f;
-		if (!WisEqual(alpha, 0.0f, g_EPSILON))
-		{
-			WRect src(0, 0, 1, 1);
-			WRect dst(g_view->GetWidth() * 0.5f - 150.0f - 20.0f, m_boardPosY,
-				m_pBoardLeft->GetWidth(), m_pBoardLeft->GetHeight());
-			m_pBoardLeft->Render(g_view, src, dst, 0, 0xa0ffffff, 0, 0);
-			dst.x += dst.w;
-			dst.w = 300.0f - m_pBoardRight->GetWidth() + 20.0f;
-			dst.h = (float)m_pBoardMiddle->GetHeight();
-			m_pBoardMiddle->Render(g_view, src, dst, 0, 0xa0ffffff, 0, 0);
-			dst.x += dst.w;
-			dst.w = (float)m_pBoardRight->GetWidth();
-			dst.h = (float)m_pBoardRight->GetHeight();
-			m_pBoardRight->Render(g_view, src, dst, 0, 0xa0ffffff, 0, 0);
-		}
-	}
-	if (m_curNotice != m_noticeList.end())
-	{
-		sNotice* notice = *m_curNotice;
-		if (m_pFont)
-		{
-			WRect clip(g_view->GetWidth() * 0.5f - 150.0f, 0.0f, 300.0f, 40);
-			m_pFont->SetClippingArea(&clip);
-			int x = (int)m_textPosX;
-			m_pFont->Print(g_view, (float)x, 7.0f, notice->text.c_str(),
-				0x80000, notice->color, NULL);
-			m_pFont->Flush(g_view);
-			m_pFont->SetClippingArea(NULL);
-		}
-	}
 }
 
 void CNoticeBoard::AddNotice(const char* text, int count, bool bImmediately)

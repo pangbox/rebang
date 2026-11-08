@@ -39,6 +39,13 @@ FrMascotInfoDlg::FrMascotInfoDlg()
 	m_pPuppet = NULL;
 }
 
+void FrMascotInfoDlg::SetMascotInfo(const sMascotInfo& info, WPuppet* pPuppet)
+{
+	m_mascotInfo = info;
+	m_message = m_mascotInfo.szMsg;
+	m_pPuppet = pPuppet;
+}
+
 void FrMascotInfoDlg::OnPortraitInit(int param)
 {
 	m_pPortrait = DYNAMIC_CAST(FrArea, (FrWnd*)param);
@@ -84,16 +91,65 @@ void FrMascotInfoDlg::OnOkInit(int param)
 		m_pOk->Enable(false);
 }
 
+void FrMascotInfoDlg::OnOkBtnUp()
+{
+	if (!strcmp(m_message.c_str(), m_mascotInfo.szMsg))
+		return;
+	if (m_mascotInfo.tid == 0x40000004)
+	{
+		if (strlen(m_message.c_str()) > 8)
+		{
+			AfxGetTask()->GetActor("RealMyRoom") << MsgObject(NULL, 35,
+				(int)"\xb8\xde\xbc\xbc\xc1\xf6 \xc3\xd6\xb4\xeb \xb1\xe6\xc0\xcc\xb4\xc2 \xbf\xb5\xb9\xae 8\xb1\xdb\xc0\xda, \xc7\xd1\xb1\xdb 4\xb1\xdb\xc0\xda \xc0\xd4\xb4\xcf\xb4\xd9.",
+				0, 0, 0, 0);
+			return;
+		}
+	}
+	else if (strlen(m_message.c_str()) > 16)
+	{
+		AfxGetTask()->GetActor("RealMyRoom") << MsgObject(NULL, 35,
+			(int)"\xb8\xde\xbc\xbc\xc1\xf6 \xc3\xd6\xb4\xeb \xb1\xe6\xc0\xcc\xb4\xc2 \xbf\xb5\xb9\xae 16\xb1\xdb\xc0\xda, \xc7\xd1\xb1\xdb 8\xb1\xdb\xc0\xda \xc0\xd4\xb4\xcf\xb4\xd9.",
+			0, 0, 0, 0);
+		return;
+	}
+	cTokenV token;
+	token.Init(m_message.c_str(), strlen(m_message.c_str()));
+	int count = token.GetTokenNum(0, "'", 1) - 1;
+	if (count > 0)
+	{
+		AfxGetTask()->GetActor("RealMyRoom") << MsgObject(NULL, 35,
+			(int)"[']\xb4\xc2 \xb8\xde\xbc\xbc\xc1\xf6\xbf\xa1 \xbb\xe7\xbf\xeb\xc7\xd2 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
+			0, 0, 0, 0);
+	}
+	else
+	{
+		char text[256];
+		strcpy(text, m_message.c_str());
+		if (Doc()->m_chatManager.Filtering(text))
+			AfxGetTask()->GetActor("RealMyRoom") << MsgObject(NULL, 35,
+				(int)"\xc0\xfb\xb4\xe7\xc7\xcf\xc1\xf6\xbe\xca\xc0\xba \xb4\xdc\xbe\xee\xb0\xa1 \xc6\xf7\xc7\xd4\xb5\xc7\xbe\xfa\xbd\xc0\xb4\xcf\xb4\xd9.",
+				0, 0, 0, 0);
+		else
+		{
+			if (!m_pConfirmDlg)
+				m_pConfirmDlg = CreateForm<FrForm>(g_pFresh->GetManager(), this,
+					"mascot_msg", NULL);
+			if (m_pConfirmDlg)
+			{
+				m_pConfirmDlg->SetMessage(
+					"\xb8\xb6\xbd\xba\xc4\xda\xc6\xae \xb8\xde\xbc\xbc\xc1\xf6\xb8\xa6 \xba\xaf\xb0\xe6 \xc7\xcf\xbd\xc3\xb0\xda\xbd\xc0\xb4\xcf\xb1\xee?",
+					false);
+				m_pConfirmDlg->Open((FRESH_PFN_RESULT)&FrMascotInfoDlg::
+										OnChangeMsgConfirmDlgResult,
+					1);
+			}
+		}
+	}
+}
+
 void FrMascotInfoDlg::OnCancelInit(int param)
 {
 	m_pCancel = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-}
-
-void FrMascotInfoDlg::SetMascotInfo(const sMascotInfo& info, WPuppet* pPuppet)
-{
-	m_mascotInfo = info;
-	m_message = m_mascotInfo.szMsg;
-	m_pPuppet = pPuppet;
 }
 
 void FrMascotInfoDlg::OnCancelBtnUp()
@@ -263,62 +319,6 @@ void FrMascotInfoDlg::OnProc(const float dt)
 				CMascot::ChangeMascotMsgInTex(m_message.c_str(), pMascot,
 					m_pPuppet,
 					MakeStr("myroom%02d", (pMascot->c.TypeId & 0x3ffffff)));
-		}
-	}
-}
-
-void FrMascotInfoDlg::OnOkBtnUp()
-{
-	if (!strcmp(m_message.c_str(), m_mascotInfo.szMsg))
-		return;
-	if (m_mascotInfo.tid == 0x40000004)
-	{
-		if (strlen(m_message.c_str()) > 8)
-		{
-			AfxGetTask()->GetActor("RealMyRoom") << MsgObject(NULL, 35,
-				(int)"\xb8\xde\xbc\xbc\xc1\xf6 \xc3\xd6\xb4\xeb \xb1\xe6\xc0\xcc\xb4\xc2 \xbf\xb5\xb9\xae 8\xb1\xdb\xc0\xda, \xc7\xd1\xb1\xdb 4\xb1\xdb\xc0\xda \xc0\xd4\xb4\xcf\xb4\xd9.",
-				0, 0, 0, 0);
-			return;
-		}
-	}
-	else if (strlen(m_message.c_str()) > 16)
-	{
-		AfxGetTask()->GetActor("RealMyRoom") << MsgObject(NULL, 35,
-			(int)"\xb8\xde\xbc\xbc\xc1\xf6 \xc3\xd6\xb4\xeb \xb1\xe6\xc0\xcc\xb4\xc2 \xbf\xb5\xb9\xae 16\xb1\xdb\xc0\xda, \xc7\xd1\xb1\xdb 8\xb1\xdb\xc0\xda \xc0\xd4\xb4\xcf\xb4\xd9.",
-			0, 0, 0, 0);
-		return;
-	}
-	cTokenV token;
-	token.Init(m_message.c_str(), strlen(m_message.c_str()));
-	int count = token.GetTokenNum(0, "'", 1) - 1;
-	if (count > 0)
-	{
-		AfxGetTask()->GetActor("RealMyRoom") << MsgObject(NULL, 35,
-			(int)"[']\xb4\xc2 \xb8\xde\xbc\xbc\xc1\xf6\xbf\xa1 \xbb\xe7\xbf\xeb\xc7\xd2 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
-			0, 0, 0, 0);
-	}
-	else
-	{
-		char text[256];
-		strcpy(text, m_message.c_str());
-		if (Doc()->m_chatManager.Filtering(text))
-			AfxGetTask()->GetActor("RealMyRoom") << MsgObject(NULL, 35,
-				(int)"\xc0\xfb\xb4\xe7\xc7\xcf\xc1\xf6\xbe\xca\xc0\xba \xb4\xdc\xbe\xee\xb0\xa1 \xc6\xf7\xc7\xd4\xb5\xc7\xbe\xfa\xbd\xc0\xb4\xcf\xb4\xd9.",
-				0, 0, 0, 0);
-		else
-		{
-			if (!m_pConfirmDlg)
-				m_pConfirmDlg = CreateForm<FrForm>(g_pFresh->GetManager(), this,
-					"mascot_msg", NULL);
-			if (m_pConfirmDlg)
-			{
-				m_pConfirmDlg->SetMessage(
-					"\xb8\xb6\xbd\xba\xc4\xda\xc6\xae \xb8\xde\xbc\xbc\xc1\xf6\xb8\xa6 \xba\xaf\xb0\xe6 \xc7\xcf\xbd\xc3\xb0\xda\xbd\xc0\xb4\xcf\xb1\xee?",
-					false);
-				m_pConfirmDlg->Open((FRESH_PFN_RESULT)&FrMascotInfoDlg::
-										OnChangeMsgConfirmDlgResult,
-					1);
-			}
 		}
 	}
 }

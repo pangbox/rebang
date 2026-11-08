@@ -13,8 +13,7 @@
 #include "wind.h"
 #include "mathconsts.h"
 #include "slicestr.h"
-
-extern "C" __declspec(dllimport) int __cdecl mkdir(const char*);
+#include <direct.h>
 
 static bool IsSeaPet(const char* name)
 {

@@ -57,26 +57,6 @@ void FrOnelineReqDlg::OnEmoticonInit(int param)
 	m_pEmoticon = DYNAMIC_CAST(FrButton, (FrWnd*)param);
 }
 
-void FrOnelineReqDlg::OnEmoticonBtnUp()
-{
-	if (m_pEmoticon && !m_pEmoticonDlg)
-	{
-		m_pEmoticonDlg =
-			CreateForm<FrEmoticonDlg>(g_pFresh->GetManager(), this, "emoticon");
-		if (m_pEmoticonDlg)
-		{
-			WPoint pos(0.0f, 0.0f);
-			if (m_pEmoticon)
-			{
-				pos.x = m_pEmoticon->GetRect().x - 200.0f;
-				pos.y = m_pEmoticon->GetRect().y - 260.0f;
-			}
-			m_pEmoticonDlg->Open(
-				(FRESH_PFN_RESULT)&FrOnelineReqDlg::OnEmoticonResult, pos, 3);
-		}
-	}
-}
-
 bool FrOnelineReqDlg::OnEmoticonResult(int result, FrForm* pForm)
 {
 	if (m_pEmoticonDlg && result == 1)
@@ -107,6 +87,26 @@ bool FrOnelineReqDlg::OnEmoticonResult(int result, FrForm* pForm)
 	}
 	m_pEmoticonDlg = NULL;
 	return true;
+}
+
+void FrOnelineReqDlg::OnEmoticonBtnUp()
+{
+	if (m_pEmoticon && !m_pEmoticonDlg)
+	{
+		m_pEmoticonDlg =
+			CreateForm<FrEmoticonDlg>(g_pFresh->GetManager(), this, "emoticon");
+		if (m_pEmoticonDlg)
+		{
+			WPoint pos(0.0f, 0.0f);
+			if (m_pEmoticon)
+			{
+				pos.x = m_pEmoticon->GetRect().x - 200.0f;
+				pos.y = m_pEmoticon->GetRect().y - 260.0f;
+			}
+			m_pEmoticonDlg->Open(
+				(FRESH_PFN_RESULT)&FrOnelineReqDlg::OnEmoticonResult, pos, 3);
+		}
+	}
 }
 
 void FrOnelineReqDlg::OnLanguageInit(int param)

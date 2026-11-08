@@ -9,6 +9,7 @@ WPoint g_ptScratchItem[] = { WPoint(-17.0f, -38.0f), WPoint(23.0f, -38.0f),
 	WPoint(3.0f, -38.0f) };
 
 IMPLEMENT_OBJECT(FrScratchDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrScratchDlg, FrForm)
 ON_FRESH_VI("scratchdlg", FRCMD_INIT, FrScratchDlg::OnScratchDlgInit)
 ON_FRESH_VI("scratch_bottom_02", FRCMD_INIT, FrScratchDlg::OnScratchBottomInit)
@@ -406,17 +407,6 @@ void FrScratchDlg::EnableScratchSerialNumber(bool enable)
 	m_bEnableSerialNumber = enable;
 }
 
-void FrScratchDlg::RequestScratchItem()
-{
-	if (m_scratchCardCount && m_bEnableRequestScratchItem)
-	{
-		WSendPacket packet((enumClientPacket)0x70);
-		packet.Send(TO_GAME);
-		m_bEnableRequestScratchItem = false;
-		EnableScratchSerialNumber(false);
-	}
-}
-
 void FrScratchDlg::SendScratchSerialNumber()
 {
 	if (m_pSerialNumber)
@@ -468,6 +458,17 @@ void FrScratchDlg::ResponseScratchSerialNumber(int result,
 	default:
 		SetBmpResultText(0);
 		break;
+	}
+}
+
+void FrScratchDlg::RequestScratchItem()
+{
+	if (m_scratchCardCount && m_bEnableRequestScratchItem)
+	{
+		WSendPacket packet((enumClientPacket)0x70);
+		packet.Send(TO_GAME);
+		m_bEnableRequestScratchItem = false;
+		EnableScratchSerialNumber(false);
 	}
 }
 
@@ -1058,6 +1059,7 @@ void FrScratchDlg::UpdateListMyItem(sBonusBall* ball)
 }
 
 IMPLEMENT_OBJECT(FrScratchResultDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrScratchResultDlg, FrForm)
 ON_FRESH_VI("scratchresultdlg", FRCMD_INIT,
 	FrScratchResultDlg::OnScratchResultDlgInit)
@@ -1322,6 +1324,7 @@ void FrScratchResultDlg::SetResultItem(sBonusBall* balls, int count)
 }
 
 IMPLEMENT_OBJECT(FrScratchAboutDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrScratchAboutDlg, FrForm)
 ON_FRESH_VI("aboutviewer", FRCMD_INIT, FrScratchAboutDlg::OnAboutViewerInit)
 ON_FRESH_VI("index01", FRCMD_INIT, FrScratchAboutDlg::OnIndex01Init)

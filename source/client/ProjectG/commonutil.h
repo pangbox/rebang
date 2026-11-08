@@ -30,6 +30,7 @@ inline int Ceil(float value, float tolerance)
 	}
 }
 
+class Bitmap;
 class cFile;
 class WResourceManager;
 
@@ -41,6 +42,8 @@ unsigned long htoi(const char* str);
 bool str_Replace(std::string& str, const std::string& from,
 	const std::string& to);
 
+void SaveJPG(const char* filename, const Bitmap* bitmap, int quality);
+void SaveBMP(const char* filename, const Bitmap* bitmap);
 std::string GetMyComputerName();
 
 template <class T>

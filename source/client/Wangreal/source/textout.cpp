@@ -71,17 +71,6 @@ int CTextOut::Print(float x, float y, const char* text,
 	return set->width;
 }
 
-float CTextOut::PrintInside(WView*, float x, float y, const char* text,
-	int renderState, unsigned long diffuse, Bitmap*)
-{
-	return (float)Print(x, y, text, renderState, diffuse);
-}
-
-float CTextOut::GetTextWidthInside(WView*, const char* text)
-{
-	return (float)GetTextSet(text, m_iFontSize)->width;
-}
-
 void CTextOut::Flush(WView* view)
 {
 	if (m_DisplayList.size() == 0)
@@ -304,31 +293,6 @@ void CTextOut::UpdateText(_TEXTSET* textset)
 	textset->lastrendertick = timeGetTime();
 }
 
-void CTextOut::Clear(void)
-{
-	Reset();
-	for (list::multimap_str<_TEXTSET*>::iterator current = m_TextSet.begin();
-		current != m_TextSet.end(); current++)
-	{
-		_TEXTSET* set = (*current).second;
-		_IMAGESET* image = set->ptr;
-		while (image != 0)
-		{
-			_IMAGESET* old = image;
-			image = image->next;
-			delete old;
-		}
-		delete (*current).second;
-	}
-	m_TextSet.clear();
-
-	m_DisplayList.clear();
-
-	for (unsigned int index = 0; index < m_TextList.size(); ++index)
-		GetResrcManager()->Release(m_TextList[index]);
-	m_TextList.clear();
-}
-
 void CTextOut::UpdateTexture(void)
 {
 	if (m_bUpdateTexture == true)
@@ -386,4 +350,40 @@ void CTextOut::Reset(void)
 	m_WorkY[1] = 0;
 	m_bUpdateTexture = false;
 	m_BeginWorkTextureCnt = 0;
+}
+
+void CTextOut::Clear(void)
+{
+	Reset();
+	for (list::multimap_str<_TEXTSET*>::iterator current = m_TextSet.begin();
+		current != m_TextSet.end(); current++)
+	{
+		_TEXTSET* set = (*current).second;
+		_IMAGESET* image = set->ptr;
+		while (image != 0)
+		{
+			_IMAGESET* old = image;
+			image = image->next;
+			delete old;
+		}
+		delete (*current).second;
+	}
+	m_TextSet.clear();
+
+	m_DisplayList.clear();
+
+	for (unsigned int index = 0; index < m_TextList.size(); ++index)
+		GetResrcManager()->Release(m_TextList[index]);
+	m_TextList.clear();
+}
+
+float CTextOut::PrintInside(WView*, float x, float y, const char* text,
+	int renderState, unsigned long diffuse, Bitmap*)
+{
+	return (float)Print(x, y, text, renderState, diffuse);
+}
+
+float CTextOut::GetTextWidthInside(WView*, const char* text)
+{
+	return (float)GetWidth(text);
 }

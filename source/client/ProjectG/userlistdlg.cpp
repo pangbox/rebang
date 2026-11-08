@@ -330,9 +330,6 @@ void FrUserListDlg::OnUserListOwnerDraw(int param)
 
 void FrUserListDlg::OnUserListLBtnDown()
 {
-	// HACK
-	if (0)
-		OnSexBtnUp();
 	FrListItem* item = m_pUserList->GetItemUnderCursor();
 	if (item)
 	{

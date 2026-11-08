@@ -6,45 +6,23 @@
 
 typedef void*(__cdecl* WEnumDeviceProc)(int);
 
-bool WDeviceManager::ResetVideoDevice(bool windowed, int width, int height,
-	int bpp, long refresh, int flags)
+WDeviceManager::WDeviceManager(const char* name, int flags)
 {
-	for (WVideoDev* video = vidList.Start(); video; video = vidList.Next())
-	{
-		for (WDevice* device = devList.Start(); device; device = devList.Next())
-		{
-			if (strstr(device->GetDeviceName(), video->GetDeviceName()) ||
-				strstr(video->GetDeviceName(), device->GetDeviceName()))
-				return ((WVideoDev*)device)
-					->Reset(windowed, width, height, bpp, refresh, flags);
-		}
-	}
-	return false;
+	LoadModule(name, flags);
 }
 
-char* WDeviceManager::EnumVideoDevice(void)
+WDeviceManager::~WDeviceManager()
 {
-	static char text[512];
-
-	int offset;
-	WVideoDev* video;
-	for (video = vidList.Start(), offset = 0; video; video = vidList.Next())
+	for (;;)
 	{
-		strcpy(text + offset, video->GetDeviceName());
-		offset += (int)strlen(video->GetDeviceName()) + 1;
+		WDevice* device = devList.Start();
+		if (!device)
+			break;
+		Release(device);
 	}
-	text[offset] = '\0';
-	return text;
-}
 
-char* WDeviceManager::EnumVideoMode(char* name)
-{
-	for (WVideoDev* video = vidList.Start(); video; video = vidList.Next())
-	{
-		if (!strcmpi(video->GetDeviceName(), name))
-			return video->EnumModeName();
-	}
-	return 0;
+	for (HINSTANCE library = dllList.Start(); library; library = dllList.Next())
+		FreeLibrary(library);
 }
 
 void WDeviceManager::LoadModule(const char* name, int flags)
@@ -148,6 +126,22 @@ WVideoDev* WDeviceManager::CreateVideoDevice(char* name, char* mode, int flags)
 	return created;
 }
 
+bool WDeviceManager::ResetVideoDevice(bool windowed, int width, int height,
+	int bpp, long refresh, int flags)
+{
+	for (WVideoDev* video = vidList.Start(); video; video = vidList.Next())
+	{
+		for (WDevice* device = devList.Start(); device; device = devList.Next())
+		{
+			if (strstr(device->GetDeviceName(), video->GetDeviceName()) ||
+				strstr(video->GetDeviceName(), device->GetDeviceName()))
+				return ((WVideoDev*)device)
+					->Reset(windowed, width, height, bpp, refresh, flags);
+		}
+	}
+	return false;
+}
+
 WInputDev* WDeviceManager::CreateInputDevice(char* name, char* mode)
 {
 	WInputDev* created = 0;
@@ -170,21 +164,27 @@ void WDeviceManager::Release(WDevice* device)
 	delete device;
 }
 
-WDeviceManager::WDeviceManager(const char* name, int flags)
+char* WDeviceManager::EnumVideoDevice(void)
 {
-	LoadModule(name, flags);
+	static char text[512];
+
+	int offset;
+	WVideoDev* video;
+	for (video = vidList.Start(), offset = 0; video; video = vidList.Next())
+	{
+		strcpy(text + offset, video->GetDeviceName());
+		offset += (int)strlen(video->GetDeviceName()) + 1;
+	}
+	text[offset] = '\0';
+	return text;
 }
 
-WDeviceManager::~WDeviceManager()
+char* WDeviceManager::EnumVideoMode(char* name)
 {
-	for (;;)
+	for (WVideoDev* video = vidList.Start(); video; video = vidList.Next())
 	{
-		WDevice* device = devList.Start();
-		if (!device)
-			break;
-		Release(device);
+		if (!strcmpi(video->GetDeviceName(), name))
+			return video->EnumModeName();
 	}
-
-	for (HINSTANCE library = dllList.Start(); library; library = dllList.Next())
-		FreeLibrary(library);
+	return 0;
 }

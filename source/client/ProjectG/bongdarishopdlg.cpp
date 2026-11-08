@@ -1528,6 +1528,25 @@ void FrBongdariShopDlg::DrawUserInfo()
 	}
 }
 
+void FrBongdariShopDlg::SetOpeningBonusBallInfo(sBonusBall* ball)
+{
+	char text[256] = "";
+	if (ball)
+	{
+		IFF_ITEM_COMMON* item = ItemManager()->FindCommonItem(ball->typeId);
+		if (item)
+			SetMessage(MakeStr("%s %d\xb0\xb3 \xc8\xb9\xb5\xe6", item->Name,
+						   ball->count),
+				false);
+	}
+	else
+	{
+		SetMessage(
+			"\xc8\xb9\xb5\xe6 \xbe\xc6\xc0\xcc\xc5\xdb \xc1\xa4\xba\xb8\xb0\xa1 \xc7\xa5\xbd\xc3\xb5\xcb\xb4\xcf\xb4\xd9",
+			false);
+	}
+}
+
 void FrBongdariShopDlg::ShowBongdari()
 {
 	if (m_pPetBongdari)
@@ -1599,25 +1618,6 @@ void FrBongdariShopDlg::SetStartAnimationBongdari()
 	{
 		m_bAnimating = true;
 		m_pPetBongdari->SetMotion(s_bongdariMotions[rand() % 5 + 1], false, 0);
-	}
-}
-
-void FrBongdariShopDlg::SetOpeningBonusBallInfo(sBonusBall* ball)
-{
-	char text[256] = "";
-	if (ball)
-	{
-		IFF_ITEM_COMMON* item = ItemManager()->FindCommonItem(ball->typeId);
-		if (item)
-			SetMessage(MakeStr("%s %d\xb0\xb3 \xc8\xb9\xb5\xe6", item->Name,
-						   ball->count),
-				false);
-	}
-	else
-	{
-		SetMessage(
-			"\xc8\xb9\xb5\xe6 \xbe\xc6\xc0\xcc\xc5\xdb \xc1\xa4\xba\xb8\xb0\xa1 \xc7\xa5\xbd\xc3\xb5\xcb\xb4\xcf\xb4\xd9",
-			false);
 	}
 }
 
@@ -2136,6 +2136,7 @@ void FrBongdariShopDlg::DrawBonusBall(unsigned int index)
 }
 
 IMPLEMENT_OBJECT(FrAboutShopDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrAboutShopDlg, FrForm)
 ON_FRESH_VI("about_shop", FRCMD_INIT, FrAboutShopDlg::OnAboutShopInit)
 ON_FRESH_VI("aboutviewer", FRCMD_INIT, FrAboutShopDlg::OnAboutViewerInit)
@@ -2358,6 +2359,7 @@ void FrAboutShopDlg::SetImgAboutIndex(int index)
 }
 
 IMPLEMENT_OBJECT(FrTotalItemDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrTotalItemDlg, FrForm)
 ON_FRESH_VI("total_item", FRCMD_INIT, FrTotalItemDlg::OnTotalItemInit)
 ON_FRESH_VI("totalitemlist", FRCMD_INIT, FrTotalItemDlg::OnTotalItemListInit)
@@ -2605,6 +2607,7 @@ void FrTotalItemDlg::SetListItem(std::list<sBonusBall>* items)
 char* g_strIndex[] = { "1", "2", "3", "4", "5" };
 
 IMPLEMENT_OBJECT(FrBongdarishopNoticeDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrBongdarishopNoticeDlg, FrForm)
 ON_FRESH_VI("bongdarishop_notice", FRCMD_INIT,
 	FrBongdarishopNoticeDlg::OnBongdarishopNoticeInit)
@@ -2864,6 +2867,7 @@ void FrBongdarishopNoticeDlg::NextIndex()
 }
 
 IMPLEMENT_OBJECT(FrBongdarishopRareItemDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrBongdarishopRareItemDlg, FrForm)
 ON_FRESH_VI("bongdarishop_rareitem", FRCMD_INIT,
 	FrBongdarishopRareItemDlg::OnBongdarishopRareItemInit)
@@ -3031,6 +3035,7 @@ void FrBongdarishopRareItemDlg::SetRareItem(sBonusBall* ball)
 }
 
 IMPLEMENT_OBJECT(FrBongdarishopWarningDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrBongdarishopWarningDlg, FrForm)
 ON_FRESH_VI("bongdarishop_warning", FRCMD_INIT,
 	FrBongdarishopWarningDlg::OnBongdarishopWarningInit)
@@ -3099,19 +3104,6 @@ void FrBongdarishopWarningDlg::OnOkBnUp()
 	OnFreshOkay();
 }
 
-void FrBongdarishopWarningDlg::OnWarningBackOwnerDraw(int param)
-{
-	if (m_type == 2)
-	{
-		WRect rect;
-		rect = GetRect();
-		char text[32] = "";
-		MakePriceStrA(text, m_price);
-		m_pFont->Print(g_view, rect.x + 170, rect.y + 50, text, 0, 0xffffffff,
-			NULL);
-	}
-}
-
 bool FrBongdarishopWarningDlg::OnInit()
 {
 	return true;
@@ -3134,7 +3126,21 @@ void FrBongdarishopWarningDlg::SetImgWarningBack(int type, int price)
 	}
 }
 
+void FrBongdarishopWarningDlg::OnWarningBackOwnerDraw(int param)
+{
+	if (m_type == 2)
+	{
+		WRect rect;
+		rect = GetRect();
+		char text[32] = "";
+		MakePriceStrA(text, m_price);
+		m_pFont->Print(g_view, rect.x + 170, rect.y + 50, text, 0, 0xffffffff,
+			NULL);
+	}
+}
+
 IMPLEMENT_OBJECT(FrClosedBonusBallResultDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrClosedBonusBallResultDlg, FrForm)
 ON_FRESH_VI("closed_bonusball", FRCMD_INIT,
 	FrClosedBonusBallResultDlg::OnClosedBonusBallResultInit)

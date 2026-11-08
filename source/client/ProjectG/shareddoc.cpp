@@ -13,8 +13,8 @@ ILFILLTU_SHAREDDOC0
 #include "../../shared/s5/sharedutilities.h"
 #include "standinginline.h"
 #include "mathconsts.h"
+#include <direct.h>
 
-extern "C" __declspec(dllimport) int __cdecl mkdir(const char*);
 char* GetStr(char* str, char* out);
 void LineParse(const char* line, std::vector<std::string>& tokens);
 

@@ -118,7 +118,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		unsigned long guid = packet.Decode4();
 		unsigned char kind = packet.Decode1();
 
-		if (guid == WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwGuid)
+		if (guid == Doc()->m_myInfo.info.dwGuid)
 		{
 			break;
 		}
@@ -155,20 +155,18 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 		if (index == 3)
 		{
-			packet.DecodeBuffer(
-				WSingleton<CSharedDoc>::Instance()->m_tutorialComplete,
-				sizeof(WSingleton<CSharedDoc>::Instance()->m_tutorialComplete));
+			packet.DecodeBuffer(Doc()->m_tutorialComplete,
+				sizeof(Doc()->m_tutorialComplete));
 		}
 		else if (index < 3)
 		{
-			WSingleton<CSharedDoc>::Instance()->m_tutorialComplete[index] =
-				packet.Decode4();
+			Doc()->m_tutorialComplete[index] = packet.Decode4();
 		}
 		break;
 	}
 	case 0xB0:
 	{
-		WSingleton<CSharedDoc>::Instance()->m_noteList.clear();
+		Doc()->m_noteList.clear();
 
 		unsigned char count = packet.Decode1();
 		for (unsigned char i = 0; i < count; i++)
@@ -176,9 +174,8 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			sNoteInfo note;
 			packet.DecodeBuffer(&note, 0x6D);
 
-			WSingleton<CSharedDoc>::Instance()->m_chatManager.FilteringHack(
-				note.sNote, false);
-			WSingleton<CSharedDoc>::Instance()->m_noteList.push_back(note);
+			Doc()->m_chatManager.FilteringHack(note.sNote, false);
+			Doc()->m_noteList.push_back(note);
 		}
 		break;
 	}
@@ -203,12 +200,11 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		packet.DecodeStr(nickname);
 		packet.DecodeStr(message);
 
-		WSingleton<CSharedDoc>::Instance()->m_chatManager.FilteringHack(
-			message.c_str(), false);
+		Doc()->m_chatManager.FilteringHack(message.c_str(), false);
 
 		if (own)
 		{
-			text = WSingleton<CSharedDoc>::Instance()->m_myInfo.info.sNick;
+			text = Doc()->m_myInfo.info.sNick;
 			text += ">";
 			text += nickname;
 		}
@@ -219,11 +215,10 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				break;
 			}
 
-			std::list<std::string>::iterator it = std::find(
-				WSingleton<CSharedDoc>::Instance()->m_ignoreList.begin(),
-				WSingleton<CSharedDoc>::Instance()->m_ignoreList.end(),
-				nickname);
-			if (it != WSingleton<CSharedDoc>::Instance()->m_ignoreList.end())
+			std::list<std::string>::iterator it =
+				std::find(Doc()->m_ignoreList.begin(),
+					Doc()->m_ignoreList.end(), nickname);
+			if (it != Doc()->m_ignoreList.end())
 			{
 				break;
 			}
@@ -270,15 +265,13 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		}
 
 		std::list<std::string>::iterator it = std::find(
-			WSingleton<CSharedDoc>::Instance()->m_ignoreList.begin(),
-			WSingleton<CSharedDoc>::Instance()->m_ignoreList.end(), nickname);
-		if (it != WSingleton<CSharedDoc>::Instance()->m_ignoreList.end())
+			Doc()->m_ignoreList.begin(), Doc()->m_ignoreList.end(), nickname);
+		if (it != Doc()->m_ignoreList.end())
 		{
 			break;
 		}
 
-		WSingleton<CSharedDoc>::Instance()->m_chatManager.FilteringHack(
-			message.c_str(), false);
+		Doc()->m_chatManager.FilteringHack(message.c_str(), false);
 
 		text = nickname + ">" + "\xc6\xc0\xbf\xa1\xb0\xd4";
 		text += " : ";
@@ -296,65 +289,43 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 		std::string title, password;
 
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType =
-			packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.mapType =
-			packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.nHole = packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.holeType =
-			packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.nUserLimit =
-			packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.nGalleryLimit =
-			packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.bSleep =
-			packet.Decode1() == 1;
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.shotTimeLimit =
-			packet.Decode4();
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameTimeLimit =
-			packet.Decode4();
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.tidMatch =
-			packet.Decode4();
+		Doc()->m_roomInfo.gameType = packet.Decode1();
+		Doc()->m_roomInfo.mapType = packet.Decode1();
+		Doc()->m_roomInfo.nHole = packet.Decode1();
+		Doc()->m_roomInfo.holeType = packet.Decode1();
+		Doc()->m_roomInfo.nUserLimit = packet.Decode1();
+		Doc()->m_roomInfo.nGalleryLimit = packet.Decode1();
+		Doc()->m_roomInfo.bSleep = packet.Decode1() == 1;
+		Doc()->m_roomInfo.shotTimeLimit = packet.Decode4();
+		Doc()->m_roomInfo.gameTimeLimit = packet.Decode4();
+		Doc()->m_roomInfo.tidMatch = packet.Decode4();
 
 		packet.DecodeStr(password);
-		memset(WSingleton<CSharedDoc>::Instance()->m_roomInfo.password, 0,
-			sizeof(WSingleton<CSharedDoc>::Instance()->m_roomInfo.password));
-		strncpy(WSingleton<CSharedDoc>::Instance()->m_roomInfo.password,
-			password.c_str(),
-			sizeof(WSingleton<CSharedDoc>::Instance()->m_roomInfo.password) -
-				1);
+		memset(Doc()->m_roomInfo.password, 0,
+			sizeof(Doc()->m_roomInfo.password));
+		strncpy(Doc()->m_roomInfo.password, password.c_str(),
+			sizeof(Doc()->m_roomInfo.password) - 1);
 
 		packet.DecodeStr(title);
-		WSingleton<CSharedDoc>::Instance()->m_chatManager.FilteringHack(
-			title.c_str(), false);
-		memset(WSingleton<CSharedDoc>::Instance()->m_roomInfo.title, 0,
-			sizeof(WSingleton<CSharedDoc>::Instance()->m_roomInfo.title));
-		strncpy(WSingleton<CSharedDoc>::Instance()->m_roomInfo.title,
-			title.c_str(),
-			sizeof(WSingleton<CSharedDoc>::Instance()->m_roomInfo.title) - 1);
+		Doc()->m_chatManager.FilteringHack(title.c_str(), false);
+		memset(Doc()->m_roomInfo.title, 0, sizeof(Doc()->m_roomInfo.title));
+		strncpy(Doc()->m_roomInfo.title, title.c_str(),
+			sizeof(Doc()->m_roomInfo.title) - 1);
 
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.bPublic =
-			strlen(WSingleton<CSharedDoc>::Instance()->m_roomInfo.password) ==
-			0;
+		Doc()->m_roomInfo.bPublic = strlen(Doc()->m_roomInfo.password) == 0;
 
-		if (strlen(title.c_str()) >
-				strlen(WSingleton<CSharedDoc>::Instance()->m_roomInfo.title) ||
-			strlen(password.c_str()) >
-				strlen(WSingleton<CSharedDoc>::Instance()->m_roomInfo.password))
+		if (strlen(title.c_str()) > strlen(Doc()->m_roomInfo.title) ||
+			strlen(password.c_str()) > strlen(Doc()->m_roomInfo.password))
 		{
 			int titleLength = strlen(title.c_str());
 			int passwordLength = strlen(password.c_str());
 
 			WSingleton<CProjectG>::Instance()->ReportError(6,
 				"[%d_%d]_%d_%d_%d_%d_%d_%d(%d_%d)", titleLength, passwordLength,
-				changes,
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType,
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.realGameType,
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.mapType,
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.nHole,
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.nUserLimit,
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.roomGuid,
-				WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwGuid);
+				changes, Doc()->m_roomInfo.gameType,
+				Doc()->m_roomInfo.realGameType, Doc()->m_roomInfo.mapType,
+				Doc()->m_roomInfo.nHole, Doc()->m_roomInfo.nUserLimit,
+				Doc()->m_roomInfo.roomGuid, Doc()->m_myInfo.info.dwGuid);
 		}
 
 		int refresh;
@@ -364,12 +335,10 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		{
 			GetActor("Lobby") << MsgObject(0, 2, 0, 0, 0, 0, 0);
 			GetActor("Lobby") << MsgObject(0, 0x10, 0, 0, 0, 0, 0);
-			GetActor("Lobby") << MsgObject(0, 0x11,
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.mapType, 0, 0, 0,
-				0);
-			GetActor("Lobby") << MsgObject(0, 0x12,
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.holeType, 0, 0,
-				0, 0);
+			GetActor("Lobby")
+				<< MsgObject(0, 0x11, Doc()->m_roomInfo.mapType, 0, 0, 0, 0);
+			GetActor("Lobby")
+				<< MsgObject(0, 0x12, Doc()->m_roomInfo.holeType, 0, 0, 0, 0);
 			GetActor("Lobby") << MsgObject(0, 0x2F, 0, 0, 0, 0, 0);
 		}
 		break;
@@ -382,7 +351,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 		if (IsLocalContent((localContentType_t)0x54))
 		{
-			WSingleton<CSharedDoc>::Instance()->m_inviteMode = 0;
+			Doc()->m_inviteMode = 0;
 		}
 
 		unsigned char result = packet.Decode1();
@@ -390,44 +359,33 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		{
 			if (packet.Decode1())
 			{
-				WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwIdentity |=
-					2;
-				WSingleton<CSharedDoc>::Instance()
-					->m_myInfo.info.dwGalleryGuid = packet.Decode4();
+				Doc()->m_myInfo.info.dwIdentity |= 2;
+				Doc()->m_myInfo.info.dwGalleryGuid = packet.Decode4();
 			}
 			else
 			{
-				WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwIdentity &=
-					~2;
-				WSingleton<CSharedDoc>::Instance()
-					->m_myInfo.info.dwGalleryGuid = 0xFFFFFFFF;
+				Doc()->m_myInfo.info.dwIdentity &= ~2;
+				Doc()->m_myInfo.info.dwGalleryGuid = 0xFFFFFFFF;
 			}
 
-			WSingleton<CSharedDoc>::Instance()->m_slotList.clear();
-			WSingleton<CSharedDoc>::Instance()->m_rivalList.clear();
-			WSingleton<CSharedDoc>::Instance()->m_guildMatchupList.clear();
-			WSingleton<CSharedDoc>::Instance()->m_bGameOver = false;
+			Doc()->m_slotList.clear();
+			Doc()->m_rivalList.clear();
+			Doc()->m_guildMatchupList.clear();
+			Doc()->m_bGameOver = false;
 
-			packet.DecodeBuffer(&WSingleton<CSharedDoc>::Instance()->m_roomInfo,
-				sizeof(sRoomInfo));
+			packet.DecodeBuffer(&Doc()->m_roomInfo, sizeof(sRoomInfo));
 
-			WSingleton<CSharedDoc>::Instance()->m_chatManager.FilteringHack(
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.title, false);
-			WSingleton<CSharedDoc>::Instance()->m_myInfo.roomIndex =
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.roomGuid;
+			Doc()->m_chatManager.FilteringHack(Doc()->m_roomInfo.title, false);
+			Doc()->m_myInfo.roomIndex = Doc()->m_roomInfo.roomGuid;
 
 			std::map<unsigned long, sUserInfoTime>::iterator info;
-			if (WSingleton<CSharedDoc>::Instance()->FindUserInfoTimeGUID(
-					WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwGuid,
-					info))
+			if (Doc()->FindUserInfoTimeGUID(Doc()->m_myInfo.info.dwGuid, info))
 			{
-				info->second.info.roomIndex =
-					WSingleton<CSharedDoc>::Instance()->m_roomInfo.roomGuid;
+				info->second.info.roomIndex = Doc()->m_roomInfo.roomGuid;
 			}
 
 			const char* layout;
-			if (IsMassGame(
-					WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType))
+			if (IsMassGame(Doc()->m_roomInfo.gameType))
 			{
 				GetActor("Lobby") << MsgObject(0, 0x2E, 0, 0, 0, 0, 0);
 				layout = "GAMEROOM_EXT";
@@ -437,30 +395,26 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				layout = "GAMEROOM";
 			}
 
-			WSingleton<CSharedDoc>::Instance()->m_chatLineList.clear();
+			Doc()->m_chatLineList.clear();
 
 			if (WSingleton<WNetworkSystem>::Instance()->IsConnected(
 					WNetworkSystem::NET_MSN) &&
 				WSingleton<CMessengerInfo>::Instance()->GetComplete() == 4)
 			{
 				sUserPosition position;
-				position.iServerGUID =
-					WSingleton<CSharedDoc>::Instance()->m_gameServerUID;
-				position.iChannelUid =
-					WSingleton<CSharedDoc>::Instance()->m_curChannel.Uid;
+				position.iServerGUID = Doc()->m_gameServerUID;
+				position.iChannelUid = Doc()->m_curChannel.Uid;
 				wsprintfA(position.csChannelName, "%s",
-					WSingleton<CSharedDoc>::Instance()->m_curChannel.Name);
-				position.iRoomIdx =
-					WSingleton<CSharedDoc>::Instance()->m_roomInfo.roomGuid;
-				position.iRoomType =
-					WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType;
+					Doc()->m_curChannel.Name);
+				position.iRoomIdx = Doc()->m_roomInfo.roomGuid;
+				position.iRoomType = Doc()->m_roomInfo.gameType;
 
 				WSendPacket send(0x23);
 				send.EncodeBuffer(&position, sizeof(position));
 				send.Send(TO_MSN);
 			}
 
-			if (WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType == 2)
+			if (Doc()->m_roomInfo.gameType == 2)
 			{
 				WSingleton<CMouseCursor>::Instance()->SetActive(false);
 				WSingleton<COption>::Instance()->vSetMinimumScreenSize(1, 800,
@@ -472,25 +426,19 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				break;
 			}
 
-			if (WSingleton<CSharedDoc>::Instance()->m_roomInfo.realGameType ==
-					14 &&
-				WSingleton<CSharedDoc>::Instance()->m_roomInfo.masterUID ==
-					WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwUID)
+			if (Doc()->m_roomInfo.realGameType == 14 &&
+				Doc()->m_roomInfo.masterUID == Doc()->m_myInfo.info.dwUID)
 			{
 				std::list<sItemInfo>::iterator it;
-				for (it = WSingleton<CSharedDoc>::Instance()
-						 ->m_myItemList.begin();
-					it !=
-					WSingleton<CSharedDoc>::Instance()->m_myItemList.end();
-					++it)
+				for (it = Doc()->m_myItemList.begin();
+					it != Doc()->m_myItemList.end(); ++it)
 				{
 					if (it->tid == 0x1A0000F7 && it->Common[0] > 0)
 					{
 						it->Common[0]--;
 						if (it->Common[0] < 1)
 						{
-							WSingleton<CSharedDoc>::Instance()
-								->m_myItemList.erase(it);
+							Doc()->m_myItemList.erase(it);
 						}
 						break;
 					}
@@ -504,51 +452,15 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			if (false)
 			{
 				(void)&g_EPSILON;
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
-				WSingleton<CSharedDoc>::Instance()->m_slotList.begin();
+				Doc()->m_slotList.begin();
+				Doc()->m_slotList.begin();
+				Doc()->m_slotList.begin();
+				Doc()->m_slotList.begin();
+				Doc()->m_slotList.begin();
+				Doc()->m_slotList.begin();
+				Doc()->m_slotList.begin();
+				Doc()->m_slotList.begin();
+				Doc()->m_slotList.begin();
 			}
 
 			GetActor("Lobby") << MsgObject(0, 0, (intptr_t)layout, 0, 0, 0, 0);
@@ -561,15 +473,14 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	}
 	case 0x80:
 	{
-		std::list<sSlotInfo>& players =
-			WSingleton<CSharedDoc>::Instance()->m_slotList;
+		std::list<sSlotInfo>& players = Doc()->m_slotList;
 
 		std::list<sSlotInfo>::iterator it;
 		unsigned long uid = packet.Decode4();
 
 		if (uid != 0xFFFFFFFF)
 		{
-			if (uid == WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwGuid)
+			if (uid == Doc()->m_myInfo.info.dwGuid)
 			{
 				AfxPostMsg(0, "Lobby", 2, 0, 0, 0, 0);
 				AfxPostMsg(0, "Lobby", 0, (intptr_t)"ROOMLIST", 0, 0, 0);
@@ -593,8 +504,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	{
 		unsigned long uid = packet.Decode4();
 
-		std::list<sSlotInfo>& players =
-			WSingleton<CSharedDoc>::Instance()->m_slotList;
+		std::list<sSlotInfo>& players = Doc()->m_slotList;
 
 		for (std::list<sSlotInfo>::iterator it = players.begin();
 			it != players.end();)
@@ -611,8 +521,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			}
 		}
 
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.nUserNum =
-			(unsigned char)players.size();
+		Doc()->m_roomInfo.nUserNum = (unsigned char)players.size();
 
 		GetActor("Lobby") << MsgObject(0, 0x2F, 0, 0, 0, 0, 0);
 		GetActor("Lobby") << MsgObject(0, 0x0F, 0, 0, 0, 0, 0);
@@ -621,8 +530,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	}
 	case 0xAC:
 	{
-		std::list<sSlotInfo>& players =
-			WSingleton<CSharedDoc>::Instance()->m_slotList2;
+		std::list<sSlotInfo>& players = Doc()->m_slotList2;
 
 		unsigned char type = packet.Decode1();
 		switch (type)
@@ -641,7 +549,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 			GetActor("Lobby") << MsgObject(0, 0x2F, 0, 0, 0, 0, 0);
 			GetActor("Lobby") << MsgObject(0, 0x0F, 0, 0, 0, 0, 0);
-			if (WSingleton<CSharedDoc>::Instance()->m_slotList.size() == 0)
+			if (Doc()->m_slotList.size() == 0)
 			{
 				GetActor("Lobby") << MsgObject(0, 0x0E, 0, 0, 0, 0, 0);
 			}
@@ -679,8 +587,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	}
 	case 0x46:
 	{
-		std::list<sSlotInfo>& players =
-			WSingleton<CSharedDoc>::Instance()->m_slotList;
+		std::list<sSlotInfo>& players = Doc()->m_slotList;
 
 		unsigned char type = packet.Decode1();
 		packet.Decode2();
@@ -704,8 +611,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				packet.DecodeBuffer(&slot, sizeof(slot));
 				players.push_back(slot);
 
-				if (!IsMassGame(WSingleton<CSharedDoc>::Instance()
-							->m_roomInfo.gameType))
+				if (!IsMassGame(Doc()->m_roomInfo.gameType))
 				{
 					packet.DecodeBuffer(&character, sizeof(character));
 					if (IsLocalContent((localContentType_t)0x57))
@@ -731,7 +637,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			{
 				std::map<unsigned int, sCaddieInfo>::iterator caddie;
 
-				CSharedDoc* doc = WSingleton<CSharedDoc>::Instance();
+				CSharedDoc* doc = Doc();
 				std::map<unsigned int, sCaddieInfo>& caddies = doc->m_caddieMap;
 				caddie = caddies.find(doc->m_myInfo.userEquip.guidCaddie);
 
@@ -745,13 +651,9 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 						<< MsgObject(0, 0x13, caddie->second.tid, 1, 0, 0, 0);
 				}
 				GetActor("Lobby") << MsgObject(0, 0x14,
-					WSingleton<CSharedDoc>::Instance()
-						->m_myInfo.userEquip.guidClubSet,
-					0, 0, 0, 0);
+					Doc()->m_myInfo.userEquip.guidClubSet, 0, 0, 0, 0);
 				GetActor("Lobby") << MsgObject(0, 0x15,
-					WSingleton<CSharedDoc>::Instance()
-						->m_myInfo.userEquip.tidBall,
-					0, 0, 0, 0);
+					Doc()->m_myInfo.userEquip.tidBall, 0, 0, 0, 0);
 			}
 
 			GetActor("Lobby") << MsgObject(0, 0x0E, 0, 0, 0, 0, 0);
@@ -772,8 +674,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			players.push_back(slot);
 
 			it = --players.end();
-			if (IsMassGame(
-					WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType))
+			if (IsMassGame(Doc()->m_roomInfo.gameType))
 			{
 				GetActor("Lobby")
 					<< MsgObject(0, 7, (intptr_t)&*it, 0, 0, 0, 0);
@@ -851,13 +752,12 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		}
 		}
 
-		WSingleton<CSharedDoc>::Instance()->m_roomInfo.nUserNum =
-			(unsigned char)players.size();
+		Doc()->m_roomInfo.nUserNum = (unsigned char)players.size();
 
 		GetActor("Lobby") << MsgObject(0, 0x2F, 0, 0, 0, 0, 0);
 		GetActor("Lobby") << MsgObject(0, 0x0F, 0, 0, 0, 0, 0);
 		GetActor("Lobby") << MsgObject(0, 0x10, 0, 0, 0, 0, 0);
-		if (WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType == 6)
+		if (Doc()->m_roomInfo.gameType == 6)
 		{
 			GetActor("Lobby") << MsgObject(0, 0x71, 0, 0, 0, 0, 0);
 		}
@@ -879,41 +779,32 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				break;
 			}
 
-			WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwUID =
-				packet.Decode4();
-			WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwIdentity =
-				packet.Decode4();
-			strcpy(WSingleton<CSharedDoc>::Instance()->m_myInfo.info.sID,
-				id.c_str());
+			Doc()->m_myInfo.info.dwUID = packet.Decode4();
+			Doc()->m_myInfo.info.dwIdentity = packet.Decode4();
+			strcpy(Doc()->m_myInfo.info.sID, id.c_str());
 
-			WSingleton<CSharedDoc>::Instance()->m_provType =
-				LOGININFO()->ProvType();
-			WSingleton<CSharedDoc>::Instance()->m_myInfo.stat.Level =
-				packet.Decode1();
-			WSingleton<CSharedDoc>::Instance()->m_lobbyLoginTime =
-				timeGetTime();
+			Doc()->m_provType = LOGININFO()->ProvType();
+			Doc()->m_myInfo.stat.Level = packet.Decode1();
+			Doc()->m_lobbyLoginTime = timeGetTime();
 
 			_GGC_SendUserID(MyId());
 
-			WSingleton<CSharedDoc>::Instance()->m_pcBang =
-				packet.Decode1() == 1;
+			Doc()->m_pcBang = packet.Decode1() == 1;
 
 			unsigned long flagBlock = packet.Decode4();
 			int timeBlock = packet.Decode4();
 
 			if (IsLocalContent((localContentType_t)8))
 			{
-				WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwFlagBlock =
-					flagBlock;
-				WSingleton<CSharedDoc>::Instance()->SetTimeBlock(timeBlock);
+				Doc()->m_myInfo.info.dwFlagBlock = flagBlock;
+				Doc()->SetTimeBlock(timeBlock);
 			}
 
 			if (IsLocalContent((localContentType_t)0x81))
 			{
 				std::string nickname;
 				packet.DecodeStr(nickname);
-				strcpy(WSingleton<CSharedDoc>::Instance()->m_myInfo.info.sNick,
-					nickname.c_str());
+				strcpy(Doc()->m_myInfo.info.sNick, nickname.c_str());
 			}
 
 			GetActor("Lobby") << MsgObject(0, 0x1E, 4, 0, 0, 0, 0);
@@ -950,13 +841,13 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 			if (packet.Decode4() != 0xFFFFFFFF)
 			{
-				WSingleton<CSharedDoc>::Instance()->SetForceNicknameChange(2);
+				Doc()->SetForceNicknameChange(2);
 				GetActor("Lobby")
 					<< MsgObject(0, 0, (intptr_t)"BLANK", 0, 0, 0, 0);
 			}
 			else
 			{
-				WSingleton<CSharedDoc>::Instance()->SetForceNicknameChange(1);
+				Doc()->SetForceNicknameChange(1);
 				if (g_pFresh->IsCurrentLayout("LOGIN") == true)
 				{
 					GetActor("Lobby")
@@ -977,17 +868,15 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			GetActor("Lobby") << MsgObject(0, 0x1E, 8, 0, 0, 0, 0);
 			break;
 		case 5:
-			WSingleton<CSharedDoc>::Instance()->m_chatModeName =
-				packet.DecodeStr();
+			Doc()->m_chatModeName = packet.DecodeStr();
 			GetActor("Lobby") << MsgObject(0, 0x1E, 9, 0, 0, 0, 0);
 			break;
 		case 0x13:
 			GetActor("Lobby") << MsgObject(0, 0x1E, 0x17, 0, 0, 0, 0);
 			break;
 		case 7:
-			WSingleton<CSharedDoc>::Instance()->m_chatMode = packet.Decode4();
-			WSingleton<CSharedDoc>::Instance()->m_chatModeName =
-				packet.DecodeStr();
+			Doc()->m_chatMode = packet.Decode4();
+			Doc()->m_chatModeName = packet.DecodeStr();
 			GetActor("Lobby") << MsgObject(0, 0x1E, 0xA, 0, 0, 0, 0);
 			break;
 		case 8:
@@ -1031,7 +920,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		break;
 	}
 	case 0xB:
-		packet.DecodeStr(WSingleton<CSharedDoc>::Instance()->m_authTicket);
+		packet.DecodeStr(Doc()->m_authTicket);
 		break;
 	case 0x11:
 		if (packet.Decode1())
@@ -1078,17 +967,16 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	case 0x10:
 	{
 		std::string authKey = packet.DecodeStr();
-		WSingleton<CSharedDoc>::Instance()->SetLoginAuthKey(authKey);
+		Doc()->SetLoginAuthKey(authKey);
 		break;
 	}
 	case 0xF:
 	{
-		WSingleton<CSharedDoc>::Instance()->m_bTutorialResume = true;
-		WSingleton<CSharedDoc>::Instance()->m_bTutorialRedirect = true;
+		Doc()->m_bTutorialResume = true;
+		Doc()->m_bTutorialRedirect = true;
 
 		unsigned char eventFlag = packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_myInfo.info.gender =
-			eventFlag & 1;
+		Doc()->m_myInfo.info.gender = eventFlag & 1;
 
 		std::string id;
 		packet.DecodeStr(id);
@@ -1116,15 +1004,14 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		AfxGetTask()->GetActor("Lobby")
 			<< MsgObject(0, 0, (intptr_t)"SERVERLIST", 0, 0, 0, 0);
 
-		WSingleton<CSharedDoc>::Instance()->m_gameServerList.clear();
+		Doc()->m_gameServerList.clear();
 		int count = packet.Decode1();
 		sGameServerInfo info;
 		for (int i = 0; i < count; i++)
 		{
 			memset(&info, 0, sizeof(info));
 			packet.DecodeBuffer(&info, sizeof(info));
-			WSingleton<CSharedDoc>::Instance()->m_gameServerList.push_back(
-				info);
+			Doc()->m_gameServerList.push_back(info);
 		}
 
 		GetActor("Lobby") << MsgObject(0, 0x19, 0, 0, 0, 0, 0);
@@ -1147,8 +1034,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		break;
 	}
 	case 0x4:
-		WSingleton<CSharedDoc>::Instance()->m_needParentAgree =
-			packet.Decode1();
+		Doc()->m_needParentAgree = packet.Decode1();
 		break;
 	case 0x3:
 	{
@@ -1376,45 +1262,36 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	}
 	case 0x6A:
 
-		if (IsMassGame(WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType))
+		if (IsMassGame(Doc()->m_roomInfo.gameType))
 		{
 			unsigned long uid = packet.Decode4();
 			unsigned char state = packet.Decode1();
 
-			if (WSingleton<CSharedDoc>::Instance()->AreWePlayingTogether(uid))
+			if (Doc()->AreWePlayingTogether(uid))
 			{
 				switch (state)
 				{
 				case 3:
 				{
 					for (std::vector<sRivalData>::iterator rival =
-							 WSingleton<CSharedDoc>::Instance()
-								 ->m_rivalList.begin();
-						rival !=
-						WSingleton<CSharedDoc>::Instance()->m_rivalList.end();
-						++rival)
+							 Doc()->m_rivalList.begin();
+						rival != Doc()->m_rivalList.end(); ++rival)
 					{
 						if (rival->state != 3)
 						{
-							WSingleton<CSharedDoc>::Instance()
-								->m_rivalList[WSingleton<CSharedDoc>::Instance()
-										->GetIndex(uid)]
+							Doc()
+								->m_rivalList[Doc()->GetIndex(uid)]
 								.quitOrder--;
 						}
 					}
 
-					std::list<sSlotInfo>::iterator it = std::find(
-						WSingleton<CSharedDoc>::Instance()->m_slotList.begin(),
-						WSingleton<CSharedDoc>::Instance()->m_slotList.end(),
-						uid);
+					std::list<sSlotInfo>::iterator it =
+						std::find(Doc()->m_slotList.begin(),
+							Doc()->m_slotList.end(), uid);
 
-					if (it !=
-						WSingleton<CSharedDoc>::Instance()->m_slotList.end())
+					if (it != Doc()->m_slotList.end())
 					{
-						if (WSingleton<CSharedDoc>::Instance()
-								->m_rivalList[WSingleton<CSharedDoc>::Instance()
-										->GetIndex(uid)]
-								.state == 2)
+						if (Doc()->m_rivalList[Doc()->GetIndex(uid)].state == 2)
 						{
 							GetActor("Lobby")
 								<< MsgObject(0, 8, (intptr_t)&*it, 0, 0, 0, 0);
@@ -1424,12 +1301,10 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				}
 				case 2:
 				{
-					std::list<sSlotInfo>::iterator it = std::find(
-						WSingleton<CSharedDoc>::Instance()->m_slotList.begin(),
-						WSingleton<CSharedDoc>::Instance()->m_slotList.end(),
-						uid);
-					if (it !=
-						WSingleton<CSharedDoc>::Instance()->m_slotList.end())
+					std::list<sSlotInfo>::iterator it =
+						std::find(Doc()->m_slotList.begin(),
+							Doc()->m_slotList.end(), uid);
+					if (it != Doc()->m_slotList.end())
 					{
 						GetActor("Lobby")
 							<< MsgObject(0, 7, (intptr_t)&*it, 0, 0, 0, 0);
@@ -1438,10 +1313,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				}
 				}
 
-				WSingleton<CSharedDoc>::Instance()
-					->m_rivalList[WSingleton<CSharedDoc>::Instance()->GetIndex(
-						uid)]
-					.state = state;
+				Doc()->m_rivalList[Doc()->GetIndex(uid)].state = state;
 				GetActor("Lobby") << MsgObject(0, 0x2A, 0, 0, 0, 0, 0);
 			}
 		}
@@ -1457,7 +1329,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 			unsigned int distance;
 			int point;
-			if (WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType == 10)
+			if (Doc()->m_roomInfo.gameType == 10)
 			{
 				distance = packet.Decode4();
 				point = packet.Decode4();
@@ -1465,30 +1337,22 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 			packet.Decode2();
 
-			if (WSingleton<CSharedDoc>::Instance()->AreWePlayingTogether(uid))
+			if (Doc()->AreWePlayingTogether(uid))
 			{
-				unsigned char index =
-					WSingleton<CSharedDoc>::Instance()->GetIndex(uid);
-				std::vector<sRivalData>& rivals =
-					WSingleton<CSharedDoc>::Instance()->m_rivalList;
+				unsigned char index = Doc()->GetIndex(uid);
+				std::vector<sRivalData>& rivals = Doc()->m_rivalList;
 
 				if (!WisEqual(rivals[index].ballPos.x, pos[0], 0.00001f) &&
 					!WisEqual(rivals[index].ballPos.z, pos[1], 0.00001f))
 				{
 					rivals[index].ballPos = WVector(pos[0], 0.0f, pos[1]);
 
-					if (WSingleton<CSharedDoc>::Instance()
-							->m_roomInfo.gameType == 10)
+					if (Doc()->m_roomInfo.gameType == 10)
 					{
-						WSingleton<CSharedDoc>::Instance()
-							->m_rivalList[index]
-							.approachDistance = distance;
-						WSingleton<CSharedDoc>::Instance()
-							->m_rivalList[index]
-							.approachResultDistance = distance;
-						WSingleton<CSharedDoc>::Instance()
-							->m_rivalList[index]
-							.approachTime = point;
+						Doc()->m_rivalList[index].approachDistance = distance;
+						Doc()->m_rivalList[index].approachResultDistance =
+							distance;
+						Doc()->m_rivalList[index].approachTime = point;
 					}
 				}
 			}
@@ -1508,12 +1372,10 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 			int finished = packet.Decode1();
 
-			if (WSingleton<CSharedDoc>::Instance()->AreWePlayingTogether(uid))
+			if (Doc()->AreWePlayingTogether(uid))
 			{
-				WSingleton<CSharedDoc>::Instance()->LogGstUpdateHole(uid, hole,
-					score, pang);
-				std::vector<sRivalData>& rivals =
-					WSingleton<CSharedDoc>::Instance()->m_rivalList;
+				Doc()->LogGstUpdateHole(uid, hole, score, pang);
+				std::vector<sRivalData>& rivals = Doc()->m_rivalList;
 				std::vector<sRivalData>::iterator it =
 					std::find_if(rivals.begin(), rivals.end(), sFindRival(uid));
 
@@ -1537,15 +1399,13 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 					rival.totalStroke = shots;
 					rival.totalScore = score;
-					rival.hole = WSingleton<CSharedDoc>::Instance()
-									 ->m_holeOrder[GetHoleIndex(hole)];
+					rival.hole = Doc()->m_holeOrder[GetHoleIndex(hole)];
 				}
 
 				rival.totalPang = pang;
 				rival.totalBonusPang = extraPang;
 
-				if (WSingleton<CSharedDoc>::Instance()->m_golfGame.gameType ==
-					6)
+				if (Doc()->m_golfGame.gameType == 6)
 				{
 					GetActor("Lobby") << MsgObject(0, 0x5E, uid, hole, 0, 0, 0);
 				}
@@ -1556,40 +1416,33 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		break;
 	case 0x77:
 	{
-		if (WSingleton<CSharedDoc>::Instance()->m_holeStatistics[0].dwExp !=
-			0xFFFFFFFF)
+		if (Doc()->m_holeStatistics[0].dwExp != 0xFFFFFFFF)
 		{
 			break;
 		}
 
-		WSingleton<CSharedDoc>::Instance()->m_holeStatistics[0].dwExp =
-			packet.Decode4();
-		WSingleton<CSharedDoc>::Instance()->m_roomType = packet.Decode4();
-		WSingleton<CSharedDoc>::Instance()->m_eventType = packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_eventFlag = packet.Decode1();
+		Doc()->m_holeStatistics[0].dwExp = packet.Decode4();
+		Doc()->m_roomType = packet.Decode4();
+		Doc()->m_eventType = packet.Decode1();
+		Doc()->m_eventFlag = packet.Decode1();
 
-		if (WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType == 6)
+		if (Doc()->m_roomInfo.gameType == 6)
 		{
-			WSingleton<CSharedDoc>::Instance()->m_guildBonusPang =
-				packet.Decode4();
-			WSingleton<CSharedDoc>::Instance()->m_guildPoint = packet.Decode4();
+			Doc()->m_guildBonusPang = packet.Decode4();
+			Doc()->m_guildPoint = packet.Decode4();
 
-			WSingleton<CSharedDoc>::Instance()->m_guildRoundScore[0] =
-				packet.Decode4();
-			WSingleton<CSharedDoc>::Instance()->m_guildRoundScore[1] =
-				packet.Decode4();
+			Doc()->m_guildRoundScore[0] = packet.Decode4();
+			Doc()->m_guildRoundScore[1] = packet.Decode4();
 		}
 
-		packet.DecodeBuffer(WSingleton<CSharedDoc>::Instance()->m_awardItem,
-			0x60);
+		packet.DecodeBuffer(Doc()->m_awardItem, 0x60);
 
 		GetActor("Lobby") << MsgObject(0, 0x2D, 0, 0, 0, 0, 0);
 		break;
 	}
 	case 0x7A:
 	{
-		std::list<sSlotInfo>& players =
-			WSingleton<CSharedDoc>::Instance()->m_slotList;
+		std::list<sSlotInfo>& players = Doc()->m_slotList;
 
 		unsigned long uid = packet.Decode4();
 		packet.Decode2();
@@ -1614,8 +1467,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	}
 	case 0x7B:
 	{
-		std::list<sSlotInfo>& players =
-			WSingleton<CSharedDoc>::Instance()->m_slotList;
+		std::list<sSlotInfo>& players = Doc()->m_slotList;
 
 		unsigned long uid = packet.Decode4();
 		unsigned char team = packet.Decode1();
@@ -1689,8 +1541,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			break;
 		}
 
-		std::list<sSlotInfo>& players =
-			WSingleton<CSharedDoc>::Instance()->m_slotList;
+		std::list<sSlotInfo>& players = Doc()->m_slotList;
 		std::list<sSlotInfo>::iterator it =
 			std::find(players.begin(), players.end(), MyGuid(false));
 		if (it == players.end())
@@ -1704,7 +1555,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				<< MsgObject(0, 0x23, (intptr_t)message.c_str(), 0, 0, 0, 0);
 			GetActor("Lobby") << MsgObject(0, 0x0F, 0, 0, 0, 0, 0);
 		}
-		else if (WSingleton<CSharedDoc>::Instance()->m_roomInfo.gameType == 6)
+		else if (Doc()->m_roomInfo.gameType == 6)
 		{
 			GetActor("Lobby")
 				<< MsgObject(0, 0x23, (intptr_t)message.c_str(), 0, 0, 0, 0);
@@ -1746,8 +1597,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			std::string password = packet.DecodeStr();
 			unsigned long moveKey = packet.Decode4();
 
-			WSingleton<CSharedDoc>::Instance()->SetDirectMoveRoomInfo(server,
-				room, uid);
+			Doc()->SetDirectMoveRoomInfo(server, room, uid);
 
 			WSendPacket send(0x24);
 			send.Encode4(moveKey);
@@ -1771,10 +1621,9 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			sRoomDetail desc;
 			packet.DecodeBuffer(&desc, sizeof(desc));
 
-			WSingleton<CSharedDoc>::Instance()->m_roomDetail = desc;
+			Doc()->m_roomDetail = desc;
 
-			std::list<sRoomUserInfo>& userList =
-				WSingleton<CSharedDoc>::Instance()->m_roomUserList;
+			std::list<sRoomUserInfo>& userList = Doc()->m_roomUserList;
 			userList.clear();
 			for (int i = 0; i < count; i++)
 			{
@@ -1802,10 +1651,8 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			unsigned short roomIndex = packet.Decode2();
 
 			std::map<unsigned long, sBriefUserInfo>::iterator it =
-				WSingleton<CSharedDoc>::Instance()->m_briefUserInfoMap.find(
-					uid);
-			if (it !=
-				WSingleton<CSharedDoc>::Instance()->m_briefUserInfoMap.end())
+				Doc()->m_briefUserInfoMap.find(uid);
+			if (it != Doc()->m_briefUserInfoMap.end())
 			{
 				it->second.roomIndex = roomIndex;
 			}
@@ -1814,26 +1661,20 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	}
 	case 0x8A:
 	{
-		unsigned char finishOrder =
-			(unsigned char)WSingleton<CSharedDoc>::Instance()
-				->m_rivalList.size();
-		for (std::vector<sRivalData>::iterator it =
-				 WSingleton<CSharedDoc>::Instance()->m_rivalList.begin();
-			it != WSingleton<CSharedDoc>::Instance()->m_rivalList.end(); ++it)
+		unsigned char finishOrder = (unsigned char)Doc()->m_rivalList.size();
+		for (std::vector<sRivalData>::iterator it = Doc()->m_rivalList.begin();
+			it != Doc()->m_rivalList.end(); ++it)
 		{
 			if (it->state == 0)
 			{
 				it->state = 2;
 				it->finishOrder = finishOrder--;
 
-				for (;; it->hole = WSingleton<CSharedDoc>::Instance()
-							->m_holeOrder[GetHoleIndex(it->hole)])
+				for (;; it->hole = Doc()->m_holeOrder[GetHoleIndex(it->hole)])
 				{
 					it->holePang[it->hole - 1] = 0;
 					it->holeStroke[it->hole - 1] =
-						WSingleton<CSharedDoc>::Instance()
-							->m_holePar[it->hole - 1] +
-						5;
+						Doc()->m_holePar[it->hole - 1] + 5;
 					it->holeScore[it->hole - 1] = 5;
 					it->totalScore += 5;
 
@@ -1858,12 +1699,12 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	}
 	case 0x94:
 
-		WSingleton<CSharedDoc>::Instance()->m_bonusCash = packet.Decode8();
-		WSingleton<CSharedDoc>::Instance()->RefreshAllCookie();
+		Doc()->m_bonusCash = packet.Decode8();
+		Doc()->RefreshAllCookie();
 
 		GetActor("Lobby") << MsgObject(0, 2, 0, 0, 0, 0, 0);
 
-		if (*WSingleton<CSharedDoc>::Instance()->m_shopName)
+		if (*Doc()->m_shopName)
 		{
 			WSingleton<CMouseCursor>::Instance()->SetActive(false);
 
@@ -1874,30 +1715,25 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 			WSingleton<CTaskManager>::Instance()->ChangeTask("CShopTask", "",
 				false);
-			AfxPostMsg(0, "Shop", 0,
-				(intptr_t)WSingleton<CSharedDoc>::Instance()->m_shopName, 0, 0,
-				0);
+			AfxPostMsg(0, "Shop", 0, (intptr_t)Doc()->m_shopName, 0, 0, 0);
 		}
 		break;
 	case 0x96:
 
 		if (GalleryMode())
 		{
-			packet.DecodeBuffer(
-				&WSingleton<CSharedDoc>::Instance()->m_userInfo[0],
-				sizeof(sUserInfo));
-			WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwGalleryGuid =
-				WSingleton<CSharedDoc>::Instance()->m_userInfo[0].info.dwGuid;
+			packet.DecodeBuffer(&Doc()->m_userInfo[0], sizeof(sUserInfo));
+			Doc()->m_myInfo.info.dwGalleryGuid =
+				Doc()->m_userInfo[0].info.dwGuid;
 
 			if (IsLocalContent((localContentType_t)0x57))
 			{
-				RequestUccInfo(
-					WSingleton<CSharedDoc>::Instance()->m_userInfo[0]);
+				RequestUccInfo(Doc()->m_userInfo[0]);
 			}
 		}
 		break;
 	case 0x95:
-		WSingleton<CSharedDoc>::Instance()->m_roomType = packet.Decode4();
+		Doc()->m_roomType = packet.Decode4();
 		break;
 	case 0xBA:
 	{
@@ -1919,33 +1755,31 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			break;
 		}
 
-		packet.DecodeBuffer(&WSingleton<CSharedDoc>::Instance()->m_roomInfo,
-			sizeof(sRoomInfo));
-		WSingleton<CSharedDoc>::Instance()->m_expRate = packet.Decode4();
+		packet.DecodeBuffer(&Doc()->m_roomInfo, sizeof(sRoomInfo));
+		Doc()->m_expRate = packet.Decode4();
 
 		unsigned char count = packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_slotList.clear();
+		Doc()->m_slotList.clear();
 
 		for (unsigned char i = 0; i < count; i++)
 		{
 			sSlotInfo slot;
 			packet.DecodeBuffer(&slot, sizeof(sSlotInfo));
-			WSingleton<CSharedDoc>::Instance()->m_slotList.push_back(slot);
+			Doc()->m_slotList.push_back(slot);
 		}
 
-		CSharedDoc* pDoc = WSingleton<CSharedDoc>::Instance();
+		CSharedDoc* pDoc = Doc();
 		if (IsMassGame(pDoc->m_roomInfo.gameType))
 		{
 			packet.DecodeBuffer(&pDoc->m_userInfo[0], sizeof(sUserInfo));
 
 			if (IsLocalContent((localContentType_t)0x57))
 			{
-				RequestUccInfo(
-					WSingleton<CSharedDoc>::Instance()->m_userInfo[0]);
+				RequestUccInfo(Doc()->m_userInfo[0]);
 			}
 
-			WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwGalleryGuid =
-				WSingleton<CSharedDoc>::Instance()->m_userInfo[0].info.dwGuid;
+			Doc()->m_myInfo.info.dwGalleryGuid =
+				Doc()->m_userInfo[0].info.dwGuid;
 		}
 		else
 		{
@@ -1956,14 +1790,11 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 			for (unsigned char i = 0; i < count; i++)
 			{
-				packet.DecodeBuffer(
-					&WSingleton<CSharedDoc>::Instance()->m_userInfo[i],
-					sizeof(sUserInfo));
+				packet.DecodeBuffer(&Doc()->m_userInfo[i], sizeof(sUserInfo));
 
 				if (IsLocalContent((localContentType_t)0x57))
 				{
-					RequestUccInfo(
-						WSingleton<CSharedDoc>::Instance()->m_userInfo[i]);
+					RequestUccInfo(Doc()->m_userInfo[i]);
 				}
 			}
 		}
@@ -1972,25 +1803,19 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		SetGameType(packet.Decode1());
 		SetHoleType(packet.Decode1());
 		SetHoles(packet.Decode1());
-		WSingleton<CSharedDoc>::Instance()->m_roomType = packet.Decode4();
+		Doc()->m_roomType = packet.Decode4();
 		SetShotTimeLimit(packet.Decode4());
 		SetGameTimeLimit(packet.Decode4());
 
-		for (int i = 0;
-			i < WSingleton<CSharedDoc>::Instance()->m_golfGame.holes; i++)
+		for (int i = 0; i < Doc()->m_golfGame.holes; i++)
 		{
-			WSingleton<CSharedDoc>::Instance()->m_holeRandom[i] =
-				packet.Decode4();
-			WSingleton<CSharedDoc>::Instance()->m_courseMap[i] =
-				(unsigned char)(WSingleton<CSharedDoc>::Instance()
-									->m_holeRandom[i] %
-					3);
-			WSingleton<CSharedDoc>::Instance()->m_holeOrder[i] =
-				packet.Decode1();
+			Doc()->m_holeRandom[i] = packet.Decode4();
+			Doc()->m_courseMap[i] = (unsigned char)(Doc()->m_holeRandom[i] % 3);
+			Doc()->m_holeOrder[i] = packet.Decode1();
 		}
 
-		WSingleton<CSharedDoc>::Instance()->m_startHole = packet.Decode1();
-		WSingleton<CSharedDoc>::Instance()->m_roomSetupStage = 0;
+		Doc()->m_startHole = packet.Decode1();
+		Doc()->m_roomSetupStage = 0;
 
 		GetActor("Lobby") << MsgObject(0, 0x18, 0, 0, 0, 0, 0);
 		break;
@@ -2003,35 +1828,28 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			sGuildMatchup matchup;
 			packet.DecodeBuffer(&matchup, sizeof(matchup));
 
-			unsigned long myGuid =
-				WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwGuid;
+			unsigned long myGuid = Doc()->m_myInfo.info.dwGuid;
 
 			if (myGuid == matchup.uid[0])
 			{
-				WSingleton<CSharedDoc>::Instance()->m_teamPlayerGuid[0] =
-					matchup.uid[0];
-				WSingleton<CSharedDoc>::Instance()->m_teamPlayerGuid[1] =
-					matchup.uid[1];
-				WSingleton<CSharedDoc>::Instance()->m_guildTeam = matchup.team;
+				Doc()->m_teamPlayerGuid[0] = matchup.uid[0];
+				Doc()->m_teamPlayerGuid[1] = matchup.uid[1];
+				Doc()->m_guildTeam = matchup.team;
 			}
 			else if (myGuid == matchup.uid[1])
 			{
-				WSingleton<CSharedDoc>::Instance()->m_teamPlayerGuid[0] =
-					matchup.uid[1];
-				WSingleton<CSharedDoc>::Instance()->m_teamPlayerGuid[1] =
-					matchup.uid[0];
-				WSingleton<CSharedDoc>::Instance()->m_guildTeam = matchup.team;
+				Doc()->m_teamPlayerGuid[0] = matchup.uid[1];
+				Doc()->m_teamPlayerGuid[1] = matchup.uid[0];
+				Doc()->m_guildTeam = matchup.team;
 			}
 
-			WSingleton<CSharedDoc>::Instance()->m_guildMatchupList.push_back(
-				matchup);
+			Doc()->m_guildMatchupList.push_back(matchup);
 		}
 		break;
 	}
 	case 0xBE:
-		packet.DecodeBuffer(
-			WSingleton<CSharedDoc>::Instance()->m_guildRefreshData,
-			sizeof(WSingleton<CSharedDoc>::Instance()->m_guildRefreshData));
+		packet.DecodeBuffer(Doc()->m_guildRefreshData,
+			sizeof(Doc()->m_guildRefreshData));
 		WSingleton<CUserInfo>::Instance()->Refresh();
 		break;
 	case 0xBF:
@@ -2039,10 +1857,10 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		unsigned long guildUID = packet.Decode4();
 
 		std::map<unsigned long, sBriefUserInfo>::iterator it =
-			WSingleton<CSharedDoc>::Instance()->m_briefUserInfoMap.find(
+			Doc()->m_briefUserInfoMap.find(
 				WSingleton<CUserInfo>::Instance()->GetGuid());
 
-		if (it == WSingleton<CSharedDoc>::Instance()->m_briefUserInfoMap.end())
+		if (it == Doc()->m_briefUserInfoMap.end())
 		{
 			if (guildUID == it->second.m_GuildId)
 			{
@@ -2053,8 +1871,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				{
 					sGuildMatchFlagInfo info;
 					packet.DecodeBuffer(&info, 0x2E);
-					WSingleton<CSharedDoc>::Instance()
-						->m_guildMatchFlagList.push_back(info);
+					Doc()->m_guildMatchFlagList.push_back(info);
 				}
 
 				WSingleton<CUserInfo>::Instance()->Refresh();
@@ -2066,21 +1883,17 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	{
 		unsigned char point[2];
 		unsigned long uid = packet.Decode4();
-		WSingleton<CSharedDoc>::Instance()->m_guildScore[0] = packet.Decode2();
-		WSingleton<CSharedDoc>::Instance()->m_guildScore[1] = packet.Decode2();
+		Doc()->m_guildScore[0] = packet.Decode2();
+		Doc()->m_guildScore[1] = packet.Decode2();
 		point[0] = packet.Decode1();
 		point[1] = packet.Decode1();
 
-		sRivalData* pMine =
-			&WSingleton<CSharedDoc>::Instance()
-				 ->m_rivalList[WSingleton<CSharedDoc>::Instance()->GetIndex(
-					 uid)];
-		sRivalData* pRival = WSingleton<CSharedDoc>::Instance()->GetRival(uid);
+		sRivalData* pMine = &Doc()->m_rivalList[Doc()->GetIndex(uid)];
+		sRivalData* pRival = Doc()->GetRival(uid);
 		if (pMine && pRival)
 		{
-			GetActor("Lobby") << MsgObject(0, 0x57,
-				WSingleton<CSharedDoc>::Instance()->m_guildScore[0],
-				WSingleton<CSharedDoc>::Instance()->m_guildScore[1], 0, 0, 0);
+			GetActor("Lobby") << MsgObject(0, 0x57, Doc()->m_guildScore[0],
+				Doc()->m_guildScore[1], 0, 0, 0);
 
 			pMine->guildPoint = point[0];
 			pRival->guildPoint = point[1];
@@ -2094,7 +1907,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	case 0xCD:
 	{
 		unsigned short count = packet.Decode2();
-		WSingleton<CSharedDoc>::Instance()->m_questList.clear();
+		Doc()->m_questList.clear();
 
 		for (int i = 0; i < count; i++)
 		{
@@ -2104,7 +1917,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			quest.pQuest = ItemManager()->FindQuest(quest.typeId);
 			quest.flag = false;
 
-			WSingleton<CSharedDoc>::Instance()->m_questList.push_back(quest);
+			Doc()->m_questList.push_back(quest);
 		}
 		break;
 	}
@@ -2113,12 +1926,9 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 		if (IsLocalContent((localContentType_t)0x14))
 		{
 			unsigned long uid = packet.Decode4();
-			if (WSingleton<CSharedDoc>::Instance()->AreWePlayingTogether(uid))
+			if (Doc()->AreWePlayingTogether(uid))
 			{
-				WSingleton<CSharedDoc>::Instance()
-					->m_rivalList[WSingleton<CSharedDoc>::Instance()->GetIndex(
-						uid)]
-					.state = 2;
+				Doc()->m_rivalList[Doc()->GetIndex(uid)].state = 2;
 				GetActor("Lobby") << MsgObject(0, 0x2A, 0, 0, 0, 0, 0);
 			}
 		}
@@ -2139,8 +1949,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 				std::string name = packet.DecodeStr();
 				unsigned long inviteKey = packet.Decode4();
 
-				if (WSingleton<CSharedDoc>::Instance()->m_gameServerUID ==
-					WSingleton<CSharedDoc>::Instance()->GetFriendGameSvrUID())
+				if (Doc()->m_gameServerUID == Doc()->GetFriendGameSvrUID())
 				{
 					WSendPacket send((enumClientPacket)0x29);
 					send.Encode4(inviteKey);
@@ -2223,7 +2032,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 						0, 0, 0, 0);
 				}
 
-				WSingleton<CSharedDoc>::Instance()->m_inviteMode = 0;
+				Doc()->m_inviteMode = 0;
 			}
 		}
 		break;
@@ -2231,12 +2040,11 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 
 		if (IsLocalContent((localContentType_t)0x54))
 		{
-			std::list<sSlotInfo>& players =
-				WSingleton<CSharedDoc>::Instance()->m_slotList;
+			std::list<sSlotInfo>& players = Doc()->m_slotList;
 
 			unsigned long ruleUID = packet.Decode4();
 
-			WSingleton<CSharedDoc>::Instance()->m_inviteMode = 0;
+			Doc()->m_inviteMode = 0;
 
 			for (std::list<sSlotInfo>::iterator it = players.begin();
 				it != players.end(); ++it)
@@ -2262,8 +2070,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 					GetActor("Lobby")
 						<< MsgObject(0, 8, (intptr_t)slot, uid, team, 0, 0);
 
-					WSingleton<CSharedDoc>::Instance()->m_roomInfo.nUserNum =
-						(unsigned char)players.size();
+					Doc()->m_roomInfo.nUserNum = (unsigned char)players.size();
 
 					GetActor("Lobby") << MsgObject(0, 0x2F, 0, 0, 0, 0, 0);
 					GetActor("Lobby") << MsgObject(0, 0xF, 0, 0, 0, 0, 0);
@@ -2353,8 +2160,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 			unsigned char channel = packet.Decode1();
 			unsigned short room = packet.Decode2();
 
-			if (serverUID ==
-				WSingleton<CSharedDoc>::Instance()->m_gameServerUID)
+			if (serverUID == Doc()->m_gameServerUID)
 			{
 				WSendPacket send((enumClientPacket)0xAC);
 				send.Encode1(channel);
@@ -2369,15 +2175,14 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 						<< MsgObject(0, 0xDF, 0, 0, 0, 0, 0);
 				}
 
-				WSingleton<CSharedDoc>::Instance()->m_gameServerList.clear();
-				WSingleton<CSharedDoc>::Instance()->m_channelList.clear();
+				Doc()->m_gameServerList.clear();
+				Doc()->m_channelList.clear();
 
 				WSendPacket send((enumClientPacket)0x43);
 				send.Send(TO_GAME);
 
-				WSingleton<CSharedDoc>::Instance()->m_goWithMode = 3;
-				WSingleton<CSharedDoc>::Instance()->SetDirectMoveRoomInfo(
-					channel, room, serverUID);
+				Doc()->m_goWithMode = 3;
+				Doc()->SetDirectMoveRoomInfo(channel, room, serverUID);
 			}
 		}
 		break;
@@ -2420,8 +2225,7 @@ int CLobbyTask::OnPacket(WReceivedPacket& packet)
 	case 0x182:
 	{
 		unsigned long flagBlock = packet.Decode4();
-		WSingleton<CSharedDoc>::Instance()->m_myInfo.info.dwFlagBlock =
-			flagBlock;
+		Doc()->m_myInfo.info.dwFlagBlock = flagBlock;
 		break;
 	}
 	case 0x18C:

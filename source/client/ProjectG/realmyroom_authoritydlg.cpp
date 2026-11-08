@@ -257,6 +257,13 @@ CRealMyRoom_EnterSetting::~CRealMyRoom_EnterSetting()
 {
 }
 
+void CRealMyRoom_EnterSetting::OnInputPwInit(int param)
+{
+	m_pInputPw = DYNAMIC_CAST(FrEdit, param);
+	if (m_pInputPw)
+		m_pInputPw->ClearLine();
+}
+
 void CRealMyRoom_EnterSetting::OnOK()
 {
 	if (m_pInputPw)
@@ -272,13 +279,6 @@ void CRealMyRoom_EnterSetting::OnCancle()
 std::string CRealMyRoom_EnterSetting::GetPassWord()
 {
 	return m_password;
-}
-
-void CRealMyRoom_EnterSetting::OnInputPwInit(int param)
-{
-	m_pInputPw = DYNAMIC_CAST(FrEdit, param);
-	if (m_pInputPw)
-		m_pInputPw->ClearLine();
 }
 
 bool CRealMyRoom_EnterSetting::OnInputPwEnterKey(int param)

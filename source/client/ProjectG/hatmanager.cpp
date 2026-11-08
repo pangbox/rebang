@@ -10,10 +10,10 @@
 #include "gmtoolkit.h"
 #include <io.h>
 #include <wchar.h>
-extern "C" __declspec(dllimport) int __cdecl mkdir(const char*);
 #include "fresh.h"
 #include "frwndmanager.h"
 #include "fremoticon.h"
+#include <direct.h>
 
 extern Fresh* g_pFresh;
 

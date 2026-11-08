@@ -38,51 +38,6 @@ void CRival::Shot()
 		GOLFDOC()->m_bar.grade = 1;
 }
 
-void CRival::SetResult()
-{
-	m_resultPos = GolfBall().PreData(GolfBall().m_renderNum)->pos;
-	if (!GolfBall().m_bOB && GolfBall().m_standGround > 4)
-	{
-		m_result = 0;
-		m_curve = 0.f;
-		m_spin = 0.f;
-	}
-	else
-	{
-		if (GetPVS().GetObjColNum() > 0)
-			m_result = 1;
-		else if (GolfBall().m_water == 2 || GolfBall().m_water == 3)
-			m_result = 2;
-		else if (GolfBall().m_water == 1)
-			m_result = 3;
-		else
-			m_result = 4;
-		m_curve = GolfBall().m_initCurve;
-		m_spin = GolfBall().m_initSpin;
-	}
-}
-
-WVector CRival::GetGreenSlope()
-{
-	WVector dir;
-	dir = GetHoleCupPos() - GolfBall().m_pos;
-	dir.y = 0.f;
-	int count = (int)(dir.Magnitude() / 3.2f);
-	dir.Normalize();
-	WVector slope;
-	slope.Reset();
-	WVector pos = GolfBall().m_pos;
-	for (int i = 0; i < count; i++)
-	{
-		pos += dir * 3.2f;
-		WVector normal;
-		normal = GetPVS().GetMeshNormal(pos);
-		normal.y = 0.f;
-		slope += normal;
-	}
-	return slope;
-}
-
 void CRival::SetVariable(CGolfDoc* pDoc)
 {
 	int mesh;
@@ -329,4 +284,49 @@ aim:
 			}
 		}
 	}
+}
+
+void CRival::SetResult()
+{
+	m_resultPos = GolfBall().PreData(GolfBall().m_renderNum)->pos;
+	if (!GolfBall().m_bOB && GolfBall().m_standGround > 4)
+	{
+		m_result = 0;
+		m_curve = 0.f;
+		m_spin = 0.f;
+	}
+	else
+	{
+		if (GetPVS().GetObjColNum() > 0)
+			m_result = 1;
+		else if (GolfBall().m_water == 2 || GolfBall().m_water == 3)
+			m_result = 2;
+		else if (GolfBall().m_water == 1)
+			m_result = 3;
+		else
+			m_result = 4;
+		m_curve = GolfBall().m_initCurve;
+		m_spin = GolfBall().m_initSpin;
+	}
+}
+
+WVector CRival::GetGreenSlope()
+{
+	WVector dir;
+	dir = GetHoleCupPos() - GolfBall().m_pos;
+	dir.y = 0.f;
+	int count = (int)(dir.Magnitude() / 3.2f);
+	dir.Normalize();
+	WVector slope;
+	slope.Reset();
+	WVector pos = GolfBall().m_pos;
+	for (int i = 0; i < count; i++)
+	{
+		pos += dir * 3.2f;
+		WVector normal;
+		normal = GetPVS().GetMeshNormal(pos);
+		normal.y = 0.f;
+		slope += normal;
+	}
+	return slope;
 }

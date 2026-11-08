@@ -40,11 +40,6 @@ unsigned int NewsReader::Load(const char* filename, unsigned int maxArticles)
 	return count;
 }
 
-void NewsReader::Clear()
-{
-	m_articles.clear();
-}
-
 unsigned int NewsReader::GetNumArticles() const
 {
 	return m_articles.size();
@@ -55,6 +50,11 @@ const NewsReader::sArticle* NewsReader::GetArticle(unsigned int index) const
 	if (index < m_articles.size())
 		return &m_articles[index];
 	return NULL;
+}
+
+void NewsReader::Clear()
+{
+	m_articles.clear();
 }
 
 bool NewsReader::GetChildNodeText(const TiXmlNode* node, const char* name,

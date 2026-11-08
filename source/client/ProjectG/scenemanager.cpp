@@ -858,14 +858,6 @@ void CSceneManager::Render_BaseAndShadow(WView* pView, unsigned long mask)
 	}
 }
 
-void CSceneManager::Render_RenderOBMarker(WView* pView)
-{
-	if (m_pMarker)
-	{
-		m_pMarker->Display();
-	}
-}
-
 int CSceneManager::Render_RenderElement(WView* pView, unsigned long mask)
 {
 	int numBlend = 0;
@@ -1051,6 +1043,14 @@ void CSceneManager::Render_RenderEffect(WView* pView)
 		{
 			(*it).m_pRender->DisplayAll();
 		}
+	}
+}
+
+void CSceneManager::Render_RenderOBMarker(WView* pView)
+{
+	if (m_pMarker)
+	{
+		m_pMarker->Display();
 	}
 }
 

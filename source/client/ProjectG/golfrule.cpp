@@ -54,8 +54,8 @@ ILFILLTU_GOLFRULE
 #include "s5/classicserver/classicserver.h"
 #include "../../shared/s5/sharedutilities.h"
 #include <io.h>
+#include <direct.h>
 
-extern "C" __declspec(dllimport) int __cdecl mkdir(const char*);
 extern Fresh* g_pFresh;
 extern bool g_bQuit;
 extern int g_iSendFailType;
@@ -8863,10 +8863,8 @@ void CGolfRule::DoFlyBall_Stopped(float delta)
 	CCameraWork::Instance()->Process(delta, 0.0f);
 }
 
-extern "C" _CRTIMP int __cdecl mkdir(const char* dirname);
 extern int g_last_screen_width;
 extern int g_last_screen_height;
-void SaveBMP(const char* filename, const Bitmap* bitmap);
 
 void CGolfRule::CaptureProcess()
 {

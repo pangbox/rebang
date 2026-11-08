@@ -127,9 +127,6 @@ LightSet g_lightset;
 
 extern char PY_PUBLIC_VERSION[];
 
-void SaveJPG(const char* filename, const Bitmap* bitmap, int quality);
-void SaveBMP(const char* filename, const Bitmap* bitmap);
-
 void __cdecl TextOut(WView* view, float x, float y, const char* format, ...)
 {
 	char text[2048];

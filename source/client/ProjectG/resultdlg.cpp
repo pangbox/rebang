@@ -16,8 +16,7 @@
 #include "mousecursor.h"
 #include "../../shared/localize.h"
 #include "mathconsts.h"
-
-extern "C" __declspec(dllimport) int __cdecl mkdir(const char* path);
+#include <direct.h>
 
 extern Fresh* g_pFresh;
 

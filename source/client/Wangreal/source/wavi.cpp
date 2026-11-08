@@ -61,6 +61,29 @@ bool WAVIEncoder::Open(char* filename, int w, int h, int fps, HWND)
 	return true;
 }
 
+void WAVIEncoder::Write(Bitmap* bitmap)
+{
+	if (m_history)
+	{
+		ScaleBitmap(m_history[m_cur++], bitmap, m_width, m_height, 0, 0, true);
+		if (m_cur >= m_hisNum)
+			Flush();
+	}
+	else
+	{
+		Bitmap* image = ScaleBitmap(bitmap, m_width, m_height, 0, 0, true);
+		WriteAVI(image);
+		delete image;
+	}
+}
+
+void WAVIEncoder::WriteAVI(Bitmap* bitmap)
+{
+	AVIStreamWrite(m_psCompressed, m_cur_frame, 1, bitmap->vram,
+		bitmap->bi->bmiHeader.biHeight * bitmap->pitch, 0x10, 0, 0);
+	++m_cur_frame;
+}
+
 sAviResult WAVIEncoder::Close()
 {
 	if (m_bOpened)
@@ -93,29 +116,6 @@ void WAVIEncoder::SetFrameBuffer(int page)
 	}
 }
 
-void WAVIEncoder::Write(Bitmap* bitmap)
-{
-	if (m_history)
-	{
-		ScaleBitmap(m_history[m_cur++], bitmap, m_width, m_height, 0, 0, true);
-		if (m_cur >= m_hisNum)
-			Flush();
-	}
-	else
-	{
-		Bitmap* image = ScaleBitmap(bitmap, m_width, m_height, 0, 0, true);
-		WriteAVI(image);
-		delete image;
-	}
-}
-
-void WAVIEncoder::WriteAVI(Bitmap* bitmap)
-{
-	AVIStreamWrite(m_psCompressed, m_cur_frame, 1, bitmap->vram,
-		bitmap->bi->bmiHeader.biHeight * bitmap->pitch, 0x10, 0, 0);
-	++m_cur_frame;
-}
-
 void WAVIEncoder::Flush()
 {
 	for (int i = 0; i < m_cur; ++i)
@@ -146,6 +146,18 @@ Bitmap* WAVIEncoder::ScaleBitmap(Bitmap* bitmap, int w, int h, int px, int py,
 	else
 		ScaleBitmap(image, bitmap, w, h, px, py, flip);
 	return image;
+}
+
+void WAVIEncoder::CopyBitmap(Bitmap* image, Bitmap* bitmap, bool flip)
+{
+	for (int y = 0; y < image->bi->bmiHeader.biHeight; ++y)
+	{
+		if (flip)
+			memcpy(image->GetVram(image->bi->bmiHeader.biHeight - y - 1),
+				bitmap->GetVram(y), bitmap->pitch);
+		else
+			memcpy(image->GetVram(y), bitmap->GetVram(y), bitmap->pitch);
+	}
 }
 
 void WAVIEncoder::ScaleBitmap(Bitmap* image, Bitmap* bitmap, int w, int h,
@@ -204,17 +216,5 @@ void WAVIEncoder::ScaleBitmap(Bitmap* image, Bitmap* bitmap, int w, int h,
 				((Min((int)(b * 1.2f), 0xff0000) & 0xff0000) >> 16);
 			memcpy(vram, &code, 3);
 		}
-	}
-}
-
-void WAVIEncoder::CopyBitmap(Bitmap* image, Bitmap* bitmap, bool flip)
-{
-	for (int y = 0; y < image->bi->bmiHeader.biHeight; ++y)
-	{
-		if (flip)
-			memcpy(image->GetVram(image->bi->bmiHeader.biHeight - y - 1),
-				bitmap->GetVram(y), bitmap->pitch);
-		else
-			memcpy(image->GetVram(y), bitmap->GetVram(y), bitmap->pitch);
 	}
 }

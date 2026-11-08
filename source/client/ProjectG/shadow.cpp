@@ -566,20 +566,6 @@ CShadowCaster* CShadowManager::RegisterCaster_New(const char* name, int state,
 	return pCaster;
 }
 
-CShadowCaster* CShadowManager::FindCaster(const char* name)
-{
-	std::list<CShadowCaster*>::iterator it;
-	for (it = m_casters.begin(); it != m_casters.end(); it++)
-	{
-		if (strcmp((*it)->GetName(), g_theCasterName) == 0)
-		{
-			return *it;
-		}
-	}
-
-	return NULL;
-}
-
 void CShadowManager::AddCastPet_New(const char* name, bool bClear,
 	WPuppet* pPet)
 {
@@ -594,6 +580,20 @@ void CShadowManager::AddCastPet_New(const char* name, bool bClear,
 		pCaster->ClearCaster();
 	}
 	pCaster->AddPet_New(pPet);
+}
+
+CShadowCaster* CShadowManager::FindCaster(const char* name)
+{
+	std::list<CShadowCaster*>::iterator it;
+	for (it = m_casters.begin(); it != m_casters.end(); it++)
+	{
+		if (strcmp((*it)->GetName(), g_theCasterName) == 0)
+		{
+			return *it;
+		}
+	}
+
+	return NULL;
 }
 
 sShadowRecver* CShadowManager::RegisterRecver_New(const char* name)
@@ -696,13 +696,6 @@ void CShadowManager::UpdateBVolume(WView* view)
 	}
 }
 
-void CShadowManager::SetMinViewInfo(float minFov, float maxDist, bool flag)
-{
-	m_minFov = Max(minFov, 0.001f);
-	m_maxDist = Max(maxDist, 0.001f);
-	m_bFlag = flag;
-}
-
 void CShadowManager::UpdateLight(const char* lightName, LightSet& light)
 {
 	std::list<CShadowCaster*>::iterator it;
@@ -725,4 +718,11 @@ void CShadowManager::Reset_New()
 {
 	ClearCasters_New();
 	ClearRecvers_New();
+}
+
+void CShadowManager::SetMinViewInfo(float minFov, float maxDist, bool flag)
+{
+	m_minFov = Max(minFov, 0.001f);
+	m_maxDist = Max(maxDist, 0.001f);
+	m_bFlag = flag;
 }
