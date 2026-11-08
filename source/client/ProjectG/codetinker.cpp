@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include "codetinker.h"
 
 CCodeTinker::CCodeTinker()

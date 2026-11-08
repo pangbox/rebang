@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "dlgquickstartsetting.h"
-#include "minatl.h"
 extern Fresh* g_pFresh;
 
 IMPLEMENT_OBJECT(FrQuickResultDlg, FrForm)

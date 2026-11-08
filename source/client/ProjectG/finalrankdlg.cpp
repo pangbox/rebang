@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "finalrankdlg.h"
 #include "frlistbox.h"
 #include "frwndmanager.h"

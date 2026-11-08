@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "notedlg.h"
 #include "fredit.h"
 #include "frstatic.h"

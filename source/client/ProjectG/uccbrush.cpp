@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "uccbrush.h"
 #include "wresrcmng.h"
 

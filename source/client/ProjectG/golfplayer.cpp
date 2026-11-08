@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "golfdoc.h"
 #include "uccmanager.h"
 #include "wbone.h"

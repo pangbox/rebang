@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "changeroominfodlg.h"
 #include "makeroomdlg.h"
 #include "treasuredlg.h"
@@ -55,69 +54,6 @@ ON_FRESH_VI("holetype", FRCMD_OWNERDRAW,
 	FrChangeRoomInfoDlg::OnHoleTypeOwnerDraw)
 ON_FRESH_VV("ok", FRCMD_LBUTTONUP, FrChangeRoomInfoDlg::OnOkBtnUp)
 END_FRESH_MSGMAP()
-
-void FrChangeRoomInfoDlg::ChangeUserLimit(int limit)
-{
-	m_userLimit = limit;
-}
-
-void FrChangeRoomInfoDlg::ChangeHole(int hole)
-{
-	m_hole = hole;
-	switch (m_gameType)
-	{
-	case GAME_TYPE_STROKE:
-	case GAME_TYPE_TEAM:
-	case GAME_TYPE_SKINS:
-		if (hole == 18 && (m_holeType == 1 || m_holeType == 2))
-			m_holeType = 0;
-		break;
-	case GAME_TYPE_30S:
-	case GAME_TYPE_30S_TEAM:
-		if (hole == 9)
-			m_timeLimit = 15;
-		else if (hole == 18)
-		{
-			m_timeLimit = 30;
-			if (m_holeType == 1 || m_holeType == 2)
-				m_holeType = 0;
-		}
-		break;
-	case GAME_TYPE_GUILD_MATCH:
-		if (hole == 9)
-			m_timeLimit = 20;
-		else if (hole == 18)
-		{
-			m_timeLimit = 30;
-			m_holeType = 0;
-		}
-		break;
-	}
-}
-
-void FrChangeRoomInfoDlg::ChangeTimeLimit(int time)
-{
-	m_timeLimit = time;
-}
-
-void FrChangeRoomInfoDlg::ChangeHoleType(eHoleType type)
-{
-	m_holeType = type;
-}
-
-void FrChangeRoomInfoDlg::OnProc(const float dt)
-{
-	FrForm::OnProc(dt);
-	if (!m_pMapSelectDlg && m_btnDelay >= 0.0f)
-		m_btnDelay -= dt;
-}
-
-bool FrChangeRoomInfoDlg::IsBtnEnable()
-{
-	if (!m_pMapSelectDlg && m_btnDelay < 0.0f)
-		return true;
-	return false;
-}
 
 FrChangeRoomInfoDlg::FrChangeRoomInfoDlg()
 {
@@ -192,6 +128,21 @@ FrChangeRoomInfoDlg::~FrChangeRoomInfoDlg()
 {
 }
 
+bool FrChangeRoomInfoDlg::OnInit()
+{
+	ChangeGameType(m_roomInfo.gameType, false, true);
+	ChangeCourse(m_roomInfo.mapType);
+	if (m_gameType == GAME_TYPE_NEW_APPROACH ||
+		m_gameType == GAME_TYPE_GUILD_MATCH)
+	{
+		if (m_pMapPrev)
+			m_pMapPrev->Enable(false);
+		if (m_pMapNext)
+			m_pMapNext->Enable(false);
+	}
+	return true;
+}
+
 void FrChangeRoomInfoDlg::OnTextInit(int param)
 {
 	m_pText = DYNAMIC_CAST(FrArea, (FrWnd*)param);
@@ -227,6 +178,12 @@ void FrChangeRoomInfoDlg::OnMapPrevInit(int param)
 	}
 }
 
+void FrChangeRoomInfoDlg::OnMapPrevUp()
+{
+	if (m_pMapPrev)
+		ChangeCourse(PrevMap(m_course));
+}
+
 void FrChangeRoomInfoDlg::OnMapNextInit(int param)
 {
 	m_pMapNext = DYNAMIC_CAST(FrButton, (FrWnd*)param);
@@ -237,9 +194,107 @@ void FrChangeRoomInfoDlg::OnMapNextInit(int param)
 	}
 }
 
+void FrChangeRoomInfoDlg::OnMapNextUp()
+{
+	if (m_pMapNext)
+		ChangeCourse(NextMap(m_course, m_gameType == GAME_TYPE_AVATARCHAT));
+}
+
 void FrChangeRoomInfoDlg::OnGameTypeInit(int param)
 {
 	m_pGameType = DYNAMIC_CAST(FrArea, (FrWnd*)param);
+}
+
+void FrChangeRoomInfoDlg::DrawGameTypeButton(FrGraphicInterface* gi, int type,
+	WRect rect, bool bEnable)
+{
+	const Bitmap* bitmap = m_pSelectBtnN;
+	unsigned long color = 0xffffffff;
+	if (bEnable)
+	{
+		if (m_gameType == type)
+			bitmap = m_pSelectBtnD;
+		else
+		{
+			const WPoint& mouse = g_pFresh->GetManager()->GetMousePos();
+			if (IsBtnEnable() && rect.IsInRect(mouse))
+			{
+				if (g_input->GetButton(LEFT_BUTTON) == 2)
+					ChangeGameType(type, false, false);
+				bitmap = m_pSelectBtnO;
+			}
+		}
+	}
+	else
+	{
+		color = 0xff909090;
+	}
+	gi->DrawTexture(bitmap, rect, color, 0);
+	gi->PrintText11(WPoint(rect.x + rect.w * 0.5f, rect.y + 5.0f), 1,
+		s_gameTypeTitle[type], NULL);
+}
+
+void FrChangeRoomInfoDlg::OnGameTypeOwnerDraw(int param)
+{
+	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
+	if (!gi)
+		return;
+	WRect rect = m_pGameType->GetRect();
+	switch (m_gameTypeGroup)
+	{
+	case 0:
+	{
+		WRect r1(rect.x, rect.y, rect.w / 2.0f, rect.h);
+		WRect r2(rect.x + rect.w * 1.0f / 2.0f, rect.y, rect.w / 2.0f, rect.h);
+		DrawGameTypeButton(gi, GAME_TYPE_STROKE, r1, true);
+		DrawGameTypeButton(gi, GAME_TYPE_TEAM, r2, true);
+		break;
+	}
+	case 1:
+	{
+		int developer;
+		if (IsLocalContent(S3_HUNDRED_MODE) &&
+			(developer = (Doc()->m_myInfo.info.dwIdentity & 4) == 4) &&
+			Doc()->m_roomInfo.nUserLimit >= 100)
+		{
+			WRect button(rect.x, rect.y, rect.w, rect.h);
+			DrawGameTypeButton(gi, GAME_TYPE_30S, button, false);
+		}
+		else
+		{
+			bool guild = m_gameType == GAME_TYPE_GUILD_MATCH;
+			WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
+			WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f,
+				rect.h);
+			WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f,
+				rect.h);
+			DrawGameTypeButton(gi, GAME_TYPE_30S, r1, !guild);
+			DrawGameTypeButton(gi, GAME_TYPE_30S_TEAM, r2, !guild);
+			DrawGameTypeButton(gi, GAME_TYPE_GUILD_MATCH, r3, guild);
+		}
+		break;
+	}
+	case 3:
+		DrawGameTypeButton(gi, GAME_TYPE_AVATARCHAT, rect, true);
+		break;
+	case 2:
+	{
+		WRect battle(rect.x, rect.y, rect.w / 2.0f, rect.h);
+		WRect approach(rect.x + rect.w / 2.0f, rect.y, rect.w / 2.0f, rect.h);
+		switch (m_gameType)
+		{
+		case GAME_TYPE_SKINS:
+			DrawGameTypeButton(gi, GAME_TYPE_SKINS, battle, true);
+			DrawGameTypeButton(gi, GAME_TYPE_NEW_APPROACH, approach, false);
+			break;
+		case GAME_TYPE_NEW_APPROACH:
+			DrawGameTypeButton(gi, GAME_TYPE_SKINS, battle, false);
+			DrawGameTypeButton(gi, GAME_TYPE_NEW_APPROACH, approach, true);
+			break;
+		}
+		break;
+	}
+	}
 }
 
 void FrChangeRoomInfoDlg::OnUserLimitInit(int param)
@@ -266,6 +321,87 @@ void FrChangeRoomInfoDlg::DrawUserLimitButton(FrGraphicInterface* gi, int limit,
 	gi->DrawTexture(bitmap, rect, 0xffffffff, 0);
 	gi->PrintText11(WPoint(rect.x + rect.w * 0.5f, rect.y + 5.0f), 1,
 		MakeStr("%d", limit), NULL);
+}
+
+void FrChangeRoomInfoDlg::OnUserLimitOwnerDraw(int param)
+{
+	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
+	if (!gi)
+		return;
+	WRect rect = m_pUserLimit->GetRect();
+	switch (m_gameType)
+	{
+	case GAME_TYPE_STROKE:
+	{
+		WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
+		WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
+		WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
+		DrawUserLimitButton(gi, 2, r1);
+		DrawUserLimitButton(gi, 3, r2);
+		DrawUserLimitButton(gi, 4, r3);
+		break;
+	}
+	case GAME_TYPE_TEAM:
+	{
+		WRect r1(rect.x, rect.y, rect.w / 2.0f, rect.h);
+		WRect r2(rect.x + rect.w * 1.0f / 2.0f, rect.y, rect.w / 2.0f, rect.h);
+		DrawUserLimitButton(gi, 2, r1);
+		DrawUserLimitButton(gi, 4, r2);
+		break;
+	}
+	case GAME_TYPE_SKINS:
+	{
+		WRect r1(rect.x, rect.y, rect.w / 2.0f, rect.h);
+		WRect r2(rect.x + rect.w * 1.0f / 2.0f, rect.y, rect.w / 2.0f, rect.h);
+		DrawUserLimitButton(gi, 2, r1);
+		DrawUserLimitButton(gi, 4, r2);
+		break;
+	}
+	case GAME_TYPE_AVATARCHAT:
+	case GAME_TYPE_30S_TEAM:
+	case GAME_TYPE_GUILD_MATCH:
+	{
+		WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
+		WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
+		WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
+		DrawUserLimitButton(gi, 10, r1);
+		DrawUserLimitButton(gi, 20, r2);
+		DrawUserLimitButton(gi, 30, r3);
+		break;
+	}
+	case GAME_TYPE_NEW_APPROACH:
+	{
+		WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
+		WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
+		WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
+		DrawUserLimitButton(gi, 6, r1);
+		DrawUserLimitButton(gi, 20, r2);
+		DrawUserLimitButton(gi, 30, r3);
+		break;
+	}
+	case GAME_TYPE_30S:
+	{
+		if (IsLocalContent(S3_HUNDRED_MODE) &&
+			(Doc()->m_myInfo.info.dwIdentity & 4) &&
+			Doc()->m_roomInfo.nUserLimit >= 100)
+		{
+			WRect button(rect.x, rect.y, rect.w, rect.h);
+			DrawUserLimitButton(gi, Doc()->m_roomInfo.nUserLimit, button);
+		}
+		else
+		{
+			WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
+			WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f,
+				rect.h);
+			WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f,
+				rect.h);
+			DrawUserLimitButton(gi, 10, r1);
+			DrawUserLimitButton(gi, 20, r2);
+			DrawUserLimitButton(gi, 30, r3);
+		}
+		break;
+	}
+	}
 }
 
 void FrChangeRoomInfoDlg::OnHoleInit(int param)
@@ -446,6 +582,37 @@ void FrChangeRoomInfoDlg::OnCourseInit(int param)
 	m_pCourse = DYNAMIC_CAST(FrViewer, (FrWnd*)param);
 }
 
+bool FrChangeRoomInfoDlg::OnMapSelectDlgResult(int result, FrForm* form)
+{
+	unsigned char map = 0;
+	if (form)
+		map = ((FrTreasureCourse*)form)->GetCurMapIdx();
+	ChangeCourse(map);
+	m_pMapSelectDlg = NULL;
+	m_btnDelay = 0.7f;
+	return true;
+}
+
+void FrChangeRoomInfoDlg::OnCourseUp()
+{
+	if (m_gameType != GAME_TYPE_NEW_APPROACH &&
+		m_gameType != GAME_TYPE_GUILD_MATCH)
+	{
+		g_audio->PlaySfx("ui_icon_click");
+		m_pMapSelectDlg = CreateForm<FrTreasureCourse>(g_pFresh->GetManager(),
+			this, "treasuremap", NULL);
+		if (m_pMapSelectDlg)
+		{
+			m_pMapSelectDlg->SetSelectMap(m_course);
+			m_pMapSelectDlg->SetMapIndexChanged(false);
+			m_pMapSelectDlg->EnableDrag(false);
+			m_pMapSelectDlg->Open(
+				(FRESH_PFN_RESULT)&FrChangeRoomInfoDlg::OnMapSelectDlgResult,
+				3);
+		}
+	}
+}
+
 void FrChangeRoomInfoDlg::OnCourseOwnerDraw(int param)
 {
 	if (m_gameType == GAME_TYPE_NEW_APPROACH ||
@@ -538,87 +705,6 @@ void FrChangeRoomInfoDlg::OnHoleTypeOwnerDraw(int param)
 		DrawHoleTypeButton(gi, BACK_HOLE, back, true);
 		DrawHoleTypeButton(gi, START_RANDOM, random, true);
 		DrawHoleTypeButton(gi, ALL_RANDOM, shuffle, true);
-	}
-}
-
-void FrChangeRoomInfoDlg::OnUserLimitOwnerDraw(int param)
-{
-	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
-	if (!gi)
-		return;
-	WRect rect = m_pUserLimit->GetRect();
-	switch (m_gameType)
-	{
-	case GAME_TYPE_STROKE:
-	{
-		WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
-		WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
-		WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
-		DrawUserLimitButton(gi, 2, r1);
-		DrawUserLimitButton(gi, 3, r2);
-		DrawUserLimitButton(gi, 4, r3);
-		break;
-	}
-	case GAME_TYPE_TEAM:
-	{
-		WRect r1(rect.x, rect.y, rect.w / 2.0f, rect.h);
-		WRect r2(rect.x + rect.w * 1.0f / 2.0f, rect.y, rect.w / 2.0f, rect.h);
-		DrawUserLimitButton(gi, 2, r1);
-		DrawUserLimitButton(gi, 4, r2);
-		break;
-	}
-	case GAME_TYPE_SKINS:
-	{
-		WRect r1(rect.x, rect.y, rect.w / 2.0f, rect.h);
-		WRect r2(rect.x + rect.w * 1.0f / 2.0f, rect.y, rect.w / 2.0f, rect.h);
-		DrawUserLimitButton(gi, 2, r1);
-		DrawUserLimitButton(gi, 4, r2);
-		break;
-	}
-	case GAME_TYPE_AVATARCHAT:
-	case GAME_TYPE_30S_TEAM:
-	case GAME_TYPE_GUILD_MATCH:
-	{
-		WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
-		WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
-		WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
-		DrawUserLimitButton(gi, 10, r1);
-		DrawUserLimitButton(gi, 20, r2);
-		DrawUserLimitButton(gi, 30, r3);
-		break;
-	}
-	case GAME_TYPE_NEW_APPROACH:
-	{
-		WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
-		WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
-		WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f, rect.h);
-		DrawUserLimitButton(gi, 6, r1);
-		DrawUserLimitButton(gi, 20, r2);
-		DrawUserLimitButton(gi, 30, r3);
-		break;
-	}
-	case GAME_TYPE_30S:
-	{
-		if (IsLocalContent(S3_HUNDRED_MODE) &&
-			(Doc()->m_myInfo.info.dwIdentity & 4) &&
-			Doc()->m_roomInfo.nUserLimit >= 100)
-		{
-			WRect button(rect.x, rect.y, rect.w, rect.h);
-			DrawUserLimitButton(gi, Doc()->m_roomInfo.nUserLimit, button);
-		}
-		else
-		{
-			WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
-			WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f,
-				rect.h);
-			WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f,
-				rect.h);
-			DrawUserLimitButton(gi, 10, r1);
-			DrawUserLimitButton(gi, 20, r2);
-			DrawUserLimitButton(gi, 30, r3);
-		}
-		break;
-	}
 	}
 }
 
@@ -775,68 +861,6 @@ void FrChangeRoomInfoDlg::OnOkBtnUp()
 	OnFreshOkay();
 }
 
-void FrChangeRoomInfoDlg::ChangeCourse(int course)
-{
-	unsigned long index =
-		course > 0x7f && course != 0xfd ? course - 0x80 : course;
-	IFF_STRUCT::sCourse* info = ItemManager()->FindCourse(index | 0x28000000);
-	if (info)
-	{
-		if (course != 0x7f)
-			m_pCourse->Open(MakeStr("small_%s.tga", info->c.Icon));
-		else
-			m_pCourse->Open("map_random_middle.tga");
-		m_course = course;
-		if (m_pMapPrev)
-			m_pMapPrev->Enable(m_course != FirstMap());
-		if (m_pMapNext)
-			m_pMapNext->Enable(m_course != LastMap(false));
-	}
-}
-
-void FrChangeRoomInfoDlg::OnMapPrevUp()
-{
-	if (m_pMapPrev)
-		ChangeCourse(PrevMap(m_course));
-}
-
-void FrChangeRoomInfoDlg::OnMapNextUp()
-{
-	if (m_pMapNext)
-		ChangeCourse(NextMap(m_course, m_gameType == GAME_TYPE_AVATARCHAT));
-}
-
-bool FrChangeRoomInfoDlg::OnMapSelectDlgResult(int result, FrForm* form)
-{
-	unsigned char map = 0;
-	if (form)
-		map = ((FrTreasureCourse*)form)->GetCurMapIdx();
-	ChangeCourse(map);
-	m_pMapSelectDlg = NULL;
-	m_btnDelay = 0.7f;
-	return true;
-}
-
-void FrChangeRoomInfoDlg::OnCourseUp()
-{
-	if (m_gameType != GAME_TYPE_NEW_APPROACH &&
-		m_gameType != GAME_TYPE_GUILD_MATCH)
-	{
-		g_audio->PlaySfx("ui_icon_click");
-		m_pMapSelectDlg = CreateForm<FrTreasureCourse>(g_pFresh->GetManager(),
-			this, "treasuremap", NULL);
-		if (m_pMapSelectDlg)
-		{
-			m_pMapSelectDlg->SetSelectMap(m_course);
-			m_pMapSelectDlg->SetMapIndexChanged(false);
-			m_pMapSelectDlg->EnableDrag(false);
-			m_pMapSelectDlg->Open(
-				(FRESH_PFN_RESULT)&FrChangeRoomInfoDlg::OnMapSelectDlgResult,
-				3);
-		}
-	}
-}
-
 void FrChangeRoomInfoDlg::ChangeGameType(int type, bool bUnused,
 	bool bKeepValues)
 {
@@ -931,109 +955,84 @@ void FrChangeRoomInfoDlg::ChangeGameType(int type, bool bUnused,
 	}
 }
 
-bool FrChangeRoomInfoDlg::OnInit()
+void FrChangeRoomInfoDlg::ChangeUserLimit(int limit)
 {
-	ChangeGameType(m_roomInfo.gameType, false, true);
-	ChangeCourse(m_roomInfo.mapType);
-	if (m_gameType == GAME_TYPE_NEW_APPROACH ||
-		m_gameType == GAME_TYPE_GUILD_MATCH)
+	m_userLimit = limit;
+}
+
+void FrChangeRoomInfoDlg::ChangeHole(int hole)
+{
+	m_hole = hole;
+	switch (m_gameType)
 	{
+	case GAME_TYPE_STROKE:
+	case GAME_TYPE_TEAM:
+	case GAME_TYPE_SKINS:
+		if (hole == 18 && (m_holeType == 1 || m_holeType == 2))
+			m_holeType = 0;
+		break;
+	case GAME_TYPE_30S:
+	case GAME_TYPE_30S_TEAM:
+		if (hole == 9)
+			m_timeLimit = 15;
+		else if (hole == 18)
+		{
+			m_timeLimit = 30;
+			if (m_holeType == 1 || m_holeType == 2)
+				m_holeType = 0;
+		}
+		break;
+	case GAME_TYPE_GUILD_MATCH:
+		if (hole == 9)
+			m_timeLimit = 20;
+		else if (hole == 18)
+		{
+			m_timeLimit = 30;
+			m_holeType = 0;
+		}
+		break;
+	}
+}
+
+void FrChangeRoomInfoDlg::ChangeTimeLimit(int time)
+{
+	m_timeLimit = time;
+}
+
+void FrChangeRoomInfoDlg::ChangeCourse(int course)
+{
+	unsigned long index =
+		course > 0x7f && course != 0xfd ? course - 0x80 : course;
+	IFF_STRUCT::sCourse* info = ItemManager()->FindCourse(index | 0x28000000);
+	if (info)
+	{
+		if (course != 0x7f)
+			m_pCourse->Open(MakeStr("small_%s.tga", info->c.Icon));
+		else
+			m_pCourse->Open("map_random_middle.tga");
+		m_course = course;
 		if (m_pMapPrev)
-			m_pMapPrev->Enable(false);
+			m_pMapPrev->Enable(m_course != FirstMap());
 		if (m_pMapNext)
-			m_pMapNext->Enable(false);
+			m_pMapNext->Enable(m_course != LastMap(false));
 	}
-	return true;
 }
 
-void FrChangeRoomInfoDlg::DrawGameTypeButton(FrGraphicInterface* gi, int type,
-	WRect rect, bool bEnable)
+void FrChangeRoomInfoDlg::ChangeHoleType(eHoleType type)
 {
-	const Bitmap* bitmap = m_pSelectBtnN;
-	unsigned long color = 0xffffffff;
-	if (bEnable)
-	{
-		if (m_gameType == type)
-			bitmap = m_pSelectBtnD;
-		else
-		{
-			const WPoint& mouse = g_pFresh->GetManager()->GetMousePos();
-			if (IsBtnEnable() && rect.IsInRect(mouse))
-			{
-				if (g_input->GetButton(LEFT_BUTTON) == 2)
-					ChangeGameType(type, false, false);
-				bitmap = m_pSelectBtnO;
-			}
-		}
-	}
-	else
-	{
-		color = 0xff909090;
-	}
-	gi->DrawTexture(bitmap, rect, color, 0);
-	gi->PrintText11(WPoint(rect.x + rect.w * 0.5f, rect.y + 5.0f), 1,
-		s_gameTypeTitle[type], NULL);
+	m_holeType = type;
 }
 
-void FrChangeRoomInfoDlg::OnGameTypeOwnerDraw(int param)
+void FrChangeRoomInfoDlg::OnProc(const float dt)
 {
-	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
-	if (!gi)
-		return;
-	WRect rect = m_pGameType->GetRect();
-	switch (m_gameTypeGroup)
-	{
-	case 0:
-	{
-		WRect r1(rect.x, rect.y, rect.w / 2.0f, rect.h);
-		WRect r2(rect.x + rect.w * 1.0f / 2.0f, rect.y, rect.w / 2.0f, rect.h);
-		DrawGameTypeButton(gi, GAME_TYPE_STROKE, r1, true);
-		DrawGameTypeButton(gi, GAME_TYPE_TEAM, r2, true);
-		break;
-	}
-	case 1:
-	{
-		int developer;
-		if (IsLocalContent(S3_HUNDRED_MODE) &&
-			(developer = (Doc()->m_myInfo.info.dwIdentity & 4) == 4) &&
-			Doc()->m_roomInfo.nUserLimit >= 100)
-		{
-			WRect button(rect.x, rect.y, rect.w, rect.h);
-			DrawGameTypeButton(gi, GAME_TYPE_30S, button, false);
-		}
-		else
-		{
-			bool guild = m_gameType == GAME_TYPE_GUILD_MATCH;
-			WRect r1(rect.x, rect.y, rect.w / 3.0f, rect.h);
-			WRect r2(rect.x + rect.w * 1.0f / 3.0f, rect.y, rect.w / 3.0f,
-				rect.h);
-			WRect r3(rect.x + rect.w * 2.0f / 3.0f, rect.y, rect.w / 3.0f,
-				rect.h);
-			DrawGameTypeButton(gi, GAME_TYPE_30S, r1, !guild);
-			DrawGameTypeButton(gi, GAME_TYPE_30S_TEAM, r2, !guild);
-			DrawGameTypeButton(gi, GAME_TYPE_GUILD_MATCH, r3, guild);
-		}
-		break;
-	}
-	case 3:
-		DrawGameTypeButton(gi, GAME_TYPE_AVATARCHAT, rect, true);
-		break;
-	case 2:
-	{
-		WRect battle(rect.x, rect.y, rect.w / 2.0f, rect.h);
-		WRect approach(rect.x + rect.w / 2.0f, rect.y, rect.w / 2.0f, rect.h);
-		switch (m_gameType)
-		{
-		case GAME_TYPE_SKINS:
-			DrawGameTypeButton(gi, GAME_TYPE_SKINS, battle, true);
-			DrawGameTypeButton(gi, GAME_TYPE_NEW_APPROACH, approach, false);
-			break;
-		case GAME_TYPE_NEW_APPROACH:
-			DrawGameTypeButton(gi, GAME_TYPE_SKINS, battle, false);
-			DrawGameTypeButton(gi, GAME_TYPE_NEW_APPROACH, approach, true);
-			break;
-		}
-		break;
-	}
-	}
+	FrForm::OnProc(dt);
+	if (!m_pMapSelectDlg && m_btnDelay >= 0.0f)
+		m_btnDelay -= dt;
+}
+
+bool FrChangeRoomInfoDlg::IsBtnEnable()
+{
+	if (!m_pMapSelectDlg && m_btnDelay < 0.0f)
+		return true;
+	return false;
 }

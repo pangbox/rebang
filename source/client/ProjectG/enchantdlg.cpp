@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "enchantdlg.h"
 #include "frwnd.h"
 #include "frarea.h"
@@ -42,139 +41,6 @@ void FrEnchantDlg::OnTitleInit(int param)
 void FrEnchantDlg::OnBaseInit(int param)
 {
 	m_pBase = DYNAMIC_CAST(FrArea, (FrWnd*)param);
-}
-
-void FrEnchantDlg::OnYesInit(int param)
-{
-	m_pYesBtn = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pYesBtn)
-		m_pYesBtn->SetVisible(false);
-}
-
-void FrEnchantDlg::OnNoInit(int param)
-{
-	m_pNoBtn = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pNoBtn)
-		m_pNoBtn->SetVisible(false);
-}
-
-void FrEnchantDlg::OnOKInit(int param)
-{
-	m_pOKBtn = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pOKBtn)
-		m_pOKBtn->SetVisible(false);
-}
-
-void FrEnchantDlg::OnGaugeBarInit(int param)
-{
-	m_pGaugeBar = DYNAMIC_CAST(FrGaugeBar, (FrWnd*)param);
-	if (m_pGaugeBar)
-	{
-		m_pGaugeBar->SetVisible(false);
-		m_pGaugeBar->SetBarSpeed(10.0f);
-	}
-}
-
-void FrEnchantDlg::OnTextEditInit(int param)
-{
-	m_pText = DYNAMIC_CAST(FrEdit, (FrWnd*)param);
-}
-
-void FrEnchantDlg::OnNoBtnUp()
-{
-	Close(FrNONE, true);
-}
-
-void FrEnchantDlg::OnOKBtnUp()
-{
-	Close(FrOK, true);
-}
-
-void FrEnchantDlg::OnProc(const float dt)
-{
-	if (m_pGaugeBar)
-	{
-		if (WisEqual(m_pGaugeBar->GetPos(), 100.0f, g_EPSILON) &&
-			!m_bResultShown && m_resultCode)
-		{
-			m_bResultShown = true;
-			if (m_pOKBtn)
-				m_pOKBtn->Enable(true);
-			if (m_pText)
-			{
-				m_pText->ClearLine();
-				switch (m_resultCode)
-				{
-				case 1:
-					m_pText->SetClientRect(WRect(45, 60, 200, 80));
-					if (m_type & 1)
-						m_pText->AddLine(
-							MakeStr(
-								"\xc0\xe5\xba\xf1 \xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbc\xba\xb0\xf8\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
-								m_statName),
-							0, false);
-					else
-						m_pText->AddLine(
-							MakeStr(
-								"\xc4\xb3\xb8\xaf\xc5\xcd \xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbc\xba\xb0\xf8\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
-								m_statName),
-							0, false);
-					g_audio->PlaySfx("enchant_up");
-					AfxGetTask()->GetActor("RealMyRoom")
-						<< MsgObject(NULL, 211, m_type & 1, 0, 0, 0, 0);
-					break;
-				case 2:
-					m_pText->SetClientRect(WRect(45, 60, 200, 80));
-					if (m_type & 1)
-						m_pText->AddLine(
-							MakeStr(
-								"\xc0\xe5\xba\xf1 \xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbc\xba\xb0\xf8\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
-								m_statName),
-							0, false);
-					else
-						m_pText->AddLine(
-							MakeStr(
-								"\xc4\xb3\xb8\xaf\xc5\xcd \xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbc\xba\xb0\xf8\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
-								m_statName),
-							0, false);
-					g_audio->PlayBGM("enchant_down.mp3", true, true);
-					AfxGetTask()->GetActor("RealMyRoom")
-						<< MsgObject(NULL, 211, m_type & 1, 0, 0, 0, 0);
-					break;
-				case 6:
-					if (m_type & 2)
-						m_pText->AddLine(
-							"\xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbd\xc7\xc6\xd0\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
-							0, false);
-					else
-						m_pText->AddLine(
-							"\xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbd\xc7\xc6\xd0\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
-							0, false);
-					break;
-				case 3:
-					if (m_type & 2)
-						m_pText->AddLine(
-							"\xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xc0\xa7\xc7\xd1 \xc6\xce\xc0\xcc \xba\xce\xc1\xb7\xc7\xd5\xb4\xcf\xb4\xd9.",
-							0, false);
-					else
-						m_pText->AddLine(
-							"\xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xc0\xa7\xc7\xd1 \xc6\xce\xc0\xcc \xba\xce\xc1\xb7\xc7\xd5\xb4\xcf\xb4\xd9.",
-							0, false);
-					break;
-				case 4:
-					m_pText->AddLine(
-						"\xb4\xf5 \xc0\xcc\xbb\xf3 \xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xc7\xd2 \xbc\xf6 \xc0\xd6\xb4\xc2 \xbd\xbd\xb7\xd4\xc0\xcc \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
-						0, false);
-					break;
-				case 5:
-					m_pText->AddLine(
-						"\xb4\xf5 \xc0\xcc\xbb\xf3 \xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5 \xc7\xd2 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
-						0, false);
-					break;
-				}
-			}
-		}
-	}
 }
 
 void FrEnchantDlg::SetType(unsigned char type, unsigned char stat)
@@ -311,6 +177,100 @@ void FrEnchantDlg::SetType(unsigned char type, unsigned char stat)
 	}
 }
 
+void FrEnchantDlg::OnProc(const float dt)
+{
+	if (m_pGaugeBar)
+	{
+		if (WisEqual(m_pGaugeBar->GetPos(), 100.0f, g_EPSILON) &&
+			!m_bResultShown && m_resultCode)
+		{
+			m_bResultShown = true;
+			if (m_pOKBtn)
+				m_pOKBtn->Enable(true);
+			if (m_pText)
+			{
+				m_pText->ClearLine();
+				switch (m_resultCode)
+				{
+				case 1:
+					m_pText->SetClientRect(WRect(45, 60, 200, 80));
+					if (m_type & 1)
+						m_pText->AddLine(
+							MakeStr(
+								"\xc0\xe5\xba\xf1 \xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbc\xba\xb0\xf8\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
+								m_statName),
+							0, false);
+					else
+						m_pText->AddLine(
+							MakeStr(
+								"\xc4\xb3\xb8\xaf\xc5\xcd \xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbc\xba\xb0\xf8\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
+								m_statName),
+							0, false);
+					g_audio->PlaySfx("enchant_up");
+					AfxGetTask()->GetActor("RealMyRoom")
+						<< MsgObject(NULL, 211, m_type & 1, 0, 0, 0, 0);
+					break;
+				case 2:
+					m_pText->SetClientRect(WRect(45, 60, 200, 80));
+					if (m_type & 1)
+						m_pText->AddLine(
+							MakeStr(
+								"\xc0\xe5\xba\xf1 \xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbc\xba\xb0\xf8\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
+								m_statName),
+							0, false);
+					else
+						m_pText->AddLine(
+							MakeStr(
+								"\xc4\xb3\xb8\xaf\xc5\xcd \xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbc\xba\xb0\xf8\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
+								m_statName),
+							0, false);
+					g_audio->PlayBGM("enchant_down.mp3", true, true);
+					AfxGetTask()->GetActor("RealMyRoom")
+						<< MsgObject(NULL, 211, m_type & 1, 0, 0, 0, 0);
+					break;
+				case 6:
+					if (m_type & 2)
+						m_pText->AddLine(
+							"\xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbd\xc7\xc6\xd0\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
+							0, false);
+					else
+						m_pText->AddLine(
+							"\xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xbd\xc7\xc6\xd0\xc7\xdf\xbd\xc0\xb4\xcf\xb4\xd9.",
+							0, false);
+					break;
+				case 3:
+					if (m_type & 2)
+						m_pText->AddLine(
+							"\xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xc0\xa7\xc7\xd1 \xc6\xce\xc0\xcc \xba\xce\xc1\xb7\xc7\xd5\xb4\xcf\xb4\xd9.",
+							0, false);
+					else
+						m_pText->AddLine(
+							"\xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xb8\xa6 \xc0\xa7\xc7\xd1 \xc6\xce\xc0\xcc \xba\xce\xc1\xb7\xc7\xd5\xb4\xcf\xb4\xd9.",
+							0, false);
+					break;
+				case 4:
+					m_pText->AddLine(
+						"\xb4\xf5 \xc0\xcc\xbb\xf3 \xbe\xf7\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5\xc7\xd2 \xbc\xf6 \xc0\xd6\xb4\xc2 \xbd\xbd\xb7\xd4\xc0\xcc \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
+						0, false);
+					break;
+				case 5:
+					m_pText->AddLine(
+						"\xb4\xf5 \xc0\xcc\xbb\xf3 \xb4\xd9\xbf\xee\xb1\xd7\xb7\xb9\xc0\xcc\xb5\xe5 \xc7\xd2 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
+						0, false);
+					break;
+				}
+			}
+		}
+	}
+}
+
+void FrEnchantDlg::OnYesInit(int param)
+{
+	m_pYesBtn = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pYesBtn)
+		m_pYesBtn->SetVisible(false);
+}
+
 void FrEnchantDlg::OnYesBtnUp()
 {
 	if (m_pYesBtn)
@@ -370,4 +330,43 @@ void FrEnchantDlg::OnYesBtnUp()
 		packet.EncodeBuffer(&it->second, sizeof(sCharacterInfo));
 	}
 	packet.Send(TO_GAME);
+}
+
+void FrEnchantDlg::OnNoInit(int param)
+{
+	m_pNoBtn = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pNoBtn)
+		m_pNoBtn->SetVisible(false);
+}
+
+void FrEnchantDlg::OnNoBtnUp()
+{
+	Close(FrNONE, true);
+}
+
+void FrEnchantDlg::OnOKInit(int param)
+{
+	m_pOKBtn = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pOKBtn)
+		m_pOKBtn->SetVisible(false);
+}
+
+void FrEnchantDlg::OnOKBtnUp()
+{
+	Close(FrOK, true);
+}
+
+void FrEnchantDlg::OnGaugeBarInit(int param)
+{
+	m_pGaugeBar = DYNAMIC_CAST(FrGaugeBar, (FrWnd*)param);
+	if (m_pGaugeBar)
+	{
+		m_pGaugeBar->SetVisible(false);
+		m_pGaugeBar->SetBarSpeed(10.0f);
+	}
+}
+
+void FrEnchantDlg::OnTextEditInit(int param)
+{
+	m_pText = DYNAMIC_CAST(FrEdit, (FrWnd*)param);
 }

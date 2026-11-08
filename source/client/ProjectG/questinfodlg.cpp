@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "questinfodlg.h"
 
 #include "wfont.h"

@@ -1,5 +1,4 @@
 #include "mathconsts.h"
-#include "minatl.h"
 #include "projectg.h"
 #include "mascot.h"
 #include "npc.h"

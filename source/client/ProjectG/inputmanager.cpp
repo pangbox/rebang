@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include <vector>
 #include "projectg.h"
 

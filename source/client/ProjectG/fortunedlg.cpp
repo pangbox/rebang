@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "fortunedlg.h"
 #include "frarea.h"
 #include "frstatic.h"

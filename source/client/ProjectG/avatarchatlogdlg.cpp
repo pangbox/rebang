@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "avatarchatlogdlg.h"
 #include "reportdlg.h"
 #include "fredit.h"

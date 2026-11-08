@@ -3,7 +3,6 @@
 #include "exhibition.h"
 #include "titlefontex.h"
 #include "../../shared/sharedtables.h"
-#include "minatl.h"
 
 extern Fresh* g_pFresh;
 

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "monitor.h"
 #include "woverlay.h"
 

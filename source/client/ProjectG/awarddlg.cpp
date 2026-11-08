@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "awarddlg.h"
 #include "projectg.h"
 #include "netresourcemanager.h"

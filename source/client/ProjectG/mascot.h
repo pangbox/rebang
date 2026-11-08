@@ -44,5 +44,3 @@ protected:
 	sMascot m_mascot[4];
 	int m_fxHandle;
 };
-
-ILNUM_MASCOT

@@ -3,7 +3,6 @@
 #include "luatablehelper.h"
 #include "wresrcmng.h"
 #include "westpak.h"
-#include "minatl.h"
 #include <algorithm>
 extern "C"
 {

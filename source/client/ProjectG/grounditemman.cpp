@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "grounditemman.h"
 #include "grounditem.h"
 #include "quadtree.h"

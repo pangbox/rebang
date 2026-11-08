@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "frhalloweendlg.h"
 #include "contentsdoc.h"
 

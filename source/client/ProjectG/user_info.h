@@ -42,4 +42,3 @@ inline FrUserInfoForm* USERINFODLG()
 		return NULL;
 	return CUserInfo::Instance()->GetDlg();
 }
-ILNUM_UI

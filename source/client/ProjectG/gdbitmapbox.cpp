@@ -1,5 +1,9 @@
-#include "minatl.h"
 #include "gdbitmapbox.h"
+
+inline ATL::CAtlWinModule& AtlWinModule()
+{
+	return ATL::_AtlWinModule;
+}
 
 CGDBitmapBox::CGDBitmapBox()
 {

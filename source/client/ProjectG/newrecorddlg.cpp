@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "newrecorddlg.h"
 #include "courseorder.h"
 #include "frlistbox.h"

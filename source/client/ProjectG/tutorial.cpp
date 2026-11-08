@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "tutorial.h"
 #include "quizdlg.h"
 #include "inputmanager.h"

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "ggc_wrapper.h"
 #include "npgamelib.h"
 #include "ggc_helper.h"

@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include "initdelegate.h"
 
 CInitDelegate::FUNC CInitDelegate::m_ReleaseFunctions[256] = { 0 };

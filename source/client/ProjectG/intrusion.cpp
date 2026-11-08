@@ -37,30 +37,6 @@ void CIntrusion::FinishGame()
 	m_calcExpMemberSize = 0;
 }
 
-unsigned long CIntrusion::GetActiveColor()
-{
-	return 0xc3e5ffd8;
-}
-
-bool CIntrusion::OnAccessRoom(sRoomInfo& room)
-{
-	if (room.bIntrusion != true || room.bAvailable)
-		return false;
-	room.bAvailable = true;
-	return true;
-}
-
-void CIntrusion::GetInfoTime(sInfoTime* info, unsigned long passTime,
-	unsigned long remainTime)
-{
-	int passed = passTime / 1000;
-	int remaining = remainTime / 1000 - passTime / 1000;
-	info->passMin = passed / 60;
-	info->passSec = passed - info->passMin * 60;
-	info->remainMin = remaining / 60;
-	info->remainSec = remaining - info->remainMin * 60;
-}
-
 CIntrusion::CIntrusion()
 	: m_pDlg(NULL), m_roomNumber(0), m_calcExpMemberSize(0)
 {
@@ -71,170 +47,16 @@ CIntrusion::~CIntrusion()
 {
 }
 
-void CIntrusion::DoJoinRoom(unsigned short roomNumber)
+unsigned long CIntrusion::GetActiveColor()
 {
-	m_roomNumber = roomNumber;
-	WSendPacket packet((enumClientPacket)154);
-	packet.Encode1(0);
-	packet.Encode2(m_roomNumber);
-	packet.Send(TO_GAME);
+	return 0xc3e5ffd8;
 }
 
-bool CIntrusion::OnDelayDlgResult(int result, FrForm* form)
+bool CIntrusion::OnAccessRoom(sRoomInfo& room)
 {
-	if (result != FrOK)
-	{
-		AfxGetTask()->GetActor("Lobby") << MsgObject(NULL, 59, 0, 0, 0, 0, 0);
-		m_pDlg = NULL;
-		return true;
-	}
-	m_pDlg = NULL;
-	return true;
-}
-
-bool CIntrusion::OnDenyDlgResult(int result, FrForm* form)
-{
-	AfxGetTask()->GetActor("Lobby") << MsgObject(NULL, 59, 0, 0, 0, 0, 0);
-	m_pDlg = NULL;
-	return true;
-}
-
-void CIntrusion::DenyAnlaysis(eIntrusionDenyCode code)
-{
-	if (!m_pDlg)
-	{
-		m_pDlg =
-			CreateForm<FrForm>(g_pFresh->GetManager(), this, "IntrusionDeny");
-		m_pDlg->SetCaption(
-			"30\xc0\xce \xb4\xeb\xc8\xb8 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5");
-		m_pDlg->SetDesc(
-			" \xa1\xd8 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5 \xb0\xe1\xb0\xfa");
-		switch (code)
-		{
-		case INTRUSION_DENY_CROWDED:
-			m_pDlg->SetMessage(
-				"\xc0\xce\xbf\xf8\xc0\xcc \xb0\xa1\xb5\xe6 \xc2\xf7\xbc\xad \xb9\xe6\xbf\xa1 \xc0\xd4\xc0\xe5 \xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
-				false);
-			break;
-		case INTRUSION_DENY_LATE:
-			m_pDlg->SetMessage(
-				"\xb0\xd4\xc0\xd3 \xbd\xc3\xc0\xdb \xc8\xc4 5\xba\xd0\xc0\xcc \xc1\xf6\xb3\xad \xb9\xe6\xbf\xa1\xb4\xc2 \xc0\xd4\xc0\xe5 \xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
-				false);
-			break;
-		case INTRUSION_DENY_PRIVATE:
-			m_pDlg->SetMessage(
-				"\xba\xf1\xb0\xf8\xb0\xb3 \xb9\xe6\xbf\xa1\xb4\xc2 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5 \xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
-				false);
-			break;
-		case INTRUSION_DENY_RECENT:
-			m_pDlg->SetMessage(
-				"\xc0\xcc\xc0\xfc\xbf\xa1 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5\xc7\xd1 \xb1\xe2\xb7\xcf\xc0\xcc \xc0\xd6\xbe\xee\xbc\xad \xb4\xe7\xba\xd0\xb0\xa3 \xc0\xd4\xc0\xe5\xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
-				false);
-			break;
-		case INTRUSION_DENY_CLOSED:
-			m_pDlg->SetMessage(
-				"\xc7\xf6\xc0\xe7 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5\xc0\xcc \xba\xd2\xb0\xa1\xb4\xc9\xc7\xd1 \xb9\xe6\xc0\xd4\xb4\xcf\xb4\xd9.",
-				false);
-			break;
-		case INTRUSION_DENY_PLAYED:
-			m_pDlg->SetMessage(
-				"\xc7\xd8\xb4\xe7 \xb9\xe6\xbf\xa1\xbc\xad \xc7\xc3\xb7\xb9\xc0\xcc\xc7\xd1 \xb1\xe2\xb7\xcf\xc0\xcc \xc0\xd6\xbe\xee\xbc\xad \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5\xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
-				false);
-			break;
-		case INTRUSION_DENY_KICKED:
-			m_pDlg->SetMessage(
-				"\xc7\xd8\xb4\xe7 \xb9\xe6\xbf\xa1\xbc\xad \xb0\xad\xc1\xa6 \xc5\xf0\xc0\xe5\xb4\xe7\xc7\xd1 \xb1\xe2\xb7\xcf\xc0\xcc \xc0\xd6\xbe\xee\xbc\xad \xc0\xd4\xc0\xe5\xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
-				false);
-			break;
-		}
-		m_pDlg->Open((FRESH_PFN_RESULT)&CIntrusion::OnDenyDlgResult, 3);
-	}
-}
-
-void CIntrusion::RivalDataUpdate(WReceivedPacket& packet)
-{
-	unsigned long oid = packet.Decode4();
-	unsigned char stroke = packet.Decode1();
-	unsigned char hole = packet.Decode1();
-	int score = packet.Decode4();
-	__int64 pang = packet.Decode8();
-	sIntrusionReport report;
-	memset(&report, 0, sizeof(report));
-	packet.DecodeBuffer(&report, sizeof(report));
-	if (oid != Doc()->m_myInfo.info.dwGuid)
-	{
-		RIVAL_LIST_IT it = std::find_if(Doc()->m_rivalList.begin(),
-			Doc()->m_rivalList.end(), sFindRival(oid));
-		if (it != Doc()->m_rivalList.end())
-		{
-			it->totalStroke = stroke;
-			it->hole = hole;
-			it->totalScore = score;
-			it->totalPang = pang;
-			memcpy(it->holeStroke, report.score.stroke, sizeof(it->holeStroke));
-			memcpy(it->holeScore, report.score.score, sizeof(it->holeScore));
-			memcpy(it->holePang, report.score.pang, sizeof(it->holePang));
-			IActor* scoreActor = AfxGetTask()->GetActor("Score");
-			if (scoreActor)
-				scoreActor << MsgObject(NULL, 316, 0, 0, 0, 0, 0);
-			IActor* spotActor = AfxGetTask()->GetActor("Spot");
-			if (spotActor)
-				spotActor << MsgObject(NULL, 251, 0, 0, 0, 0, 0);
-		}
-	}
-}
-
-bool CIntrusion::IsIntrusionGame(unsigned short roomNumber)
-{
-	bool result = false;
-	for (std::list<sRoomInfo>::iterator it = Doc()->m_roomList.begin();
-		it != Doc()->m_roomList.end(); it++)
-		if ((*it).roomGuid == roomNumber)
-		{
-			result = (*it).bIntrusion;
-			break;
-		}
-	return result;
-}
-
-bool CIntrusion::OnAlarmDlgResult(int result, FrForm* form)
-{
-	if (result == FrOK)
-	{
-		WSendPacket packet((enumClientPacket)154);
-		packet.Encode1(1);
-		packet.Encode2(m_roomNumber);
-		packet.Send(TO_GAME);
-		CSharedDoc* doc = Doc();
-		unsigned long caddie = doc->m_myInfo.userEquip.guidCaddie;
-		std::map<unsigned int, sCaddieInfo>& caddies = doc->m_caddieMap;
-		CADDIE_MAP_IT it = caddies.find(caddie);
-		if (it != caddies.end())
-		{
-			IFF_STRUCT::sCaddie* info =
-				ItemManager()->FindCaddie(it->second.tid);
-			if (it->second.Rent_flag && !it->second.Remain_Date && info &&
-				info->MonthlyFee > 0)
-				caddie = 0;
-		}
-		unsigned long equipment[4];
-		memset(equipment, 0, sizeof(equipment));
-		equipment[0] = Doc()->m_myInfo.userEquip.guidChar;
-		Doc()->m_myInfo.userEquip.guidCaddie = caddie;
-		equipment[1] = caddie;
-		equipment[2] = Doc()->m_myInfo.userEquip.guidClubSet;
-		equipment[3] = Doc()->m_myInfo.userEquip.tidBall;
-		WSendPacket equipPacket((enumClientPacket)12);
-		equipPacket.Encode1(7);
-		equipPacket.EncodeBuffer(equipment, sizeof(equipment));
-		equipPacket.Send(TO_GAME);
-	}
-	else
-	{
-		AfxGetTask()->GetActor("Lobby") << MsgObject(NULL, 59, 0, 0, 0, 0, 0);
-		Doc()->m_myInfo.roomIndex = 0xffff;
-	}
-	m_pDlg = NULL;
+	if (room.bIntrusion != true || room.bAvailable)
+		return false;
+	room.bAvailable = true;
 	return true;
 }
 
@@ -364,58 +186,6 @@ void CIntrusion::DoIntrusionAccess(WReceivedPacket& packet,
 		break;
 	}
 	}
-}
-
-void CIntrusion::PlayersUpdate(int state)
-{
-	std::list<sSlotInfo>& slots = Doc()->m_slotList;
-	std::vector<sRivalData>& rivals = Doc()->m_rivalList;
-	for (std::list<sSlotInfo>::iterator slot = slots.begin();
-		slot != slots.end(); ++slot)
-	{
-		RIVAL_LIST_IT it = std::find_if(rivals.begin(), rivals.end(),
-			sFindRival(slot->dwGuid));
-		if (it != rivals.end())
-			it->quitOrder = state;
-		else if (slot->dwGuid == -1)
-			GOLFDOC()->GetPlayer(0)->state = 3;
-		else
-		{
-			Doc()->SetIndex(slot->dwGuid);
-			sRivalData rival;
-			memset(&rival, 0, sizeof(rival));
-			strcpy(rival.nickname, slot->sNick);
-			strcpy(rival.guildName, slot->sGuild);
-			rival.uid = slot->dwUserUID;
-			rival.order = state;
-			rival.quitOrder = state;
-			rival.capability = slot->dwIdentity;
-			strcpy(rival.guildMark, slot->szEmblemName);
-			rival.finishOrder = slots.size();
-			rival.flag = slot->gender;
-			rival.oid = slot->dwGuid;
-			rival.guildUID = slot->GuildId;
-			rival.hole = Doc()->m_holeOrder[0];
-			rival.level = slot->level;
-			rival.pangMastery = slot->pangma[0];
-			rival.pangNitro = slot->pangma[1];
-			rival.ballPos = GOLFDOC()->GetHoleData().tee;
-			rival.team = slot->bTeam;
-			rival.observerState = 1;
-			rival.rank = 1;
-			rival.observerRank = 1;
-			rival.state = 0;
-			rival.mascotTypeId = slot->tidMascot;
-			rival.titleTypeId = slot->dwTitle;
-			rivals.push_back(rival);
-		}
-	}
-	IActor* score = AfxGetTask()->GetActor("Score");
-	if (score)
-		score << MsgObject(NULL, 316, 0, 0, 0, 0, 0);
-	IActor* spot = AfxGetTask()->GetActor("Spot");
-	if (spot)
-		spot << MsgObject(NULL, 251, 0, 0, 0, 0, 0);
 }
 
 void CIntrusion::PacketAnalysis(WReceivedPacket& packet)
@@ -556,4 +326,238 @@ void CIntrusion::PacketAnalysis(WReceivedPacket& packet)
 			break;
 		}
 	}
+}
+
+void CIntrusion::RivalDataUpdate(WReceivedPacket& packet)
+{
+	unsigned long oid = packet.Decode4();
+	unsigned char stroke = packet.Decode1();
+	unsigned char hole = packet.Decode1();
+	int score = packet.Decode4();
+	__int64 pang = packet.Decode8();
+	sIntrusionReport report;
+	memset(&report, 0, sizeof(report));
+	packet.DecodeBuffer(&report, sizeof(report));
+	if (oid != Doc()->m_myInfo.info.dwGuid)
+	{
+		RIVAL_LIST_IT it = std::find_if(Doc()->m_rivalList.begin(),
+			Doc()->m_rivalList.end(), sFindRival(oid));
+		if (it != Doc()->m_rivalList.end())
+		{
+			it->totalStroke = stroke;
+			it->hole = hole;
+			it->totalScore = score;
+			it->totalPang = pang;
+			memcpy(it->holeStroke, report.score.stroke, sizeof(it->holeStroke));
+			memcpy(it->holeScore, report.score.score, sizeof(it->holeScore));
+			memcpy(it->holePang, report.score.pang, sizeof(it->holePang));
+			IActor* scoreActor = AfxGetTask()->GetActor("Score");
+			if (scoreActor)
+				scoreActor << MsgObject(NULL, 316, 0, 0, 0, 0, 0);
+			IActor* spotActor = AfxGetTask()->GetActor("Spot");
+			if (spotActor)
+				spotActor << MsgObject(NULL, 251, 0, 0, 0, 0, 0);
+		}
+	}
+}
+
+void CIntrusion::PlayersUpdate(int state)
+{
+	std::list<sSlotInfo>& slots = Doc()->m_slotList;
+	std::vector<sRivalData>& rivals = Doc()->m_rivalList;
+	for (std::list<sSlotInfo>::iterator slot = slots.begin();
+		slot != slots.end(); ++slot)
+	{
+		RIVAL_LIST_IT it = std::find_if(rivals.begin(), rivals.end(),
+			sFindRival(slot->dwGuid));
+		if (it != rivals.end())
+		{
+			it->quitOrder = state;
+		}
+		else if (slot->dwGuid == -1)
+		{
+			GOLFDOC()->GetPlayer(0)->state = 3;
+		}
+		else
+		{
+			Doc()->SetIndex(slot->dwGuid);
+			sRivalData rival;
+			memset(&rival, 0, sizeof(rival));
+			strcpy(rival.nickname, slot->sNick);
+			strcpy(rival.guildName, slot->sGuild);
+			rival.uid = slot->dwUserUID;
+			rival.order = state;
+			rival.quitOrder = state;
+			rival.capability = slot->dwIdentity;
+			strcpy(rival.guildMark, slot->szEmblemName);
+			rival.finishOrder = slots.size();
+			rival.flag = slot->gender;
+			rival.oid = slot->dwGuid;
+			rival.guildUID = slot->GuildId;
+			rival.hole = Doc()->m_holeOrder[0];
+			rival.level = slot->level;
+			rival.pangMastery = slot->pangma[0];
+			rival.pangNitro = slot->pangma[1];
+			rival.ballPos = GOLFDOC()->GetHoleData().tee;
+			rival.team = slot->bTeam;
+			rival.observerState = 1;
+			rival.rank = 1;
+			rival.observerRank = 1;
+			rival.state = 0;
+			rival.mascotTypeId = slot->tidMascot;
+			rival.titleTypeId = slot->dwTitle;
+			rivals.push_back(rival);
+		}
+	}
+	IActor* score = AfxGetTask()->GetActor("Score");
+	if (score)
+		score << MsgObject(NULL, 316, 0, 0, 0, 0, 0);
+	IActor* spot = AfxGetTask()->GetActor("Spot");
+	if (spot)
+		spot << MsgObject(NULL, 251, 0, 0, 0, 0, 0);
+}
+
+void CIntrusion::GetInfoTime(sInfoTime* info, unsigned long passTime,
+	unsigned long remainTime)
+{
+	int passed = passTime / 1000;
+	int remaining = remainTime / 1000 - passTime / 1000;
+	info->passMin = passed / 60;
+	info->passSec = passed - info->passMin * 60;
+	info->remainMin = remaining / 60;
+	info->remainSec = remaining - info->remainMin * 60;
+}
+
+bool CIntrusion::OnAlarmDlgResult(int result, FrForm* form)
+{
+	if (result == FrOK)
+	{
+		WSendPacket packet((enumClientPacket)154);
+		packet.Encode1(1);
+		packet.Encode2(m_roomNumber);
+		packet.Send(TO_GAME);
+		CSharedDoc* doc = Doc();
+		unsigned long caddie = doc->m_myInfo.userEquip.guidCaddie;
+		std::map<unsigned int, sCaddieInfo>& caddies = doc->m_caddieMap;
+		CADDIE_MAP_IT it = caddies.find(caddie);
+		if (it != caddies.end())
+		{
+			IFF_STRUCT::sCaddie* info =
+				ItemManager()->FindCaddie(it->second.tid);
+			if (it->second.Rent_flag && !it->second.Remain_Date && info &&
+				info->MonthlyFee > 0)
+				caddie = 0;
+		}
+		unsigned long equipment[4];
+		memset(equipment, 0, sizeof(equipment));
+		equipment[0] = Doc()->m_myInfo.userEquip.guidChar;
+		Doc()->m_myInfo.userEquip.guidCaddie = caddie;
+		equipment[1] = caddie;
+		equipment[2] = Doc()->m_myInfo.userEquip.guidClubSet;
+		equipment[3] = Doc()->m_myInfo.userEquip.tidBall;
+		WSendPacket equipPacket((enumClientPacket)12);
+		equipPacket.Encode1(7);
+		equipPacket.EncodeBuffer(equipment, sizeof(equipment));
+		equipPacket.Send(TO_GAME);
+	}
+	else
+	{
+		AfxGetTask()->GetActor("Lobby") << MsgObject(NULL, 59, 0, 0, 0, 0, 0);
+		Doc()->m_myInfo.roomIndex = 0xffff;
+	}
+	m_pDlg = NULL;
+	return true;
+}
+
+bool CIntrusion::OnDelayDlgResult(int result, FrForm* form)
+{
+	if (result != FrOK)
+	{
+		AfxGetTask()->GetActor("Lobby") << MsgObject(NULL, 59, 0, 0, 0, 0, 0);
+		m_pDlg = NULL;
+		return true;
+	}
+	m_pDlg = NULL;
+	return true;
+}
+
+bool CIntrusion::OnDenyDlgResult(int result, FrForm* form)
+{
+	AfxGetTask()->GetActor("Lobby") << MsgObject(NULL, 59, 0, 0, 0, 0, 0);
+	m_pDlg = NULL;
+	return true;
+}
+
+void CIntrusion::DenyAnlaysis(eIntrusionDenyCode code)
+{
+	if (!m_pDlg)
+	{
+		m_pDlg =
+			CreateForm<FrForm>(g_pFresh->GetManager(), this, "IntrusionDeny");
+		m_pDlg->SetCaption(
+			"30\xc0\xce \xb4\xeb\xc8\xb8 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5");
+		m_pDlg->SetDesc(
+			" \xa1\xd8 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5 \xb0\xe1\xb0\xfa");
+		switch (code)
+		{
+		case INTRUSION_DENY_CROWDED:
+			m_pDlg->SetMessage(
+				"\xc0\xce\xbf\xf8\xc0\xcc \xb0\xa1\xb5\xe6 \xc2\xf7\xbc\xad \xb9\xe6\xbf\xa1 \xc0\xd4\xc0\xe5 \xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
+				false);
+			break;
+		case INTRUSION_DENY_LATE:
+			m_pDlg->SetMessage(
+				"\xb0\xd4\xc0\xd3 \xbd\xc3\xc0\xdb \xc8\xc4 5\xba\xd0\xc0\xcc \xc1\xf6\xb3\xad \xb9\xe6\xbf\xa1\xb4\xc2 \xc0\xd4\xc0\xe5 \xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
+				false);
+			break;
+		case INTRUSION_DENY_PRIVATE:
+			m_pDlg->SetMessage(
+				"\xba\xf1\xb0\xf8\xb0\xb3 \xb9\xe6\xbf\xa1\xb4\xc2 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5 \xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
+				false);
+			break;
+		case INTRUSION_DENY_RECENT:
+			m_pDlg->SetMessage(
+				"\xc0\xcc\xc0\xfc\xbf\xa1 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5\xc7\xd1 \xb1\xe2\xb7\xcf\xc0\xcc \xc0\xd6\xbe\xee\xbc\xad \xb4\xe7\xba\xd0\xb0\xa3 \xc0\xd4\xc0\xe5\xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
+				false);
+			break;
+		case INTRUSION_DENY_CLOSED:
+			m_pDlg->SetMessage(
+				"\xc7\xf6\xc0\xe7 \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5\xc0\xcc \xba\xd2\xb0\xa1\xb4\xc9\xc7\xd1 \xb9\xe6\xc0\xd4\xb4\xcf\xb4\xd9.",
+				false);
+			break;
+		case INTRUSION_DENY_PLAYED:
+			m_pDlg->SetMessage(
+				"\xc7\xd8\xb4\xe7 \xb9\xe6\xbf\xa1\xbc\xad \xc7\xc3\xb7\xb9\xc0\xcc\xc7\xd1 \xb1\xe2\xb7\xcf\xc0\xcc \xc0\xd6\xbe\xee\xbc\xad \xb0\xd4\xc0\xd3\xc1\xdf \xc0\xd4\xc0\xe5\xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
+				false);
+			break;
+		case INTRUSION_DENY_KICKED:
+			m_pDlg->SetMessage(
+				"\xc7\xd8\xb4\xe7 \xb9\xe6\xbf\xa1\xbc\xad \xb0\xad\xc1\xa6 \xc5\xf0\xc0\xe5\xb4\xe7\xc7\xd1 \xb1\xe2\xb7\xcf\xc0\xcc \xc0\xd6\xbe\xee\xbc\xad \xc0\xd4\xc0\xe5\xc7\xcf\xbd\xc7 \xbc\xf6 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9.",
+				false);
+			break;
+		}
+		m_pDlg->Open((FRESH_PFN_RESULT)&CIntrusion::OnDenyDlgResult, 3);
+	}
+}
+
+bool CIntrusion::IsIntrusionGame(unsigned short roomNumber)
+{
+	bool result = false;
+	for (std::list<sRoomInfo>::iterator it = Doc()->m_roomList.begin();
+		it != Doc()->m_roomList.end(); it++)
+		if ((*it).roomGuid == roomNumber)
+		{
+			result = (*it).bIntrusion;
+			break;
+		}
+	return result;
+}
+
+void CIntrusion::DoJoinRoom(unsigned short roomNumber)
+{
+	m_roomNumber = roomNumber;
+	WSendPacket packet((enumClientPacket)154);
+	packet.Encode1(0);
+	packet.Encode2(m_roomNumber);
+	packet.Send(TO_GAME);
 }

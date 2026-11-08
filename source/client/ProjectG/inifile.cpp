@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "wresrcmng.h"
 #include "projectg.h"
 #include "inifile.h"

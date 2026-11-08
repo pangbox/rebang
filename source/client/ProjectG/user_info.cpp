@@ -1,5 +1,4 @@
 #include "s5/utilities.h"
-#include "minatl.h"
 #include "userinfoform.h"
 #include "user_info.h"
 #include "matchhistory.h"

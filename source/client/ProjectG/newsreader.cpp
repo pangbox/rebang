@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "newsreader.h"
 
 NewsReader::NewsReader()

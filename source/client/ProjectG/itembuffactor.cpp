@@ -182,101 +182,6 @@ void CItemBuff::OnLoad()
 		m_pButtonNormal->Height());
 }
 
-bool CItemBuff::OnUseBuffItemDlgResult(int result, FrForm* form)
-{
-	if (result == 1 && m_useTypeId)
-	{
-		GetActor("RealMyRoom") << MsgObject(NULL, 1, 0, 0, 0, 0, 0);
-		WSendPacket packet((enumClientPacket)218);
-		packet.Encode4(m_useTypeId);
-		packet.Send(TO_GAME);
-	}
-	m_useTypeId = 0;
-	return true;
-}
-
-void CItemBuff::DrawMiniButton(FrListItem* item, const WPoint& pos)
-{
-	FrGraphicInterface* graphic = g_pFresh->GetManager()->GetGDI();
-	if (item->underCursor && (m_buttonRect + item->pos).IsInRect(pos))
-	{
-		graphic->DrawTexture(m_pButtonOver, m_buttonRect + item->pos,
-			0xffffffff, 0);
-		TOOLTIP()->SetToolTip(TOOLTIP_USE);
-	}
-	else
-	{
-		graphic->DrawTexture(m_pButtonNormal, m_buttonRect + item->pos,
-			0xffffffff, 0);
-	}
-}
-
-void CItemBuff::IsCompatibleBuff(unsigned long typeId,
-	const std::list<sSCardAvilityPeriodInfo>& buffList, bool& compatible,
-	unsigned long& conflictTypeId)
-{
-	for (std::list<sSCardAvilityPeriodInfo>::const_iterator it =
-			 buffList.begin();
-		compatible && it != buffList.end(); ++it)
-	{
-		if (!ItemManager()->IsCompatibleBuff(typeId, (*it).tid))
-		{
-			conflictTypeId = (*it).tid;
-			compatible = false;
-		}
-	}
-}
-
-void CItemBuff::UpdateBuffDlg(FrSPCardBuffDlg* dlg)
-{
-	if (dlg)
-	{
-		dlg->SetBuffItem(Doc()->m_cardAbilityList[0], true);
-		dlg->SetBuffItem(ms_BuffItemInfoList, false);
-	}
-}
-
-void CItemBuff::ResetBuffList()
-{
-	ms_BuffItemInfoList.clear();
-}
-
-void CItemBuff::RemoveBuffItem(unsigned long typeId)
-{
-	for (std::list<sSCardAvilityPeriodInfo>::iterator it =
-			 ms_BuffItemInfoList.begin();
-		it != ms_BuffItemInfoList.end();)
-	{
-		if ((*it).tid == typeId)
-			it = ms_BuffItemInfoList.erase(it);
-		else
-			++it;
-	}
-	CCardManager::Instance()->UpdateCardBuffDlg();
-}
-
-void CItemBuff::AddBuffItem(sSCardAvilityPeriodInfo& info)
-{
-	if (!ItemManager()->IsItemBuff(info.tid))
-		return;
-	std::list<sSCardAvilityPeriodInfo>::iterator it =
-		std::find_if(ms_BuffItemInfoList.begin(), ms_BuffItemInfoList.end(),
-			sAbilityFinder(info.tid));
-	if (it != ms_BuffItemInfoList.end())
-	{
-		(*it).useEndTime = info.useEndTime;
-		(*it).useStartTime.wSecond = HIWORD(g_CurrentTime);
-		(*it).useStartTime.wMilliseconds = LOWORD(g_CurrentTime);
-	}
-	else
-	{
-		info.useStartTime.wSecond = HIWORD(g_CurrentTime);
-		info.useStartTime.wMilliseconds = LOWORD(g_CurrentTime);
-		ms_BuffItemInfoList.push_back(info);
-	}
-	CCardManager::Instance()->UpdateCardBuffDlg();
-}
-
 void CItemBuff::HandleMsg(const MsgObject& msg)
 {
 	if (msg.time > g_CurrentTime)
@@ -329,6 +234,22 @@ void CItemBuff::HandleBuffItemSubMsg(const MsgObject& msg)
 	}
 }
 
+void CItemBuff::DrawMiniButton(FrListItem* item, const WPoint& pos)
+{
+	FrGraphicInterface* graphic = g_pFresh->GetManager()->GetGDI();
+	if (item->underCursor && (m_buttonRect + item->pos).IsInRect(pos))
+	{
+		graphic->DrawTexture(m_pButtonOver, m_buttonRect + item->pos,
+			0xffffffff, 0);
+		TOOLTIP()->SetToolTip(TOOLTIP_USE);
+	}
+	else
+	{
+		graphic->DrawTexture(m_pButtonNormal, m_buttonRect + item->pos,
+			0xffffffff, 0);
+	}
+}
+
 void CItemBuff::ButtonDown(FrListItem* item, const WPoint& pos)
 {
 	if (item && (m_buttonRect + item->pos).IsInRect(pos))
@@ -365,6 +286,40 @@ void CItemBuff::UseBuffItem(sItemInfo* item)
 			OpenConfirmDlg(item->tid, this,
 				(FRESH_PFN_RESULT)&CItemBuff::OnUseBuffItemDlgResult);
 	}
+}
+
+void CItemBuff::IsCompatibleBuff(unsigned long typeId,
+	const std::list<sSCardAvilityPeriodInfo>& buffList, bool& compatible,
+	unsigned long& conflictTypeId)
+{
+	for (std::list<sSCardAvilityPeriodInfo>::const_iterator it =
+			 buffList.begin();
+		compatible && it != buffList.end(); ++it)
+	{
+		if (!ItemManager()->IsCompatibleBuff(typeId, (*it).tid))
+		{
+			conflictTypeId = (*it).tid;
+			compatible = false;
+		}
+	}
+}
+
+bool CItemBuff::OnUseBuffItemDlgResult(int result, FrForm* form)
+{
+	if (result == 1 && m_useTypeId)
+	{
+		GetActor("RealMyRoom") << MsgObject(NULL, 1, 0, 0, 0, 0, 0);
+		WSendPacket packet((enumClientPacket)218);
+		packet.Encode4(m_useTypeId);
+		packet.Send(TO_GAME);
+	}
+	m_useTypeId = 0;
+	return true;
+}
+
+void CItemBuff::ResetBuffList()
+{
+	ms_BuffItemInfoList.clear();
 }
 
 void CItemBuff::ProcessPacket(WReceivedPacket& packet)
@@ -408,5 +363,50 @@ void CItemBuff::ProcessPacket(WReceivedPacket& packet)
 		}
 	}
 	break;
+	}
+}
+
+void CItemBuff::AddBuffItem(sSCardAvilityPeriodInfo& info)
+{
+	if (!ItemManager()->IsItemBuff(info.tid))
+		return;
+	std::list<sSCardAvilityPeriodInfo>::iterator it =
+		std::find_if(ms_BuffItemInfoList.begin(), ms_BuffItemInfoList.end(),
+			sAbilityFinder(info.tid));
+	if (it != ms_BuffItemInfoList.end())
+	{
+		(*it).useEndTime = info.useEndTime;
+		(*it).useStartTime.wSecond = HIWORD(g_CurrentTime);
+		(*it).useStartTime.wMilliseconds = LOWORD(g_CurrentTime);
+	}
+	else
+	{
+		info.useStartTime.wSecond = HIWORD(g_CurrentTime);
+		info.useStartTime.wMilliseconds = LOWORD(g_CurrentTime);
+		ms_BuffItemInfoList.push_back(info);
+	}
+	CCardManager::Instance()->UpdateCardBuffDlg();
+}
+
+void CItemBuff::RemoveBuffItem(unsigned long typeId)
+{
+	for (std::list<sSCardAvilityPeriodInfo>::iterator it =
+			 ms_BuffItemInfoList.begin();
+		it != ms_BuffItemInfoList.end();)
+	{
+		if ((*it).tid == typeId)
+			it = ms_BuffItemInfoList.erase(it);
+		else
+			++it;
+	}
+	CCardManager::Instance()->UpdateCardBuffDlg();
+}
+
+void CItemBuff::UpdateBuffDlg(FrSPCardBuffDlg* dlg)
+{
+	if (dlg)
+	{
+		dlg->SetBuffItem(Doc()->m_cardAbilityList[0], true);
+		dlg->SetBuffItem(ms_BuffItemInfoList, false);
 	}
 }

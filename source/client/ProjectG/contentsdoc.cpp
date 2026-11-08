@@ -6,7 +6,6 @@
 #include "../../shared/s5/sharedutilities.h"
 #include "../../shared/LuaSystem/luascriptmanager.h"
 #include "../../shared/LuaSystem/luatablehelper.h"
-#include "minatl.h"
 
 namespace
 {

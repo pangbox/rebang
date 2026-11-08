@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include <process.h>
 #include <time.h>
 #include <mmsystem.h>

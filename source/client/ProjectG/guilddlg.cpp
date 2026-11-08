@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "guilddlg.h"
 #include "frlistbox.h"
 #include "fredit.h"

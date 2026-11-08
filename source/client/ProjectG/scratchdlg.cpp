@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "scratchdlg.h"
 #include "frviewer.h"
 #include "frdesktop.h"

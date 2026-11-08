@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "onelineboard.h"
 #include "fresh.h"
 #include "frwndmanager.h"

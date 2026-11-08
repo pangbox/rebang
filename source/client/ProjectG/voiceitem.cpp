@@ -24,6 +24,18 @@ CVoiceItem::~CVoiceItem()
 {
 }
 
+bool CVoiceItem::PlaySoundA(unsigned long typeID, eWaveState state, int index)
+{
+	switch (typeID >> 26)
+	{
+	case 4:
+		return ClubPlaySound(typeID, state, index);
+	case 5:
+		return AztecPlaySound(typeID, state);
+	}
+	return false;
+}
+
 void CVoiceItem::Initialize()
 {
 	CGDVoiceItem* data = (CGDVoiceItem*)CGameDataDB::Instance()->GetGameData(
@@ -70,36 +82,6 @@ void CVoiceItem::SetSound(unsigned long typeID, std::string name,
 	voice->numOfSounds = numOfSounds;
 	m_voiceMap.insert(
 		std::multimap<unsigned long, cVoice*>::value_type(typeID, voice));
-}
-
-bool CVoiceItem::IsExistVoiceFile(char* filename)
-{
-	std::string source = "";
-	std::string matched = "";
-	source = filename;
-	source += ".wav";
-	matched = g_resrcmng->FindMatchFile(source.c_str());
-	if (matched.compare(source) == 0)
-	{
-		matched.clear();
-		source.clear();
-		return false;
-	}
-	source.clear();
-	matched.clear();
-	return true;
-}
-
-bool CVoiceItem::PlaySoundA(unsigned long typeID, eWaveState state, int index)
-{
-	switch (typeID >> 26)
-	{
-	case 4:
-		return ClubPlaySound(typeID, state, index);
-	case 5:
-		return AztecPlaySound(typeID, state);
-	}
-	return false;
 }
 
 bool CVoiceItem::ClubPlaySound(unsigned long typeID, eWaveState state,
@@ -222,16 +204,25 @@ bool CVoiceItem::AztecPlaySound(unsigned long typeID, eWaveState state)
 	return true;
 }
 
-bool WearWig(unsigned char player)
+bool CVoiceItem::IsExistVoiceFile(char* filename)
 {
-	CPartTidList* parts = &GOLFDOC()->GetPartTidList(player);
-	if (!parts)
+	std::string source = "";
+	std::string matched = "";
+	source = filename;
+	source += ".wav";
+	matched = g_resrcmng->FindMatchFile(source.c_str());
+	if (matched.compare(source) == 0)
+	{
+		matched.clear();
+		source.clear();
 		return false;
-	unsigned int character = Doc()->m_userInfo[player].charInfo.tid & 0x3ffffff;
-	if (character >= 7)
-		return false;
-	return parts->IsEquipped(wigParts[character], 0);
+	}
+	source.clear();
+	matched.clear();
+	return true;
 }
+
+bool WearWig(unsigned char player);
 
 void CSoundItemManager::PlayCurrentSoundItem()
 {
@@ -260,4 +251,15 @@ void CSoundItemManager::PlayCurrentSoundItem()
 		else
 			g_audio->PlaySfx(g_plSound[6]);
 	}
+}
+
+bool WearWig(unsigned char player)
+{
+	CPartTidList* parts = &GOLFDOC()->GetPartTidList(player);
+	if (!parts)
+		return false;
+	unsigned int character = Doc()->m_userInfo[player].charInfo.tid & 0x3ffffff;
+	if (character >= 7)
+		return false;
+	return parts->IsEquipped(wigParts[character], 0);
 }

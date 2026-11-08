@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "secondarypassworddlg.h"
 #include "messagemanager.h"
 #include "gatewayactor.h"
@@ -6,20 +5,6 @@
 #include <mbstring.h>
 
 extern Fresh* g_pFresh;
-
-namespace S5
-{
-	inline void EnableFreshWindow(FrWnd* wnd)
-	{
-		wnd->SetVisible(true);
-		wnd->Enable(true);
-	}
-	inline void DisableFreshWindow(FrWnd* wnd)
-	{
-		wnd->SetVisible(false);
-		wnd->Enable(false);
-	}
-}
 
 namespace _gateway
 {

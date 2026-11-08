@@ -6,7 +6,6 @@
 #include "quadtree.h"
 #include "clientsetting.h"
 #include "wbone.h"
-#include "minatl.h"
 #include "mathconsts.h"
 
 extern WMatrix g_camera;

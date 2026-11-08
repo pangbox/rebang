@@ -4,21 +4,6 @@
 #include "guilddefine.h"
 #include "s5/utilities.h"
 
-namespace S5
-{
-	inline void DisableFreshWindow(FrWnd* wnd)
-	{
-		wnd->SetVisible(false);
-		wnd->Enable(false);
-	}
-
-	inline void EnableFreshWindow(FrWnd* wnd, bool enable)
-	{
-		wnd->SetVisible(enable);
-		wnd->Enable(enable);
-	}
-}
-
 namespace _guild
 {
 	CGuildFormController::CGuildFormController()

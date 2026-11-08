@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "ccrc32.h"
 #include <fcntl.h>
 #include <io.h>
@@ -187,6 +186,18 @@ unsigned long CRC_32::CalcCRC(const char* filename, HWND hWnd)
 	return (unsigned long)thread;
 }
 
+namespace
+{
+	struct _delete
+	{
+		template <typename T>
+		void operator()(const T* p) const
+		{
+			delete p;
+		}
+	};
+}
+
 CRC_MT::CRC_MT()
 	: m_hParentWnd(NULL),
 	  m_hThread(NULL),
@@ -203,58 +214,9 @@ CRC_MT::~CRC_MT()
 	Reset();
 }
 
-void CRC_MT::Terminate()
-{
-	m_bTerminate = TRUE;
-	if (m_bPause)
-		Resume();
-	if (m_hThread)
-	{
-		WaitForSingleObject(m_hThread, INFINITE);
-		m_hThread = NULL;
-	}
-}
-
-void CRC_MT::Pause()
-{
-	if (m_hThread && !m_bPause)
-	{
-		SuspendThread(m_hThread);
-		m_bPause = TRUE;
-	}
-}
-
-void CRC_MT::Resume()
-{
-	if (m_hThread && m_bPause)
-	{
-		ResumeThread(m_hThread);
-		m_bPause = FALSE;
-	}
-}
-
 void CRC_MT::GetWork(std::vector<sCRC_CHKTASK*>& work)
 {
 	work.assign(m_work.begin(), m_work.end());
-}
-
-namespace
-{
-	struct _delete
-	{
-		template <typename T>
-		void operator()(const T* p) const
-		{
-			delete p;
-		}
-	};
-}
-
-__declspec(noinline) void CRC_MT::Reset()
-{
-	m_hThread = NULL;
-	std::for_each(m_work.begin(), m_work.end(), _delete());
-	m_work.clear();
 }
 
 int CRC_MT::AddWork(const char* filename, unsigned long crc)
@@ -266,6 +228,25 @@ int CRC_MT::AddWork(const char* filename, unsigned long crc)
 	task->crc = crc;
 	m_work.push_back(task);
 	return TRUE;
+}
+
+__declspec(noinline) void CRC_MT::Reset()
+{
+	m_hThread = NULL;
+	std::for_each(m_work.begin(), m_work.end(), _delete());
+	m_work.clear();
+}
+
+void CRC_MT::Terminate()
+{
+	m_bTerminate = TRUE;
+	if (m_bPause)
+		Resume();
+	if (m_hThread)
+	{
+		WaitForSingleObject(m_hThread, INFINITE);
+		m_hThread = NULL;
+	}
 }
 
 unsigned int __stdcall ThreadCRCCheckProc(void* param)
@@ -324,4 +305,22 @@ int CRC_MT::Begin(HWND hWnd)
 	m_hThread =
 		(HANDLE)_beginthreadex(NULL, 0, ThreadCRCCheckProc, this, 0, NULL);
 	return m_hThread != NULL;
+}
+
+void CRC_MT::Pause()
+{
+	if (m_hThread && !m_bPause)
+	{
+		SuspendThread(m_hThread);
+		m_bPause = TRUE;
+	}
+}
+
+void CRC_MT::Resume()
+{
+	if (m_hThread && m_bPause)
+	{
+		ResumeThread(m_hThread);
+		m_bPause = FALSE;
+	}
 }

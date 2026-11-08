@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "frquickmovedlg.h"
 #include "frviewer.h"
 #include "frbutton.h"

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "fortuneopendlg.h"
 #include "frlistbox.h"
 #include "frstatic.h"

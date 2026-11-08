@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "rankunit.h"
 #include "networksystem.h"
 #include "projectg.h"

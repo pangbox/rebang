@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "headicon.h"
 #include "projectg.h"
 #include "golfdoc.h"
@@ -66,45 +65,6 @@ CHeadIcon::~CHeadIcon()
 	m_itemIcon.clear();
 }
 
-bool CHeadIcon::SetIcon(unsigned long uid, unsigned short icon)
-{
-	unsigned char index = Doc()->GetIndex(uid);
-	if (index < 4)
-	{
-		sPlayerHead& head = m_head[index];
-		head.icon = icon;
-		head.time = 0.f;
-		return true;
-	}
-	return false;
-}
-
-bool CHeadIcon::SendIcon(unsigned short icon)
-{
-	if (OnlinePlay())
-	{
-		WSendPacket packet((enumClientPacket)24);
-		packet.Encode2(icon);
-		packet.Send(TO_GAME);
-		return SetIcon(MyGuid(false), icon);
-	}
-	return SetIcon(GOLFDOC()->m_currentPlayer, icon);
-}
-
-void CHeadIcon::SetPlayerPos(int index, WVector& pos)
-{
-	if (index >= 0 && (unsigned int)index < 4)
-	{
-		WVector screenPos = g_view->Projection(pos);
-		sPlayerHead& head = m_head[index];
-		WVector diff = pos - g_view->camera.pivot;
-		head.screenPos.x = screenPos.x;
-		head.screenPos.y = screenPos.y;
-		head.screenPos.z = screenPos.z;
-		head.distance = diff.Magnitude();
-	}
-}
-
 void CHeadIcon::SetLevel()
 {
 	int count = Min((int)GOLFDOC()->m_playerNum, 4);
@@ -138,6 +98,45 @@ void CHeadIcon::SetLevel()
 				MakeStr("level_%03d.tga", Doc()->m_userInfo[i].stat.Level + 1),
 				0);
 	}
+}
+
+void CHeadIcon::SetPlayerPos(int index, WVector& pos)
+{
+	if (index >= 0 && (unsigned int)index < 4)
+	{
+		WVector screenPos = g_view->Projection(pos);
+		sPlayerHead& head = m_head[index];
+		WVector diff = pos - g_view->camera.pivot;
+		head.screenPos.x = screenPos.x;
+		head.screenPos.y = screenPos.y;
+		head.screenPos.z = screenPos.z;
+		head.distance = diff.Magnitude();
+	}
+}
+
+bool CHeadIcon::SetIcon(unsigned long uid, unsigned short icon)
+{
+	unsigned char index = Doc()->GetIndex(uid);
+	if (index < 4)
+	{
+		sPlayerHead& head = m_head[index];
+		head.icon = icon;
+		head.time = 0.f;
+		return true;
+	}
+	return false;
+}
+
+bool CHeadIcon::SendIcon(unsigned short icon)
+{
+	if (OnlinePlay())
+	{
+		WSendPacket packet((enumClientPacket)24);
+		packet.Encode2(icon);
+		packet.Send(TO_GAME);
+		return SetIcon(MyGuid(false), icon);
+	}
+	return SetIcon(GOLFDOC()->m_currentPlayer, icon);
 }
 
 void CHeadIcon::Process(float delta)
@@ -185,67 +184,6 @@ void CHeadIcon::DisplayOverPlayer()
 	}
 	else
 		DisplayOverPlayer(GOLFDOC()->m_currentPlayer, false);
-}
-
-void CHeadIcon::DisplayBesideBoard(float x, float y)
-{
-	if (!(GOLFDOC()->m_gameMode & 0xfffff77e))
-		return;
-	y -= 64.f;
-	for (unsigned char i = 0; i < GOLFDOC()->m_playerNum; ++i)
-	{
-		if (PLAYER(i)->state == 3)
-			continue;
-		sPlayerHead& head = m_head[i];
-		if (PLAYER(i)->chatBlock)
-		{
-			m_srcRect.x = .75f;
-			m_srcRect.y = 0.f;
-			if (Doc()->m_golfGame.gameType == 1)
-			{
-				m_dstRect.x = PLAYER(i)->team == 0 ? x : y;
-				if (PLAYER(i)->teammate == 0xff)
-					m_dstRect.y = 10.f;
-				else
-					m_dstRect.y = i < PLAYER(i)->teammate ? 10.f : 60.f;
-				m_emoticon->Render(g_view, m_srcRect, m_dstRect, 0, 0xccffffff,
-					0, PLAYER(i)->team == 0);
-			}
-			else
-			{
-				m_dstRect.x = (i & 2) ? y : x;
-				m_dstRect.y = (i & 1) ? 81.f : 10.f;
-				m_emoticon->Render(g_view, m_srcRect, m_dstRect, 0, 0xccffffff,
-					0, (i & 2) == 0);
-			}
-		}
-		else
-		{
-			if (i == GOLFDOC()->m_currentPlayer || head.icon >= 0xffff)
-				continue;
-			int column = head.icon % 4;
-			int row = head.icon % 16 / 4;
-			m_srcRect.x = column * .25f;
-			m_srcRect.y = row * .25f;
-			if (Doc()->m_golfGame.gameType == 1)
-			{
-				m_dstRect.x = PLAYER(i)->team == 0 ? x : y;
-				if (PLAYER(i)->teammate == 0xff)
-					m_dstRect.y = 10.f;
-				else
-					m_dstRect.y = i < PLAYER(i)->teammate ? 10.f : 60.f;
-				m_emoticon->Render(g_view, m_srcRect, m_dstRect, 0, 0xccffffff,
-					0, PLAYER(i)->team == 0);
-			}
-			else
-			{
-				m_dstRect.x = (i & 2) ? y : x;
-				m_dstRect.y = (i & 1) ? 81.f : 10.f;
-				m_emoticon->Render(g_view, m_srcRect, m_dstRect, 0, 0xccffffff,
-					0, (i & 2) == 0);
-			}
-		}
-	}
 }
 
 void CHeadIcon::DisplayOverPlayer(unsigned char index, bool bBesideName)
@@ -417,5 +355,66 @@ void CHeadIcon::DisplayOverPlayer(unsigned char index, bool bBesideName)
 		else
 			gdi->PrintText(pos, 0, nickname, 0);
 		gdi->SetAlpha(1.f);
+	}
+}
+
+void CHeadIcon::DisplayBesideBoard(float x, float y)
+{
+	if (!(GOLFDOC()->m_gameMode & 0xfffff77e))
+		return;
+	y -= 64.f;
+	for (unsigned char i = 0; i < GOLFDOC()->m_playerNum; ++i)
+	{
+		if (PLAYER(i)->state == 3)
+			continue;
+		sPlayerHead& head = m_head[i];
+		if (PLAYER(i)->chatBlock)
+		{
+			m_srcRect.x = .75f;
+			m_srcRect.y = 0.f;
+			if (Doc()->m_golfGame.gameType == 1)
+			{
+				m_dstRect.x = PLAYER(i)->team == 0 ? x : y;
+				if (PLAYER(i)->teammate == 0xff)
+					m_dstRect.y = 10.f;
+				else
+					m_dstRect.y = i < PLAYER(i)->teammate ? 10.f : 60.f;
+				m_emoticon->Render(g_view, m_srcRect, m_dstRect, 0, 0xccffffff,
+					0, PLAYER(i)->team == 0);
+			}
+			else
+			{
+				m_dstRect.x = (i & 2) ? y : x;
+				m_dstRect.y = (i & 1) ? 81.f : 10.f;
+				m_emoticon->Render(g_view, m_srcRect, m_dstRect, 0, 0xccffffff,
+					0, (i & 2) == 0);
+			}
+		}
+		else
+		{
+			if (i == GOLFDOC()->m_currentPlayer || head.icon >= 0xffff)
+				continue;
+			int column = head.icon % 4;
+			int row = head.icon % 16 / 4;
+			m_srcRect.x = column * .25f;
+			m_srcRect.y = row * .25f;
+			if (Doc()->m_golfGame.gameType == 1)
+			{
+				m_dstRect.x = PLAYER(i)->team == 0 ? x : y;
+				if (PLAYER(i)->teammate == 0xff)
+					m_dstRect.y = 10.f;
+				else
+					m_dstRect.y = i < PLAYER(i)->teammate ? 10.f : 60.f;
+				m_emoticon->Render(g_view, m_srcRect, m_dstRect, 0, 0xccffffff,
+					0, PLAYER(i)->team == 0);
+			}
+			else
+			{
+				m_dstRect.x = (i & 2) ? y : x;
+				m_dstRect.y = (i & 1) ? 81.f : 10.f;
+				m_emoticon->Render(g_view, m_srcRect, m_dstRect, 0, 0xccffffff,
+					0, (i & 2) == 0);
+			}
+		}
 	}
 }

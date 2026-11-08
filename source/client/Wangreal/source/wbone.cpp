@@ -21,7 +21,6 @@ int WBone::m_vtx_count = 0;
 int WriteID(int, FILE*);
 bool VECEQU(const WVector&, const WVector&);
 bool QUATEQU(const WQuat&, const WQuat&);
-struct w_keyframe_scale;
 struct w_3d_object;
 struct w_vertex;
 struct w_rigid;
@@ -119,14 +118,14 @@ WBone::WBone()
 	m_parent = 0;
 	m_child = 0;
 	m_next = 0;
-	m_rendMode = 0;
+	m_rendMode = W_PUPPET_RENDER_NORMAL;
 	m_scale = 1.0f;
 	m_lightLine = 0.0f;
 	m_keyPos = 0;
 	m_keyPosNum = 0;
 	m_keyRot = 0;
 	m_keyRotNum = 0;
-	m_keyFlag = 0;
+	m_keyFlag = KEY_NONE;
 	m_bound_sphere = WSphere(WVector::ZERO, 0.0f);
 	m_mesh = 0;
 	m_selfillumColor = 0xffffff;
@@ -640,8 +639,6 @@ WVector WBone::GetKeyPos(float time)
 
 WQuat WBone::GetKeyRot(float time)
 {
-	if (0)
-		Abs(time);
 	if (m_keyRot == 0)
 		return GetBasicRot();
 	int low = 0;
@@ -669,16 +666,17 @@ WQuat WBone::GetKeyRot(float time)
 
 void WBone::InsertBoneSetList(float time, WBoneSet* set, int flag)
 {
-	if ((flag & 4) == 0 || strstr(m_name, "tail") == 0)
+	if ((flag & EX_SUBPONYTAIL) == 0 || strstr(m_name, "tail") == 0)
 	{
 		WQuat rot;
 		WVector pos;
 		float scale;
-		if ((flag & 2) != 0)
+		if ((flag & FORCE) != 0)
 		{
 			rot = GetKeyRot(time);
 			pos = GetKeyPos(time);
-			set->AddBoneKey(m_motion_bone_name, &rot, &pos, 0, 3);
+			set->AddBoneKey(m_motion_bone_name, &rot, &pos, 0,
+				KEY_ROT | KEY_POS);
 		}
 		else if (m_keyFlag != 0)
 		{
@@ -689,7 +687,7 @@ void WBone::InsertBoneSetList(float time, WBoneSet* set, int flag)
 			set->AddBoneKey(m_motion_bone_name, &rot, &pos, &scale, m_keyFlag);
 		}
 	}
-	if ((flag & 1) != 0)
+	if ((flag & RECURSIVE) != 0)
 	{
 		for (WBone* bone = m_child; bone != 0; bone = bone->m_next)
 			bone->InsertBoneSetList(time, set, flag);
@@ -771,7 +769,7 @@ void WBone::SetKeyframe(w_keyframe* frame, float end, float start)
 				++m_keyPosNum;
 		}
 	}
-	m_keyFlag = 0;
+	m_keyFlag = KEY_NONE;
 	if (m_keyRotNum != 0)
 	{
 		m_keyRot = new w_keyframe_rot[m_keyRotNum];
@@ -1751,28 +1749,31 @@ void WBone::SetRenderMode(int mode)
 	{
 		switch (mode)
 		{
-		case 0:
+		case W_PUPPET_RENDER_NORMAL:
 			mesh->drawFlag =
-				(((mesh->flags & 0x1800000) != 0x800000) ? 0x8000000 : 0) |
+				(((mesh->flags & 0x1800000) != W_POLY_BLEND_ADD) ? 0x8000000
+																 : 0) |
 				(mesh->texHandle & 0x3ffff) | mesh->flags;
 			break;
-		case 1:
-			mesh->drawFlag =
-				(mesh->texHandle & 0x3ffff) | mesh->flags | 0x40000000;
+		case W_PUPPET_RENDER_TEXTURE_ONLY:
+			mesh->drawFlag = (mesh->texHandle & 0x3ffff) | mesh->flags |
+				W_POLY_NO_VERTEX_COLOR;
 			break;
-		case 5:
+		case W_PUPPET_RENDER_TWO_TEXTURE_ADD:
 			mesh->drawFlag =
-				(((mesh->flags & 0x1800000) != 0x800000) ? 0x8000000 : 0) |
+				(((mesh->flags & 0x1800000) != W_POLY_BLEND_ADD) ? 0x8000000
+																 : 0) |
 				(mesh->texHandle & 0x3ffff) | mesh->flags | 0x40000;
 			break;
-		case 2:
+		case W_PUPPET_RENDER_DIFFUSE_ONLY:
 			mesh->drawFlag = mesh->flags;
 			break;
-		case 3:
-			mesh->drawFlag = 0x4000000;
+		case W_PUPPET_RENDER_WIREFRAME:
+			mesh->drawFlag = W_POLY_TYPE_WIRE;
 			break;
-		case 4:
-			mesh->drawFlag = (mesh->texHandle & 0x3ffff) | 0x20300000;
+		case W_PUPPET_RENDER_OVERLAY:
+			mesh->drawFlag = (mesh->texHandle & 0x3ffff) |
+				W_POLY_NO_DEPTH_WRITE | W_POLY_ZFUNC_ALWAYS;
 			break;
 		}
 	}
@@ -3796,7 +3797,7 @@ void WBone::ReplaceKeyframe(WBone* bone, float time)
 	mine = m_localMat;
 	other = bone->m_localMat;
 
-	m_keyFlag = 0;
+	m_keyFlag = KEY_NONE;
 	if (m_keyRot != 0)
 	{
 		delete[] m_keyRot;

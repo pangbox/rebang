@@ -7,6 +7,30 @@
 #include <string>
 #include <map>
 
+enum wPuppetSaveFlag
+{
+	W_PET_SV_TEXT = 1,
+	W_PET_SV_BONE = 2,
+	W_PET_SV_ANIM = 4,
+	W_PET_SV_MESH = 8,
+	W_PET_SV_FANM = 16,
+	W_PET_SV_FRAM = 32,
+	W_PET_SV_MOTI = 64,
+	W_PET_SV_COLL = 128,
+	W_PET_SV_ALL = 255,
+	W_PET_SV_SKINLIST = 0x100,
+};
+
+enum wPuppetRenderMode
+{
+	W_PUPPET_RENDER_NORMAL = 0,
+	W_PUPPET_RENDER_TEXTURE_ONLY = 1,
+	W_PUPPET_RENDER_DIFFUSE_ONLY = 2,
+	W_PUPPET_RENDER_WIREFRAME = 3,
+	W_PUPPET_RENDER_OVERLAY = 4,
+	W_PUPPET_RENDER_TWO_TEXTURE_ADD = 5,
+};
+
 typedef std::vector<const WMatrix*> WMatrixPtrList;
 
 class WBone;

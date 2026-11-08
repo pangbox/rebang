@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "trainingoptiondlg.h"
 #include "wind.h"
 #include <math.h>

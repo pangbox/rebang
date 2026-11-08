@@ -6,8 +6,6 @@
 #include "gatewayactor.h"
 #include "wlocalize.h"
 
-enum eGameServerProperty;
-
 namespace
 {
 	unsigned long l_dwSRVPROP;

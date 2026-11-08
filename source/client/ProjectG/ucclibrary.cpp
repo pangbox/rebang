@@ -3,7 +3,6 @@
 #include "uccmanager.h"
 #include "rankingdlg.h"
 #include "netresourcemanager.h"
-#include "minatl.h"
 #include "xzip.h"
 #include "xunzip.h"
 #include <shlwapi.h>

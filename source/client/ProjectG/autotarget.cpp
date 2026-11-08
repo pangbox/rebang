@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "autotarget.h"
 #include "club.h"
 #include "quadtree.h"
@@ -6,6 +5,19 @@
 void CAutoTarget::Reset()
 {
 	m_pointList.clear();
+}
+
+float CAutoTarget::GetAngle()
+{
+	return CalcDeltaAngle(GetPoint(NULL) - GolfBall().m_pos,
+		WVector::UNIT_POS_Z);
+}
+
+float CAutoTarget::InArea(const WVector& a, const WVector& b,
+	float radius) const
+{
+	return sqrtf((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z)) -
+		radius;
 }
 
 int CAutoTarget::CalcDropPos(const WVector& pos)
@@ -61,6 +73,41 @@ int CAutoTarget::CalcDropPos(const WVector& pos)
 	return 0;
 }
 
+WVector CAutoTarget::GetNearest(unsigned char index)
+{
+	float t = 0.0f;
+	float nearest = 1.0f;
+	float distance = 3200.0f;
+	float step = 1.0f /
+		(float)ceil(
+			(double)((m_pointList[index + 1] - m_pointList[index]).Magnitude() /
+				16.0f));
+	do
+	{
+		WVector pos;
+		pos = (1.0f - t) * m_pointList[index] + t * m_pointList[index + 1];
+		if (GetPVS().GetGroundType(pos, true, NULL) == 1)
+		{
+			float length = (GolfBall().m_pos - pos).Magnitude();
+			if (length < distance)
+			{
+				nearest = t;
+				distance = length;
+			}
+		}
+		t += step;
+	} while (t < 1.0f);
+	return (1.0f - nearest) * m_pointList[index] +
+		nearest * m_pointList[index + 1];
+}
+
+float CAutoTarget::GetDistance(const WVector& a, const WVector& b)
+{
+	float x = a.x - b.x;
+	float z = a.z - b.z;
+	return sqrtf((float)(x * x) + z * z);
+}
+
 WVector CAutoTarget::GetPoint(const char* club)
 {
 	float range = GolfClub().GetRange(club);
@@ -114,54 +161,6 @@ WVector CAutoTarget::GetPoint(const char* club)
 
 CAutoTarget::~CAutoTarget()
 {
-}
-
-float CAutoTarget::GetAngle()
-{
-	return CalcDeltaAngle(GetPoint(NULL) - GolfBall().m_pos,
-		WVector::UNIT_POS_Z);
-}
-
-float CAutoTarget::InArea(const WVector& a, const WVector& b,
-	float radius) const
-{
-	return sqrtf((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z)) -
-		radius;
-}
-
-float CAutoTarget::GetDistance(const WVector& a, const WVector& b)
-{
-	float x = a.x - b.x;
-	float z = a.z - b.z;
-	return sqrtf((float)(x * x) + z * z);
-}
-
-WVector CAutoTarget::GetNearest(unsigned char index)
-{
-	float t = 0.0f;
-	float nearest = 1.0f;
-	float distance = 3200.0f;
-	float step = 1.0f /
-		(float)ceil(
-			(double)((m_pointList[index + 1] - m_pointList[index]).Magnitude() /
-				16.0f));
-	do
-	{
-		WVector pos;
-		pos = (1.0f - t) * m_pointList[index] + t * m_pointList[index + 1];
-		if (GetPVS().GetGroundType(pos, true, NULL) == 1)
-		{
-			float length = (GolfBall().m_pos - pos).Magnitude();
-			if (length < distance)
-			{
-				nearest = t;
-				distance = length;
-			}
-		}
-		t += step;
-	} while (t < 1.0f);
-	return (1.0f - nearest) * m_pointList[index] +
-		nearest * m_pointList[index + 1];
 }
 
 WVector CAutoTarget::SolveEquation(unsigned char index, float dist)

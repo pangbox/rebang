@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "detailedroominfodlg.h"
 #include "passworddlg.h"
 #include "user_info.h"

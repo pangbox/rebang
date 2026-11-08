@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "parallelwork.h"
 
 namespace Py

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "christamseventdlg.h"
 #include "wresrcmng.h"
 

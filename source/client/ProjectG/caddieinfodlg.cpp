@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "caddieinfodlg.h"
 #include "actor.h"
 #include "projectg.h"
@@ -42,6 +41,26 @@ FrCaddieInfoDlg::FrCaddieInfoDlg()
 	m_pWarningButton = NULL;
 	m_pWarningText = NULL;
 	m_pContractDlg = NULL;
+}
+
+void FrCaddieInfoDlg::SetCaddieInfo(const sCaddieInfo& info)
+{
+	m_caddieInfo = Doc()->m_caddieMap[info.guid];
+	if (m_caddieInfo.byCheckCaddieWarning == 1)
+		m_pWarningButton->SetStatus(FrButton::PRESSED);
+	else
+		m_pWarningButton->SetStatus(FrButton::NORMAL);
+	CaddieIterator it = ItemManager()->m_CaddieMap.begin();
+	CaddieIterator end = ItemManager()->m_CaddieMap.end();
+	for (; it != end; ++it)
+	{
+		if ((*it).second.c.TypeId == m_caddieInfo.tid)
+		{
+			if ((*it).second.c.Level > Doc()->m_myInfo.stat.Level)
+				m_pSignUp->Enable(false);
+			break;
+		}
+	}
 }
 
 void FrCaddieInfoDlg::OnPortraitInit(int param)
@@ -101,35 +120,68 @@ void FrCaddieInfoDlg::OnWarningTextInit(int param)
 	m_pWarningText = DYNAMIC_CAST(FrStatic, (FrWnd*)param);
 }
 
-void FrCaddieInfoDlg::HideContractControls()
+void FrCaddieInfoDlg::OnSignUpBtnUp()
 {
-	if (m_pVacation)
-		m_pVacation->SetVisible(false);
-	if (m_pMessage)
-		m_pMessage->SetVisible(false);
-	if (m_pContract)
-		m_pContract->SetVisible(false);
-	if (m_pCaddieFee)
-		m_pCaddieFee->SetVisible(false);
+	FrStatic* pFee;
 	if (m_pSignUp)
-		m_pSignUp->SetVisible(false);
-	if (m_pLimit)
-		m_pLimit->SetVisible(false);
+		m_pSignUp->Enable(false);
 	if (m_pCancel)
-		m_pCancel->SetVisible(false);
-	if (m_pOk)
-		m_pOk->SetVisible(true);
-	SetDesc("");
+		m_pCancel->Enable(false);
+	IFF_STRUCT::sCaddie* pCaddie = ItemManager()->FindCaddie(m_caddieInfo.tid);
+	if (!pCaddie)
+		return;
+	if (!m_pContractDlg)
+		m_pContractDlg = CreateForm<FrForm>(g_pFresh->GetManager(), this,
+			"cad_contract", NULL);
+	m_pContractDlg->SetMessage(
+		"\xc4\xb3\xb5\xf0\xb8\xa6 \xc0\xe7\xb0\xed\xbf\xeb\xc7\xcf\xb8\xe9 \xbe\xc6\xb7\xa1\xbf\xcd \xb0\xb0\xc0\xcc \xb1\xdd\xbe\xd7\xc0\xcc \\c0xffff0000\\c\xb0\xa8\xbc\xd2\\c0xff000000\\c\xc7\xd5\xb4\xcf\xb4\xd9.\n\n\xc4\xb3\xb5\xf0\xb8\xa6 \\c0xffff0000\\c\xc7\xd1\xb4\xde\xb0\xa3 \\c0xff000000\\c\xc0\xe7\xb0\xed\xbf\xeb \xc7\xcf\xbd\xc3\xb0\xda\xbd\xc0\xb4\xcf\xb1\xee?",
+		false);
+	pFee =
+		DYNAMIC_CAST(FrStatic, (FrWnd*)m_pContractDlg->FindChildByName("fee"));
+	if (pFee)
+		pFee->SetCaption(MakeStr("%d", pCaddie->MonthlyFee));
+	pFee = DYNAMIC_CAST(FrStatic,
+		(FrWnd*)m_pContractDlg->FindChildByName("mypang"));
+	if (pFee)
+		pFee->SetCaption(MakeStr("%I64d", Doc()->m_myInfo.stat.i64Pang));
+	pFee = DYNAMIC_CAST(FrStatic,
+		(FrWnd*)m_pContractDlg->FindChildByName("remainpang"));
+	if (pFee)
+		pFee->SetCaption(MakeStr("%I64d",
+			Doc()->m_myInfo.stat.i64Pang - pCaddie->MonthlyFee));
+	m_pContractDlg->Open(
+		(FRESH_PFN_RESULT)&FrCaddieInfoDlg::OnSignUpConfirmDlgResult, 1);
 }
 
-void FrCaddieInfoDlg::EndContract(int result)
+void FrCaddieInfoDlg::OnOkBtnUp()
 {
-	if (result == 2)
+	SendCaddieWarningCheckOption();
+	Close(FrOK, true);
+}
+
+void FrCaddieInfoDlg::OnCancelBtnUp()
+{
+	SendCaddieWarningCheckOption();
+	Close(FrCANCEL, true);
+}
+
+bool FrCaddieInfoDlg::OnSignUpConfirmDlgResult(int result, FrForm* form)
+{
+	m_pContractDlg = NULL;
+	if (result == 1 || result == 2)
+		SendCaddieWarningCheckOption();
+	if (result == 1)
 	{
-		m_caddieInfo.Remain_Date = 30;
-		HideContractControls();
-		if (m_pOk && m_pOk->IsVisible())
-			m_pOk->Enable(true);
+		WSendPacket send((enumClientPacket)57);
+		send.Encode4(m_caddieInfo.guid);
+		send.Send(TO_GAME);
+		AfxGetTask()->GetActor("Shop") << MsgObject(NULL, 1, 0, 0, 0, 0, 0);
+		AfxGetTask()->GetActor("RealMyRoom")
+			<< MsgObject(NULL, 1, 0, 0, 0, 0, 0);
+		AfxGetTask()->GetActor("Lobby") << MsgObject(NULL, 1, 0, 0, 0, 0, 0);
+		g_audio->PlaySfx("caddie_return");
+		g_audio->PlayBGM("caddie_return.mp3", true, true);
+		Close(FrOK, true);
 	}
 	else
 	{
@@ -138,6 +190,25 @@ void FrCaddieInfoDlg::EndContract(int result)
 		if (m_pCancel && m_pCancel->IsVisible())
 			m_pCancel->Enable(true);
 	}
+	return true;
+}
+
+void FrCaddieInfoDlg::SendCaddieWarningCheckOption()
+{
+	if (m_pWarningButton->GetStatus() == FrButton::PRESSED)
+	{
+		Doc()->m_caddieMap[m_caddieInfo.guid].byCheckCaddieWarning = 1;
+		m_caddieInfo.byCheckCaddieWarning = 1;
+	}
+	else
+	{
+		Doc()->m_caddieMap[m_caddieInfo.guid].byCheckCaddieWarning = 0;
+		m_caddieInfo.byCheckCaddieWarning = 0;
+	}
+	WSendPacket send((enumClientPacket)0x6b);
+	send.Encode4(m_caddieInfo.guid);
+	send.Encode1(m_caddieInfo.byCheckCaddieWarning);
+	send.Send(TO_GAME);
 }
 
 bool FrCaddieInfoDlg::OnInit()
@@ -267,73 +338,35 @@ bool FrCaddieInfoDlg::OnInit()
 	return true;
 }
 
-void FrCaddieInfoDlg::SetCaddieInfo(const sCaddieInfo& info)
+void FrCaddieInfoDlg::HideContractControls()
 {
-	m_caddieInfo = Doc()->m_caddieMap[info.guid];
-	if (m_caddieInfo.byCheckCaddieWarning == 1)
-		m_pWarningButton->SetStatus(FrButton::PRESSED);
-	else
-		m_pWarningButton->SetStatus(FrButton::NORMAL);
-	CaddieIterator it = ItemManager()->m_CaddieMap.begin();
-	CaddieIterator end = ItemManager()->m_CaddieMap.end();
-	for (; it != end; ++it)
-	{
-		if ((*it).second.c.TypeId == m_caddieInfo.tid)
-		{
-			if ((*it).second.c.Level > Doc()->m_myInfo.stat.Level)
-				m_pSignUp->Enable(false);
-			break;
-		}
-	}
+	if (m_pVacation)
+		m_pVacation->SetVisible(false);
+	if (m_pMessage)
+		m_pMessage->SetVisible(false);
+	if (m_pContract)
+		m_pContract->SetVisible(false);
+	if (m_pCaddieFee)
+		m_pCaddieFee->SetVisible(false);
+	if (m_pSignUp)
+		m_pSignUp->SetVisible(false);
+	if (m_pLimit)
+		m_pLimit->SetVisible(false);
+	if (m_pCancel)
+		m_pCancel->SetVisible(false);
+	if (m_pOk)
+		m_pOk->SetVisible(true);
+	SetDesc("");
 }
 
-void FrCaddieInfoDlg::SendCaddieWarningCheckOption()
+void FrCaddieInfoDlg::EndContract(int result)
 {
-	if (m_pWarningButton->GetStatus() == FrButton::PRESSED)
+	if (result == 2)
 	{
-		Doc()->m_caddieMap[m_caddieInfo.guid].byCheckCaddieWarning = 1;
-		m_caddieInfo.byCheckCaddieWarning = 1;
-	}
-	else
-	{
-		Doc()->m_caddieMap[m_caddieInfo.guid].byCheckCaddieWarning = 0;
-		m_caddieInfo.byCheckCaddieWarning = 0;
-	}
-	WSendPacket send((enumClientPacket)0x6b);
-	send.Encode4(m_caddieInfo.guid);
-	send.Encode1(m_caddieInfo.byCheckCaddieWarning);
-	send.Send(TO_GAME);
-}
-
-void FrCaddieInfoDlg::OnOkBtnUp()
-{
-	SendCaddieWarningCheckOption();
-	Close(FrOK, true);
-}
-
-void FrCaddieInfoDlg::OnCancelBtnUp()
-{
-	SendCaddieWarningCheckOption();
-	Close(FrCANCEL, true);
-}
-
-bool FrCaddieInfoDlg::OnSignUpConfirmDlgResult(int result, FrForm* form)
-{
-	m_pContractDlg = NULL;
-	if (result == 1 || result == 2)
-		SendCaddieWarningCheckOption();
-	if (result == 1)
-	{
-		WSendPacket send((enumClientPacket)57);
-		send.Encode4(m_caddieInfo.guid);
-		send.Send(TO_GAME);
-		AfxGetTask()->GetActor("Shop") << MsgObject(NULL, 1, 0, 0, 0, 0, 0);
-		AfxGetTask()->GetActor("RealMyRoom")
-			<< MsgObject(NULL, 1, 0, 0, 0, 0, 0);
-		AfxGetTask()->GetActor("Lobby") << MsgObject(NULL, 1, 0, 0, 0, 0, 0);
-		g_audio->PlaySfx("caddie_return");
-		g_audio->PlayBGM("caddie_return.mp3", true, true);
-		Close(FrOK, true);
+		m_caddieInfo.Remain_Date = 30;
+		HideContractControls();
+		if (m_pOk && m_pOk->IsVisible())
+			m_pOk->Enable(true);
 	}
 	else
 	{
@@ -342,38 +375,4 @@ bool FrCaddieInfoDlg::OnSignUpConfirmDlgResult(int result, FrForm* form)
 		if (m_pCancel && m_pCancel->IsVisible())
 			m_pCancel->Enable(true);
 	}
-	return true;
-}
-
-void FrCaddieInfoDlg::OnSignUpBtnUp()
-{
-	FrStatic* pFee;
-	if (m_pSignUp)
-		m_pSignUp->Enable(false);
-	if (m_pCancel)
-		m_pCancel->Enable(false);
-	IFF_STRUCT::sCaddie* pCaddie = ItemManager()->FindCaddie(m_caddieInfo.tid);
-	if (!pCaddie)
-		return;
-	if (!m_pContractDlg)
-		m_pContractDlg = CreateForm<FrForm>(g_pFresh->GetManager(), this,
-			"cad_contract", NULL);
-	m_pContractDlg->SetMessage(
-		"\xc4\xb3\xb5\xf0\xb8\xa6 \xc0\xe7\xb0\xed\xbf\xeb\xc7\xcf\xb8\xe9 \xbe\xc6\xb7\xa1\xbf\xcd \xb0\xb0\xc0\xcc \xb1\xdd\xbe\xd7\xc0\xcc \\c0xffff0000\\c\xb0\xa8\xbc\xd2\\c0xff000000\\c\xc7\xd5\xb4\xcf\xb4\xd9.\n\n\xc4\xb3\xb5\xf0\xb8\xa6 \\c0xffff0000\\c\xc7\xd1\xb4\xde\xb0\xa3 \\c0xff000000\\c\xc0\xe7\xb0\xed\xbf\xeb \xc7\xcf\xbd\xc3\xb0\xda\xbd\xc0\xb4\xcf\xb1\xee?",
-		false);
-	pFee =
-		DYNAMIC_CAST(FrStatic, (FrWnd*)m_pContractDlg->FindChildByName("fee"));
-	if (pFee)
-		pFee->SetCaption(MakeStr("%d", pCaddie->MonthlyFee));
-	pFee = DYNAMIC_CAST(FrStatic,
-		(FrWnd*)m_pContractDlg->FindChildByName("mypang"));
-	if (pFee)
-		pFee->SetCaption(MakeStr("%I64d", Doc()->m_myInfo.stat.i64Pang));
-	pFee = DYNAMIC_CAST(FrStatic,
-		(FrWnd*)m_pContractDlg->FindChildByName("remainpang"));
-	if (pFee)
-		pFee->SetCaption(MakeStr("%I64d",
-			Doc()->m_myInfo.stat.i64Pang - pCaddie->MonthlyFee));
-	m_pContractDlg->Open(
-		(FRESH_PFN_RESULT)&FrCaddieInfoDlg::OnSignUpConfirmDlgResult, 1);
 }

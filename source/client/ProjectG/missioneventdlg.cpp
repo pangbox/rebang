@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "wmath.h"
 #include "missioneventdlg.h"
 #include "grounditem.h"

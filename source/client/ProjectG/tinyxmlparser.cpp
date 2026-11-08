@@ -23,7 +23,6 @@ distribution.
 */
 
 #include "stdafx.h"
-#include "minatl.h"
 #include "tinyxml.h"
 #include <ctype.h>
 

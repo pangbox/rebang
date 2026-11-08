@@ -10,11 +10,3 @@ enum eEquipSkin
 	EQUIP_SKIN_TITLE,
 	MAX_EQUIP_SKIN_NUM
 };
-
-namespace S5
-{
-	namespace UTIL
-	{
-		int GetEquipSkinIndex(eEquipSkin& index, unsigned long typeId);
-	}
-}

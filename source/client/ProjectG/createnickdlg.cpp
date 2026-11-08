@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "createnickdlg.h"
 
 #include "emoticondlg.h"

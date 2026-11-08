@@ -6,7 +6,6 @@
 #include "club.h"
 #include "mousecursor.h"
 #include "inputmanager.h"
-#include "minatl.h"
 
 CHelpMsg::CHelpMsg()
 	: m_pOverlay(NULL),

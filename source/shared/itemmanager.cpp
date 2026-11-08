@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include <atltime.h>
 #include <sstream>
 

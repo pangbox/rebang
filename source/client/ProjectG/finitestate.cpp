@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include "finitestate.h"
 
 FiniteState::FiniteState(unsigned long stateID)

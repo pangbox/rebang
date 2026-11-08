@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include "sequencestatemachine.h"
 
 void CStateUnit::OnPrintLog(const char* log)

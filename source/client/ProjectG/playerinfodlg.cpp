@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "playerinfodlg.h"
 #include "fredit.h"
 #include "golfdoc.h"

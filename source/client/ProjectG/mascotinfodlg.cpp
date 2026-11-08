@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "../../shared/sharedtables.h"
 #include "mascotinfodlg.h"
 #include "mascot.h"

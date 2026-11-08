@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "soundmanager.h"
 #include "miles.h"
 #include "wview.h"
@@ -119,32 +118,6 @@ void CSoundManager::Process(float dt, WView* pView)
 	CheckIdleSfx(dt);
 }
 
-int CSoundManager::GetSoundFx(char* filename, bool b3D)
-{
-	if (!m_pMSS || !filename)
-		return 0;
-	int type;
-	if (b3D)
-		type = 1;
-	else if (strstr(filename, ".a") || strstr(filename, ".mp3"))
-		type = 2;
-	else
-		type = 0;
-	return m_pMSS->Load(filename, type);
-}
-
-_SFX_INFO* CSoundManager::FindIdleSfx(const char* name)
-{
-	for (_SFX_INFO* pInfo = m_sfxList.Start(); pInfo; pInfo = m_sfxList.Next())
-	{
-		if ((!pInfo->bActive || pInfo->bPlayed == true) &&
-			!strcmpi(pInfo->name, name))
-			if (m_pMSS && !m_pMSS->IsPlaying(pInfo->handle))
-				return pInfo;
-	}
-	return NULL;
-}
-
 void CSoundManager::CheckIdleSfx(float dt)
 {
 	if (!m_bActive)
@@ -165,6 +138,32 @@ void CSoundManager::CheckIdleSfx(float dt)
 			DelSfx(pInfo);
 		m_idleList.Reset();
 	}
+}
+
+_SFX_INFO* CSoundManager::FindIdleSfx(const char* name)
+{
+	for (_SFX_INFO* pInfo = m_sfxList.Start(); pInfo; pInfo = m_sfxList.Next())
+	{
+		if ((!pInfo->bActive || pInfo->bPlayed == true) &&
+			!strcmpi(pInfo->name, name))
+			if (m_pMSS && !m_pMSS->IsPlaying(pInfo->handle))
+				return pInfo;
+	}
+	return NULL;
+}
+
+int CSoundManager::GetSoundFx(char* filename, bool b3D)
+{
+	if (!m_pMSS || !filename)
+		return 0;
+	int type;
+	if (b3D)
+		type = 1;
+	else if (strstr(filename, ".a") || strstr(filename, ".mp3"))
+		type = 2;
+	else
+		type = 0;
+	return m_pMSS->Load(filename, type);
 }
 
 _SFX_INFO* CSoundManager::LoadSfx(const char* name, const WVector* pos,
@@ -259,6 +258,13 @@ void CSoundManager::StopSfx(const char* name)
 	}
 }
 
+bool CSoundManager::IsPlayingBGM()
+{
+	if (m_bgm)
+		return true;
+	return false;
+}
+
 bool CSoundManager::IsPlaying(const char* name)
 {
 	if (!strlen(name))
@@ -268,13 +274,6 @@ bool CSoundManager::IsPlaying(const char* name)
 		return m_pMSS->IsPlaying(pInfo->handle);
 	if (!stricmp(name, m_bgmName))
 		return m_pMSS->IsPlaying(m_bgm);
-	return false;
-}
-
-bool CSoundManager::IsPlayingBGM()
-{
-	if (m_bgm)
-		return true;
 	return false;
 }
 
@@ -331,16 +330,16 @@ void CSoundManager::SetVolume(float volume)
 			m_pMSS->SetVolume(pInfo->handle, volume);
 }
 
+float CSoundManager::GetVolume() const
+{
+	return m_volume;
+}
+
 void CSoundManager::SetSFXVolumeWhilePlaying(const char* name, float volume)
 {
 	_SFX_INFO* pInfo = FindAliasSfx(name);
 	if (pInfo && m_pMSS)
 		m_pMSS->SetVolume(pInfo->handle, m_volume * volume);
-}
-
-float CSoundManager::GetVolume() const
-{
-	return m_volume;
 }
 
 void CSoundManager::PlayBGM(const char* name, bool bLoop, bool bFadeOut)
@@ -431,6 +430,16 @@ float CSoundManager::GetBGMVolume() const
 	return m_bgmVolume;
 }
 
+void CSoundManager::DestroyBGM()
+{
+	if (m_bgm)
+	{
+		if (m_pMSS)
+			m_pMSS->DestroySoundBuffer(m_bgm);
+		m_bgm = 0;
+	}
+}
+
 void CSoundManager::StopAllSound()
 {
 	if (m_pMSS)
@@ -446,16 +455,6 @@ void CSoundManager::StopAllSound()
 			delete pInfo;
 		}
 		m_sfxList.Reset();
-	}
-}
-
-void CSoundManager::DestroyBGM()
-{
-	if (m_bgm)
-	{
-		if (m_pMSS)
-			m_pMSS->DestroySoundBuffer(m_bgm);
-		m_bgm = 0;
 	}
 }
 

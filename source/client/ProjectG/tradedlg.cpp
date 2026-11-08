@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include <numeric>
 #include "tradedlg.h"
 #include "iteminfodlg.h"

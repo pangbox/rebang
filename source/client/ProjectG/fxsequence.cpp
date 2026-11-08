@@ -2,7 +2,6 @@
 #include "fxbox.h"
 #include "binstr.h"
 #include "soundmanager.h"
-#include "minatl.h"
 #include "mathconsts.h"
 
 CFxSequence::CFxSequence(CFxBox& box, bool temporary)

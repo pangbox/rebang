@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "threadowner.h"
 #include <process.h>
 

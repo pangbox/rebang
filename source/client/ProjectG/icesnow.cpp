@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "projectg.h"
 #include "icesnow.h"
 #include "w3danispr.h"

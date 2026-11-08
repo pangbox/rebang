@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "ucccolorpicker.h"
 #include "frarea.h"
 #include "wresrcmng.h"

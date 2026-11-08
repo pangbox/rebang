@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "logoutdlg.h"
 #include "frbutton.h"
 #include "fresh.h"

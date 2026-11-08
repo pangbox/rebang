@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "s5/rentalextensiondlg.h"
 #include "fresh.h"
 #include "frwndmanager.h"

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "tweaker.h"
-#include "minatl.h"
 #include <stdarg.h>
 
 namespace

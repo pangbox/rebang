@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "rankingdlg.h"
 #include "rankinginfo.h"
 #include "binstr.h"

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "npc.h"
 #include "golfball.h"
 #include "quadtree.h"

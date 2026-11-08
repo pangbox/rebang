@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "frreadytoall.h"
 #include "shareddoc.h"
 

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "memodlg.h"
 #include "fredit.h"
 #include "frwndmanager.h"

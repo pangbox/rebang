@@ -328,5 +328,3 @@ protected:
 typedef std::list<CFxParticle*>::iterator::value_type FxParticlePtr;
 
 #include "fxspray.inl"
-
-ILNUM_FXSPRAY

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "msnusersnapshot.h"
 #include "frstatic.h"
 

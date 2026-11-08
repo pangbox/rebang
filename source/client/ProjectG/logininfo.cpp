@@ -2,14 +2,6 @@
 #include "logininfo.h"
 #include "s5/utilities.h"
 
-namespace S5
-{
-	namespace UTIL
-	{
-		int DecodingUrl(const char* src, char* dst);
-	}
-}
-
 CLoginInfo* CLoginInfo::m_pInst = NULL;
 
 int NtreevLogin::Init()

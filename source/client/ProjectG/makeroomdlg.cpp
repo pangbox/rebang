@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "s5/utilities.h"
 #include "makeroomdlg.h"
 #include "treasuredlg.h"
@@ -106,128 +105,20 @@ FrMakeRoomDlg::~FrMakeRoomDlg()
 {
 }
 
-bool FrMakeRoomDlg::OnTitleEnterKey(int param)
+bool FrMakeRoomDlg::OnInit()
 {
-	return false;
-}
-
-void FrMakeRoomDlg::ChangeUserLimit(unsigned char value)
-{
-	m_userLimit = value;
-}
-
-void FrMakeRoomDlg::ChangeHole(unsigned char hole)
-{
-	if (m_hole == hole)
-		return;
-	m_hole = hole;
-	switch (m_gameType)
-	{
-	case GAME_TYPE_STROKE:
-	case GAME_TYPE_TEAM:
-	case GAME_TYPE_SKINS:
-		if (hole == 18 && (m_holeType == 1 || m_holeType == 2))
-			m_holeType = 0;
-		break;
-	case GAME_TYPE_30S:
-	case GAME_TYPE_30S_TEAM:
-		if (hole == 9)
-		{
-			m_pTimeLimit->ClearTab();
-			m_pTimeLimit->AddTab("select_button", 15, &WSize(37.5f, 20.0f));
-			m_pTimeLimit->AddTab("select_button", 20, &WSize(37.5f, 20.0f));
-			m_pTimeLimit->AddTab("select_button", 25, &WSize(37.5f, 20.0f));
-			m_pTimeLimit->AddTab("select_button", 30, &WSize(37.5f, 20.0f));
-			m_timeLimit = 15;
-			m_pTimeLimit->Select(15);
-		}
-		else if (hole == 18)
-		{
-			m_pTimeLimit->ClearTab();
-			m_pTimeLimit->AddTab("select_button", 30, &WSize(30.0f, 20.0f));
-			m_pTimeLimit->AddTab("select_button", 35, &WSize(30.0f, 20.0f));
-			m_pTimeLimit->AddTab("select_button", 40, &WSize(30.0f, 20.0f));
-			m_pTimeLimit->AddTab("select_button", 45, &WSize(30.0f, 20.0f));
-			m_pTimeLimit->AddTab("select_button", 50, &WSize(30.0f, 20.0f));
-			m_timeLimit = 30;
-			m_pTimeLimit->Select(30);
-			if (m_holeType == 1 || m_holeType == 2)
-				m_holeType = 0;
-		}
-		break;
-	case GAME_TYPE_GUILD_MATCH:
-		if (hole == 9)
-		{
-			m_pTimeLimit->ClearTab();
-			m_pTimeLimit->AddTab("select_button", 20, &WSize(37.5f, 20.0f));
-			m_timeLimit = 20;
-			m_pTimeLimit->Select(20);
-		}
-		else if (hole == 18)
-		{
-			m_pTimeLimit->ClearTab();
-			m_pTimeLimit->AddTab("select_button", 30, &WSize(30.0f, 20.0f));
-			m_pTimeLimit->AddTab("select_button", 35, &WSize(30.0f, 20.0f));
-			m_pTimeLimit->AddTab("select_button", 40, &WSize(30.0f, 20.0f));
-			m_timeLimit = 30;
-			m_pTimeLimit->Select(30);
-		}
-		m_pTimeLimit->SetVisible(false);
-		m_holeType = 0;
-		break;
-	case 14:
-		m_pTimeLimit->ClearTab();
-		m_pTimeLimit->SetVisible(false);
-		m_timeLimit = 30;
-		m_holeType = 2;
-		break;
-	}
-}
-
-void FrMakeRoomDlg::ChangeTimeLimit(unsigned long value)
-{
-	m_timeLimit = value;
-}
-
-void FrMakeRoomDlg::ChangeHoleType(eHoleType value)
-{
-	m_holeType = value;
-}
-
-void FrMakeRoomDlg::OnHoleMinUp()
-{
+	m_holeType = 0;
 	m_chatHole = 1;
-}
-
-void FrMakeRoomDlg::OnHolePrevUp()
-{
-	if (m_chatHole > 1)
-		--m_chatHole;
-}
-
-void FrMakeRoomDlg::OnHoleNextUp()
-{
-	if (m_chatHole < 18)
-		++m_chatHole;
-}
-
-void FrMakeRoomDlg::OnHoleMaxUp()
-{
-	m_chatHole = 18;
-}
-
-void FrMakeRoomDlg::OnProc(const float dt)
-{
-	FrForm::OnProc(dt);
-	if (!m_pMapSelectDlg && m_btnDelay >= 0.0f)
-		m_btnDelay -= dt;
-}
-
-bool FrMakeRoomDlg::IsBtnEnable()
-{
-	if (!m_pMapSelectDlg && m_btnDelay < 0.0f)
-		return true;
-	return false;
+	m_gameTime = 0;
+	m_shotTime = 0;
+	m_courseX = m_pCourse->GetRect().x;
+	m_pMapSelectO =
+		g_pFresh->GetManager()->GetBitmap("MAKEROOM", "map_select_o");
+	ChangeGameType(m_gameType, true);
+	if (m_pMakeBtn[m_gameTypeGroup])
+		m_pMakeBtn[m_gameTypeGroup]->SetStatus(FrButton::PRESSED);
+	ChangeCourse(FirstMap());
+	return true;
 }
 
 void FrMakeRoomDlg::OnMakeVsInit(int param)
@@ -235,9 +126,19 @@ void FrMakeRoomDlg::OnMakeVsInit(int param)
 	m_pMakeBtn[0] = DYNAMIC_CAST(FrButton, (FrWnd*)param);
 }
 
+void FrMakeRoomDlg::OnMakeVsDown()
+{
+	ChangeGameType(GAME_TYPE_STROKE, true);
+}
+
 void FrMakeRoomDlg::OnMakeMassInit(int param)
 {
 	m_pMakeBtn[1] = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+}
+
+void FrMakeRoomDlg::OnMakeMassDown()
+{
+	ChangeGameType(GAME_TYPE_30S, true);
 }
 
 void FrMakeRoomDlg::OnMakeBattleInit(int param)
@@ -245,360 +146,19 @@ void FrMakeRoomDlg::OnMakeBattleInit(int param)
 	m_pMakeBtn[2] = DYNAMIC_CAST(FrButton, (FrWnd*)param);
 }
 
+void FrMakeRoomDlg::OnMakeBattleDown()
+{
+	ChangeGameType(GAME_TYPE_NEW_APPROACH, true);
+}
+
 void FrMakeRoomDlg::OnMakeChatInit(int param)
 {
 	m_pMakeBtn[3] = DYNAMIC_CAST(FrButton, (FrWnd*)param);
 }
 
-void FrMakeRoomDlg::OnPictureInit(int param)
+void FrMakeRoomDlg::OnMakeChatDown()
 {
-	m_pPicture = DYNAMIC_CAST(FrViewer, (FrWnd*)param);
-	if (m_pPicture)
-		m_pPicture->SetMouseEvent(false);
-}
-
-void FrMakeRoomDlg::OnTextInit(int param)
-{
-	m_pText = DYNAMIC_CAST(FrArea, (FrWnd*)param);
-}
-
-void FrMakeRoomDlg::OnPasswordInit(int param)
-{
-	FrEdit* password = DYNAMIC_CAST(FrEdit, (FrWnd*)param);
-}
-
-void FrMakeRoomDlg::OnMapPrevInit(int param)
-{
-	m_pMapPrev = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pMapPrev)
-	{
-		m_pMapPrev->SetPushDelay(0.0f);
-	}
-}
-
-void FrMakeRoomDlg::OnMapNextInit(int param)
-{
-	m_pMapNext = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pMapNext)
-	{
-		m_pMapNext->SetPushDelay(0.0f);
-	}
-}
-
-void FrMakeRoomDlg::OnMapPrevChatInit(int param)
-{
-	m_pMapPrevChat = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pMapPrevChat)
-	{
-		m_pMapPrevChat->SetPushDelay(0.0f);
-		m_pMapPrevChat->SetVisible(false);
-	}
-}
-
-void FrMakeRoomDlg::OnMapNextChatInit(int param)
-{
-	m_pMapNextChat = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pMapNextChat)
-	{
-		m_pMapNextChat->SetPushDelay(0.0f);
-		m_pMapNextChat->SetVisible(false);
-	}
-}
-
-void FrMakeRoomDlg::OnGameTypeInit(int param)
-{
-	m_pGameType = DYNAMIC_CAST(FrTabButton, (FrWnd*)param);
-	if (m_pGameType)
-		m_pGameType->SetSepWidth(1.0f);
-}
-
-void FrMakeRoomDlg::OnGameTypeOwnerDraw(int param)
-{
-	TButtonItem* item = (TButtonItem*)param;
-	if (!item)
-		return;
-	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
-	if (gi)
-		gi->PrintText11(
-			WPoint(item->rect.x + item->rect.w * 0.5f, item->rect.y + 5.0f), 1,
-			s_gameTypeTitle[item->index], NULL);
-}
-
-void FrMakeRoomDlg::OnUserLimitInit(int param)
-{
-	m_pUserLimit = DYNAMIC_CAST(FrTabButton, (FrWnd*)param);
-	if (m_pUserLimit)
-		m_pUserLimit->SetSepWidth(1.0f);
-}
-
-void FrMakeRoomDlg::OnUserLimitButtonUp()
-{
-	TButtonItem* item = m_pUserLimit->GetSelected();
-	if (item)
-		ChangeUserLimit((unsigned char)item->index);
-}
-
-void FrMakeRoomDlg::OnUserLimitOwnerDraw(int param)
-{
-	TButtonItem* item = (TButtonItem*)param;
-	if (!item)
-		return;
-	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
-	if (gi)
-		gi->PrintText11(
-			WPoint(item->rect.x + item->rect.w * 0.5f, item->rect.y + 5.0f), 1,
-			MakeStr("%d", item->index), NULL);
-}
-
-void FrMakeRoomDlg::OnHoleInit(int param)
-{
-	m_pHole = DYNAMIC_CAST(FrTabButton, (FrWnd*)param);
-	if (m_pHole)
-		m_pHole->SetSepWidth(1.0f);
-}
-
-void FrMakeRoomDlg::OnHoleButtonUp()
-{
-	TButtonItem* item = m_pHole->GetSelected();
-	if (item)
-		ChangeHole((unsigned char)item->index);
-}
-
-void FrMakeRoomDlg::OnHoleOwnerDraw(int param)
-{
-	TButtonItem* item = (TButtonItem*)param;
-	if (!item)
-		return;
-	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
-	if (gi)
-		gi->PrintText11(
-			WPoint(item->rect.x + item->rect.w * 0.5f, item->rect.y + 5.0f), 1,
-			MakeStr("%d", item->index), NULL);
-}
-
-void FrMakeRoomDlg::OnTimeLimitInit(int param)
-{
-	m_pTimeLimit = DYNAMIC_CAST(FrTabButton, (FrWnd*)param);
-	if (m_pTimeLimit)
-		m_pTimeLimit->SetSepWidth(1.0f);
-}
-
-void FrMakeRoomDlg::OnTimeLimitButtonUp()
-{
-	TButtonItem* item = m_pTimeLimit->GetSelected();
-	if (item)
-		ChangeTimeLimit(item->index);
-}
-
-void FrMakeRoomDlg::OnTimeLimitOwnerDraw(int param)
-{
-	TButtonItem* item = (TButtonItem*)param;
-	if (!item)
-		return;
-	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
-	if (gi)
-		gi->PrintText11(
-			WPoint(item->rect.x + item->rect.w * 0.5f, item->rect.y + 5.0f), 1,
-			MakeStr("%d", item->index), NULL);
-}
-
-void FrMakeRoomDlg::OnCourseInit(int param)
-{
-	m_pCourse = DYNAMIC_CAST(FrViewer, (FrWnd*)param);
-}
-
-void FrMakeRoomDlg::OnCourseOwnerDraw(int param)
-{
-	if (m_gameType == GAME_TYPE_NEW_APPROACH ||
-		m_gameType == GAME_TYPE_GUILD_MATCH)
-		return;
-	if (!m_pCourse || !m_pMapSelectO)
-		return;
-	WRect rect = m_pCourse->GetRect();
-	FrWndManager* manager = g_pFresh->GetManager();
-	if (rect.IsInRect(manager->GetMousePos()))
-	{
-		FrGraphicInterface* gi = manager->GetGDI();
-		if (gi)
-		{
-			gi->DrawTexture(m_pMapSelectO,
-				WRect(rect.x - 25.0f, rect.y - 11.0f,
-					(float)m_pMapSelectO->Width(),
-					(float)m_pMapSelectO->Height()),
-				0xffffffff, 0);
-		}
-	}
-}
-
-void FrMakeRoomDlg::OnHoleTypeInit(int param)
-{
-	m_pHoleType = DYNAMIC_CAST(FrArea, (FrWnd*)param);
-	if (!m_pHoleType)
-		return;
-	m_pHoleTypeBtn[0][0] =
-		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_front_n");
-	m_pHoleTypeBtn[0][1] =
-		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_front_d");
-	m_pHoleTypeBtn[1][0] =
-		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_back_n");
-	m_pHoleTypeBtn[1][1] =
-		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_back_d");
-	m_pHoleTypeBtn[2][0] =
-		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_random_n");
-	m_pHoleTypeBtn[2][1] =
-		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_random_d");
-	m_pHoleTypeBtn[3][0] =
-		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_shuffle_n");
-	m_pHoleTypeBtn[3][1] =
-		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_shuffle_d");
-}
-
-void FrMakeRoomDlg::DrawHoleTypeButton(FrGraphicInterface* gi, eHoleType type,
-	WRect rect, bool bEnable)
-{
-	const Bitmap* bitmap = m_pHoleTypeBtn[type][0];
-	unsigned long color = 0xffffffff;
-	if (bEnable)
-	{
-		if (m_holeType == type)
-			bitmap = m_pHoleTypeBtn[type][1];
-		else
-		{
-			const WPoint& mouse = g_pFresh->GetManager()->GetMousePos();
-			if (IsBtnEnable() && rect.IsInRect(mouse))
-			{
-				if (g_input->GetButton(LEFT_BUTTON) == 2)
-					ChangeHoleType(type);
-			}
-		}
-	}
-	else
-		color = 0xff909090;
-	gi->DrawTexture(bitmap, rect, color, 0);
-}
-
-void FrMakeRoomDlg::OnHoleTypeOwnerDraw(int param)
-{
-	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
-	if (!gi)
-		return;
-	WRect rect = m_pHoleType->GetRect();
-	float x = rect.x;
-	float width = m_pHoleTypeBtn[0][0]->Width();
-	float height = m_pHoleTypeBtn[0][0]->Height();
-	WRect front(x, rect.y, width, height);
-	x += width;
-	width = m_pHoleTypeBtn[1][0]->Width();
-	WRect back(x, rect.y, width, height);
-	x += width;
-	width = m_pHoleTypeBtn[2][0]->Width();
-	WRect random(x, rect.y, width, height);
-	x += width;
-	width = m_pHoleTypeBtn[3][0]->Width();
-	WRect shuffle(x, rect.y, width, height);
-	if (m_gameType == GAME_TYPE_NEW_APPROACH)
-	{
-		DrawHoleTypeButton(gi, (eHoleType)0, front, false);
-		DrawHoleTypeButton(gi, (eHoleType)1, back, false);
-		DrawHoleTypeButton(gi, (eHoleType)2, random, false);
-		DrawHoleTypeButton(gi, (eHoleType)3, shuffle, false);
-	}
-	else if (m_gameType == 14)
-	{
-		DrawHoleTypeButton(gi, (eHoleType)0, front, false);
-		DrawHoleTypeButton(gi, (eHoleType)1, back, false);
-		DrawHoleTypeButton(gi, (eHoleType)2, random, false);
-		DrawHoleTypeButton(gi, (eHoleType)3, shuffle, false);
-	}
-	else if (m_hole == 18)
-	{
-		DrawHoleTypeButton(gi, (eHoleType)0, front, true);
-		DrawHoleTypeButton(gi, (eHoleType)1, back, false);
-		DrawHoleTypeButton(gi, (eHoleType)2, random, false);
-		DrawHoleTypeButton(gi, (eHoleType)3, shuffle, true);
-	}
-	else
-	{
-		DrawHoleTypeButton(gi, (eHoleType)0, front, true);
-		DrawHoleTypeButton(gi, (eHoleType)1, back, true);
-		DrawHoleTypeButton(gi, (eHoleType)2, random, true);
-		DrawHoleTypeButton(gi, (eHoleType)3, shuffle, true);
-	}
-}
-
-void FrMakeRoomDlg::OnCourseChatInit(int param)
-{
-	m_pCourseChat = DYNAMIC_CAST(FrViewer, (FrWnd*)param);
-	if (m_pCourseChat)
-		m_pCourseChat->SetVisible(false);
-}
-
-void FrMakeRoomDlg::OnHoleChatInit(int param)
-{
-	m_pHoleChat = DYNAMIC_CAST(FrArea, (FrWnd*)param);
-	if (m_pHoleChat)
-		m_pHoleChat->SetVisible(false);
-}
-
-void FrMakeRoomDlg::OnHoleChatOwnerDraw(int param)
-{
-	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
-	if (gi)
-	{
-		WRect rect = m_pHoleChat->GetRect();
-		gi->PrintText11(WPoint(rect.x + 17.0f, rect.y + 5.0f), 1,
-			MakeStr("%d", m_chatHole), NULL);
-	}
-}
-
-void FrMakeRoomDlg::OnHoleMinInit(int param)
-{
-	m_pHoleMin = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pHoleMin)
-	{
-		m_pHoleMin->SetVisible(false);
-		m_pHoleMin->SetPushDelay(0.0f);
-	}
-}
-
-void FrMakeRoomDlg::OnHolePrevInit(int param)
-{
-	m_pHolePrev = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pHolePrev)
-	{
-		m_pHolePrev->SetVisible(false);
-		m_pHolePrev->SetPushDelay(0.0f);
-	}
-}
-
-void FrMakeRoomDlg::OnHoleNextInit(int param)
-{
-	m_pHoleNext = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pHoleNext)
-	{
-		m_pHoleNext->SetVisible(false);
-		m_pHoleNext->SetPushDelay(0.0f);
-	}
-}
-
-void FrMakeRoomDlg::OnHoleMaxInit(int param)
-{
-	m_pHoleMax = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-	if (m_pHoleMax)
-	{
-		m_pHoleMax->SetVisible(false);
-		m_pHoleMax->SetPushDelay(0.0f);
-	}
-}
-
-void FrMakeRoomDlg::OnOverGauge_Init(int param)
-{
-	m_pOverGauge = DYNAMIC_CAST(FrGaugeBarImage, (FrWnd*)param);
-	if (m_pOverGauge)
-	{
-		m_pOverGauge->SetRange(0, 300, 0);
-		m_pOverGauge->SetBarSpeed(200.0f);
-	}
+	ChangeGameType(GAME_TYPE_AVATARCHAT, true);
 }
 
 void FrMakeRoomDlg::OnMakeChaosInit(int param)
@@ -622,6 +182,28 @@ void FrMakeRoomDlg::OnMakeChaosInit(int param)
 	m_pMakeBtn[4]->EnableBlink(true);
 }
 
+void FrMakeRoomDlg::OnMakeChaosDown()
+{
+	AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 35,
+		(int)MakeStr(
+			"\xbd\xba\xc6\xf3\xbc\xc8 \xbc\xc5\xc7\xc3 \xb8\xf0\xb5\xe5 \xb9\xe6\xc0\xbb \xb8\xb8\xb5\xe9 \xb6\xa7, \x0a\\c0xffff0000\\c%s\\c0xff000000\\c\xc0\xcc \xbc\xd2\xb8\xf0 \xb5\xcb\xb4\xcf\xb4\xd9.",
+			ItemManager()->GetItemName(0x1a0000f7)),
+		0, 0, 0, 0));
+	ChangeGameType(14, true);
+}
+
+void FrMakeRoomDlg::OnPictureInit(int param)
+{
+	m_pPicture = DYNAMIC_CAST(FrViewer, (FrWnd*)param);
+	if (m_pPicture)
+		m_pPicture->SetMouseEvent(false);
+}
+
+void FrMakeRoomDlg::OnTextInit(int param)
+{
+	m_pText = DYNAMIC_CAST(FrArea, (FrWnd*)param);
+}
+
 void FrMakeRoomDlg::OnTitleInit(int param)
 {
 	m_pTitle = DYNAMIC_CAST(FrEdit, (FrWnd*)param);
@@ -631,9 +213,71 @@ void FrMakeRoomDlg::OnTitleInit(int param)
 	SetDefaultTitle();
 }
 
-void FrMakeRoomDlg::SetDefaultTitle()
+bool FrMakeRoomDlg::OnTitleEnterKey(int param)
 {
-	m_pTitle->SetLine(1, Doc()->GetDefaultTitle(m_gameType), 0, false, 0);
+	return false;
+}
+
+void FrMakeRoomDlg::OnPasswordInit(int param)
+{
+	FrEdit* password = DYNAMIC_CAST(FrEdit, (FrWnd*)param);
+}
+
+void FrMakeRoomDlg::OnMapPrevInit(int param)
+{
+	m_pMapPrev = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pMapPrev)
+	{
+		m_pMapPrev->SetPushDelay(0.0f);
+	}
+}
+
+void FrMakeRoomDlg::OnMapPrevUp()
+{
+	if (m_pMapPrev && m_pMapPrevChat)
+	{
+		unsigned char course = PrevMap(m_course);
+		ChangeCourse(course);
+	}
+}
+
+void FrMakeRoomDlg::OnMapNextInit(int param)
+{
+	m_pMapNext = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pMapNext)
+	{
+		m_pMapNext->SetPushDelay(0.0f);
+	}
+}
+
+void FrMakeRoomDlg::OnMapNextUp()
+{
+	if (m_pMapNext && m_pMapNextChat)
+	{
+		unsigned char course =
+			NextMap(m_course, m_gameType == GAME_TYPE_AVATARCHAT);
+		ChangeCourse(course);
+	}
+}
+
+void FrMakeRoomDlg::OnMapPrevChatInit(int param)
+{
+	m_pMapPrevChat = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pMapPrevChat)
+	{
+		m_pMapPrevChat->SetPushDelay(0.0f);
+		m_pMapPrevChat->SetVisible(false);
+	}
+}
+
+void FrMakeRoomDlg::OnMapNextChatInit(int param)
+{
+	m_pMapNextChat = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pMapNextChat)
+	{
+		m_pMapNextChat->SetPushDelay(0.0f);
+		m_pMapNextChat->SetVisible(false);
+	}
 }
 
 bool FrMakeRoomDlg::MakeRoom(bool bQuick)
@@ -812,99 +456,9 @@ bool FrMakeRoomDlg::MakeRoom(bool bQuick)
 	return true;
 }
 
-void FrMakeRoomDlg::ChangeCourse(unsigned char course)
+void FrMakeRoomDlg::SetDefaultTitle()
 {
-	unsigned long index =
-		course > 0x7f && course != 0xfd ? course - 0x80 : course;
-	IFF_STRUCT::sCourse* info = ItemManager()->FindCourse(index | 0x28000000);
-	if (!info)
-		return;
-	if (course != 0x7f)
-	{
-		m_pCourse->Open(MakeStr("small_%s.tga", info->c.Icon));
-		m_pCourseChat->Open(MakeStr("small_%s.tga", info->c.Icon));
-		unsigned long gauge =
-			CTHunter::Instance()->GetTHunterGauge((eMapType)course);
-		if (gauge != 9999)
-		{
-			m_pOverGauge->ResetGauge();
-			m_pOverGauge->SetDestPos(gauge < 701 ? 0 : gauge - 700, false);
-		}
-	}
-	else
-	{
-		m_pCourse->Open("map_random_middle.tga");
-		m_pCourseChat->Open("map_random_middle.tga");
-		if (m_pOverGauge)
-		{
-			m_pOverGauge->ResetGauge();
-			m_pOverGauge->SetDestPos(0, false);
-		}
-	}
-	m_course = course;
-	if (m_pMapPrev)
-		m_pMapPrev->Enable(m_course != FirstMap());
-	if (m_pMapPrevChat)
-		m_pMapPrevChat->Enable(m_course != FirstMap());
-	if (m_pMapNext)
-		m_pMapNext->Enable(m_course != LastMap(false));
-	if (m_pMapNextChat)
-		m_pMapNextChat->Enable(m_course != LastMap(true));
-}
-
-bool FrMakeRoomDlg::OnMapSelectDlgResult(int result, FrForm* form)
-{
-	unsigned char map = 0;
-	if (form)
-		map = ((FrTreasureCourse*)form)->GetCurMapIdx();
-	ChangeCourse(map);
-	m_pMapSelectDlg = NULL;
-	m_btnDelay = 0.7f;
-	return true;
-}
-
-void FrMakeRoomDlg::OnCourseUp()
-{
-	if (m_gameType != GAME_TYPE_NEW_APPROACH &&
-		m_gameType != GAME_TYPE_GUILD_MATCH && m_gameType != 14)
-	{
-		g_audio->PlaySfx("ui_icon_click");
-		m_pMapSelectDlg = CreateForm<FrTreasureCourse>(g_pFresh->GetManager(),
-			this, "treasuremap", NULL);
-		if (m_pMapSelectDlg)
-		{
-			m_pMapSelectDlg->SetSelectMap(m_course);
-			m_pMapSelectDlg->SetMapIndexChanged(false);
-			m_pMapSelectDlg->LockRandom(m_gameType == GAME_TYPE_AVATARCHAT);
-			m_pMapSelectDlg->EnableDrag(false);
-			m_pMapSelectDlg->Open(
-				(FRESH_PFN_RESULT)&FrMakeRoomDlg::OnMapSelectDlgResult, 3);
-		}
-	}
-}
-
-void FrMakeRoomDlg::OnCourseChatUp()
-{
-	OnCourseUp();
-}
-
-void FrMakeRoomDlg::OnMapPrevUp()
-{
-	if (m_pMapPrev && m_pMapPrevChat)
-	{
-		unsigned char course = PrevMap(m_course);
-		ChangeCourse(course);
-	}
-}
-
-void FrMakeRoomDlg::OnMapNextUp()
-{
-	if (m_pMapNext && m_pMapNextChat)
-	{
-		unsigned char course =
-			NextMap(m_course, m_gameType == GAME_TYPE_AVATARCHAT);
-		ChangeCourse(course);
-	}
+	m_pTitle->SetLine(1, Doc()->GetDefaultTitle(m_gameType), 0, false, 0);
 }
 
 void FrMakeRoomDlg::ChangeGameType(unsigned char type, bool bInit)
@@ -1260,6 +814,136 @@ void FrMakeRoomDlg::ChangeGameType(unsigned char type, bool bInit)
 	m_pTimeLimit->Select(m_timeLimit);
 }
 
+void FrMakeRoomDlg::ChangeUserLimit(unsigned char value)
+{
+	m_userLimit = value;
+}
+
+void FrMakeRoomDlg::ChangeHole(unsigned char hole)
+{
+	if (m_hole == hole)
+		return;
+	m_hole = hole;
+	switch (m_gameType)
+	{
+	case GAME_TYPE_STROKE:
+	case GAME_TYPE_TEAM:
+	case GAME_TYPE_SKINS:
+		if (hole == 18 && (m_holeType == 1 || m_holeType == 2))
+			m_holeType = 0;
+		break;
+	case GAME_TYPE_30S:
+	case GAME_TYPE_30S_TEAM:
+		if (hole == 9)
+		{
+			m_pTimeLimit->ClearTab();
+			m_pTimeLimit->AddTab("select_button", 15, &WSize(37.5f, 20.0f));
+			m_pTimeLimit->AddTab("select_button", 20, &WSize(37.5f, 20.0f));
+			m_pTimeLimit->AddTab("select_button", 25, &WSize(37.5f, 20.0f));
+			m_pTimeLimit->AddTab("select_button", 30, &WSize(37.5f, 20.0f));
+			m_timeLimit = 15;
+			m_pTimeLimit->Select(15);
+		}
+		else if (hole == 18)
+		{
+			m_pTimeLimit->ClearTab();
+			m_pTimeLimit->AddTab("select_button", 30, &WSize(30.0f, 20.0f));
+			m_pTimeLimit->AddTab("select_button", 35, &WSize(30.0f, 20.0f));
+			m_pTimeLimit->AddTab("select_button", 40, &WSize(30.0f, 20.0f));
+			m_pTimeLimit->AddTab("select_button", 45, &WSize(30.0f, 20.0f));
+			m_pTimeLimit->AddTab("select_button", 50, &WSize(30.0f, 20.0f));
+			m_timeLimit = 30;
+			m_pTimeLimit->Select(30);
+			if (m_holeType == 1 || m_holeType == 2)
+				m_holeType = 0;
+		}
+		break;
+	case GAME_TYPE_GUILD_MATCH:
+		if (hole == 9)
+		{
+			m_pTimeLimit->ClearTab();
+			m_pTimeLimit->AddTab("select_button", 20, &WSize(37.5f, 20.0f));
+			m_timeLimit = 20;
+			m_pTimeLimit->Select(20);
+		}
+		else if (hole == 18)
+		{
+			m_pTimeLimit->ClearTab();
+			m_pTimeLimit->AddTab("select_button", 30, &WSize(30.0f, 20.0f));
+			m_pTimeLimit->AddTab("select_button", 35, &WSize(30.0f, 20.0f));
+			m_pTimeLimit->AddTab("select_button", 40, &WSize(30.0f, 20.0f));
+			m_timeLimit = 30;
+			m_pTimeLimit->Select(30);
+		}
+		m_pTimeLimit->SetVisible(false);
+		m_holeType = 0;
+		break;
+	case 14:
+		m_pTimeLimit->ClearTab();
+		m_pTimeLimit->SetVisible(false);
+		m_timeLimit = 30;
+		m_holeType = 2;
+		break;
+	}
+}
+
+void FrMakeRoomDlg::ChangeTimeLimit(unsigned long value)
+{
+	m_timeLimit = value;
+}
+
+void FrMakeRoomDlg::ChangeCourse(unsigned char course)
+{
+	unsigned long index =
+		course > 0x7f && course != 0xfd ? course - 0x80 : course;
+	IFF_STRUCT::sCourse* info = ItemManager()->FindCourse(index | 0x28000000);
+	if (!info)
+		return;
+	if (course != 0x7f)
+	{
+		m_pCourse->Open(MakeStr("small_%s.tga", info->c.Icon));
+		m_pCourseChat->Open(MakeStr("small_%s.tga", info->c.Icon));
+		unsigned long gauge =
+			CTHunter::Instance()->GetTHunterGauge((eMapType)course);
+		if (gauge != 9999)
+		{
+			m_pOverGauge->ResetGauge();
+			m_pOverGauge->SetDestPos(gauge < 701 ? 0 : gauge - 700, false);
+		}
+	}
+	else
+	{
+		m_pCourse->Open("map_random_middle.tga");
+		m_pCourseChat->Open("map_random_middle.tga");
+		if (m_pOverGauge)
+		{
+			m_pOverGauge->ResetGauge();
+			m_pOverGauge->SetDestPos(0, false);
+		}
+	}
+	m_course = course;
+	if (m_pMapPrev)
+		m_pMapPrev->Enable(m_course != FirstMap());
+	if (m_pMapPrevChat)
+		m_pMapPrevChat->Enable(m_course != FirstMap());
+	if (m_pMapNext)
+		m_pMapNext->Enable(m_course != LastMap(false));
+	if (m_pMapNextChat)
+		m_pMapNextChat->Enable(m_course != LastMap(true));
+}
+
+void FrMakeRoomDlg::ChangeHoleType(eHoleType value)
+{
+	m_holeType = value;
+}
+
+void FrMakeRoomDlg::OnGameTypeInit(int param)
+{
+	m_pGameType = DYNAMIC_CAST(FrTabButton, (FrWnd*)param);
+	if (m_pGameType)
+		m_pGameType->SetSepWidth(1.0f);
+}
+
 void FrMakeRoomDlg::OnGameTypeButtonUp()
 {
 	TButtonItem* item = m_pGameType->GetSelected();
@@ -1267,48 +951,365 @@ void FrMakeRoomDlg::OnGameTypeButtonUp()
 		ChangeGameType((unsigned char)item->index, false);
 }
 
-bool FrMakeRoomDlg::OnInit()
+void FrMakeRoomDlg::OnGameTypeOwnerDraw(int param)
 {
-	m_holeType = 0;
-	m_chatHole = 1;
-	m_gameTime = 0;
-	m_shotTime = 0;
-	m_courseX = m_pCourse->GetRect().x;
-	m_pMapSelectO =
-		g_pFresh->GetManager()->GetBitmap("MAKEROOM", "map_select_o");
-	ChangeGameType(m_gameType, true);
-	if (m_pMakeBtn[m_gameTypeGroup])
-		m_pMakeBtn[m_gameTypeGroup]->SetStatus(FrButton::PRESSED);
-	ChangeCourse(FirstMap());
+	TButtonItem* item = (TButtonItem*)param;
+	if (!item)
+		return;
+	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
+	if (gi)
+		gi->PrintText11(
+			WPoint(item->rect.x + item->rect.w * 0.5f, item->rect.y + 5.0f), 1,
+			s_gameTypeTitle[item->index], NULL);
+}
+
+void FrMakeRoomDlg::OnUserLimitInit(int param)
+{
+	m_pUserLimit = DYNAMIC_CAST(FrTabButton, (FrWnd*)param);
+	if (m_pUserLimit)
+		m_pUserLimit->SetSepWidth(1.0f);
+}
+
+void FrMakeRoomDlg::OnUserLimitButtonUp()
+{
+	TButtonItem* item = m_pUserLimit->GetSelected();
+	if (item)
+		ChangeUserLimit((unsigned char)item->index);
+}
+
+void FrMakeRoomDlg::OnUserLimitOwnerDraw(int param)
+{
+	TButtonItem* item = (TButtonItem*)param;
+	if (!item)
+		return;
+	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
+	if (gi)
+		gi->PrintText11(
+			WPoint(item->rect.x + item->rect.w * 0.5f, item->rect.y + 5.0f), 1,
+			MakeStr("%d", item->index), NULL);
+}
+
+void FrMakeRoomDlg::OnHoleInit(int param)
+{
+	m_pHole = DYNAMIC_CAST(FrTabButton, (FrWnd*)param);
+	if (m_pHole)
+		m_pHole->SetSepWidth(1.0f);
+}
+
+void FrMakeRoomDlg::OnHoleButtonUp()
+{
+	TButtonItem* item = m_pHole->GetSelected();
+	if (item)
+		ChangeHole((unsigned char)item->index);
+}
+
+void FrMakeRoomDlg::OnHoleOwnerDraw(int param)
+{
+	TButtonItem* item = (TButtonItem*)param;
+	if (!item)
+		return;
+	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
+	if (gi)
+		gi->PrintText11(
+			WPoint(item->rect.x + item->rect.w * 0.5f, item->rect.y + 5.0f), 1,
+			MakeStr("%d", item->index), NULL);
+}
+
+void FrMakeRoomDlg::OnTimeLimitInit(int param)
+{
+	m_pTimeLimit = DYNAMIC_CAST(FrTabButton, (FrWnd*)param);
+	if (m_pTimeLimit)
+		m_pTimeLimit->SetSepWidth(1.0f);
+}
+
+void FrMakeRoomDlg::OnTimeLimitButtonUp()
+{
+	TButtonItem* item = m_pTimeLimit->GetSelected();
+	if (item)
+		ChangeTimeLimit(item->index);
+}
+
+void FrMakeRoomDlg::OnTimeLimitOwnerDraw(int param)
+{
+	TButtonItem* item = (TButtonItem*)param;
+	if (!item)
+		return;
+	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
+	if (gi)
+		gi->PrintText11(
+			WPoint(item->rect.x + item->rect.w * 0.5f, item->rect.y + 5.0f), 1,
+			MakeStr("%d", item->index), NULL);
+}
+
+void FrMakeRoomDlg::OnCourseInit(int param)
+{
+	m_pCourse = DYNAMIC_CAST(FrViewer, (FrWnd*)param);
+}
+
+bool FrMakeRoomDlg::OnMapSelectDlgResult(int result, FrForm* form)
+{
+	unsigned char map = 0;
+	if (form)
+		map = ((FrTreasureCourse*)form)->GetCurMapIdx();
+	ChangeCourse(map);
+	m_pMapSelectDlg = NULL;
+	m_btnDelay = 0.7f;
 	return true;
 }
 
-void FrMakeRoomDlg::OnMakeVsDown()
+void FrMakeRoomDlg::OnCourseUp()
 {
-	ChangeGameType(GAME_TYPE_STROKE, true);
+	if (m_gameType != GAME_TYPE_NEW_APPROACH &&
+		m_gameType != GAME_TYPE_GUILD_MATCH && m_gameType != 14)
+	{
+		g_audio->PlaySfx("ui_icon_click");
+		m_pMapSelectDlg = CreateForm<FrTreasureCourse>(g_pFresh->GetManager(),
+			this, "treasuremap", NULL);
+		if (m_pMapSelectDlg)
+		{
+			m_pMapSelectDlg->SetSelectMap(m_course);
+			m_pMapSelectDlg->SetMapIndexChanged(false);
+			m_pMapSelectDlg->LockRandom(m_gameType == GAME_TYPE_AVATARCHAT);
+			m_pMapSelectDlg->EnableDrag(false);
+			m_pMapSelectDlg->Open(
+				(FRESH_PFN_RESULT)&FrMakeRoomDlg::OnMapSelectDlgResult, 3);
+		}
+	}
 }
 
-void FrMakeRoomDlg::OnMakeMassDown()
+void FrMakeRoomDlg::OnCourseOwnerDraw(int param)
 {
-	ChangeGameType(GAME_TYPE_30S, true);
+	if (m_gameType == GAME_TYPE_NEW_APPROACH ||
+		m_gameType == GAME_TYPE_GUILD_MATCH)
+		return;
+	if (!m_pCourse || !m_pMapSelectO)
+		return;
+	WRect rect = m_pCourse->GetRect();
+	FrWndManager* manager = g_pFresh->GetManager();
+	if (rect.IsInRect(manager->GetMousePos()))
+	{
+		FrGraphicInterface* gi = manager->GetGDI();
+		if (gi)
+		{
+			gi->DrawTexture(m_pMapSelectO,
+				WRect(rect.x - 25.0f, rect.y - 11.0f,
+					(float)m_pMapSelectO->Width(),
+					(float)m_pMapSelectO->Height()),
+				0xffffffff, 0);
+		}
+	}
 }
 
-void FrMakeRoomDlg::OnMakeBattleDown()
+void FrMakeRoomDlg::OnHoleTypeInit(int param)
 {
-	ChangeGameType(GAME_TYPE_NEW_APPROACH, true);
+	m_pHoleType = DYNAMIC_CAST(FrArea, (FrWnd*)param);
+	if (!m_pHoleType)
+		return;
+	m_pHoleTypeBtn[0][0] =
+		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_front_n");
+	m_pHoleTypeBtn[0][1] =
+		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_front_d");
+	m_pHoleTypeBtn[1][0] =
+		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_back_n");
+	m_pHoleTypeBtn[1][1] =
+		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_back_d");
+	m_pHoleTypeBtn[2][0] =
+		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_random_n");
+	m_pHoleTypeBtn[2][1] =
+		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_random_d");
+	m_pHoleTypeBtn[3][0] =
+		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_shuffle_n");
+	m_pHoleTypeBtn[3][1] =
+		g_pFresh->GetManager()->GetBitmap("ITEMS", "hole_shuffle_d");
 }
 
-void FrMakeRoomDlg::OnMakeChatDown()
+void FrMakeRoomDlg::DrawHoleTypeButton(FrGraphicInterface* gi, eHoleType type,
+	WRect rect, bool bEnable)
 {
-	ChangeGameType(GAME_TYPE_AVATARCHAT, true);
+	const Bitmap* bitmap = m_pHoleTypeBtn[type][0];
+	unsigned long color = 0xffffffff;
+	if (bEnable)
+	{
+		if (m_holeType == type)
+			bitmap = m_pHoleTypeBtn[type][1];
+		else
+		{
+			const WPoint& mouse = g_pFresh->GetManager()->GetMousePos();
+			if (IsBtnEnable() && rect.IsInRect(mouse))
+			{
+				if (g_input->GetButton(LEFT_BUTTON) == 2)
+					ChangeHoleType(type);
+			}
+		}
+	}
+	else
+	{
+		color = 0xff909090;
+	}
+	gi->DrawTexture(bitmap, rect, color, 0);
 }
 
-void FrMakeRoomDlg::OnMakeChaosDown()
+void FrMakeRoomDlg::OnHoleTypeOwnerDraw(int param)
 {
-	AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 35,
-		(int)MakeStr(
-			"\xbd\xba\xc6\xf3\xbc\xc8 \xbc\xc5\xc7\xc3 \xb8\xf0\xb5\xe5 \xb9\xe6\xc0\xbb \xb8\xb8\xb5\xe9 \xb6\xa7, \x0a\\c0xffff0000\\c%s\\c0xff000000\\c\xc0\xcc \xbc\xd2\xb8\xf0 \xb5\xcb\xb4\xcf\xb4\xd9.",
-			ItemManager()->GetItemName(0x1a0000f7)),
-		0, 0, 0, 0));
-	ChangeGameType(14, true);
+	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
+	if (!gi)
+		return;
+	WRect rect = m_pHoleType->GetRect();
+	float x = rect.x;
+	float width = m_pHoleTypeBtn[0][0]->Width();
+	float height = m_pHoleTypeBtn[0][0]->Height();
+	WRect front(x, rect.y, width, height);
+	x += width;
+	width = m_pHoleTypeBtn[1][0]->Width();
+	WRect back(x, rect.y, width, height);
+	x += width;
+	width = m_pHoleTypeBtn[2][0]->Width();
+	WRect random(x, rect.y, width, height);
+	x += width;
+	width = m_pHoleTypeBtn[3][0]->Width();
+	WRect shuffle(x, rect.y, width, height);
+	if (m_gameType == GAME_TYPE_NEW_APPROACH)
+	{
+		DrawHoleTypeButton(gi, (eHoleType)0, front, false);
+		DrawHoleTypeButton(gi, (eHoleType)1, back, false);
+		DrawHoleTypeButton(gi, (eHoleType)2, random, false);
+		DrawHoleTypeButton(gi, (eHoleType)3, shuffle, false);
+	}
+	else if (m_gameType == 14)
+	{
+		DrawHoleTypeButton(gi, (eHoleType)0, front, false);
+		DrawHoleTypeButton(gi, (eHoleType)1, back, false);
+		DrawHoleTypeButton(gi, (eHoleType)2, random, false);
+		DrawHoleTypeButton(gi, (eHoleType)3, shuffle, false);
+	}
+	else if (m_hole == 18)
+	{
+		DrawHoleTypeButton(gi, (eHoleType)0, front, true);
+		DrawHoleTypeButton(gi, (eHoleType)1, back, false);
+		DrawHoleTypeButton(gi, (eHoleType)2, random, false);
+		DrawHoleTypeButton(gi, (eHoleType)3, shuffle, true);
+	}
+	else
+	{
+		DrawHoleTypeButton(gi, (eHoleType)0, front, true);
+		DrawHoleTypeButton(gi, (eHoleType)1, back, true);
+		DrawHoleTypeButton(gi, (eHoleType)2, random, true);
+		DrawHoleTypeButton(gi, (eHoleType)3, shuffle, true);
+	}
+}
+
+void FrMakeRoomDlg::OnCourseChatInit(int param)
+{
+	m_pCourseChat = DYNAMIC_CAST(FrViewer, (FrWnd*)param);
+	if (m_pCourseChat)
+		m_pCourseChat->SetVisible(false);
+}
+
+void FrMakeRoomDlg::OnCourseChatUp()
+{
+	OnCourseUp();
+}
+
+void FrMakeRoomDlg::OnHoleChatInit(int param)
+{
+	m_pHoleChat = DYNAMIC_CAST(FrArea, (FrWnd*)param);
+	if (m_pHoleChat)
+		m_pHoleChat->SetVisible(false);
+}
+
+void FrMakeRoomDlg::OnHoleChatOwnerDraw(int param)
+{
+	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
+	if (gi)
+	{
+		WRect rect = m_pHoleChat->GetRect();
+		gi->PrintText11(WPoint(rect.x + 17.0f, rect.y + 5.0f), 1,
+			MakeStr("%d", m_chatHole), NULL);
+	}
+}
+
+void FrMakeRoomDlg::OnHoleMinInit(int param)
+{
+	m_pHoleMin = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pHoleMin)
+	{
+		m_pHoleMin->SetVisible(false);
+		m_pHoleMin->SetPushDelay(0.0f);
+	}
+}
+
+void FrMakeRoomDlg::OnHoleMinUp()
+{
+	m_chatHole = 1;
+}
+
+void FrMakeRoomDlg::OnHolePrevInit(int param)
+{
+	m_pHolePrev = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pHolePrev)
+	{
+		m_pHolePrev->SetVisible(false);
+		m_pHolePrev->SetPushDelay(0.0f);
+	}
+}
+
+void FrMakeRoomDlg::OnHolePrevUp()
+{
+	if (m_chatHole > 1)
+		--m_chatHole;
+}
+
+void FrMakeRoomDlg::OnHoleNextInit(int param)
+{
+	m_pHoleNext = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pHoleNext)
+	{
+		m_pHoleNext->SetVisible(false);
+		m_pHoleNext->SetPushDelay(0.0f);
+	}
+}
+
+void FrMakeRoomDlg::OnHoleNextUp()
+{
+	if (m_chatHole < 18)
+		++m_chatHole;
+}
+
+void FrMakeRoomDlg::OnHoleMaxInit(int param)
+{
+	m_pHoleMax = DYNAMIC_CAST(FrButton, (FrWnd*)param);
+	if (m_pHoleMax)
+	{
+		m_pHoleMax->SetVisible(false);
+		m_pHoleMax->SetPushDelay(0.0f);
+	}
+}
+
+void FrMakeRoomDlg::OnHoleMaxUp()
+{
+	m_chatHole = 18;
+}
+
+void FrMakeRoomDlg::OnOverGauge_Init(int param)
+{
+	m_pOverGauge = DYNAMIC_CAST(FrGaugeBarImage, (FrWnd*)param);
+	if (m_pOverGauge)
+	{
+		m_pOverGauge->SetRange(0, 300, 0);
+		m_pOverGauge->SetBarSpeed(200.0f);
+	}
+}
+
+void FrMakeRoomDlg::OnProc(const float dt)
+{
+	FrForm::OnProc(dt);
+	if (!m_pMapSelectDlg && m_btnDelay >= 0.0f)
+		m_btnDelay -= dt;
+}
+
+bool FrMakeRoomDlg::IsBtnEnable()
+{
+	if (!m_pMapSelectDlg && m_btnDelay < 0.0f)
+		return true;
+	return false;
 }

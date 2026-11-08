@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "projectg.h"
 #include "3dfont.h"
 

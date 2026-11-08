@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "gdtextbox.h"
 
 CGDTextBox::CGDTextBox()

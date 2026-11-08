@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "eventprizedlg.h"
 #include "frbutton.h"
 #include "frviewer.h"

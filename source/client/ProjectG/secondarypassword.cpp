@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "browser.h"
 #include "secondarypassword.h"
 #include "secondarypassworddlg.h"

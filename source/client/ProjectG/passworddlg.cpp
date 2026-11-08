@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "passworddlg.h"
 #include "fredit.h"
 

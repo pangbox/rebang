@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 struct sRecycleItem;
 
 sRecycleItem* g_ArrayRecycleItem;

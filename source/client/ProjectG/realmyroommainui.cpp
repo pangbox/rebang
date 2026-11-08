@@ -63,13 +63,6 @@
 #include "guildactor.h"
 #include "gatewayactor.h"
 #include "avatar_task.h"
-#include "minatl.h"
-
-namespace S5
-{
-	bool UnderCategory(unsigned long charTypeId, unsigned long typeId,
-		unsigned long category);
-}
 
 void ReviseItemIconPoint(unsigned long typeId, WPoint& pt)
 {

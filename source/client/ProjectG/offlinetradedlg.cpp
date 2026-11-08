@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "offlinetradedlg.h"
 #include "standinginline.h"
 #include "binstr.h"
@@ -9,6 +8,7 @@
 extern Fresh* g_pFresh;
 
 IMPLEMENT_OBJECT(FrOfflineTradeFinishEditDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrOfflineTradeFinishEditDlg, FrForm)
 ON_FRESH_VI("tradefinisheditdlg", FRCMD_INIT,
 	FrOfflineTradeFinishEditDlg::OnTradeFinishEditDlgInit)
@@ -98,24 +98,6 @@ FrOfflineTradeFinishEditDlg::FrOfflineTradeFinishEditDlg()
 
 FrOfflineTradeFinishEditDlg::~FrOfflineTradeFinishEditDlg()
 {
-}
-
-void FrOfflineTradeFinishEditDlg::GetSelectSlotInfo(int& uid, int& slot)
-{
-	if (!m_pSelectItem)
-	{
-		slot = 0;
-		uid = 0;
-		return;
-	}
-	sStallSlot* data = (sStallSlot*)m_pSelectItem->pData;
-	uid = data->stallKey;
-	slot = data->Idx;
-}
-
-void FrOfflineTradeFinishEditDlg::OnToolTipInit(int param)
-{
-	m_pToolTip = DYNAMIC_CAST(FrArea, param);
 }
 
 void FrOfflineTradeFinishEditDlg::OnTradeItemListOwnerDraw(int param)
@@ -354,12 +336,31 @@ void FrOfflineTradeFinishEditDlg::SetListTradeItem(std::list<sTradeItem>* list)
 		m_pTradeItemList->AddItem(&stall->slotList[i]);
 }
 
+void FrOfflineTradeFinishEditDlg::GetSelectSlotInfo(int& uid, int& slot)
+{
+	if (!m_pSelectItem)
+	{
+		slot = 0;
+		uid = 0;
+		return;
+	}
+	sStallSlot* data = (sStallSlot*)m_pSelectItem->pData;
+	uid = data->stallKey;
+	slot = data->Idx;
+}
+
+void FrOfflineTradeFinishEditDlg::OnToolTipInit(int param)
+{
+	m_pToolTip = DYNAMIC_CAST(FrArea, param);
+}
+
 void FrOfflineTradeFinishEditDlg::OnToolTipOnwerDraw(int param)
 {
 	CIconToolTip::GetInstance()->Render();
 }
 
 IMPLEMENT_OBJECT(COfflineTradeDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(COfflineTradeDlg, FrForm)
 ON_FRESH_VI("AreaSub_Nick", FRCMD_INIT, COfflineTradeDlg::OnAreaSubNickInit)
 ON_FRESH_VI("AreaSub_Nick", FRCMD_OWNERDRAW,
@@ -448,209 +449,6 @@ COfflineTradeDlg::~COfflineTradeDlg()
 {
 }
 
-bool COfflineTradeDlg::OnEditCurrentPageEnterKey(int param)
-{
-	return true;
-}
-
-void COfflineTradeDlg::OnEditMsgLBtnUp()
-{
-}
-
-void COfflineTradeDlg::OnAreaSubNickInit(int param)
-{
-	m_pAreaSubNick = DYNAMIC_CAST(FrViewer, param);
-	if (m_pAreaSubNick)
-	{
-		WRect rect = m_pAreaSubNick->GetRect();
-		m_pAreaSubNick->SetRect(WRect(rect.x, rect.y, rect.w + 55.0f, rect.h));
-	}
-}
-
-void COfflineTradeDlg::OnAreaSubNickOwnerDraw(int param)
-{
-	FrGraphicInterface* graphic = g_pFresh->GetManager()->GetGDI();
-	graphic->SetTextColor(0xffffffff, 0xffffffff);
-	WRect rect = m_pAreaSubNick->GetRect();
-	if (rect.IsInRect(g_pFresh->GetManager()->GetMousePos()))
-	{
-		graphic->SetTextColor(0xffffffff, 0xff000000);
-		graphic->SetTextStyle(2);
-	}
-	else
-		graphic->SetTextStyle(0);
-	graphic->Print(WPoint(rect.x + 10.0f, rect.y), 0,
-		"\xb4\xd0\xb3\xd7\xc0\xd3");
-}
-
-void COfflineTradeDlg::OnAreaSubPriceInit(int param)
-{
-	m_pAreaSubPrice = DYNAMIC_CAST(FrViewer, param);
-	if (m_pAreaSubPrice)
-	{
-		WRect rect = m_pAreaSubPrice->GetRect();
-		m_pAreaSubPrice->SetRect(WRect(rect.x, rect.y, rect.w + 35.0f, rect.h));
-	}
-}
-
-void COfflineTradeDlg::OnAreaSubPriceOwnerDraw(int param)
-{
-	FrGraphicInterface* graphic = g_pFresh->GetManager()->GetGDI();
-	graphic->SetTextColor(0xffffffff, 0xffffffff);
-	WRect rect = m_pAreaSubPrice->GetRect();
-	if (rect.IsInRect(g_pFresh->GetManager()->GetMousePos()))
-	{
-		graphic->SetTextColor(0xffffffff, 0xff000000);
-		graphic->SetTextStyle(2);
-	}
-	else
-		graphic->SetTextStyle(0);
-	graphic->Print(WPoint(rect.x + 10.0f, rect.y), 0, "\xb0\xa1\xb0\xdd");
-}
-
-void COfflineTradeDlg::OnAreaSubItemNameInit(int param)
-{
-	m_pAreaSubItemName = DYNAMIC_CAST(FrViewer, param);
-	if (m_pAreaSubItemName)
-	{
-		WRect rect = m_pAreaSubItemName->GetRect();
-		m_pAreaSubItemName->SetRect(
-			WRect(rect.x, rect.y, rect.w + 75.0f, rect.h));
-	}
-}
-
-void COfflineTradeDlg::OnAreaSubItemNameOwnerDraw(int param)
-{
-	FrGraphicInterface* graphic = g_pFresh->GetManager()->GetGDI();
-	graphic->SetTextColor(0xffffffff, 0xffffffff);
-	WRect rect = m_pAreaSubItemName->GetRect();
-	if (rect.IsInRect(g_pFresh->GetManager()->GetMousePos()))
-	{
-		graphic->SetTextColor(0xffffffff, 0xff000000);
-		graphic->SetTextStyle(2);
-	}
-	else
-		graphic->SetTextStyle(0);
-	graphic->Print(WPoint(rect.x + 10.0f, rect.y), 0,
-		"\xbe\xc6\xc0\xcc\xc5\xdb\xc0\xcc\xb8\xa7");
-}
-
-void COfflineTradeDlg::OnMaketListInit(int param)
-{
-	m_pMarketList = DYNAMIC_CAST(FrListBox, param);
-}
-
-void COfflineTradeDlg::OnItemSearchInit(int param)
-{
-	m_pItemSearch = DYNAMIC_CAST(FrEdit, param);
-	if (m_pItemSearch)
-	{
-		m_pItemSearch->SetFontColor(0xffd1d1d0);
-		m_pItemSearch->ClearLine();
-		m_pItemSearch->AddLine(
-			"\xb9\xb0\xb0\xc7\xc0\xbb \xb0\xf1\xb6\xf3\xba\xb8\xb7\xc5", 0,
-			false);
-		m_pItemSearch->SetKeyFocus(true);
-	}
-}
-
-void COfflineTradeDlg::OnItemSearchLBtnUp()
-{
-	std::string text = m_pItemSearch->GetLine(1, false);
-	std::string empty;
-	empty.clear();
-	if (!stricmp("\xb9\xb0\xb0\xc7\xc0\xbb \xb0\xf1\xb6\xf3\xba\xb8\xb7\xc5",
-			text.c_str()))
-	{
-		m_pItemSearch->SetFontColor(0xff000000);
-		m_pItemSearch->ClearLine();
-		m_pItemSearch->AddLine("", 0, false);
-		m_pItemSearch->SetKeyFocus(true);
-	}
-}
-
-void COfflineTradeDlg::OnBtnMainSearchInit(int param)
-{
-	m_pBtnMainSearch = DYNAMIC_CAST(FrButton, param);
-}
-
-void COfflineTradeDlg::OnEditMaxPageInit(int param)
-{
-	m_pMaxPage = DYNAMIC_CAST(FrEdit, param);
-	if (m_pMaxPage)
-		m_pMaxPage->AddLine(MakeStr("%d", m_maxPage), 0, false);
-}
-
-void COfflineTradeDlg::OnEditCurrentPageInit(int param)
-{
-	m_pCurPage = DYNAMIC_CAST(FrEdit, param);
-	if (m_pCurPage)
-		m_pCurPage->AddLine(MakeStr("%d", m_curPage), 0, false);
-}
-
-void COfflineTradeDlg::SetPageData(int curPage, int maxPage)
-{
-	if (curPage != -1)
-	{
-		m_curPage = curPage;
-		m_pBtnDetail->SetVisible(false);
-	}
-	m_maxPage = maxPage;
-	if (m_curPage < 1)
-		m_curPage = Max(m_curPage, 1);
-	if (m_curPage > maxPage)
-		m_curPage = maxPage;
-	if (m_pCurPage)
-	{
-		m_pCurPage->ClearLine();
-		m_pCurPage->AddLine(MakeStr("%d", m_curPage), 0, false);
-	}
-	if (m_pMaxPage)
-	{
-		m_pMaxPage->ClearLine();
-		m_pMaxPage->AddLine(MakeStr("%d", m_maxPage), 0, false);
-	}
-}
-
-void COfflineTradeDlg::OnBtnPrevInit(int param)
-{
-	m_pBtnPrev = DYNAMIC_CAST(FrButton, param);
-}
-
-void COfflineTradeDlg::OnBtnNextInit(int param)
-{
-	m_pBtnNext = DYNAMIC_CAST(FrButton, param);
-}
-
-void COfflineTradeDlg::OnBtnGoPageInit(int param)
-{
-	m_pBtnGoPage = DYNAMIC_CAST(FrButton, param);
-}
-
-void COfflineTradeDlg::OnBtnRefreshInit(int param)
-{
-	m_pBtnRefresh = DYNAMIC_CAST(FrButton, param);
-}
-
-void COfflineTradeDlg::OnBtnDetailInit(int param)
-{
-	m_pBtnDetail = DYNAMIC_CAST(FrButton, param);
-	if (m_pBtnDetail)
-		m_pBtnDetail->SetVisible(false);
-}
-
-void COfflineTradeDlg::OnEditMsgInit(int param)
-{
-	m_pEditMsg = DYNAMIC_CAST(FrEdit, param);
-	if (m_pEditMsg)
-		m_pEditMsg->SetVisible(false);
-}
-
-void COfflineTradeDlg::OnToolTipInit(int param)
-{
-	m_pToolTip = DYNAMIC_CAST(FrArea, param);
-}
-
 bool COfflineTradeDlg::OnInit()
 {
 	if (m_pItemSearch)
@@ -682,6 +480,129 @@ void COfflineTradeDlg::OnProc(const float delta)
 {
 	FrForm::OnProc(delta);
 	CIconToolTip::GetInstance()->ClearToolTip();
+}
+
+void COfflineTradeDlg::OnAreaSubNickInit(int param)
+{
+	m_pAreaSubNick = DYNAMIC_CAST(FrViewer, param);
+	if (m_pAreaSubNick)
+	{
+		WRect rect = m_pAreaSubNick->GetRect();
+		m_pAreaSubNick->SetRect(WRect(rect.x, rect.y, rect.w + 55.0f, rect.h));
+	}
+}
+
+void COfflineTradeDlg::OnAreaSubNickOwnerDraw(int param)
+{
+	FrGraphicInterface* graphic = g_pFresh->GetManager()->GetGDI();
+	graphic->SetTextColor(0xffffffff, 0xffffffff);
+	WRect rect = m_pAreaSubNick->GetRect();
+	if (rect.IsInRect(g_pFresh->GetManager()->GetMousePos()))
+	{
+		graphic->SetTextColor(0xffffffff, 0xff000000);
+		graphic->SetTextStyle(2);
+	}
+	else
+		graphic->SetTextStyle(0);
+	graphic->Print(WPoint(rect.x + 10.0f, rect.y), 0,
+		"\xb4\xd0\xb3\xd7\xc0\xd3");
+}
+
+void COfflineTradeDlg::OnAreaSubNickLBtnUP()
+{
+	m_searchType = 4;
+	m_detailType = 0;
+	m_curPage = 1;
+	if (SetSearchString(""))
+		RequestMaketList();
+}
+
+void COfflineTradeDlg::OnAreaSubPriceInit(int param)
+{
+	m_pAreaSubPrice = DYNAMIC_CAST(FrViewer, param);
+	if (m_pAreaSubPrice)
+	{
+		WRect rect = m_pAreaSubPrice->GetRect();
+		m_pAreaSubPrice->SetRect(WRect(rect.x, rect.y, rect.w + 35.0f, rect.h));
+	}
+}
+
+void COfflineTradeDlg::OnAreaSubPriceOwnerDraw(int param)
+{
+	FrGraphicInterface* graphic = g_pFresh->GetManager()->GetGDI();
+	graphic->SetTextColor(0xffffffff, 0xffffffff);
+	WRect rect = m_pAreaSubPrice->GetRect();
+	if (rect.IsInRect(g_pFresh->GetManager()->GetMousePos()))
+	{
+		graphic->SetTextColor(0xffffffff, 0xff000000);
+		graphic->SetTextStyle(2);
+	}
+	else
+		graphic->SetTextStyle(0);
+	graphic->Print(WPoint(rect.x + 10.0f, rect.y), 0, "\xb0\xa1\xb0\xdd");
+}
+
+void COfflineTradeDlg::OnAreaSubPriceLBtnUP()
+{
+	m_searchType = 3;
+	m_detailType = 0;
+	m_curPage = 1;
+	if (SetSearchString(""))
+		RequestMaketList();
+}
+
+void COfflineTradeDlg::OnAreaSubItemNameInit(int param)
+{
+	m_pAreaSubItemName = DYNAMIC_CAST(FrViewer, param);
+	if (m_pAreaSubItemName)
+	{
+		WRect rect = m_pAreaSubItemName->GetRect();
+		m_pAreaSubItemName->SetRect(
+			WRect(rect.x, rect.y, rect.w + 75.0f, rect.h));
+	}
+}
+
+void COfflineTradeDlg::OnAreaSubItemNameOwnerDraw(int param)
+{
+	FrGraphicInterface* graphic = g_pFresh->GetManager()->GetGDI();
+	graphic->SetTextColor(0xffffffff, 0xffffffff);
+	WRect rect = m_pAreaSubItemName->GetRect();
+	if (rect.IsInRect(g_pFresh->GetManager()->GetMousePos()))
+	{
+		graphic->SetTextColor(0xffffffff, 0xff000000);
+		graphic->SetTextStyle(2);
+	}
+	else
+		graphic->SetTextStyle(0);
+	graphic->Print(WPoint(rect.x + 10.0f, rect.y), 0,
+		"\xbe\xc6\xc0\xcc\xc5\xdb\xc0\xcc\xb8\xa7");
+}
+
+void COfflineTradeDlg::OnAreaSubItemNameLBtnUP()
+{
+	m_searchType = 1;
+	m_detailType = 0;
+	m_curPage = 1;
+	if (SetSearchString(""))
+		RequestMaketList();
+}
+
+void COfflineTradeDlg::OnMaketListInit(int param)
+{
+	m_pMarketList = DYNAMIC_CAST(FrListBox, param);
+}
+
+void COfflineTradeDlg::SetListItem()
+{
+	char text[32] = { 0 };
+	std::list<sSaleItem>* list = Doc()->GetMaketList();
+	if (m_pMarketList)
+	{
+		m_pMarketList->ClearItem();
+		for (std::list<sSaleItem>::iterator it = list->begin();
+			it != list->end(); it++)
+			m_pMarketList->AddItem(&*it);
+	}
 }
 
 void COfflineTradeDlg::OnMaketListOwnerDraw(int param)
@@ -772,6 +693,98 @@ void COfflineTradeDlg::OnMaketListBtnDown()
 	}
 }
 
+void COfflineTradeDlg::OnItemSearchInit(int param)
+{
+	m_pItemSearch = DYNAMIC_CAST(FrEdit, param);
+	if (m_pItemSearch)
+	{
+		m_pItemSearch->SetFontColor(0xffd1d1d0);
+		m_pItemSearch->ClearLine();
+		m_pItemSearch->AddLine(
+			"\xb9\xb0\xb0\xc7\xc0\xbb \xb0\xf1\xb6\xf3\xba\xb8\xb7\xc5", 0,
+			false);
+		m_pItemSearch->SetKeyFocus(true);
+	}
+}
+
+bool COfflineTradeDlg::OnItemSearchEnterKey(int param)
+{
+	OnAreaSubItemNameLBtnUP();
+	return true;
+}
+
+void COfflineTradeDlg::OnItemSearchLBtnUp()
+{
+	std::string text = m_pItemSearch->GetLine(1, false);
+	std::string empty;
+	empty.clear();
+	if (!stricmp("\xb9\xb0\xb0\xc7\xc0\xbb \xb0\xf1\xb6\xf3\xba\xb8\xb7\xc5",
+			text.c_str()))
+	{
+		m_pItemSearch->SetFontColor(0xff000000);
+		m_pItemSearch->ClearLine();
+		m_pItemSearch->AddLine("", 0, false);
+		m_pItemSearch->SetKeyFocus(true);
+	}
+}
+
+void COfflineTradeDlg::OnBtnMainSearchInit(int param)
+{
+	m_pBtnMainSearch = DYNAMIC_CAST(FrButton, param);
+}
+
+void COfflineTradeDlg::OnBtnMainSearchUp()
+{
+	m_searchType = 1;
+	m_detailType = 0;
+	m_curPage = 1;
+	if (SetSearchString(""))
+		RequestMaketList();
+}
+
+void COfflineTradeDlg::OnEditMaxPageInit(int param)
+{
+	m_pMaxPage = DYNAMIC_CAST(FrEdit, param);
+	if (m_pMaxPage)
+		m_pMaxPage->AddLine(MakeStr("%d", m_maxPage), 0, false);
+}
+
+void COfflineTradeDlg::OnEditCurrentPageInit(int param)
+{
+	m_pCurPage = DYNAMIC_CAST(FrEdit, param);
+	if (m_pCurPage)
+		m_pCurPage->AddLine(MakeStr("%d", m_curPage), 0, false);
+}
+
+bool COfflineTradeDlg::OnEditCurrentPageEnterKey(int param)
+{
+	return true;
+}
+
+void COfflineTradeDlg::SetPageData(int curPage, int maxPage)
+{
+	if (curPage != -1)
+	{
+		m_curPage = curPage;
+		m_pBtnDetail->SetVisible(false);
+	}
+	m_maxPage = maxPage;
+	if (m_curPage < 1)
+		m_curPage = Max(m_curPage, 1);
+	if (m_curPage > maxPage)
+		m_curPage = maxPage;
+	if (m_pCurPage)
+	{
+		m_pCurPage->ClearLine();
+		m_pCurPage->AddLine(MakeStr("%d", m_curPage), 0, false);
+	}
+	if (m_pMaxPage)
+	{
+		m_pMaxPage->ClearLine();
+		m_pMaxPage->AddLine(MakeStr("%d", m_maxPage), 0, false);
+	}
+}
+
 void COfflineTradeDlg::RequestMaketList()
 {
 	if (!stricmp("\xb9\xb0\xb0\xc7\xc0\xbb \xb0\xf1\xb6\xf3\xba\xb8\xb7\xc5",
@@ -803,11 +816,21 @@ void COfflineTradeDlg::RequestMaketList()
 	}
 }
 
+void COfflineTradeDlg::OnBtnPrevInit(int param)
+{
+	m_pBtnPrev = DYNAMIC_CAST(FrButton, param);
+}
+
 void COfflineTradeDlg::OnBtnPrevBtnUp()
 {
 	--m_curPage;
 	SetPageData(m_curPage, m_maxPage);
 	RequestMaketList();
+}
+
+void COfflineTradeDlg::OnBtnNextInit(int param)
+{
+	m_pBtnNext = DYNAMIC_CAST(FrButton, param);
 }
 
 void COfflineTradeDlg::OnBtnNextBtnUp()
@@ -817,6 +840,11 @@ void COfflineTradeDlg::OnBtnNextBtnUp()
 	RequestMaketList();
 }
 
+void COfflineTradeDlg::OnBtnGoPageInit(int param)
+{
+	m_pBtnGoPage = DYNAMIC_CAST(FrButton, param);
+}
+
 void COfflineTradeDlg::OnBtnGoPageBtnUp()
 {
 	m_curPage = atoi(m_pCurPage->GetLine(1, false));
@@ -824,51 +852,9 @@ void COfflineTradeDlg::OnBtnGoPageBtnUp()
 	RequestMaketList();
 }
 
-void COfflineTradeDlg::OnToolTipOnwerDraw(int param)
+void COfflineTradeDlg::OnBtnRefreshInit(int param)
 {
-	CIconToolTip::GetInstance()->Render();
-}
-
-void COfflineTradeDlg::OnAreaSubNickLBtnUP()
-{
-	m_searchType = 4;
-	m_detailType = 0;
-	m_curPage = 1;
-	if (SetSearchString(""))
-		RequestMaketList();
-}
-
-void COfflineTradeDlg::OnAreaSubPriceLBtnUP()
-{
-	m_searchType = 3;
-	m_detailType = 0;
-	m_curPage = 1;
-	if (SetSearchString(""))
-		RequestMaketList();
-}
-
-void COfflineTradeDlg::OnAreaSubItemNameLBtnUP()
-{
-	m_searchType = 1;
-	m_detailType = 0;
-	m_curPage = 1;
-	if (SetSearchString(""))
-		RequestMaketList();
-}
-
-bool COfflineTradeDlg::OnItemSearchEnterKey(int param)
-{
-	OnAreaSubItemNameLBtnUP();
-	return true;
-}
-
-void COfflineTradeDlg::OnBtnMainSearchUp()
-{
-	m_searchType = 1;
-	m_detailType = 0;
-	m_curPage = 1;
-	if (SetSearchString(""))
-		RequestMaketList();
+	m_pBtnRefresh = DYNAMIC_CAST(FrButton, param);
 }
 
 void COfflineTradeDlg::OnBtnRefreshBtnUp()
@@ -902,6 +888,13 @@ void COfflineTradeDlg::OnBtnRefreshBtnUp()
 	m_pBtnDetail->SetVisible(false);
 }
 
+void COfflineTradeDlg::OnBtnDetailInit(int param)
+{
+	m_pBtnDetail = DYNAMIC_CAST(FrButton, param);
+	if (m_pBtnDetail)
+		m_pBtnDetail->SetVisible(false);
+}
+
 void COfflineTradeDlg::OnBtnDetailBtnUp()
 {
 	WRect pos;
@@ -915,6 +908,27 @@ void COfflineTradeDlg::OnBtnDetailBtnUp()
 				(FRESH_PFN_RESULT)&COfflineTradeDlg::OnStandingInLineDlgResult,
 				WPoint(pos.x + 10.0f, pos.y), FrESCAPE);
 	}
+}
+
+void COfflineTradeDlg::OnEditMsgInit(int param)
+{
+	m_pEditMsg = DYNAMIC_CAST(FrEdit, param);
+	if (m_pEditMsg)
+		m_pEditMsg->SetVisible(false);
+}
+
+void COfflineTradeDlg::OnEditMsgLBtnUp()
+{
+}
+
+void COfflineTradeDlg::OnToolTipInit(int param)
+{
+	m_pToolTip = DYNAMIC_CAST(FrArea, param);
+}
+
+void COfflineTradeDlg::OnToolTipOnwerDraw(int param)
+{
+	CIconToolTip::GetInstance()->Render();
 }
 
 bool COfflineTradeDlg::SetSearchString(std::string str)
@@ -1001,20 +1015,8 @@ bool COfflineTradeDlg::OnStandingInLineDlgResult(int result, FrForm* form)
 	return true;
 }
 
-void COfflineTradeDlg::SetListItem()
-{
-	char text[32] = { 0 };
-	std::list<sSaleItem>* list = Doc()->GetMaketList();
-	if (m_pMarketList)
-	{
-		m_pMarketList->ClearItem();
-		for (std::list<sSaleItem>::iterator it = list->begin();
-			it != list->end(); it++)
-			m_pMarketList->AddItem(&*it);
-	}
-}
-
 IMPLEMENT_OBJECT(CBuyingSlotDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(CBuyingSlotDlg, FrForm)
 ON_FRESH_VI("days", FRCMD_INIT, CBuyingSlotDlg::OnDaysInit)
 ON_FRESH_VV("days", FRCMD_LBUTTONDOWN, CBuyingSlotDlg::OnDaysBtnDown)
@@ -1050,33 +1052,6 @@ CBuyingSlotDlg::~CBuyingSlotDlg()
 {
 }
 
-void CBuyingSlotDlg::OnPriceInit(int param)
-{
-	m_pPrice = DYNAMIC_CAST(FrEdit, param);
-	if (m_pPrice)
-	{
-		char text[32];
-		MakePriceStrA(text, m_price);
-		strcat(text, "\xc6\xce");
-		m_pPrice->SetLine(1, text, 0, false, 0);
-	}
-}
-
-void CBuyingSlotDlg::OnCheckOutInit(int param)
-{
-	m_pCheckOut = DYNAMIC_CAST(FrButton, param);
-}
-
-void CBuyingSlotDlg::OnSlotPriceInit(int param)
-{
-	m_pSlotPrice = DYNAMIC_CAST(FrEdit, param);
-	if (m_pSlotPrice)
-	{
-		m_pSlotPrice->ClearLine();
-		m_pSlotPrice->AddText(MakeStr("%d \xc6\xce", m_price), false, true);
-	}
-}
-
 void CBuyingSlotDlg::OnDaysInit(int param)
 {
 	m_pDays = DYNAMIC_CAST(FrComboBox, param);
@@ -1092,6 +1067,35 @@ void CBuyingSlotDlg::OnDaysInit(int param)
 		m_price = furniture->COM[0];
 		m_pSlotPrice->ClearLine();
 		m_pSlotPrice->AddText(MakeStr("%d \xc6\xce", m_price), false, true);
+	}
+}
+
+void CBuyingSlotDlg::OnDaysBtnDown()
+{
+	IFF_STRUCT::sFurniture* furniture =
+		ItemManager()->FindFurniture(0x4800601e);
+	const char* text = m_pDays->GetLine(1, false);
+	for (int i = 0; i < 5; ++i)
+	{
+		if (!stricmp(sDay[i].str, text))
+		{
+			m_price = furniture->COM[i];
+			m_pSlotPrice->ClearLine();
+			m_pSlotPrice->AddText(MakeStr("%d \xc6\xce", m_price), false, true);
+		}
+	}
+	RecalculatePang();
+}
+
+void CBuyingSlotDlg::OnPriceInit(int param)
+{
+	m_pPrice = DYNAMIC_CAST(FrEdit, param);
+	if (m_pPrice)
+	{
+		char text[32];
+		MakePriceStrA(text, m_price);
+		strcat(text, "\xc6\xce");
+		m_pPrice->SetLine(1, text, 0, false, 0);
 	}
 }
 
@@ -1128,21 +1132,6 @@ void CBuyingSlotDlg::OnMoneyLeftInit(int param)
 	}
 }
 
-void CBuyingSlotDlg::OnDaysBtnDown()
-{
-	IFF_STRUCT::sFurniture* furniture =
-		ItemManager()->FindFurniture(0x4800601e);
-	const char* text = m_pDays->GetLine(1, false);
-	for (int i = 0; i < 5; ++i)
-		if (!stricmp(sDay[i].str, text))
-		{
-			m_price = furniture->COM[i];
-			m_pSlotPrice->ClearLine();
-			m_pSlotPrice->AddText(MakeStr("%d \xc6\xce", m_price), false, true);
-		}
-	RecalculatePang();
-}
-
 void CBuyingSlotDlg::RecalculatePang()
 {
 	char text[32];
@@ -1174,6 +1163,11 @@ void CBuyingSlotDlg::RecalculatePang()
 			m_pMoneyLeft->SetLine(1, text, 0, false, 0);
 		}
 	}
+}
+
+void CBuyingSlotDlg::OnCheckOutInit(int param)
+{
+	m_pCheckOut = DYNAMIC_CAST(FrButton, param);
 }
 
 void CBuyingSlotDlg::OnCheckOutBtnDown()
@@ -1213,7 +1207,18 @@ void CBuyingSlotDlg::OnCheckOutBtnDown()
 	FrForm::OnOK();
 }
 
+void CBuyingSlotDlg::OnSlotPriceInit(int param)
+{
+	m_pSlotPrice = DYNAMIC_CAST(FrEdit, param);
+	if (m_pSlotPrice)
+	{
+		m_pSlotPrice->ClearLine();
+		m_pSlotPrice->AddText(MakeStr("%d \xc6\xce", m_price), false, true);
+	}
+}
+
 IMPLEMENT_OBJECT(COfflineShopEditDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(COfflineShopEditDlg, FrForm)
 ON_FRESH_VI("areaBg01", FRCMD_INIT, COfflineShopEditDlg::OnAreaBg01Init)
 ON_FRESH_VI("areaBg02", FRCMD_INIT, COfflineShopEditDlg::OnAreaBg02Init)
@@ -1316,12 +1321,6 @@ COfflineShopEditDlg::~COfflineShopEditDlg()
 		IsLocalContent((localContentType_t)102);
 }
 
-void COfflineShopEditDlg::SetSelectData(unsigned long uid, unsigned long slot)
-{
-	m_selectUID = uid;
-	m_selectSlot = slot;
-}
-
 void COfflineShopEditDlg::OnAreaBg01Init(int param)
 {
 	m_pAreaBg01 = DYNAMIC_CAST(FrArea, param);
@@ -1367,32 +1366,6 @@ void COfflineShopEditDlg::OnSlotNumInit(int param)
 	m_pSlotNum = DYNAMIC_CAST(FrEdit, param);
 }
 
-void COfflineShopEditDlg::OnTradeItemListLClick()
-{
-	FrListItem* item = m_pTradeItemList->GetItemUnderCursor();
-	if (item && item->pData)
-		item->selected = !item->selected;
-}
-
-void COfflineShopEditDlg::OnOpenBnInit(int param)
-{
-	m_pOpenBn = DYNAMIC_CAST(FrButton, param);
-	if (m_pOpenBn)
-		m_pOpenBn->SetVisible(false);
-}
-
-void COfflineShopEditDlg::OnCloseBnInit(int param)
-{
-	m_pCloseBn = DYNAMIC_CAST(FrButton, param);
-	if (m_pCloseBn)
-		m_pCloseBn->SetVisible(false);
-}
-
-void COfflineShopEditDlg::OnToolTipInit(int param)
-{
-	m_pToolTip = DYNAMIC_CAST(FrArea, param);
-}
-
 void COfflineShopEditDlg::OnTradeItemListInit(int param)
 {
 	m_pTradeItemList = DYNAMIC_CAST(FrListBox, param);
@@ -1402,6 +1375,13 @@ void COfflineShopEditDlg::OnTradeItemListInit(int param)
 		for (int i = 0; i < stall->maxSlotNum; ++i)
 			m_pTradeItemList->AddItem(&stall->slotList[i]);
 	}
+}
+
+void COfflineShopEditDlg::OnTradeItemListLClick()
+{
+	FrListItem* item = m_pTradeItemList->GetItemUnderCursor();
+	if (item && item->pData)
+		item->selected = !item->selected;
 }
 
 void COfflineShopEditDlg::OnTradeItemListOwnerDraw(int param)
@@ -1463,77 +1443,11 @@ void COfflineShopEditDlg::OnVisitorInit(int param)
 		m_pVisitor->SetVisible(false);
 }
 
-void COfflineShopEditDlg::OnProc(const float delta)
+void COfflineShopEditDlg::OnOpenBnInit(int param)
 {
-	FrForm::OnProc(delta);
-	CIconToolTip::GetInstance()->ClearToolTip();
-}
-
-bool COfflineShopEditDlg::OnOfflineEquitCancelDlgResult(int result,
-	FrForm* form)
-{
-	if (result == 1)
-	{
-		FrListItem* item = m_pTradeItemList->GetItemUnderCursor();
-		if (item && IsLocalContent((localContentType_t)102))
-		{
-			WSendPacket packet((enumClientPacket)0xc8);
-			packet.Encode4(Doc()->GetStallItem()->stallKey);
-			packet.Encode2(1);
-			packet.Encode1((unsigned char)(item->idx + 1));
-			packet.Send(TO_GAME);
-			AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 1, 0, 0, 0, 0, 0));
-		}
-	}
-	return true;
-}
-
-bool COfflineShopEditDlg::OnOfflineTradeItemOnDlgResult(int result,
-	FrForm* form)
-{
-	if (result == 1 && m_pFinishEditDlg)
-	{
-		int uid, slot;
-		m_pFinishEditDlg->GetSelectSlotInfo(uid, slot);
-		sTradeItem item = *m_pSelectItem;
-		int number = atoi(m_pTradeMyItemNumber->GetLine(1, false));
-		char price[10] = { 0 };
-		const char* text = m_pTradeMyItemPrice->GetLine(1, false);
-		int i = 0;
-		char* out = price;
-		for (; i < 9; ++i)
-		{
-			char ch = text[i];
-			if (ch == 0)
-				break;
-			if (ch >= '0' && ch <= '9')
-				*out++ = ch;
-			else if (ch != ',')
-			{
-				price[0] = 0;
-				break;
-			}
-		}
-		item.i64Price = atoi(price);
-		item.iNum = number;
-		if (IsLocalContent((localContentType_t)102))
-		{
-			WSendPacket packet(0xc7);
-			packet.Encode4(uid);
-			packet.Encode2(1);
-			packet.Encode1((unsigned char)slot);
-			packet.EncodeBuffer(&item, sizeof(item));
-			packet.Send(TO_GAME);
-			AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 1, 0, 0, 0, 0, 0));
-		}
-	}
-	m_pFinishEditDlg = NULL;
-	return true;
-}
-
-void COfflineShopEditDlg::OnToolTipOnwerDraw(int param)
-{
-	CIconToolTip::GetInstance()->Render();
+	m_pOpenBn = DYNAMIC_CAST(FrButton, param);
+	if (m_pOpenBn)
+		m_pOpenBn->SetVisible(false);
 }
 
 void COfflineShopEditDlg::OnTradeMyItemOkBnUp()
@@ -1617,6 +1531,19 @@ void COfflineShopEditDlg::OnTradeMyItemOkBnUp()
 	}
 }
 
+void COfflineShopEditDlg::SetSelectData(unsigned long uid, unsigned long slot)
+{
+	m_selectUID = uid;
+	m_selectSlot = slot;
+}
+
+void COfflineShopEditDlg::OnCloseBnInit(int param)
+{
+	m_pCloseBn = DYNAMIC_CAST(FrButton, param);
+	if (m_pCloseBn)
+		m_pCloseBn->SetVisible(false);
+}
+
 void COfflineShopEditDlg::OnExitBnUp()
 {
 	m_bExit = 1;
@@ -1630,25 +1557,6 @@ void COfflineShopEditDlg::OnExitBnUp()
 		dlg->SetFadeout(false);
 	}
 	FrForm::OnFreshCancel();
-}
-
-bool COfflineShopEditDlg::OnOfflineTradeBuyDlgResult(int result, FrForm* form)
-{
-	if (result == 1)
-	{
-		FrOfflineTradeFinishEditDlg* dlg =
-			CreateForm<FrOfflineTradeFinishEditDlg>(g_pFresh->GetManager(),
-				this, "offlinetradefinisheditdlg");
-		if (dlg)
-		{
-			dlg->Open(NULL, FrRET_OK | FrRET_CANCEL);
-			dlg->SetFadeout(false);
-			dlg->SetListTradeItem(&m_tradeItemList);
-			dlg->SetTradeUserId();
-			dlg->SetTradeTitle(m_title);
-		}
-	}
-	return true;
 }
 
 bool COfflineShopEditDlg::OnInit()
@@ -1672,6 +1580,12 @@ void COfflineShopEditDlg::InitAllUI()
 	SetListTradeItem();
 	SetTradeMyItem(NULL);
 	SetControlsTradeMyItem(NULL, false);
+}
+
+void COfflineShopEditDlg::OnProc(const float delta)
+{
+	FrForm::OnProc(delta);
+	CIconToolTip::GetInstance()->ClearToolTip();
 }
 
 void COfflineShopEditDlg::SetListTradeItem()
@@ -1751,6 +1665,78 @@ bool COfflineShopEditDlg::IsCheckCardPats(unsigned long typeId,
 	return true;
 }
 
+bool COfflineShopEditDlg::OnOfflineEquitCancelDlgResult(int result,
+	FrForm* form)
+{
+	if (result == 1)
+	{
+		FrListItem* item = m_pTradeItemList->GetItemUnderCursor();
+		if (item && IsLocalContent((localContentType_t)102))
+		{
+			WSendPacket packet((enumClientPacket)0xc8);
+			packet.Encode4(Doc()->GetStallItem()->stallKey);
+			packet.Encode2(1);
+			packet.Encode1((unsigned char)(item->idx + 1));
+			packet.Send(TO_GAME);
+			AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 1, 0, 0, 0, 0, 0));
+		}
+	}
+	return true;
+}
+
+bool COfflineShopEditDlg::OnOfflineTradeItemOnDlgResult(int result,
+	FrForm* form)
+{
+	if (result == 1 && m_pFinishEditDlg)
+	{
+		int uid, slot;
+		m_pFinishEditDlg->GetSelectSlotInfo(uid, slot);
+		sTradeItem item = *m_pSelectItem;
+		int number = atoi(m_pTradeMyItemNumber->GetLine(1, false));
+		char price[10] = { 0 };
+		const char* text = m_pTradeMyItemPrice->GetLine(1, false);
+		int i = 0;
+		char* out = price;
+		for (; i < 9; ++i)
+		{
+			char ch = text[i];
+			if (ch == 0)
+				break;
+			if (ch >= '0' && ch <= '9')
+				*out++ = ch;
+			else if (ch != ',')
+			{
+				price[0] = 0;
+				break;
+			}
+		}
+		item.i64Price = atoi(price);
+		item.iNum = number;
+		if (IsLocalContent((localContentType_t)102))
+		{
+			WSendPacket packet(0xc7);
+			packet.Encode4(uid);
+			packet.Encode2(1);
+			packet.Encode1((unsigned char)slot);
+			packet.EncodeBuffer(&item, sizeof(item));
+			packet.Send(TO_GAME);
+			AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 1, 0, 0, 0, 0, 0));
+		}
+	}
+	m_pFinishEditDlg = NULL;
+	return true;
+}
+
+void COfflineShopEditDlg::OnToolTipInit(int param)
+{
+	m_pToolTip = DYNAMIC_CAST(FrArea, param);
+}
+
+void COfflineShopEditDlg::OnToolTipOnwerDraw(int param)
+{
+	CIconToolTip::GetInstance()->Render();
+}
+
 void COfflineShopEditDlg::DelListMyItem(sTradeItem* item, unsigned long count,
 	unsigned char slot)
 {
@@ -1765,7 +1751,27 @@ void COfflineShopEditDlg::DelListMyItem(sTradeItem* item, unsigned long count,
 		m_pMyItemList->UnselectAllItem();
 }
 
+bool COfflineShopEditDlg::OnOfflineTradeBuyDlgResult(int result, FrForm* form)
+{
+	if (result == 1)
+	{
+		FrOfflineTradeFinishEditDlg* dlg =
+			CreateForm<FrOfflineTradeFinishEditDlg>(g_pFresh->GetManager(),
+				this, "offlinetradefinisheditdlg");
+		if (dlg)
+		{
+			dlg->Open(NULL, FrRET_OK | FrRET_CANCEL);
+			dlg->SetFadeout(false);
+			dlg->SetListTradeItem(&m_tradeItemList);
+			dlg->SetTradeUserId();
+			dlg->SetTradeTitle(m_title);
+		}
+	}
+	return true;
+}
+
 IMPLEMENT_OBJECT(COfflineShopDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(COfflineShopDlg, FrForm)
 ON_FRESH_VI("tradedlg", FRCMD_INIT, COfflineShopDlg::OnTradeDlgInit)
 ON_FRESH_VI("visitor_back", FRCMD_INIT, COfflineShopDlg::OnVisitorBackInit)
@@ -1878,18 +1884,6 @@ void COfflineShopDlg::OnVisitorBackOwnerDraw()
 {
 }
 
-void COfflineShopDlg::OnVisitorBackInit(int param)
-{
-	m_pVisitorBack = DYNAMIC_CAST(FrArea, param);
-	if (m_pVisitorBack)
-		m_pVisitorBack->SetVisible(false);
-}
-
-void COfflineShopDlg::OnToolTipInit(int param)
-{
-	m_pToolTip = DYNAMIC_CAST(FrArea, param);
-}
-
 void COfflineShopDlg::OnVisitorInit(int param)
 {
 	m_pVisitor = DYNAMIC_CAST(FrEdit, param);
@@ -1903,6 +1897,13 @@ void COfflineShopDlg::OnCloseBnUp()
 	if (IsLocalContent((localContentType_t)102))
 		AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 0x22f, 0, 0, 0, 0, 0));
 	FrForm::OnOK();
+}
+
+void COfflineShopDlg::OnVisitorBackInit(int param)
+{
+	m_pVisitorBack = DYNAMIC_CAST(FrArea, param);
+	if (m_pVisitorBack)
+		m_pVisitorBack->SetVisible(false);
 }
 
 void COfflineShopDlg::OnTradeItemListOwnerDraw(int param)
@@ -2106,6 +2107,11 @@ void COfflineShopDlg::OnTradeItemListOwnerDraw(int param)
 	}
 }
 
+void COfflineShopDlg::OnToolTipInit(int param)
+{
+	m_pToolTip = DYNAMIC_CAST(FrArea, param);
+}
+
 void COfflineShopDlg::OnToolTipOnwerDraw(int param)
 {
 	CIconToolTip::GetInstance()->Render();
@@ -2229,6 +2235,7 @@ void COfflineShopDlg::SetListTradeItem(bool refresh)
 }
 
 IMPLEMENT_OBJECT(COfflineShopVisitorDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(COfflineShopVisitorDlg, FrForm)
 ON_FRESH_VI("tradedlg", FRCMD_INIT, COfflineShopVisitorDlg::OnTradeDlgInit)
 ON_FRESH_VI("visitor_back", FRCMD_INIT,
@@ -2306,10 +2313,11 @@ void COfflineShopVisitorDlg::OnCloseBnUp()
 	FrForm::OnOK();
 }
 
-bool COfflineShopVisitorDlg::OnOfflineShopEditDlgCreateResult(int result,
-	FrForm* form)
+void COfflineShopVisitorDlg::OnVisitorInit(int param)
 {
-	return true;
+	m_pVisitor = DYNAMIC_CAST(FrEdit, param);
+	if (IsLocalContent((localContentType_t)102) && Doc()->GetTradeMode() == 1)
+		m_pVisitor->SetVisible(false);
 }
 
 void COfflineShopVisitorDlg::OnVisitorBackInit(int param)
@@ -2317,18 +2325,6 @@ void COfflineShopVisitorDlg::OnVisitorBackInit(int param)
 	m_pVisitorBack = DYNAMIC_CAST(FrArea, param);
 	if (m_pVisitorBack)
 		m_pVisitorBack->SetVisible(false);
-}
-
-void COfflineShopVisitorDlg::OnToolTipInit(int param)
-{
-	m_pToolTip = DYNAMIC_CAST(FrArea, param);
-}
-
-void COfflineShopVisitorDlg::OnVisitorInit(int param)
-{
-	m_pVisitor = DYNAMIC_CAST(FrEdit, param);
-	if (IsLocalContent((localContentType_t)102) && Doc()->GetTradeMode() == 1)
-		m_pVisitor->SetVisible(false);
 }
 
 void COfflineShopVisitorDlg::OnTradeItemListOwnerDraw(int param)
@@ -2416,29 +2412,6 @@ void COfflineShopVisitorDlg::OnTradeItemListOwnerDraw(int param)
 	}
 }
 
-void COfflineShopVisitorDlg::OnToolTipOnwerDraw(int param)
-{
-	CIconToolTip::GetInstance()->Render();
-}
-
-void COfflineShopVisitorDlg::OnProc(const float delta)
-{
-	FrForm::OnProc(delta);
-	CIconToolTip::GetInstance()->ClearToolTip();
-}
-
-void COfflineShopVisitorDlg::SetListTradeItem(bool refresh)
-{
-	FrTradeDlg::SetListTradeItem(false);
-	sStall* stall = Doc()->GetStallItem();
-	m_pTradeItemList->UseRightButton(false);
-	m_pTradeItemList->ClearItem();
-	for (int i = 0; i < stall->maxSlotNum; ++i)
-		if (stall->slotList[i].IsValid == 1 &&
-			stall->slotList[i].itemData.dwTid)
-			m_pTradeItemList->AddItem(&stall->slotList[i]);
-}
-
 void COfflineShopVisitorDlg::OnTradeItemListLClick()
 {
 	FrListItem* item = m_pTradeItemList->GetItemUnderCursor();
@@ -2479,7 +2452,42 @@ void COfflineShopVisitorDlg::OnTradeItemListLClick()
 	item->selected = !item->selected;
 }
 
+void COfflineShopVisitorDlg::OnToolTipInit(int param)
+{
+	m_pToolTip = DYNAMIC_CAST(FrArea, param);
+}
+
+void COfflineShopVisitorDlg::OnToolTipOnwerDraw(int param)
+{
+	CIconToolTip::GetInstance()->Render();
+}
+
+bool COfflineShopVisitorDlg::OnOfflineShopEditDlgCreateResult(int result,
+	FrForm* form)
+{
+	return true;
+}
+
+void COfflineShopVisitorDlg::OnProc(const float delta)
+{
+	FrForm::OnProc(delta);
+	CIconToolTip::GetInstance()->ClearToolTip();
+}
+
+void COfflineShopVisitorDlg::SetListTradeItem(bool refresh)
+{
+	FrTradeDlg::SetListTradeItem(false);
+	sStall* stall = Doc()->GetStallItem();
+	m_pTradeItemList->UseRightButton(false);
+	m_pTradeItemList->ClearItem();
+	for (int i = 0; i < stall->maxSlotNum; ++i)
+		if (stall->slotList[i].IsValid == 1 &&
+			stall->slotList[i].itemData.dwTid)
+			m_pTradeItemList->AddItem(&stall->slotList[i]);
+}
+
 IMPLEMENT_OBJECT(COfflineBuyDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(COfflineBuyDlg, FrForm)
 ON_FRESH_VI("tradebuydlg", FRCMD_INIT, COfflineBuyDlg::OnTradeBuyDlgInit)
 ON_FRESH_VI("ok", FRCMD_INIT, COfflineBuyDlg::OnOkBnInit)
@@ -2505,27 +2513,6 @@ COfflineBuyDlg::COfflineBuyDlg()
 
 COfflineBuyDlg::~COfflineBuyDlg()
 {
-}
-
-bool COfflineBuyDlg::OnConfirmResult(int result, FrForm* form)
-{
-	if (result == 1 && form)
-	{
-		if (IsLocalContent((localContentType_t)102))
-		{
-			WSendPacket packet((enumClientPacket)0xc6);
-			packet.Encode4(Doc()->m_replayTargetUID);
-			packet.Encode4(m_buyItemData.stallKey);
-			packet.Encode1(m_buyItemData.Idx);
-			packet.Encode2((unsigned short)m_count);
-			packet.Encode8(m_buyItemData.itemData.i64Price);
-			packet.Send(TO_GAME);
-			AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 1, 0, 0, 0, 0, 0));
-			m_count = 0;
-		}
-		FrForm::OnFreshOkay();
-	}
-	return true;
 }
 
 void COfflineBuyDlg::OnOkBnUp()
@@ -2577,4 +2564,25 @@ void COfflineBuyDlg::OnOkBnUp()
 	}
 	else
 		FrTradeBuyDlg::OnOkBnUp();
+}
+
+bool COfflineBuyDlg::OnConfirmResult(int result, FrForm* form)
+{
+	if (result == 1 && form)
+	{
+		if (IsLocalContent((localContentType_t)102))
+		{
+			WSendPacket packet((enumClientPacket)0xc6);
+			packet.Encode4(Doc()->m_replayTargetUID);
+			packet.Encode4(m_buyItemData.stallKey);
+			packet.Encode1(m_buyItemData.Idx);
+			packet.Encode2((unsigned short)m_count);
+			packet.Encode8(m_buyItemData.itemData.i64Price);
+			packet.Send(TO_GAME);
+			AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 1, 0, 0, 0, 0, 0));
+			m_count = 0;
+		}
+		FrForm::OnFreshOkay();
+	}
+	return true;
 }

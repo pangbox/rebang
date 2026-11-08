@@ -8,7 +8,6 @@
 #include <stdarg.h>
 #include <ctype.h>
 
-extern "C" IJLERR __stdcall ijlWrite(JPEG_CORE_PROPERTIES*, IJLIOTYPE);
 extern HINSTANCE g_instance;
 
 WResourceManager* WFile::m_pResMng;
@@ -45,6 +44,49 @@ void SaveJPG(const char* filename, const Bitmap* bitmap, int quality)
 		properties.jquality = quality;
 		ijlWrite(&properties, IJL_JFILE_WRITEWHOLEIMAGE);
 		ijlFree(&properties);
+	}
+}
+
+#pragma pack(push, 2)
+struct BitmapFileHeader
+{
+	char type[2];
+	unsigned long size;
+	unsigned short reserved1, reserved2;
+	unsigned long offset;
+};
+#pragma pack(pop)
+
+void SaveBMP(const char* filename, const Bitmap* bitmap)
+{
+	BITMAPINFOHEADER info = { 40, 0, 0, 1, 24, 0, 0, 0, 0, 0, 0 };
+	BitmapFileHeader file = {
+		{ 'B', 'M' },
+        14, 0, 0, 54
+	};
+	FILE* out = fopen(filename, "wb");
+	if (out)
+	{
+		info.biWidth = bitmap->Width();
+		info.biHeight = bitmap->Height();
+		fwrite(&file, 1, 14, out);
+		fwrite(&info, 1, 40, out);
+		int bytes = bitmap->BitsPerPixel() >> 3;
+		for (int y = info.biHeight - 1; y >= 0; --y)
+		{
+			for (int x = 0; x < info.biWidth; ++x)
+			{
+				unsigned char* pixel =
+					bitmap->vram + y * bitmap->pitch + x * bytes;
+				fputc(pixel[0], out);
+				fputc(pixel[1], out);
+				fputc(pixel[2], out);
+			}
+			for (int pad = ((info.biWidth * 3 + 3) & ~3) - info.biWidth * 3;
+				pad > 0; --pad)
+				fputc(0, out);
+		}
+		fclose(out);
 	}
 }
 
@@ -120,59 +162,6 @@ void GetModuleName(char* name)
 		strcpy(name, slash + 1);
 	else
 		strcpy(name, path);
-}
-
-namespace std
-{
-	template <>
-	struct greater<PAKINFO> : public binary_function<PAKINFO, PAKINFO, bool>
-	{
-		bool operator()(const PAKINFO& a, const PAKINFO& b) const
-		{
-			return a.size > b.size;
-		}
-	};
-}
-
-WTL::CString __stdcall GetRegIntegratedPakName();
-
-void InitPakedFile()
-{
-	try
-	{
-		char* name;
-		WList<char*> files(16, 16);
-		WIN32_FIND_DATA data;
-		HANDLE find = FindFirstFile("projectg*.pak", &data);
-		if (find != INVALID_HANDLE_VALUE)
-		{
-			do
-			{
-				name = new char[strlen(data.cFileName) + 1];
-				strcpy(name, data.cFileName);
-				files += name;
-			} while (FindNextFile(find, &data));
-		}
-		FindClose(find);
-		char* first;
-		while ((first = files.Start()) != NULL)
-		{
-			for (name = first; name; name = files.Next())
-				if (strcmp(name, first) < 0)
-					first = name;
-			files -= first;
-			HookPAKFile(first);
-			delete[] first;
-		}
-		g_resrcmng->SetAutoMatchDirectory("data");
-	}
-	catch (...)
-	{
-		MessageBox(NULL,
-			"\xc6\xc4\xc0\xcf\xbf\xa1 \xb9\xae\xc1\xa6\xb0\xa1 \xc0\xd6\xbd\xc0\xb4\xcf\xb4\xd9. \xb4\xd9\xbd\xc3 \xbc\xb3\xc4\xa1\xc7\xd8\xc1\xd6\xbc\xbc\xbf\xe4.",
-			"\xc6\xc4\xc0\xcf \xbf\xa1\xb7\xaf", MB_ICONINFORMATION);
-		throw;
-	}
 }
 
 extern int DecodeTEA_NBYTE(char*, int, const char*, const unsigned int*);
@@ -278,6 +267,28 @@ bool DownloadUpdateList(std::list<PAKINFO>* files, char* base)
 			"\xc6\xc4\xc0\xcf \xbf\xa1\xb7\xaf", MB_ICONINFORMATION);
 	}
 	return false;
+}
+
+WTL::CString __stdcall GetRegIntegratedPakName()
+{
+	CRegistry registry;
+	registry.SetRootKey(HKEY_LOCAL_MACHINE);
+	registry.SetKey("Software\\Ntreev\\Pangya_QA", TRUE);
+	WTL::CString result = "";
+	result = registry.ReadString("IntegratedPak", "");
+	return result;
+}
+
+namespace std
+{
+	template <>
+	struct greater<PAKINFO> : public binary_function<PAKINFO, PAKINFO, bool>
+	{
+		bool operator()(const PAKINFO& a, const PAKINFO& b) const
+		{
+			return a.size > b.size;
+		}
+	};
 }
 
 int __stdcall IntegrityPakCRC(std::list<PAKINFO>& files, const char* base,
@@ -419,6 +430,79 @@ bool InitPakedFile2()
 	}
 }
 
+void InitPakedFile()
+{
+	try
+	{
+		char* name;
+		WList<char*> files(16, 16);
+		WIN32_FIND_DATA data;
+		HANDLE find = FindFirstFile("projectg*.pak", &data);
+		if (find != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				name = new char[strlen(data.cFileName) + 1];
+				strcpy(name, data.cFileName);
+				files += name;
+			} while (FindNextFile(find, &data));
+		}
+		FindClose(find);
+		char* first;
+		while ((first = files.Start()) != NULL)
+		{
+			for (name = first; name; name = files.Next())
+				if (strcmp(name, first) < 0)
+					first = name;
+			files -= first;
+			HookPAKFile(first);
+			delete[] first;
+		}
+		g_resrcmng->SetAutoMatchDirectory("data");
+	}
+	catch (...)
+	{
+		MessageBox(NULL,
+			"\xc6\xc4\xc0\xcf\xbf\xa1 \xb9\xae\xc1\xa6\xb0\xa1 \xc0\xd6\xbd\xc0\xb4\xcf\xb4\xd9. \xb4\xd9\xbd\xc3 \xbc\xb3\xc4\xa1\xc7\xd8\xc1\xd6\xbc\xbc\xbf\xe4.",
+			"\xc6\xc4\xc0\xcf \xbf\xa1\xb7\xaf", MB_ICONINFORMATION);
+		throw;
+	}
+}
+
+void LineParse(const char* line, std::vector<std::string>& tokens)
+{
+	while (*line)
+	{
+		const char* cursor = line;
+		if (*cursor == '\r')
+			break;
+		std::string token;
+		if (*cursor != '"')
+		{
+			while (!isspace(*cursor) && *cursor)
+			{
+				token += *cursor;
+				++cursor;
+			}
+		}
+		else
+		{
+			++cursor;
+			while (*cursor != '"' && *cursor)
+			{
+				token += *cursor;
+				++cursor;
+			}
+			if (*cursor == '"')
+				++cursor;
+		}
+		tokens.push_back(token);
+		while (isspace(*cursor))
+			++cursor;
+		line = cursor;
+	}
+}
+
 char* GetStr(char* source, char* dest)
 {
 	while ((*source == ' ' || *source == '\t') && *source)
@@ -475,6 +559,24 @@ char* FindTag(char* begin, char* end, char* tag)
 	return NULL;
 }
 
+void LimitText(char* text, int size)
+{
+	if (text && strlen(text) > size)
+	{
+		int i;
+		for (i = 0; i < size; ++i)
+		{
+			if (Custom_IsLeadByte(text[i]))
+			{
+				if (i + 1 >= size)
+					break;
+				++i;
+			}
+		}
+		text[i] = 0;
+	}
+}
+
 char* __cdecl MakeStr(const char* format, ...)
 {
 	static __declspec(thread) unsigned char formatIndex;
@@ -484,6 +586,23 @@ char* __cdecl MakeStr(const char* format, ...)
 	_vsnprintf(formatBuffer[formatIndex & 63], 576, format, args);
 	va_end(args);
 	return formatBuffer[formatIndex++ & 63];
+}
+
+bool str_Replace(std::string& str, const std::string& from,
+	const std::string& to)
+{
+	bool result = false;
+	int pos = str.find(from);
+	if (pos != std::string::npos)
+	{
+		do
+		{
+			str.replace(str.begin() + pos, str.begin() + pos + from.size(), to);
+			pos = str.find(from, pos + to.size());
+		} while (pos != std::string::npos);
+		result = true;
+	}
+	return result;
 }
 
 std::string GetMyComputerName()
@@ -517,6 +636,15 @@ unsigned long htoi(const char* str)
 	return 0;
 }
 
+unsigned long ModifyColor(unsigned long color, float bright)
+{
+	unsigned char r =
+		(unsigned char)Min(((color >> 16) & 255) * bright, 255.0f);
+	unsigned char g = (unsigned char)Min(((color >> 8) & 255) * bright, 255.0f);
+	unsigned char b = (unsigned char)Min((color & 255) * bright, 255.0f);
+	return (r << 16) | (g << 8) | b;
+}
+
 void RemakeNumber(int value, char* text)
 {
 	char number[32];
@@ -532,103 +660,6 @@ void RemakeNumber(int value, char* text)
 			text[j++] = ',';
 	}
 	text[j] = 0;
-}
-
-#pragma pack(push, 2)
-struct BitmapFileHeader
-{
-	char type[2];
-	unsigned long size;
-	unsigned short reserved1, reserved2;
-	unsigned long offset;
-};
-#pragma pack(pop)
-
-void SaveBMP(const char* filename, const Bitmap* bitmap)
-{
-	BITMAPINFOHEADER info = { 40, 0, 0, 1, 24, 0, 0, 0, 0, 0, 0 };
-	BitmapFileHeader file = {
-		{ 'B', 'M' },
-        14, 0, 0, 54
-	};
-	FILE* out = fopen(filename, "wb");
-	if (out)
-	{
-		info.biWidth = bitmap->Width();
-		info.biHeight = bitmap->Height();
-		fwrite(&file, 1, 14, out);
-		fwrite(&info, 1, 40, out);
-		int bytes = bitmap->BitsPerPixel() >> 3;
-		for (int y = info.biHeight - 1; y >= 0; --y)
-		{
-			for (int x = 0; x < info.biWidth; ++x)
-			{
-				unsigned char* pixel =
-					bitmap->vram + y * bitmap->pitch + x * bytes;
-				fputc(pixel[0], out);
-				fputc(pixel[1], out);
-				fputc(pixel[2], out);
-			}
-			for (int pad = ((info.biWidth * 3 + 3) & ~3) - info.biWidth * 3;
-				pad > 0; --pad)
-				fputc(0, out);
-		}
-		fclose(out);
-	}
-}
-
-void LimitText(char* text, int size)
-{
-	if (text && strlen(text) > size)
-	{
-		int i;
-		for (i = 0; i < size; ++i)
-		{
-			if (Custom_IsLeadByte(text[i]))
-			{
-				if (i + 1 >= size)
-					break;
-				++i;
-			}
-		}
-		text[i] = 0;
-	}
-}
-
-unsigned long ModifyColor(unsigned long color, float bright)
-{
-	unsigned char r =
-		(unsigned char)Min(((color >> 16) & 255) * bright, 255.0f);
-	unsigned char g = (unsigned char)Min(((color >> 8) & 255) * bright, 255.0f);
-	unsigned char b = (unsigned char)Min((color & 255) * bright, 255.0f);
-	return (r << 16) | (g << 8) | b;
-}
-
-WTL::CString __stdcall GetRegIntegratedPakName()
-{
-	CRegistry registry;
-	registry.SetRootKey(HKEY_LOCAL_MACHINE);
-	registry.SetKey("Software\\Ntreev\\Pangya_QA", TRUE);
-	WTL::CString result = "";
-	result = registry.ReadString("IntegratedPak", "");
-	return result;
-}
-
-bool str_Replace(std::string& str, const std::string& from,
-	const std::string& to)
-{
-	bool result = false;
-	int pos = str.find(from);
-	if (pos != std::string::npos)
-	{
-		do
-		{
-			str.replace(str.begin() + pos, str.begin() + pos + from.size(), to);
-			pos = str.find(from, pos + to.size());
-		} while (pos != std::string::npos);
-		result = true;
-	}
-	return result;
 }
 
 WFile::WFile()
@@ -685,46 +716,12 @@ void WFile::Seek(int offset, int origin)
 		m_pFile->Seek(offset, origin);
 }
 
-void WFile::SetResourceManager(WResourceManager* manager)
-{
-	m_pResMng = manager;
-}
-
 int WFile::Length()
 {
 	return m_pFile ? m_pFile->Length() : -1;
 }
 
-void LineParse(const char* line, std::vector<std::string>& tokens)
+void WFile::SetResourceManager(WResourceManager* manager)
 {
-	while (*line)
-	{
-		const char* cursor = line;
-		if (*cursor == '\r')
-			break;
-		std::string token;
-		if (*cursor != '"')
-		{
-			while (!isspace(*cursor) && *cursor)
-			{
-				token += *cursor;
-				++cursor;
-			}
-		}
-		else
-		{
-			++cursor;
-			while (*cursor != '"' && *cursor)
-			{
-				token += *cursor;
-				++cursor;
-			}
-			if (*cursor == '"')
-				++cursor;
-		}
-		tokens.push_back(token);
-		while (isspace(*cursor))
-			++cursor;
-		line = cursor;
-	}
+	m_pResMng = manager;
 }

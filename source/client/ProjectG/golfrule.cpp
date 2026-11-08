@@ -1,4 +1,3 @@
-#include "minatl.h"
 ILFILLTU_GOLFRULE
 #include "voiceitem.h"
 #include "fxsequence.h"
@@ -65,7 +64,6 @@ extern int g_iSendPacketType;
 extern int g_iRecvPacketType;
 bool IsMyTurn(bool bCheck);
 void RequestUccInfo(sUserInfo& info);
-std::string GetMyComputerName();
 extern const char* ball_stop_replay_data_name;
 
 ILFILLTU_GOLFRULE3

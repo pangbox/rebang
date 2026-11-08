@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "gamedatadb.h"
 #include "gdeventnotice.h"
 #include "gdtextbox.h"

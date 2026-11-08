@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "avataruserlistdlg.h"
 #include "frlistbox.h"
 #include "fresh.h"

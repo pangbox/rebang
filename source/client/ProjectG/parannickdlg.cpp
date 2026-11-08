@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "parannickdlg.h"
 #include "fredit.h"
 #include "fresh.h"

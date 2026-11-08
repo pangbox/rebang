@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "tikimagicboxdlg.h"
 #include "frbutton.h"
 #include "frlistbox.h"

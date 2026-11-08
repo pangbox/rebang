@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "upgradecaddiedlg.h"
 #include "fredit.h"
 #include "actor.h"

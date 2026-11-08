@@ -18,11 +18,11 @@ void WBoneSet::AddBoneKey(char* name, WQuat* quat, WVector* pivot, float* scale,
 		m_keyList.AddItem(key, name, false);
 	}
 	key->flags = (unsigned char)flags;
-	if (flags & 1)
+	if (flags & KEY_ROT)
 		key->quat = *quat;
-	if (flags & 2)
+	if (flags & KEY_POS)
 		key->pivot = *pivot;
-	if (flags & 4)
+	if (flags & KEY_SCALE)
 		key->scale = *scale;
 }
 
@@ -35,14 +35,16 @@ void WBoneSet::CopyFrom(WBoneSet* a)
 
 static void BlendBoneKey(WBoneKey* a, WBoneKey* b, WBoneKey* c, float fraction)
 {
-	if (b->flags & 1)
-		c->quat = (a->flags & 1) ? WQuaternionSlerp(a->quat, b->quat, fraction)
-								 : b->quat;
-	if (b->flags & 2)
-		c->pivot = (a->flags & 2) ? a->pivot + (b->pivot - a->pivot) * fraction
-								  : b->pivot;
-	if (b->flags & 4)
-		c->scale = (a->flags & 4)
+	if (b->flags & KEY_ROT)
+		c->quat = (a->flags & KEY_ROT)
+			? WQuaternionSlerp(a->quat, b->quat, fraction)
+			: b->quat;
+	if (b->flags & KEY_POS)
+		c->pivot = (a->flags & KEY_POS)
+			? a->pivot + (b->pivot - a->pivot) * fraction
+			: b->pivot;
+	if (b->flags & KEY_SCALE)
+		c->scale = (a->flags & KEY_SCALE)
 			? a->scale = (1 - fraction) * a->scale + fraction * b->scale
 			: b->scale;
 	c->flags = a->flags | b->flags;

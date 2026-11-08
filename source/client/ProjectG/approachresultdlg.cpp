@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "approachresultdlg.h"
 #include "shareddoc.h"
 #include "golfdoc.h"

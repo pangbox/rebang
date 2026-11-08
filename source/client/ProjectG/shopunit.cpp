@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "shopunit.h"
 
 ShopUnit::ShopUnit()

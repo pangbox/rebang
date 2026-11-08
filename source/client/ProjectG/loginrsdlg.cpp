@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "loginrsdlg.h"
 #include "frbutton.h"
 #include "rankinginfo.h"

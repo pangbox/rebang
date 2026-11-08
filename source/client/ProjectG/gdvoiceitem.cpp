@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "gdvoiceitem.h"
 
 CGDVoiceItem::CGDVoiceItem()

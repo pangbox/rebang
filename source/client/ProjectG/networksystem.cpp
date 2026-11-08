@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "networksystem.h"
 #include "gameunit.h"
 #include "msnunit.h"

@@ -10,8 +10,6 @@
 #include <time.h>
 
 extern Fresh* g_pFresh;
-unsigned char GetNextHole();
-
 namespace nsTHunter
 {
 	bool IsWndSizeMinimum()

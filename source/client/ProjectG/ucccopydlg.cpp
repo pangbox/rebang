@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "ucccopydlg.h"
 #include "uccmanager.h"
 #include "projectg.h"

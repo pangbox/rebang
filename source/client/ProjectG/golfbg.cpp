@@ -10,9 +10,10 @@
 #include "wind.h"
 #include "fx.h"
 #include "taskmanager.h"
-#include "minatl.h"
 
 extern bool g_bQuit;
+
+IMPLEMENT_ACTOR(CGolfBg, IActor)
 
 CGolfBg::CGolfBg()
 {
@@ -21,198 +22,10 @@ CGolfBg::CGolfBg()
 	m_renderWeather = 0;
 }
 
-void CGolfBg::SetLowestPoint()
-{
-	SendMsg(this, "Camera", 239, 0, 0, 0, 0);
-}
-
-IObject* CGolfBgMakeInstance()
-{
-	CGolfBg* p = new CGolfBg;
-	if (p)
-		p->IActor::OnProcess(0);
-	return p;
-}
-
-struct __impCGolfBg
-{
-	__impCGolfBg()
-	{
-		ObjectFactory().AddObjectFunctor(CGolfBgMakeInstance, "CGolfBg");
-		ActorFactory().AddActorClass("CGolfBg");
-	}
-};
-
-const WRTTI CGolfBg::m_RTTI("CGolfBg", &IActor::m_RTTI);
-static __impCGolfBg __implCGolfBg;
-
 void CGolfBg::OnDestroy()
 {
 	if (CShadowManager::Instance())
 		delete CShadowManager::Instance();
-}
-
-void CGolfBg::OnPreLoadInit()
-{
-	new CShadowManager(g_resrcmng, COption::Instance()->vIsShadowEnabled());
-}
-
-void CGolfBg::OnInit()
-{
-	CSceneManager::Instance()->UpdateFog(true);
-}
-
-void CGolfBg::SetGridCenter(WVector& pos)
-{
-	pos = GetPVS().GetGroundPoint(pos, false, NULL, false);
-	SendMsg(this, "Grid", 116, (int)&pos, 0, 0, 0);
-	SendMsg(this, "GolfRule", 116, (int)&pos, 0, 0, 0);
-}
-
-void CGolfBg::SetStartPoint(const WVector& pos)
-{
-	GOLFDOC()->GetHoleData().tee =
-		GetPVS().GetGroundPoint(pos, false, &GolfBall().m_meshIndex, false);
-}
-
-void CGolfBg::SetHolePoint(const WVector& pos)
-{
-	GOLFDOC()->GetHoleData().pin =
-		GetPVS().GetGroundPoint(pos, false, NULL, false);
-}
-
-void CGolfBg::SetSkyColor(unsigned long color)
-{
-	if (GOLFDOC()->m_pSky)
-		GOLFDOC()->m_pSky->SetColor(color);
-}
-
-const char* CGolfBg::GetSkyBoxName()
-{
-	if (!GetCurMapName())
-		return "blue";
-	if (!IsLocalContent((localContentType_t)154))
-		return GetCurMapName();
-	return "Halloween";
-}
-
-void CGolfBg::SetRenderWeather(unsigned char weather)
-{
-	m_renderWeather = weather;
-	if (IsLocalContent((localContentType_t)154) && GetGameType() < 11)
-	{
-		if (m_renderWeather <= 0)
-			m_renderWeather = 1;
-		if (GOLFDOC()->m_pPolySoup)
-			GOLFDOC()->m_pPolySoup->ChangePointType(2, 3);
-	}
-}
-
-void CAutoTarget::SetList(const std::vector<WVector>& list, const WVector& pos)
-{
-	m_pointList.reserve(list.size() + 1);
-	m_pointList.assign(list.begin(), list.end());
-	m_pointList.push_back(pos);
-	for (unsigned int i = 0; i < m_pointList.size(); i++)
-		m_pointList[i].y = 0;
-}
-
-void CGolfBg::DoInitAfterLoad()
-{
-	GOLFDOC()->m_pPolySoup->MakeDataStructure();
-	SendMsg(this, "Camera", 239, 0, 0, 0, 0);
-	WPolySoup::sPoint* point;
-	if (GetDiffFlag() == 1)
-	{
-		point = GOLFDOC()->m_pPolySoup->FindPoint("\xb1\xd7\xb8\xae\xb5\xe5");
-		SetGridCenter(point->pos);
-	}
-	else
-	{
-		point = GOLFDOC()->m_pPolySoup->FindPoint("\xb1\xd7\xb8\xae\xb5\xe5"
-												  "2");
-		if (!point)
-			point =
-				GOLFDOC()->m_pPolySoup->FindPoint("\xb1\xd7\xb8\xae\xb5\xe5");
-		SetGridCenter(point->pos);
-	}
-	SetStartPoint(GOLFDOC()->GetHoleData().tee);
-	SetHolePoint(GOLFDOC()->GetHoleData().pin);
-	SendMsg(this, "GolfBg", 322, GetWeather(), 0, 0, 0);
-	if (GOLFDOC()->m_pSky)
-	{
-		GOLFDOC()->m_pSky->GenerateStars(-1);
-		GOLFDOC()->m_pSky->GenerateLensFlare();
-		GOLFDOC()->m_pSky->GenerateMoons();
-	}
-	CShadowManager::Instance()->UpdateLight("sun", g_lightset);
-	if (!OnlinePlay())
-	{
-		GolfBall().Reset(
-			GetTeeShotPos() + WVector(0, GolfBall().GetRadius(), 0));
-	}
-	CSceneManager::Instance()->Load();
-	GOLFDOC()->m_pAutoTarget->Reset();
-	std::vector<CNodeContainer>::const_iterator it;
-	for (it = GOLFDOC()->m_pPolySoup->m_node.begin();
-		it != GOLFDOC()->m_pPolySoup->m_node.end(); it++)
-	{
-		if (it->GetType() == CNodeContainer::TYPE_AUTO)
-			GOLFDOC()->m_pAutoTarget->SetList(it->GetList(), GetHoleCupPos());
-	}
-	GOLFDOC()->m_pPolySoup->EndLoad(true);
-}
-
-void CGolfBg::OnLoad()
-{
-	if (CFx::Instance())
-		CFx::Instance()->SetActive(false);
-	GOLFDOC()->m_pAutoTarget = new CAutoTarget;
-	if (Doc()->m_roomInfo.realGameType == 14)
-		SetCurMap(
-			Doc()->m_pinIndex[Between<unsigned char>(1,
-								  GetHoleIndex(GOLFDOC()->m_currentHole), 18) -
-				1]);
-	if (!GOLFDOC()->m_pPolySoup->Load(
-			MakeStr("%s_%02d.gbin", GetCurMapName(), GOLFDOC()->m_currentHole),
-			false))
-	{
-		g_bQuit = true;
-		return;
-	}
-	GOLFDOC()->m_waveInfo.Load(MakeStr("%s_wave.txt", GetCurMapName()));
-	GOLFDOC()->m_riverInfo.Load(MakeStr("%s_river.txt", GetCurMapName()));
-	GOLFDOC()->m_pSky = new CSky;
-	if (GOLFDOC()->m_tutorialMode < 15)
-	{
-		GOLFDOC()->m_pSky->LoadSky("blue", 0);
-		GOLFDOC()->m_pSky->RegisterCloud("blue");
-	}
-	else
-	{
-		if (Doc()->m_roomInfo.gameType != 14 &&
-			Doc()->m_roomInfo.realGameType != 14)
-		{
-			GOLFDOC()->m_pSky->LoadSky(MakeStr("%s", GetSkyBoxName()), 0);
-			GOLFDOC()->m_pSky->RegisterCloud(
-				MakeStr("%s_cloud.dds", GetSkyBoxName()));
-		}
-		else
-		{
-			unsigned char map = Doc()->m_pinIndex[17];
-			IFF_STRUCT::sCourse* course = ItemManager()->FindCourse(
-				0x28000000 | ((map > 127 && map != 0xfd) ? map - 128 : map));
-			if (course && course->Data)
-			{
-				const char* name = course->Data;
-				GOLFDOC()->m_pSky->LoadSky(name, 0);
-				GOLFDOC()->m_pSky->RegisterCloud(MakeStr("%s_cloud.dds", name));
-			}
-		}
-	}
-	DoInitAfterLoad();
-	if (CFx::Instance())
-		CFx::Instance()->SetActive(true);
 }
 
 void CGolfBg::DoReLoad()
@@ -292,6 +105,123 @@ void CGolfBg::DoReLoad()
 	}
 	else
 		SendMsg(this, "GolfRule", 129, 0, 0, 0, 0);
+}
+
+void CAutoTarget::SetList(const std::vector<WVector>& list, const WVector& pos)
+{
+	m_pointList.reserve(list.size() + 1);
+	m_pointList.assign(list.begin(), list.end());
+	m_pointList.push_back(pos);
+	for (unsigned int i = 0; i < m_pointList.size(); i++)
+		m_pointList[i].y = 0;
+}
+
+void CGolfBg::DoInitAfterLoad()
+{
+	GOLFDOC()->m_pPolySoup->MakeDataStructure();
+	SendMsg(this, "Camera", 239, 0, 0, 0, 0);
+	WPolySoup::sPoint* point;
+	if (GetDiffFlag() == 1)
+	{
+		point = GOLFDOC()->m_pPolySoup->FindPoint("\xb1\xd7\xb8\xae\xb5\xe5");
+		SetGridCenter(point->pos);
+	}
+	else
+	{
+		point = GOLFDOC()->m_pPolySoup->FindPoint("\xb1\xd7\xb8\xae\xb5\xe5"
+												  "2");
+		if (!point)
+			point =
+				GOLFDOC()->m_pPolySoup->FindPoint("\xb1\xd7\xb8\xae\xb5\xe5");
+		SetGridCenter(point->pos);
+	}
+	SetStartPoint(GOLFDOC()->GetHoleData().tee);
+	SetHolePoint(GOLFDOC()->GetHoleData().pin);
+	SendMsg(this, "GolfBg", 322, GetWeather(), 0, 0, 0);
+	if (GOLFDOC()->m_pSky)
+	{
+		GOLFDOC()->m_pSky->GenerateStars(-1);
+		GOLFDOC()->m_pSky->GenerateLensFlare();
+		GOLFDOC()->m_pSky->GenerateMoons();
+	}
+	CShadowManager::Instance()->UpdateLight("sun", g_lightset);
+	if (!OnlinePlay())
+	{
+		GolfBall().Reset(
+			GetTeeShotPos() + WVector(0, GolfBall().GetRadius(), 0));
+	}
+	CSceneManager::Instance()->Load();
+	GOLFDOC()->m_pAutoTarget->Reset();
+	std::vector<CNodeContainer>::const_iterator it;
+	for (it = GOLFDOC()->m_pPolySoup->m_node.begin();
+		it != GOLFDOC()->m_pPolySoup->m_node.end(); it++)
+	{
+		if (it->GetType() == CNodeContainer::TYPE_AUTO)
+			GOLFDOC()->m_pAutoTarget->SetList(it->GetList(), GetHoleCupPos());
+	}
+	GOLFDOC()->m_pPolySoup->EndLoad(true);
+}
+
+void CGolfBg::OnPreLoadInit()
+{
+	new CShadowManager(g_resrcmng, COption::Instance()->vIsShadowEnabled());
+}
+
+void CGolfBg::OnLoad()
+{
+	if (CFx::Instance())
+		CFx::Instance()->SetActive(false);
+	GOLFDOC()->m_pAutoTarget = new CAutoTarget;
+	if (Doc()->m_roomInfo.realGameType == 14)
+		SetCurMap(
+			Doc()->m_pinIndex[Between<unsigned char>(1,
+								  GetHoleIndex(GOLFDOC()->m_currentHole), 18) -
+				1]);
+	if (!GOLFDOC()->m_pPolySoup->Load(
+			MakeStr("%s_%02d.gbin", GetCurMapName(), GOLFDOC()->m_currentHole),
+			false))
+	{
+		g_bQuit = true;
+		return;
+	}
+	GOLFDOC()->m_waveInfo.Load(MakeStr("%s_wave.txt", GetCurMapName()));
+	GOLFDOC()->m_riverInfo.Load(MakeStr("%s_river.txt", GetCurMapName()));
+	GOLFDOC()->m_pSky = new CSky;
+	if (GOLFDOC()->m_tutorialMode < 15)
+	{
+		GOLFDOC()->m_pSky->LoadSky("blue", 0);
+		GOLFDOC()->m_pSky->RegisterCloud("blue");
+	}
+	else
+	{
+		if (Doc()->m_roomInfo.gameType != 14 &&
+			Doc()->m_roomInfo.realGameType != 14)
+		{
+			GOLFDOC()->m_pSky->LoadSky(MakeStr("%s", GetSkyBoxName()), 0);
+			GOLFDOC()->m_pSky->RegisterCloud(
+				MakeStr("%s_cloud.dds", GetSkyBoxName()));
+		}
+		else
+		{
+			unsigned char map = Doc()->m_pinIndex[17];
+			IFF_STRUCT::sCourse* course = ItemManager()->FindCourse(
+				0x28000000 | ((map > 127 && map != 0xfd) ? map - 128 : map));
+			if (course && course->Data)
+			{
+				const char* name = course->Data;
+				GOLFDOC()->m_pSky->LoadSky(name, 0);
+				GOLFDOC()->m_pSky->RegisterCloud(MakeStr("%s_cloud.dds", name));
+			}
+		}
+	}
+	DoInitAfterLoad();
+	if (CFx::Instance())
+		CFx::Instance()->SetActive(true);
+}
+
+void CGolfBg::OnInit()
+{
+	CSceneManager::Instance()->UpdateFog(true);
 }
 
 void CGolfBg::HandleMsg(const MsgObject& msg)
@@ -479,5 +409,56 @@ void CGolfBg::HandleMsg(const MsgObject& msg)
 		}
 		break;
 	}
+	}
+}
+
+void CGolfBg::SetStartPoint(const WVector& pos)
+{
+	GOLFDOC()->GetHoleData().tee =
+		GetPVS().GetGroundPoint(pos, false, &GolfBall().m_meshIndex, false);
+}
+
+void CGolfBg::SetHolePoint(const WVector& pos)
+{
+	GOLFDOC()->GetHoleData().pin =
+		GetPVS().GetGroundPoint(pos, false, NULL, false);
+}
+
+void CGolfBg::SetGridCenter(WVector& pos)
+{
+	pos = GetPVS().GetGroundPoint(pos, false, NULL, false);
+	SendMsg(this, "Grid", 116, (int)&pos, 0, 0, 0);
+	SendMsg(this, "GolfRule", 116, (int)&pos, 0, 0, 0);
+}
+
+void CGolfBg::SetSkyColor(unsigned long color)
+{
+	if (GOLFDOC()->m_pSky)
+		GOLFDOC()->m_pSky->SetColor(color);
+}
+
+void CGolfBg::SetLowestPoint()
+{
+	SendMsg(this, "Camera", 239, 0, 0, 0, 0);
+}
+
+const char* CGolfBg::GetSkyBoxName()
+{
+	if (!GetCurMapName())
+		return "blue";
+	if (!IsLocalContent((localContentType_t)154))
+		return GetCurMapName();
+	return "Halloween";
+}
+
+void CGolfBg::SetRenderWeather(unsigned char weather)
+{
+	m_renderWeather = weather;
+	if (IsLocalContent((localContentType_t)154) && GetGameType() < 11)
+	{
+		if (m_renderWeather <= 0)
+			m_renderWeather = 1;
+		if (GOLFDOC()->m_pPolySoup)
+			GOLFDOC()->m_pPolySoup->ChangePointType(2, 3);
 	}
 }

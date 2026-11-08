@@ -41,6 +41,8 @@ unsigned long htoi(const char* str);
 bool str_Replace(std::string& str, const std::string& from,
 	const std::string& to);
 
+std::string GetMyComputerName();
+
 template <class T>
 void sequence_delete(T first, T last)
 {

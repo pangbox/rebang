@@ -1196,7 +1196,7 @@ void ntAvatar::Render()
 		WVector zAxis = WVector(0.0f, 0.0f, 2.9f) * m_spItem[0].getvalue();
 
 		GetPVS().DrawDecal(m_pMain->m_shadowTex, pos, xAxis, zAxis, 1.0f,
-			m_height, (enumPolyBlend)0, false);
+			m_height, W_POLY_BLEND_NORMAL, false);
 	}
 
 	if (m_pPetFrame != NULL && m_pPetFrame->GetCurAniPet() != NULL)

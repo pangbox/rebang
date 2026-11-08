@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include <bitset>
 
 #include "localize.h"

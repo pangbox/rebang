@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "texturepart.h"
 #include "petbody.h"
 #include "slicestr.h"

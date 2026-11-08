@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "caddiewarningdlg.h"
 #include "frarea.h"
 #include "fredit.h"

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "uselzo.h"
 
 CCompressBuffer::CCompressBuffer()

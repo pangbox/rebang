@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "furniture_ability.h"
 #include "standinginline.h"
 #include "frlistbox.h"

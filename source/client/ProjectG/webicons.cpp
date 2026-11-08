@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include "frbutton.h"
 #include "webicons.h"
 

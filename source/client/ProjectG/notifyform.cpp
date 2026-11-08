@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "notifyform.h"
 
 IMPLEMENT_OBJECT(FrNotifyForm, FrForm)

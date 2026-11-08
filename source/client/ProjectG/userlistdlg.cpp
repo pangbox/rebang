@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "userlistdlg.h"
 #include "shareddoc.h"
 #include "user_info.h"

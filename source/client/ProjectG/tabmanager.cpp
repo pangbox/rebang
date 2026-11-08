@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "tabmanager.h"
 #include <stdarg.h>
 

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "jrencrypt.h"
 
 void SimpleStreamEncrypt_Alpha(const char* src, char* tar, unsigned int len,

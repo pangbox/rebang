@@ -1,12 +1,9 @@
-#include "minatl.h"
 #include "s5/demonlanddlg.h"
 #include "s5/utilities.h"
 #include "netresourcemanager.h"
 #include "mathconsts.h"
 
 extern Fresh* g_pFresh;
-
-unsigned char GetNextHole();
 
 bool FrDemonNextHole::OnInit()
 {
@@ -492,14 +489,6 @@ void CDemonLandForm::AdjustAttackGaugePos(WRect& rect)
 	rect.h = current.h;
 	rect.x = g_view->GetWidth() * 0.5f + current.w;
 	m_pAttackGauge->SetRect(rect);
-}
-
-unsigned char GetNextHole()
-{
-	for (unsigned char i = 0; i < 18; ++i)
-		if (Doc()->m_holeOrder[i] == GOLFDOC()->m_currentHole)
-			return Doc()->m_holeOrder[i + 1];
-	return 19;
 }
 
 bool CDemonLandForm::CreateDemonLandForm(eDemonDlg dlg)

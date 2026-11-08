@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "skinnedtheme.h"
 #include "frgroupbox.h"
 #include "frarea.h"

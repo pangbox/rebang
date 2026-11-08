@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include <ctype.h>
 #include <tchar.h>
 

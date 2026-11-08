@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "shopmain.h"
 #include "exhibition.h"
 #include "parttidlist.h"
@@ -36,12 +35,6 @@
 extern Fresh* g_pFresh;
 extern WView* g_view;
 extern WResourceManager* g_resrcmng;
-
-namespace S5
-{
-	bool UnderCategory(unsigned long charTypeId, unsigned long typeId,
-		unsigned long category);
-}
 
 void SetSubTabImg(const char** const img, int index);
 
@@ -552,12 +545,6 @@ bool PartCompare(const void* left, const void* right);
 
 std::string GenerateTextureName_F(unsigned long typeId, const char* uccIndex);
 std::string GenerateTextureName_B(unsigned long typeId, const char* uccIndex);
-
-namespace S5
-{
-	bool UnderCategory(unsigned long charTypeId, unsigned long typeId,
-		unsigned long category);
-}
 
 bool PartCompare(const void* left, const void* right)
 {

@@ -37,13 +37,21 @@ CBonusTicket::~CBonusTicket()
 	Release();
 }
 
-int CBonusTicket::GetRandomTicket(std::string name)
+void CBonusTicket::Release()
 {
-	std::map<std::string, sTicketTable*>::iterator it =
-		m_ticketTable.find(name);
-	if (it != m_ticketTable.end())
-		return it->second->GetTicket();
-	return 0;
+	std::map<std::string, sTicketTable*>::iterator it = m_ticketTable.begin();
+	while (it != m_ticketTable.end())
+	{
+		if (it->second)
+		{
+			delete it->second;
+			it->second = NULL;
+			m_ticketTable.erase(it++);
+		}
+		else
+			++it;
+	}
+	m_ticketTable.clear();
 }
 
 void CBonusTicket::DeleteTable(std::string name)
@@ -91,23 +99,6 @@ void __cdecl CBonusTicket::SetTicketFromClient(std::string name, int num, ...)
 	m_ticketTable[name] = table;
 }
 
-void CBonusTicket::Release()
-{
-	std::map<std::string, sTicketTable*>::iterator it = m_ticketTable.begin();
-	while (it != m_ticketTable.end())
-	{
-		if (it->second)
-		{
-			delete it->second;
-			it->second = NULL;
-			m_ticketTable.erase(it++);
-		}
-		else
-			++it;
-	}
-	m_ticketTable.clear();
-}
-
 void CBonusTicket::SetRandomTicket(sTicketTable& table, std::vector<int>& rate)
 {
 	int index = 0;
@@ -124,4 +115,13 @@ void CBonusTicket::SetRandomTicket(sTicketTable& table, std::vector<int>& rate)
 		int other = rand() % 100;
 		std::swap(table.ticket[i], table.ticket[other]);
 	}
+}
+
+int CBonusTicket::GetRandomTicket(std::string name)
+{
+	std::map<std::string, sTicketTable*>::iterator it =
+		m_ticketTable.find(name);
+	if (it != m_ticketTable.end())
+		return it->second->GetTicket();
+	return 0;
 }

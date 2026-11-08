@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "invitedlg.h"
 
 IMPLEMENT_OBJECT(FrInviteDlg, FrForm)

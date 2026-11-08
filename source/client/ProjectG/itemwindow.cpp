@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "minatl.h"
 #include "s5/utilities.h"
 #include "itemwindow.h"
 #include "simpleoverlay.h"
@@ -11,11 +10,6 @@
 #include "quadtree.h"
 #include "cardsystem.h"
 #include "wbone.h"
-
-namespace S5
-{
-	bool IsUsableCalipers();
-}
 
 void PerformPowerBarSetting();
 

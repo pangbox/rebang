@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "networkunit.h"
 
 NetworkUnit::NetworkUnit()

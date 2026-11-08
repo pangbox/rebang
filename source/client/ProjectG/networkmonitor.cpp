@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "networkmonitor.h"
 
 const float s_graphLeft = 10.0f;

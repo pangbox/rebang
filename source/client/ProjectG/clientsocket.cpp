@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "clientsocket.h"
 #include "networkmonitor.h"
 #include "exception.h"

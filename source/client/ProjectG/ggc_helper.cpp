@@ -4,6 +4,12 @@
 extern bool g_bQuit;
 extern Fresh* g_pFresh;
 
+GGC_Helper* GGC_GetHelper()
+{
+	static GGC_Helper helper;
+	return &helper;
+}
+
 GGC_Helper::GGC_Helper()
 	: m_pDlg(NULL)
 {
@@ -95,36 +101,10 @@ GGC_Helper::GGC_Helper()
 	m_errorMessages[1015] += m_buffer;
 }
 
-void GGC_Helper::ForceShutdown()
+GGC_Helper::~GGC_Helper()
 {
-	g_bQuit = true;
-	if (WNetworkSystem::Instance())
-	{
-		if (WNetworkSystem::Instance()->IsConnected(WNetworkSystem::NET_GAME))
-			WNetworkSystem::Instance()->ForceShutDown(WNetworkSystem::NET_GAME);
-		if (WNetworkSystem::Instance() &&
-			WNetworkSystem::Instance()->IsConnected(WNetworkSystem::NET_LOGIN))
-			WNetworkSystem::Instance()->ForceShutDown(
-				WNetworkSystem::NET_LOGIN);
-	}
-}
-
-bool GGC_Helper::OnGameGuardDlgResult(int result, FrForm* form)
-{
-	ForceShutdown();
-	return true;
-}
-
-void GGC_Helper::Reset()
-{
-	m_approvableErrors.clear();
-	m_criticalErrors.clear();
-}
-
-bool GGC_Helper::StackApprovableError(unsigned long error)
-{
-	m_approvableErrors.push_back(error);
-	return true;
+	m_errorMessages.clear();
+	Reset();
 }
 
 bool GGC_Helper::StackError(unsigned long error, bool bCritical)
@@ -172,10 +152,10 @@ bool GGC_Helper::StackError(unsigned long error, bool bCritical)
 	}
 }
 
-GGC_Helper::~GGC_Helper()
+bool GGC_Helper::StackApprovableError(unsigned long error)
 {
-	m_errorMessages.clear();
-	Reset();
+	m_approvableErrors.push_back(error);
+	return true;
 }
 
 bool GGC_Helper::StackCriticalError(unsigned long error)
@@ -229,8 +209,28 @@ bool GGC_Helper::GetFirstCriticalErrorMessage(unsigned long& error,
 	return true;
 }
 
-GGC_Helper* GGC_GetHelper()
+void GGC_Helper::ForceShutdown()
 {
-	static GGC_Helper helper;
-	return &helper;
+	g_bQuit = true;
+	if (WNetworkSystem::Instance())
+	{
+		if (WNetworkSystem::Instance()->IsConnected(WNetworkSystem::NET_GAME))
+			WNetworkSystem::Instance()->ForceShutDown(WNetworkSystem::NET_GAME);
+		if (WNetworkSystem::Instance() &&
+			WNetworkSystem::Instance()->IsConnected(WNetworkSystem::NET_LOGIN))
+			WNetworkSystem::Instance()->ForceShutDown(
+				WNetworkSystem::NET_LOGIN);
+	}
+}
+
+void GGC_Helper::Reset()
+{
+	m_approvableErrors.clear();
+	m_criticalErrors.clear();
+}
+
+bool GGC_Helper::OnGameGuardDlgResult(int result, FrForm* form)
+{
+	ForceShutdown();
+	return true;
 }

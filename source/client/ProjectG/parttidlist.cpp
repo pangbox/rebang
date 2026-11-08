@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "parttidlist.h"
 #include "../../shared/localize.h"
 

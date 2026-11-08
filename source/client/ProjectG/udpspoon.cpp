@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "udpspoon.h"
 
 unsigned int __stdcall SubSpoonThread(void* Param)

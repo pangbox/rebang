@@ -1,6 +1,5 @@
 // This file is based on the MD5 implementation by Colin Plumb in 1993.
 // Some minor changes were made to match the implementation in PangYa.
-#include "minatl.h"
 #include <stdio.h>
 #include <string.h>
 #include "md5.h"

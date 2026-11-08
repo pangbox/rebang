@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "projectg.h"
 #include "w3dspr.h"
 #include "lensflare.h"

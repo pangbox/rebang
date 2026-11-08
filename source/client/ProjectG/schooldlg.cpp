@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "schooldlg.h"
 #include "frcombobox.h"
 #include "wresrcmng.h"

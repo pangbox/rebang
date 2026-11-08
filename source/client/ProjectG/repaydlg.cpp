@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "repaydlg.h"
 #include "fredit.h"
 #include "frlistbox.h"

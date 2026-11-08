@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include "finitestatemachine.h"
 
 FiniteStateMachine::FiniteStateMachine()

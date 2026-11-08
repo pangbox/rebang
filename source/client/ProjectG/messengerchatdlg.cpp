@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "messengerchatdlg.h"
 #include "messengerdlg.h"
 #include "emoticondlg.h"

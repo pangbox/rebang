@@ -47,12 +47,6 @@
 #include "fredit.h"
 #include "standinginline.h"
 
-namespace _util
-{
-	void GenerateRandomTidParts(unsigned long, unsigned long* const,
-		unsigned long* const);
-}
-
 extern bool g_bQuit;
 
 IMPLEMENT_ACTOR(CRealMyRoomMain, CTaskMain)
@@ -715,8 +709,7 @@ void CRealMyRoomMain::OnProcess(float elapsed)
 					decalZ = WVector(0.0f, 0.0f, 4.8f);
 
 					GetPVS().DrawDecal(m_glowBallTex, target, decalX, decalZ,
-						0.5f, 1.0f, (enumPolyBlend)(enumPolyBlend)0x800000,
-						false);
+						0.5f, 1.0f, W_POLY_BLEND_ADD, false);
 
 					if (CRealMyRoomData::Instance()->m_pSelModel &&
 						(CRealMyRoomData::Instance()
@@ -1467,7 +1460,7 @@ void CRealMyRoomMain::Display(void)
 			{
 				GetPVS().DrawDecal(m_glowBallTex, pAvatar->m_pos, right,
 					forward, (cos(m_glowTime * 10.0f) + 1.0f) * 0.05f + 1.0f,
-					1.0f, (enumPolyBlend)0x800000, false);
+					1.0f, W_POLY_BLEND_ADD, false);
 			}
 		}
 		else
@@ -1475,7 +1468,7 @@ void CRealMyRoomMain::Display(void)
 			GetPVS().DrawDecal(m_glowBallTex,
 				CRealMyRoom_AvatarManager::Instance()->m_pMyAvatar->m_targetPos,
 				right, forward, (cos(m_glowTime * 10.0f) + 1.0f) * 0.05f + 1.0f,
-				1.0f, (enumPolyBlend)0x800000, false);
+				1.0f, W_POLY_BLEND_ADD, false);
 		}
 	}
 

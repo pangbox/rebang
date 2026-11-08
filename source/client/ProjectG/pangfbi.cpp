@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "pangfbi.h"
 #include "generichttpclient.h"
 

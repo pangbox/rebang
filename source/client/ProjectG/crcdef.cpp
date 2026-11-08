@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "crcdef.h"
 
 const unsigned long g_dwMapCheckNum = 198;

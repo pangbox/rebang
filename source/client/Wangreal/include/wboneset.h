@@ -2,6 +2,15 @@
 #include "wmath.h"
 #include "wlist.h"
 
+enum keyType
+{
+	KEY_NONE = 0,
+	KEY_ROT = 1,
+	KEY_POS = 2,
+	KEY_SCALE = 4,
+	KEY_FOV = 4,
+};
+
 struct WBoneKey
 {
 	char* name;

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <vector>
+#include "wvideo.h"
 #include "polysoup.h"
 #include "aniobj.h"
 #include "golfball.h"
 
 struct trace_s;
-enum enumPolyBlend;
 
 class CQuadTree
 {

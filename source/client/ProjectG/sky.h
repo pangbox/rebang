@@ -7,7 +7,6 @@ class CPvsFxBox;
 
 struct sCloud
 {
-	sCloud() { }
 	float windRand;
 	float size;
 	WVector pos;

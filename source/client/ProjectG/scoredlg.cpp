@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "scoredlg.h"
 #include "projectg.h"
 #include "golfdoc.h"

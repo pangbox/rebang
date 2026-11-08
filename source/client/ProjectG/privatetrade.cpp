@@ -91,18 +91,56 @@ void CPrivateTradeImpl::Display()
 {
 }
 
-void CPrivateTradeImpl::CloseWnd()
+void CPrivateTradeImpl::OnOpenTradeWnd()
 {
-	if (m_pTradeWnd)
+	CloseWnd();
+	ntAvatar* avatar =
+		ntAvatarManager::Instance()->FindAvatarByGuid(GetTraderGuid());
+	if (avatar)
 	{
-		m_pTradeWnd->Close(FrNONE, true);
-		m_pTradeWnd = NULL;
+		SetState(PTS_TRADE);
+		if (!m_pTradeWnd)
+		{
+			unsigned long typeId = avatar->GetCharacterInfo().tid;
+			m_pTradeWnd = CreateForm<FrPrivateTrade>(g_pFresh->GetManager(),
+				this, "FrPrivateTrade");
+			m_pTradeWnd->SetCompanion(GetTraderNick(), GetTraderGuid(), typeId);
+			m_pTradeWnd->Open(
+				(FRESH_PFN_RESULT)&CPrivateTradeImpl::OnResultTrade, FrESCAPE);
+		}
 	}
+	else
+	{
+		ChatMsg(
+			"\xb0\xc5\xb7\xa1 \xbb\xf3\xb4\xeb\xb0\xa1 \xb4\xeb\xc8\xad\xb9\xe6\xbf\xa1 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9. \xb0\xc5\xb7\xa1\xb0\xa1 \xc3\xeb\xbc\xd2 \xb5\xc7\xbe\xfa\xbd\xc0\xb4\xcf\xb4\xd9.");
+	}
+}
+
+void CPrivateTradeImpl::OpenRequestWaitWnd(const std::string& nick)
+{
 	if (m_pWaitWnd)
-	{
-		m_pWaitWnd->Close(FrNONE, true);
-		m_pWaitWnd = NULL;
-	}
+		return;
+
+	SetState(PTS_WAIT);
+	m_pWaitWnd = OpenFormBar();
+	m_pWaitWnd->SetAutoCloseTimer(10);
+	m_pWaitWnd->EnableButton(true);
+	m_pWaitWnd->SetDesc(MakeStr(
+		"%s\xb4\xd4\xbf\xa1\xb0\xd4 \xb0\xc5\xb7\xa1 \xbf\xe4\xc3\xbb\xc0\xcc \xbf\xd4\xbd\xc0\xb4\xcf\xb4\xd9.",
+		nick.c_str()));
+}
+
+void CPrivateTradeImpl::OpenAcceptWaitWnd(const std::string& nick)
+{
+	if (m_pWaitWnd)
+		return;
+
+	SetState(PTS_WAIT);
+	m_pWaitWnd = OpenFormBar();
+	m_pWaitWnd->SetAutoCloseTimer(12);
+	m_pWaitWnd->SetDesc(MakeStr(
+		"%s\xb4\xd4\xbf\xa1\xb0\xd4 \xb0\xc5\xb7\xa1\xb8\xa6 \xbf\xe4\xc3\xbb\xc1\xdf \xc0\xd4\xb4\xcf\xb4\xd9.",
+		nick.c_str()));
 }
 
 bool CPrivateTradeImpl::OnResultTrade(int result, FrForm* form)
@@ -126,35 +164,6 @@ bool CPrivateTradeImpl::OnResultTrade(int result, FrForm* form)
 	if (result != FrNONE)
 		Reset();
 	return true;
-}
-
-void CPrivateTradeImpl::ChatMsg(const char* msg)
-{
-	CChatMsg::Instance()->AddChatMsg(std::string(msg), 0xffff8000, false,
-		false);
-}
-
-void CPrivateTradeImpl::OnOpenTradeWnd()
-{
-	CloseWnd();
-	ntAvatar* avatar =
-		ntAvatarManager::Instance()->FindAvatarByGuid(GetTraderGuid());
-	if (avatar)
-	{
-		SetState(PTS_TRADE);
-		if (!m_pTradeWnd)
-		{
-			unsigned long typeId = avatar->GetCharacterInfo().tid;
-			m_pTradeWnd = CreateForm<FrPrivateTrade>(g_pFresh->GetManager(),
-				this, "FrPrivateTrade");
-			m_pTradeWnd->SetCompanion(GetTraderNick(), GetTraderGuid(), typeId);
-			m_pTradeWnd->Open(
-				(FRESH_PFN_RESULT)&CPrivateTradeImpl::OnResultTrade, FrESCAPE);
-		}
-	}
-	else
-		ChatMsg(
-			"\xb0\xc5\xb7\xa1 \xbb\xf3\xb4\xeb\xb0\xa1 \xb4\xeb\xc8\xad\xb9\xe6\xbf\xa1 \xbe\xf8\xbd\xc0\xb4\xcf\xb4\xd9. \xb0\xc5\xb7\xa1\xb0\xa1 \xc3\xeb\xbc\xd2 \xb5\xc7\xbe\xfa\xbd\xc0\xb4\xcf\xb4\xd9.");
 }
 
 bool CPrivateTradeImpl::OnResultWait(int result, FrForm* form)
@@ -183,6 +192,12 @@ bool CPrivateTradeImpl::OnResultWait(int result, FrForm* form)
 	return true;
 }
 
+void CPrivateTradeImpl::ChatMsg(const char* msg)
+{
+	CChatMsg::Instance()->AddChatMsg(std::string(msg), 0xffff8000, false,
+		false);
+}
+
 FrFormBar* CPrivateTradeImpl::OpenFormBar()
 {
 	FrFormBar* form =
@@ -199,30 +214,17 @@ FrFormBar* CPrivateTradeImpl::OpenFormBar()
 	return form;
 }
 
-void CPrivateTradeImpl::OpenRequestWaitWnd(const std::string& nick)
+void CPrivateTradeImpl::CloseWnd()
 {
-	if (!m_pWaitWnd)
+	if (m_pTradeWnd)
 	{
-		SetState(PTS_WAIT);
-		m_pWaitWnd = OpenFormBar();
-		m_pWaitWnd->SetAutoCloseTimer(10);
-		m_pWaitWnd->EnableButton(true);
-		m_pWaitWnd->SetDesc(MakeStr(
-			"%s\xb4\xd4\xbf\xa1\xb0\xd4 \xb0\xc5\xb7\xa1 \xbf\xe4\xc3\xbb\xc0\xcc \xbf\xd4\xbd\xc0\xb4\xcf\xb4\xd9.",
-			nick.c_str()));
+		m_pTradeWnd->Close(FrNONE, true);
+		m_pTradeWnd = NULL;
 	}
-}
-
-void CPrivateTradeImpl::OpenAcceptWaitWnd(const std::string& nick)
-{
-	if (!m_pWaitWnd)
+	if (m_pWaitWnd)
 	{
-		SetState(PTS_WAIT);
-		m_pWaitWnd = OpenFormBar();
-		m_pWaitWnd->SetAutoCloseTimer(12);
-		m_pWaitWnd->SetDesc(MakeStr(
-			"%s\xb4\xd4\xbf\xa1\xb0\xd4 \xb0\xc5\xb7\xa1\xb8\xa6 \xbf\xe4\xc3\xbb\xc1\xdf \xc0\xd4\xb4\xcf\xb4\xd9.",
-			nick.c_str()));
+		m_pWaitWnd->Close(FrNONE, true);
+		m_pWaitWnd = NULL;
 	}
 }
 

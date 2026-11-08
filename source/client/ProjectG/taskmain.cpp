@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "mathconsts.h"
 #include "levelupitemdlg.h"
 #include "standinginline.h"

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "uccpickcolordlg.h"
 #include "uccdrawdlg.h"
 #include "inputmanager.h"

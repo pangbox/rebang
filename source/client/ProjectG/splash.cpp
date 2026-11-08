@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "splash.h"
 
 #define WS_EX_LAYERED 0x00080000

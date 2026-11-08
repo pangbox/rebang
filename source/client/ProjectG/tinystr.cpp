@@ -23,7 +23,6 @@ distribution.
 */
 
 #include "stdafx.h"
-#include "minatl.h"
 #include "tinyxml.h"
 
 #ifndef TIXML_USE_STL

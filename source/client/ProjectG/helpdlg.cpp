@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "helpdlg.h"
 #include "frviewer.h"
 #include "frarea.h"

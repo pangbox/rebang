@@ -2,7 +2,6 @@
 #include "messengerdlg.h"
 #include "mathconsts.h"
 #include "avatar_main.h"
-#include "minatl.h"
 #include "frcombobox.h"
 #include "frcontextmenuctrl.h"
 #include "frscrollbar.h"

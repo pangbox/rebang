@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "rssmanager.h"
 #include <process.h>
 #include <WinInet.h>

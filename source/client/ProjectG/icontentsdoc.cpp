@@ -2,7 +2,6 @@
 #include "icontentsdoc.h"
 #include "gatewaydoc.h"
 #include "contentsdoc.h"
-#include "minatl.h"
 
 CContentsDoc::CContentsDoc()
 {

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "friendinfodlg.h"
 #include "fredit.h"
 #include "frbutton.h"

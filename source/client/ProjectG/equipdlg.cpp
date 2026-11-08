@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "equipdlg.h"
 #include "frdesktop.h"
 #include "cardsystem.h"

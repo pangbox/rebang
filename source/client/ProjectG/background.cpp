@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "background.h"
 #include "wsplash.h"
 

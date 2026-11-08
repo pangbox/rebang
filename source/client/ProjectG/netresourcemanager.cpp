@@ -8,7 +8,6 @@
 #include "guildactor.h"
 #include "guilddefine.h"
 #include "commonutil.h"
-#include "minatl.h"
 #include <process.h>
 
 std::string GenerateTextureName_F(unsigned long, const char*);

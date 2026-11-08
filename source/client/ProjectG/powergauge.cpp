@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "club.h"
 #include "golfdoc.h"
 #include "cardsystem.h"

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "trainingdlg.h"
 #include "guidebook.h"
 #include "frlistbox.h"

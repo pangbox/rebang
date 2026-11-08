@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "realmyroom_authoritydlg.h"
 #include "frbutton.h"
 #include "fredit.h"

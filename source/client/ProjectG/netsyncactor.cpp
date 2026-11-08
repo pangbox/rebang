@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "netsyncactor.h"
 #include "club.h"
 

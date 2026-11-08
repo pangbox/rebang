@@ -10,7 +10,6 @@
 #include "clientsetting.h"
 #include "inputmanager.h"
 #include "chatmsg.h"
-#include "minatl.h"
 #include "wmathutil.inl"
 #include "capturedbg.h"
 #include "projectg.h"
@@ -20,14 +19,6 @@
 
 const unsigned long CSpot::m_adwColors[5] = { 0xffff0000, 0xffff8a00,
 	0xffffde00, 0xff95fb21, 0xff02ff42 };
-
-inline bool IsValidHole(unsigned char hole)
-{
-	for (unsigned char i = 0; i < Doc()->m_golfGame.holes; ++i)
-		if (Doc()->m_holeOrder[i] == hole)
-			return true;
-	return false;
-}
 
 IMPLEMENT_ACTOR(CSpot, IActor)
 

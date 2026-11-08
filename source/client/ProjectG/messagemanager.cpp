@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include "actor.h"
 #include "messagemanager.h"
 

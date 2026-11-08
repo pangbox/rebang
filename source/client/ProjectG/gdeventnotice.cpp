@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "gdeventnotice.h"
 
 CGDEventNotice::CGDEventNotice()

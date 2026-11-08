@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "minatl.h"
 #include "uccbase.h"
 #include "uccdrawdlg.h"
 #include "frarea.h"

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "replaydlg.h"
 #include "mousecursor.h"
 #include "projectg.h"

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "transferableitem.h"
 #include "ucclibrary.h"
-#include "minatl.h"
 
 CTransferableItem::CTransferableItem()
 {

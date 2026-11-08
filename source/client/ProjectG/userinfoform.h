@@ -323,5 +323,4 @@ public:
 	DECLARE_FRESH_MSGMAP()
 };
 
-ILNUM_UF
 #include "user_info.h"

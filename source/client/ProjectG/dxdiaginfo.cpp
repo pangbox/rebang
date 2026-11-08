@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "dxdiaginfo.h"
 
 #define DXDIAG_FILE "./gameguard/npsys.des"

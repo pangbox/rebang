@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "registry.h"
 
 using namespace WTL;
@@ -15,20 +14,20 @@ CRegistry::~CRegistry()
 	ClearKey();
 }
 
+BOOL CRegistry::ClearKey()
+{
+	m_key.Empty();
+	m_rootKey = HKEY_CURRENT_USER;
+	m_lazyWrite = TRUE;
+	return TRUE;
+}
+
 BOOL CRegistry::SetRootKey(HKEY rootKey)
 {
 	if (rootKey != HKEY_CLASSES_ROOT && rootKey != HKEY_CURRENT_USER &&
 		rootKey != HKEY_LOCAL_MACHINE && rootKey != HKEY_USERS)
 		return FALSE;
 	m_rootKey = rootKey;
-	return TRUE;
-}
-
-BOOL CRegistry::ClearKey()
-{
-	m_key.Empty();
-	m_rootKey = HKEY_CURRENT_USER;
-	m_lazyWrite = TRUE;
 	return TRUE;
 }
 
@@ -53,41 +52,6 @@ BOOL CRegistry::DeleteKey(CString key)
 	if (RegDeleteKey(m_rootKey, key) != ERROR_SUCCESS)
 		return FALSE;
 	return TRUE;
-}
-
-BOOL CRegistry::SetKey(CString key, BOOL create)
-{
-	HKEY handle;
-	DWORD disposition;
-	if (key.GetLength() == 0)
-	{
-		m_key.Empty();
-		return TRUE;
-	}
-	if (create)
-	{
-		if (RegCreateKeyEx(m_rootKey, key, 0, NULL, REG_OPTION_NON_VOLATILE,
-				KEY_ALL_ACCESS, NULL, &handle, &disposition) == ERROR_SUCCESS)
-		{
-			m_key = key;
-			if (!m_lazyWrite)
-				RegFlushKey(handle);
-			RegCloseKey(handle);
-			return TRUE;
-		}
-		return FALSE;
-	}
-	else
-	{
-		m_lastError = RegOpenKeyEx(m_rootKey, key, 0, KEY_ALL_ACCESS, &handle);
-		if (m_lastError != ERROR_SUCCESS)
-			return FALSE;
-		m_key = key;
-		if (!m_lazyWrite)
-			RegFlushKey(handle);
-		RegCloseKey(handle);
-		return TRUE;
-	}
 }
 
 BOOL CRegistry::DeleteValue(CString name)
@@ -181,6 +145,41 @@ BOOL CRegistry::KeyExists(CString key, HKEY rootKey)
 	return FALSE;
 }
 
+BOOL CRegistry::SetKey(CString key, BOOL create)
+{
+	HKEY handle;
+	DWORD disposition;
+	if (key.GetLength() == 0)
+	{
+		m_key.Empty();
+		return TRUE;
+	}
+	if (create)
+	{
+		if (RegCreateKeyEx(m_rootKey, key, 0, NULL, REG_OPTION_NON_VOLATILE,
+				KEY_ALL_ACCESS, NULL, &handle, &disposition) == ERROR_SUCCESS)
+		{
+			m_key = key;
+			if (!m_lazyWrite)
+				RegFlushKey(handle);
+			RegCloseKey(handle);
+			return TRUE;
+		}
+		return FALSE;
+	}
+	else
+	{
+		m_lastError = RegOpenKeyEx(m_rootKey, key, 0, KEY_ALL_ACCESS, &handle);
+		if (m_lastError != ERROR_SUCCESS)
+			return FALSE;
+		m_key = key;
+		if (!m_lazyWrite)
+			RegFlushKey(handle);
+		RegCloseKey(handle);
+		return TRUE;
+	}
+}
+
 BOOL CRegistry::ValueExists(CString name)
 {
 	HKEY handle;
@@ -211,6 +210,29 @@ double CRegistry::ReadFloat(CString name, double defaultValue)
 		value = defaultValue;
 	RegCloseKey(handle);
 	return value;
+}
+
+CString CRegistry::ReadString(CString name, CString defaultValue)
+{
+	HKEY handle;
+	char value[256];
+	DWORD type = REG_SZ;
+	DWORD size = 255;
+	BOOL success = TRUE;
+	type = GetDataType(name);
+	if (type != REG_SZ && type != REG_EXPAND_SZ)
+		return defaultValue;
+	m_lastError = RegOpenKeyEx(m_rootKey, m_key, 0, KEY_READ, &handle);
+	if (m_lastError != ERROR_SUCCESS)
+		return defaultValue;
+	m_lastError =
+		RegQueryValueEx(handle, name, NULL, &type, (BYTE*)value, &size);
+	if (m_lastError != ERROR_SUCCESS)
+		success = FALSE;
+	RegCloseKey(handle);
+	if (!success)
+		return defaultValue;
+	return CString(value);
 }
 
 DWORD CRegistry::ReadDword(CString name, DWORD defaultValue)
@@ -271,29 +293,6 @@ COLORREF CRegistry::ReadColor(CString name, COLORREF defaultValue)
 		value = defaultValue;
 	RegCloseKey(handle);
 	return value;
-}
-
-CString CRegistry::ReadString(CString name, CString defaultValue)
-{
-	HKEY handle;
-	char value[256];
-	DWORD type = REG_SZ;
-	DWORD size = 255;
-	BOOL success = TRUE;
-	type = GetDataType(name);
-	if (type != REG_SZ && type != REG_EXPAND_SZ)
-		return defaultValue;
-	m_lastError = RegOpenKeyEx(m_rootKey, m_key, 0, KEY_READ, &handle);
-	if (m_lastError != ERROR_SUCCESS)
-		return defaultValue;
-	m_lastError =
-		RegQueryValueEx(handle, name, NULL, &type, (BYTE*)value, &size);
-	if (m_lastError != ERROR_SUCCESS)
-		success = FALSE;
-	RegCloseKey(handle);
-	if (!success)
-		return defaultValue;
-	return CString(value);
 }
 
 BOOL CRegistry::ReadFont(CString name, CFont* value)

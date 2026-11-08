@@ -6,6 +6,38 @@
 #include "fxbox.inl"
 #include "mathconsts.h"
 
+CSky::CSky()
+{
+	m_pLensFlare = NULL;
+	m_pStar = NULL;
+	m_pMoon = NULL;
+	m_cloudTex = 0;
+	m_cloudNum = 0;
+	m_activeCloudNum = 0;
+	m_cloudInterval = 0.0f;
+	m_cloudTime = 0.0f;
+	m_height = 0.0f;
+	m_turn = 0.0f;
+	m_cloudRange = 1120.0f;
+	m_cloudFadeRange = 1600.0f;
+	m_cloudHeight = 416.0f;
+	m_color = 0xffffffff;
+	m_farDiv = 2;
+	m_nearDiv = 2;
+	memset(m_farTex, 0, sizeof(m_farTex));
+	memset(m_nearTex, 0, sizeof(m_nearTex));
+	memset(m_upTex, 0, sizeof(m_upTex));
+	memset(m_dnTex, 0, sizeof(m_dnTex));
+	m_bLoaded = 0;
+	m_upAngle = 0.0f;
+	m_nearAngle = 0.0f;
+}
+
+CSky::~CSky()
+{
+	Clear();
+}
+
 void CSky::Clear()
 {
 	if (!m_bLoaded)
@@ -130,123 +162,6 @@ int CSky::IsThereTexHandle(const char* part, int weather)
 	else
 		return -1;
 	return *tex;
-}
-
-void CSky::SetSkyTex(int tex, unsigned char unused, unsigned char index)
-{
-	if (tex)
-		m_batch[index].xiFlag0 = (tex & 0x7ff) | 0x22300000;
-	else
-		m_batch[index].xiFlag0 = 0;
-}
-
-void CSky::ChangeWeatherTex(unsigned char weather)
-{
-	int farTex = IsThereTexHandle("far", weather);
-	int nearTex = IsThereTexHandle("near", weather);
-	if (!farTex && !nearTex)
-		return;
-	SetSkyTex(farTex, weather, 0);
-	SetSkyTex(nearTex, weather, 1);
-	SetSkyTex(IsThereTexHandle("up", weather), weather, 2);
-	SetSkyTex(IsThereTexHandle("dn", weather), weather, 3);
-}
-
-void CSky::ClearClouds()
-{
-	if (g_resrcmng && m_cloudTex)
-	{
-		g_resrcmng->Release(m_cloudTex);
-		m_cloudTex = 0;
-	}
-	m_cloudNum = 0;
-	m_activeCloudNum = 0;
-}
-
-void CSky::RegisterCloud(char* name)
-{
-	ClearClouds();
-	m_cloudTex = g_resrcmng->LoadTexture(name, 0, 0, NULL);
-}
-
-void CSky::ShowClouds(bool bShow)
-{
-	if (bShow == true)
-	{
-		for (int i = 0; i < m_cloudNum; ++i)
-			m_cloud[i].bActive = rand() % 2 == 0;
-	}
-	else
-	{
-		for (int i = 0; i < m_cloudNum; ++i)
-			m_cloud[i].bActive = true;
-	}
-}
-
-void CSky::ClearSky()
-{
-	switch (GetCurMap())
-	{
-	case 5:
-	case 6:
-		m_pStar->Clear();
-		m_pMoon->Clear();
-		if (m_pStar)
-		{
-			delete m_pStar;
-			m_pStar = NULL;
-		}
-		if (m_pMoon)
-		{
-			delete m_pMoon;
-			m_pMoon = NULL;
-		}
-		break;
-	case 7:
-		m_pMoon->Clear();
-		if (m_pMoon)
-		{
-			delete m_pMoon;
-			m_pMoon = NULL;
-		}
-		break;
-	}
-}
-
-void CSky::UpdateBright()
-{
-}
-
-void CSky::GenerateClouds(int num, float rate)
-{
-	num = Min(num, 50);
-	m_cloudNum = num;
-	if (rate < 1.0f)
-		m_cloudInterval = 10.0f;
-	else
-		m_cloudInterval = 9.0f / rate + 1.0f;
-	for (int i = 0; i < num; ++i)
-	{
-		sCloud& cloud = m_cloud[i];
-		cloud.size = Random(1.0f, 2.0f) * 256.0f;
-		cloud.tile = rand() % 4;
-		cloud.windRand = Random(-0.1f, 0.1f);
-		cloud.bFlip = rand() % 2 != 0;
-		if (rand() % 2 == 0)
-		{
-			cloud.pos =
-				WVector(Random(-1.0f, 1.0f), 0.0f, Random(-1.0f, 1.0f)) *
-				m_cloudRange;
-			cloud.pos.y = m_cloudHeight;
-			cloud.bActive = true;
-			++m_activeCloudNum;
-		}
-		else
-		{
-			cloud.pos.y = m_cloudHeight;
-			cloud.bActive = false;
-		}
-	}
 }
 
 void CSky::LoadSky(const char* name, float turn)
@@ -425,248 +340,87 @@ void CSky::LoadSky(const char* name, float turn)
 	}
 }
 
-void CSky::GenerateLensFlare()
+void CSky::SetSkyTex(int tex, unsigned char unused, unsigned char index)
 {
-	if (m_pLensFlare)
+	if (tex)
+		m_batch[index].xiFlag0 = (tex & 0x7ff) | 0x22300000;
+	else
+		m_batch[index].xiFlag0 = 0;
+}
+
+void CSky::ChangeWeatherTex(unsigned char weather)
+{
+	int farTex = IsThereTexHandle("far", weather);
+	int nearTex = IsThereTexHandle("near", weather);
+	if (!farTex && !nearTex)
+		return;
+	SetSkyTex(farTex, weather, 0);
+	SetSkyTex(nearTex, weather, 1);
+	SetSkyTex(IsThereTexHandle("up", weather), weather, 2);
+	SetSkyTex(IsThereTexHandle("dn", weather), weather, 3);
+}
+
+void CSky::ClearClouds()
+{
+	if (g_resrcmng && m_cloudTex)
 	{
-		delete m_pLensFlare;
-		m_pLensFlare = NULL;
+		g_resrcmng->Release(m_cloudTex);
+		m_cloudTex = 0;
 	}
-	int num = GOLFDOC()->m_pPolySoup->m_header.pointNum;
-	WPolySoup::sPoint* points = GOLFDOC()->m_pPolySoup->m_point;
+	m_cloudNum = 0;
+	m_activeCloudNum = 0;
+}
+
+void CSky::RegisterCloud(char* name)
+{
+	ClearClouds();
+	m_cloudTex = g_resrcmng->LoadTexture(name, 0, 0, NULL);
+}
+
+void CSky::ShowClouds(bool bShow)
+{
+	if (bShow == true)
+	{
+		for (int i = 0; i < m_cloudNum; ++i)
+			m_cloud[i].bActive = rand() % 2 == 0;
+	}
+	else
+	{
+		for (int i = 0; i < m_cloudNum; ++i)
+			m_cloud[i].bActive = true;
+	}
+}
+
+void CSky::GenerateClouds(int num, float rate)
+{
+	num = Min(num, 50);
+	m_cloudNum = num;
+	if (rate < 1.0f)
+		m_cloudInterval = 10.0f;
+	else
+		m_cloudInterval = 9.0f / rate + 1.0f;
 	for (int i = 0; i < num; ++i)
 	{
-		WPolySoup::sPoint* point = &points[i];
-		if (point && point->type == 2)
-		{
-			if (!m_pLensFlare)
-				m_pLensFlare = new CLensFlare;
-			m_pLensFlare->Init(point->pos);
-			break;
-		}
-	}
-}
-
-void CSky::Process(float delta)
-{
-	m_cloudTime += delta;
-	if (m_cloudTime > m_cloudInterval)
-	{
-		m_cloudTime -= m_cloudInterval;
-		if (m_activeCloudNum < m_cloudNum)
-		{
-			for (int i = 0; i < m_cloudNum; ++i)
-			{
-				if (!m_cloud[i].bActive)
-				{
-					m_cloud[i].pos = WVector(Random(-1.0f, 1.0f), 0.0f, -1.0f) *
-						m_cloudRange * RotMat(Wind().GetGlobalDirection(), 1);
-					m_cloud[i].pos.y = m_cloudHeight;
-					m_cloud[i].bActive = true;
-					m_cloud[i].bFlip = rand() % 2 != 0;
-					++m_activeCloudNum;
-					break;
-				}
-			}
-		}
-	}
-	for (int i = 0; i < m_cloudNum; ++i)
-	{
 		sCloud& cloud = m_cloud[i];
-		if (!cloud.bActive)
-			continue;
-		cloud.pos +=
-			((cloud.windRand + 1.0f) * 3.0f) * Wind().GetGlobalWind() * delta;
-		float dx = cloud.pos.x - g_camera.pivot.x;
-		float dz = cloud.pos.z - g_camera.pivot.z;
-		float alpha =
-			Max(0.0f, 1.0f - sqrtf(dx * dx + dz * dz) / m_cloudFadeRange);
-		if (alpha > 0.5f)
-			cloud.alpha = 255.0f;
+		cloud.size = Random(1.0f, 2.0f) * 256.0f;
+		cloud.tile = rand() % 4;
+		cloud.windRand = Random(-0.1f, 0.1f);
+		cloud.bFlip = rand() % 2 != 0;
+		if (rand() % 2 == 0)
+		{
+			cloud.pos =
+				WVector(Random(-1.0f, 1.0f), 0.0f, Random(-1.0f, 1.0f)) *
+				m_cloudRange;
+			cloud.pos.y = m_cloudHeight;
+			cloud.bActive = true;
+			++m_activeCloudNum;
+		}
 		else
-			cloud.alpha = (alpha + alpha) * 255.0f;
-		WVector pos;
-		pos = cloud.pos - GOLFDOC()->m_pPolySoup->GetBaseModel()->pos;
-		float distance = sqrtf(pos.x * pos.x + pos.z * pos.z);
-		alpha = Max(0.0f, 1.0f - distance / m_cloudRange);
-		if (alpha < 0.1f)
-			cloud.alpha = alpha * cloud.alpha * 10.0f;
-		if (sqrt(2.0) * m_cloudRange < distance)
 		{
+			cloud.pos.y = m_cloudHeight;
 			cloud.bActive = false;
-			--m_activeCloudNum;
 		}
 	}
-	if (m_pStar)
-		m_pStar->Process(delta * 1000.0f);
-	if (m_pMoon)
-		m_pMoon->Process(delta * 1000.0f);
-	if (m_pLensFlare)
-		m_pLensFlare->Process(delta);
-	WVector wind = Wind().GetGlobalWind();
-	WMatrix rot;
-	g_camera.GetRotMatrix(&rot);
-	WVector left;
-	left = WVector(-1.0f, 0.0f, 0.0f) * rot;
-	left.Normalize();
-	wind.Normalize();
-	float dot = left * wind;
-	m_nearAngle += Wind().GetGlobalWind().Magnitude() * dot * delta * 0.005f;
-	if (fabsf(m_nearAngle) >= 360.0f)
-		m_nearAngle = 0.0f;
-	m_upAngle += delta * 0.01f;
-	if (m_upAngle >= 360.0f)
-		m_upAngle = 0.0f;
-}
-
-void CSky::RenderUpAndBottom(WView* view)
-{
-	WMatrix mat;
-	if (m_batch[2].xiFlag0 & 0x7ff)
-	{
-		mat.Reset();
-		mat.Rotate(m_upAngle, 1);
-		mat *= CalcScaleByView(view);
-		mat.pivot = m_pos;
-		m_batch[2].xmW = mat;
-		view->xDrawIndexedTriangles(m_batch[2]);
-	}
-	if (m_batch[3].xiFlag0 & 0x7ff)
-	{
-		mat.Reset();
-		mat *= CalcScaleByView(view);
-		mat.pivot = m_pos;
-		m_batch[3].xmW = mat;
-		view->xDrawIndexedTriangles(m_batch[3]);
-	}
-}
-
-void CSky::RenderFarCylinder(WView* view)
-{
-	if (m_batch[0].xiFlag0 & 0x7ff)
-	{
-		WMatrix mat;
-		mat.Reset();
-		mat *= CalcScaleByView(view);
-		mat.pivot = m_pos;
-		m_batch[0].xmW = mat;
-		view->xDrawIndexedTriangles(m_batch[0]);
-	}
-}
-
-void CSky::RenderBillboardCloud(WView* view)
-{
-	WTVertex vtx[4];
-	WTVertex* quad[5] = { &vtx[0], &vtx[1], &vtx[3], &vtx[2], NULL };
-	for (int i = 0; i < m_cloudNum; ++i)
-	{
-		if (!m_cloud[i].bActive)
-			continue;
-		for (int j = 0; j < 4; ++j)
-		{
-			WVector pos;
-			pos = RotVec(WVector(j & 2 ? 0.5f : -0.5f, j & 1 ? 0.25f : -0.25f,
-							 0.0f),
-					  view->camera) *
-					m_cloud[i].size +
-				m_cloud[i].pos;
-			vtx[j].SetPosition(pos);
-			vtx[j].tu = m_cloud[i].bFlip ? (j & 2 ? 0.0f : 1.0f)
-										 : (j & 2 ? 1.0f : 0.0f);
-			vtx[j].tv = (m_cloud[i].tile + (j & 1 ? 0 : 1)) * 0.25f;
-			vtx[j].diffuse = ((unsigned char)m_cloud[i].alpha << 24) |
-				ModifyColor(m_color, GOLFDOC()->m_bright);
-		}
-		view->DrawPolygonFan(quad, (m_cloudTex & 0x7ff) | 0x20300000, 0x400, 0);
-	}
-}
-
-void CSky::RenderFlatCloud(WView* view)
-{
-	WTVertex vtx[4];
-	WTVertex* quad[5] = { &vtx[0], &vtx[1], &vtx[3], &vtx[2], NULL };
-	for (int i = 0; i < m_cloudNum; ++i)
-	{
-		sCloud& cloud = m_cloud[i];
-		if (!cloud.bActive)
-			continue;
-		for (int j = 0; j < 4; ++j)
-		{
-			WVector pos;
-			pos = WVector(j & 2 ? 0.5f : -0.5f, 0.0f, j & 1 ? 0.25f : -0.25f) *
-					cloud.size +
-				cloud.pos;
-			vtx[j].SetPosition(pos);
-			vtx[j].tu =
-				cloud.bFlip ? (j & 2 ? 0.0f : 1.0f) : (j & 2 ? 1.0f : 0.0f);
-			vtx[j].tv = (cloud.tile + (j & 1 ? 0 : 1)) * 0.25f;
-			vtx[j].diffuse =
-				ModifyColor(m_color, GOLFDOC()->m_bright) | 0xff000000;
-		}
-		view->DrawPolygonFan(quad, (m_cloudTex & 0x7ff) | 0x20300000, 0x400, 0);
-	}
-}
-
-void CSky::RenderNearCylinder(WView* view)
-{
-	if (m_batch[1].xiFlag0 & 0x7ff)
-	{
-		WMatrix mat;
-		mat.Reset();
-		mat.Rotate(m_nearAngle, 1);
-		mat *= CalcScaleByView(view);
-		mat.pivot = m_pos;
-		m_batch[1].xmW = mat;
-		view->xDrawIndexedTriangles(m_batch[1]);
-	}
-}
-
-void CSky::Render(WView* view)
-{
-	float nearClip = view->GetClipNearValue();
-	float farClip = view->GetClipFarValue();
-	view->SetClip(1.0f, CalcClipFarByView(view), false);
-	view->UpdateCamera();
-	m_pos = view->camera.pivot;
-	m_pos.y += m_height;
-	RenderUpAndBottom(view);
-	if (GOLFDOC()->m_gameMode != 0x200 || view->GetReflective())
-	{
-		RenderFarCylinder(view);
-		if (m_pStar)
-		{
-			for (std::map<CFxSpray*, CFxSpray*>::iterator it =
-					 m_pStar->GetSprayList().begin();
-				it != m_pStar->GetSprayList().end(); ++it)
-				(*it).second->Pos() = g_view->camera.pivot;
-			m_pStar->Display(g_view);
-			g_view->Flush(0);
-		}
-		if (m_pMoon)
-		{
-			for (std::map<CFxSpray*, CFxSpray*>::iterator it =
-					 m_pMoon->GetSprayList().begin();
-				it != m_pMoon->GetSprayList().end(); ++it)
-			{
-				CFxSpray* spray = (*it).second;
-				spray->Pos() = g_view->camera.pivot + spray->Vel();
-			}
-			m_pMoon->Display(g_view);
-			g_view->Flush(0);
-		}
-		if (m_pLensFlare && !Doc()->m_golfGame.weather)
-			m_pLensFlare->Render(view);
-		RenderNearCylinder(view);
-		if (GOLFDOC()->m_gameMode != 0x200000)
-		{
-			if (GOLFDOC()->m_gameMode & 0x200)
-				RenderFlatCloud(view);
-			else
-				RenderBillboardCloud(view);
-		}
-	}
-	view->SetClip(nearClip, farClip, false);
-	view->UpdateCamera();
 }
 
 void CSky::GenerateStars(int map)
@@ -818,6 +572,284 @@ void CSky::GenerateMoons()
 	}
 }
 
+void CSky::GenerateLensFlare()
+{
+	if (m_pLensFlare)
+	{
+		delete m_pLensFlare;
+		m_pLensFlare = NULL;
+	}
+	int num = GOLFDOC()->m_pPolySoup->m_header.pointNum;
+	WPolySoup::sPoint* points = GOLFDOC()->m_pPolySoup->m_point;
+	for (int i = 0; i < num; ++i)
+	{
+		WPolySoup::sPoint* point = &points[i];
+		if (point && point->type == 2)
+		{
+			if (!m_pLensFlare)
+				m_pLensFlare = new CLensFlare;
+			m_pLensFlare->Init(point->pos);
+			break;
+		}
+	}
+}
+
+void CSky::ClearSky()
+{
+	switch (GetCurMap())
+	{
+	case 5:
+	case 6:
+		m_pStar->Clear();
+		m_pMoon->Clear();
+		if (m_pStar)
+		{
+			delete m_pStar;
+			m_pStar = NULL;
+		}
+		if (m_pMoon)
+		{
+			delete m_pMoon;
+			m_pMoon = NULL;
+		}
+		break;
+	case 7:
+		m_pMoon->Clear();
+		if (m_pMoon)
+		{
+			delete m_pMoon;
+			m_pMoon = NULL;
+		}
+		break;
+	}
+}
+
+void CSky::Process(float delta)
+{
+	m_cloudTime += delta;
+	if (m_cloudTime > m_cloudInterval)
+	{
+		m_cloudTime -= m_cloudInterval;
+		if (m_activeCloudNum < m_cloudNum)
+		{
+			for (int i = 0; i < m_cloudNum; ++i)
+			{
+				if (!m_cloud[i].bActive)
+				{
+					m_cloud[i].pos = WVector(Random(-1.0f, 1.0f), 0.0f, -1.0f) *
+						m_cloudRange * RotMat(Wind().GetGlobalDirection(), 1);
+					m_cloud[i].pos.y = m_cloudHeight;
+					m_cloud[i].bActive = true;
+					m_cloud[i].bFlip = rand() % 2 != 0;
+					++m_activeCloudNum;
+					break;
+				}
+			}
+		}
+	}
+	for (int i = 0; i < m_cloudNum; ++i)
+	{
+		sCloud& cloud = m_cloud[i];
+		if (!cloud.bActive)
+			continue;
+		cloud.pos +=
+			((cloud.windRand + 1.0f) * 3.0f) * Wind().GetGlobalWind() * delta;
+		float dx = cloud.pos.x - g_camera.pivot.x;
+		float dz = cloud.pos.z - g_camera.pivot.z;
+		float alpha =
+			Max(0.0f, 1.0f - sqrtf(dx * dx + dz * dz) / m_cloudFadeRange);
+		if (alpha > 0.5f)
+			cloud.alpha = 255.0f;
+		else
+			cloud.alpha = (alpha + alpha) * 255.0f;
+		WVector pos;
+		pos = cloud.pos - GOLFDOC()->m_pPolySoup->GetBaseModel()->pos;
+		float distance = sqrtf(pos.x * pos.x + pos.z * pos.z);
+		alpha = Max(0.0f, 1.0f - distance / m_cloudRange);
+		if (alpha < 0.1f)
+			cloud.alpha = alpha * cloud.alpha * 10.0f;
+		if (sqrt(2.0) * m_cloudRange < distance)
+		{
+			cloud.bActive = false;
+			--m_activeCloudNum;
+		}
+	}
+	if (m_pStar)
+		m_pStar->Process(delta * 1000.0f);
+	if (m_pMoon)
+		m_pMoon->Process(delta * 1000.0f);
+	if (m_pLensFlare)
+		m_pLensFlare->Process(delta);
+	WVector wind = Wind().GetGlobalWind();
+	WMatrix rot;
+	g_camera.GetRotMatrix(&rot);
+	WVector left;
+	left = WVector(-1.0f, 0.0f, 0.0f) * rot;
+	left.Normalize();
+	wind.Normalize();
+	float dot = left * wind;
+	m_nearAngle += Wind().GetGlobalWind().Magnitude() * dot * delta * 0.005f;
+	if (fabsf(m_nearAngle) >= 360.0f)
+		m_nearAngle = 0.0f;
+	m_upAngle += delta * 0.01f;
+	if (m_upAngle >= 360.0f)
+		m_upAngle = 0.0f;
+}
+
+void CSky::Render(WView* view)
+{
+	float nearClip = view->GetClipNearValue();
+	float farClip = view->GetClipFarValue();
+	view->SetClip(1.0f, CalcClipFarByView(view), false);
+	view->UpdateCamera();
+	m_pos = view->camera.pivot;
+	m_pos.y += m_height;
+	RenderUpAndBottom(view);
+	if (GOLFDOC()->m_gameMode != 0x200 || view->GetReflective())
+	{
+		RenderFarCylinder(view);
+		if (m_pStar)
+		{
+			for (std::map<CFxSpray*, CFxSpray*>::iterator it =
+					 m_pStar->GetSprayList().begin();
+				it != m_pStar->GetSprayList().end(); ++it)
+				(*it).second->Pos() = g_view->camera.pivot;
+			m_pStar->Display(g_view);
+			g_view->Flush(0);
+		}
+		if (m_pMoon)
+		{
+			for (std::map<CFxSpray*, CFxSpray*>::iterator it =
+					 m_pMoon->GetSprayList().begin();
+				it != m_pMoon->GetSprayList().end(); ++it)
+			{
+				CFxSpray* spray = (*it).second;
+				spray->Pos() = g_view->camera.pivot + spray->Vel();
+			}
+			m_pMoon->Display(g_view);
+			g_view->Flush(0);
+		}
+		if (m_pLensFlare && !Doc()->m_golfGame.weather)
+			m_pLensFlare->Render(view);
+		RenderNearCylinder(view);
+		if (GOLFDOC()->m_gameMode != 0x200000)
+		{
+			if (GOLFDOC()->m_gameMode & 0x200)
+				RenderFlatCloud(view);
+			else
+				RenderBillboardCloud(view);
+		}
+	}
+	view->SetClip(nearClip, farClip, false);
+	view->UpdateCamera();
+}
+
+void CSky::RenderUpAndBottom(WView* view)
+{
+	WMatrix mat;
+	if (m_batch[2].xiFlag0 & 0x7ff)
+	{
+		mat.Reset();
+		mat.Rotate(m_upAngle, 1);
+		mat *= CalcScaleByView(view);
+		mat.pivot = m_pos;
+		m_batch[2].xmW = mat;
+		view->xDrawIndexedTriangles(m_batch[2]);
+	}
+	if (m_batch[3].xiFlag0 & 0x7ff)
+	{
+		mat.Reset();
+		mat *= CalcScaleByView(view);
+		mat.pivot = m_pos;
+		m_batch[3].xmW = mat;
+		view->xDrawIndexedTriangles(m_batch[3]);
+	}
+}
+
+void CSky::RenderFarCylinder(WView* view)
+{
+	if (m_batch[0].xiFlag0 & 0x7ff)
+	{
+		WMatrix mat;
+		mat.Reset();
+		mat *= CalcScaleByView(view);
+		mat.pivot = m_pos;
+		m_batch[0].xmW = mat;
+		view->xDrawIndexedTriangles(m_batch[0]);
+	}
+}
+
+void CSky::RenderBillboardCloud(WView* view)
+{
+	WTVertex vtx[4];
+	WTVertex* quad[5] = { &vtx[0], &vtx[1], &vtx[3], &vtx[2], NULL };
+	for (int i = 0; i < m_cloudNum; ++i)
+	{
+		if (!m_cloud[i].bActive)
+			continue;
+		for (int j = 0; j < 4; ++j)
+		{
+			WVector pos;
+			pos = RotVec(WVector(j & 2 ? 0.5f : -0.5f, j & 1 ? 0.25f : -0.25f,
+							 0.0f),
+					  view->camera) *
+					m_cloud[i].size +
+				m_cloud[i].pos;
+			vtx[j].SetPosition(pos);
+			vtx[j].tu = m_cloud[i].bFlip ? (j & 2 ? 0.0f : 1.0f)
+										 : (j & 2 ? 1.0f : 0.0f);
+			vtx[j].tv = (m_cloud[i].tile + (j & 1 ? 0 : 1)) * 0.25f;
+			vtx[j].diffuse = ((unsigned char)m_cloud[i].alpha << 24) |
+				ModifyColor(m_color, GOLFDOC()->m_bright);
+		}
+		view->DrawPolygonFan(quad, (m_cloudTex & 0x7ff) | 0x20300000, 0x400, 0);
+	}
+}
+
+void CSky::RenderFlatCloud(WView* view)
+{
+	WTVertex vtx[4];
+	WTVertex* quad[5] = { &vtx[0], &vtx[1], &vtx[3], &vtx[2], NULL };
+	for (int i = 0; i < m_cloudNum; ++i)
+	{
+		sCloud& cloud = m_cloud[i];
+		if (!cloud.bActive)
+			continue;
+		for (int j = 0; j < 4; ++j)
+		{
+			WVector pos;
+			pos = WVector(j & 2 ? 0.5f : -0.5f, 0.0f, j & 1 ? 0.25f : -0.25f) *
+					cloud.size +
+				cloud.pos;
+			vtx[j].SetPosition(pos);
+			vtx[j].tu =
+				cloud.bFlip ? (j & 2 ? 0.0f : 1.0f) : (j & 2 ? 1.0f : 0.0f);
+			vtx[j].tv = (cloud.tile + (j & 1 ? 0 : 1)) * 0.25f;
+			vtx[j].diffuse =
+				ModifyColor(m_color, GOLFDOC()->m_bright) | 0xff000000;
+		}
+		view->DrawPolygonFan(quad, (m_cloudTex & 0x7ff) | 0x20300000, 0x400, 0);
+	}
+}
+
+void CSky::RenderNearCylinder(WView* view)
+{
+	if (m_batch[1].xiFlag0 & 0x7ff)
+	{
+		WMatrix mat;
+		mat.Reset();
+		mat.Rotate(m_nearAngle, 1);
+		mat *= CalcScaleByView(view);
+		mat.pivot = m_pos;
+		m_batch[1].xmW = mat;
+		view->xDrawIndexedTriangles(m_batch[1]);
+	}
+}
+
+void CSky::UpdateBright()
+{
+}
+
 float CSky::CalcScaleByView(WView* view) const
 {
 	if (view->GetProjectionMode() == WView::PARALLEL)
@@ -830,36 +862,4 @@ float CSky::CalcClipFarByView(WView* view) const
 	if (view->GetProjectionMode() == WView::PARALLEL)
 		return CalcScaleByView(view) * 1000.0f;
 	return view->GetClipFarValue();
-}
-
-CSky::CSky()
-{
-	m_pLensFlare = NULL;
-	m_pStar = NULL;
-	m_pMoon = NULL;
-	m_cloudTex = 0;
-	m_cloudNum = 0;
-	m_activeCloudNum = 0;
-	m_cloudInterval = 0.0f;
-	m_cloudTime = 0.0f;
-	m_height = 0.0f;
-	m_turn = 0.0f;
-	m_cloudRange = 1120.0f;
-	m_cloudFadeRange = 1600.0f;
-	m_cloudHeight = 416.0f;
-	m_color = 0xffffffff;
-	m_farDiv = 2;
-	m_nearDiv = 2;
-	memset(m_farTex, 0, sizeof(m_farTex));
-	memset(m_nearTex, 0, sizeof(m_nearTex));
-	memset(m_upTex, 0, sizeof(m_upTex));
-	memset(m_dnTex, 0, sizeof(m_dnTex));
-	m_bLoaded = 0;
-	m_upAngle = 0.0f;
-	m_nearAngle = 0.0f;
-}
-
-CSky::~CSky()
-{
-	Clear();
 }

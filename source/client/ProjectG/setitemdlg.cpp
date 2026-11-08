@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "setitemdlg.h"
 #include "frarea.h"
 #include "fredit.h"

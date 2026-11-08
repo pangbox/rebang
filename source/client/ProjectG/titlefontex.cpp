@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "projectg.h"
 #include "wfont.h"
 #include "titlefontex.h"

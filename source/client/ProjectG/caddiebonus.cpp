@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "golfdoc.h"
 #include "bonusticket.h"
 #include "caddiebonus.h"

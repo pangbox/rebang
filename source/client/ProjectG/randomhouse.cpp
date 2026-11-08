@@ -40,7 +40,6 @@
 // and
 //     http://www.acm.org/pubs/citations/journals/tomacs/1998-8-1/p3-matsumoto/
 
-#include "minatl.h"
 #include "randomhouse.h"
 
 #define N 624

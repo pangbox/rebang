@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "mailboxdlg.h"
 #include "notedlg.h"
 #include "frlistbox.h"

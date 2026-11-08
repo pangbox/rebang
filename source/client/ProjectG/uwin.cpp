@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "uwin.h"
 #include <sys/stat.h>
 #include <io.h>

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "frbutton.h"
 #include "actor.h"
 #include "gatewayactor.h"

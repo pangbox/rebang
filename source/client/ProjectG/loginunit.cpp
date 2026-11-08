@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "loginunit.h"
 #include "networksystem.h"
 #include "projectg.h"

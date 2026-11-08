@@ -1,6 +1,12 @@
 #pragma once
 
 class WRect;
+enum eEquipSkin;
+enum eGameServerProperty;
+namespace IFF_STRUCT
+{
+	struct sPart;
+}
 
 namespace S5
 {
@@ -30,21 +36,59 @@ namespace S5
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1 };
 
-		bool CalculateUVPos(WRect& rect, int imageWidth, int imageHeight,
-			float cellWidth, float cellHeight, int index);
-
+		void SetServerProperty(unsigned long property);
+		unsigned long GetServerProperty();
+		int EncodingUrl(const char* source, char* dest);
+		int DecodingUrl(const char* source, char* dest);
+		int GetEquipSkinIndex(eEquipSkin& index, unsigned long typeId);
 		int Base64Encode(char* pSrc, int nLength, char* pDst);
 		int Base64Decode(char* pSrc, unsigned char* pDst, int nLength);
-		unsigned long GetServerProperty();
+		int IsLunarYear(unsigned short year);
+		unsigned short GetMonthlyDayCount(unsigned short year,
+			unsigned short month);
 		int GetHoleinCoinCount(int count, int type);
+		int GetWindowBorderSize(HWND window);
+		int GetWindowTitleBarSize(HWND window);
+		bool IsInRect(const RECT& rect, int x, int y);
+		bool IsOverlappedRect(const RECT& a, const RECT& b);
+		bool CalculateUVPos(WRect& rect, int imageWidth, int imageHeight,
+			float cellWidth, float cellHeight, int index);
 		void SendCutInPacket(unsigned long uid, short type,
 			unsigned long gameMode, unsigned long charTid);
-		void SetServerProperty(unsigned long property);
+		unsigned long GetNickColor(unsigned long identity, int premium,
+			unsigned short flag);
+		bool IsEventServerControl(eGameServerProperty property);
 		int ErasePartsCardAll(unsigned long partGuid,
 			std::list<unsigned long>& cards);
+		bool FindVisibleWindowFromExStyle(unsigned long style,
+			std::vector<HWND>& windows);
 	}
 
+	bool UnderCatogory(unsigned long charTid, unsigned long category,
+		IFF_STRUCT::sPart* part);
+	void GetLine(char* source, char* dest);
+	bool UnderCategory(unsigned long charTid, unsigned long partTid,
+		unsigned long category);
+	bool IsUsableCalipers();
 	bool ISCutinItem(unsigned long typeId);
+
+	inline void EnableFreshWindow(FrWnd* wnd, bool enable)
+	{
+		wnd->SetVisible(enable);
+		wnd->Enable(enable);
+	}
+
+	inline void EnableFreshWindow(FrWnd* wnd)
+	{
+		wnd->SetVisible(true);
+		wnd->Enable(true);
+	}
+
+	inline void DisableFreshWindow(FrWnd* wnd)
+	{
+		wnd->SetVisible(false);
+		wnd->Enable(false);
+	}
 }
 
 namespace _util
@@ -52,5 +96,6 @@ namespace _util
 	const char* GetAvatarServerServiceMessage(int code);
 	const char* GetNormalServerServiceMessage(int code);
 	bool IsAvatarChatServer(int property);
+	void GenerateRandomTidParts(unsigned long charTid,
+		unsigned long* const parts, unsigned long* const auxiliary);
 }
-ILNUM_UT

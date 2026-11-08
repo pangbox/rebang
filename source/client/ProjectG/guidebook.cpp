@@ -7,6 +7,7 @@ extern WResourceManager* g_resrcmng;
 extern WView* g_view;
 
 IMPLEMENT_OBJECT(FrGuideBookDlg, FrForm)
+
 BEGIN_FRESH_MSGMAP(FrGuideBookDlg, FrForm)
 ON_FRESH_VI("content", FRCMD_INIT, FrGuideBookDlg::OnContentInit)
 ON_FRESH_VI("content", FRCMD_OWNERDRAW, FrGuideBookDlg::OnContentOwnerDraw)
@@ -72,6 +73,40 @@ void FrGuideBookDlg::OpenChapter(int chapter)
 	}
 }
 
+void FrGuideBookDlg::OnContentInit(int param)
+{
+	m_pContent = DYNAMIC_CAST(FrArea, (IObject*)param);
+}
+
+void FrGuideBookDlg::OnContentOwnerDraw(int param)
+{
+	if (m_pPage)
+	{
+		WRect src(0, 0, 1, 1);
+		WRect rect = m_pContent->GetRect();
+		rect.x += (int)(((float)(rect.w - m_pPage->GetWidth()) + 1) * .5f);
+		rect.y += (int)((rect.h - m_pPage->GetHeight() + 1) * .5f);
+		rect.w = m_pPage->GetWidth();
+		rect.h = m_pPage->GetHeight();
+		m_pPage->Render(g_view, src, rect, 0, 0xffffffff, 0, 0);
+	}
+}
+
+void FrGuideBookDlg::OnPrevInit(int param)
+{
+	m_pPrev = DYNAMIC_CAST(FrButton, (IObject*)param);
+	m_pPrev->Enable(false);
+	m_chapter = 1;
+	m_page = 1;
+	if (g_resrcmng && m_pPage)
+	{
+		g_resrcmng->Release(m_pPage);
+		m_pPage = NULL;
+	}
+	m_pPage = g_resrcmng->GetOverlay(MakeStr("%d_%d.tga", m_chapter, m_page),
+		0x80000000);
+}
+
 void FrGuideBookDlg::OnPrevBtnUp()
 {
 	int chapter = m_chapter;
@@ -103,6 +138,11 @@ void FrGuideBookDlg::OnPrevBtnUp()
 			}
 		}
 	}
+}
+
+void FrGuideBookDlg::OnNextInit(int param)
+{
+	m_pNext = DYNAMIC_CAST(FrButton, (IObject*)param);
 }
 
 void FrGuideBookDlg::OnNextBtnUp()
@@ -144,90 +184,6 @@ void FrGuideBookDlg::OnNextBtnUp()
 		else
 			m_pNext->Enable(false);
 	}
-}
-
-void FrGuideBookDlg::OnTip1BtnUp()
-{
-	OpenChapter(1);
-}
-
-void FrGuideBookDlg::OnTip2BtnUp()
-{
-	OpenChapter(2);
-}
-
-void FrGuideBookDlg::OnTip3BtnUp()
-{
-	OpenChapter(3);
-}
-
-void FrGuideBookDlg::OnTip4BtnUp()
-{
-	OpenChapter(4);
-}
-
-void FrGuideBookDlg::OnTip5BtnUp()
-{
-	OpenChapter(5);
-}
-
-void FrGuideBookDlg::OnTip6BtnUp()
-{
-	OpenChapter(6);
-}
-
-void FrGuideBookDlg::OnTip7BtnUp()
-{
-	OpenChapter(7);
-}
-
-void FrGuideBookDlg::OnTip8BtnUp()
-{
-	OpenChapter(8);
-}
-
-void FrGuideBookDlg::OnTip9BtnUp()
-{
-	OpenChapter(9);
-}
-
-void FrGuideBookDlg::OnContentInit(int param)
-{
-	m_pContent = DYNAMIC_CAST(FrArea, (IObject*)param);
-}
-
-void FrGuideBookDlg::OnContentOwnerDraw(int param)
-{
-	if (m_pPage)
-	{
-		WRect src(0, 0, 1, 1);
-		WRect rect = m_pContent->GetRect();
-		rect.x += (int)(((float)(rect.w - m_pPage->GetWidth()) + 1) * .5f);
-		rect.y += (int)((rect.h - m_pPage->GetHeight() + 1) * .5f);
-		rect.w = m_pPage->GetWidth();
-		rect.h = m_pPage->GetHeight();
-		m_pPage->Render(g_view, src, rect, 0, 0xffffffff, 0, 0);
-	}
-}
-
-void FrGuideBookDlg::OnPrevInit(int param)
-{
-	m_pPrev = DYNAMIC_CAST(FrButton, (IObject*)param);
-	m_pPrev->Enable(false);
-	m_chapter = 1;
-	m_page = 1;
-	if (g_resrcmng && m_pPage)
-	{
-		g_resrcmng->Release(m_pPage);
-		m_pPage = NULL;
-	}
-	m_pPage = g_resrcmng->GetOverlay(MakeStr("%d_%d.tga", m_chapter, m_page),
-		0x80000000);
-}
-
-void FrGuideBookDlg::OnNextInit(int param)
-{
-	m_pNext = DYNAMIC_CAST(FrButton, (IObject*)param);
 }
 
 void FrGuideBookDlg::OnTip1Init(int param)
@@ -276,19 +232,57 @@ void FrGuideBookDlg::OnTip9Init(int param)
 	m_pTip[8] = DYNAMIC_CAST(FrTextButton, (IObject*)param);
 }
 
+void FrGuideBookDlg::OnTip1BtnUp()
+{
+	OpenChapter(1);
+}
+
+void FrGuideBookDlg::OnTip2BtnUp()
+{
+	OpenChapter(2);
+}
+
+void FrGuideBookDlg::OnTip3BtnUp()
+{
+	OpenChapter(3);
+}
+
+void FrGuideBookDlg::OnTip4BtnUp()
+{
+	OpenChapter(4);
+}
+
+void FrGuideBookDlg::OnTip5BtnUp()
+{
+	OpenChapter(5);
+}
+
+void FrGuideBookDlg::OnTip6BtnUp()
+{
+	OpenChapter(6);
+}
+
+void FrGuideBookDlg::OnTip7BtnUp()
+{
+	OpenChapter(7);
+}
+
+void FrGuideBookDlg::OnTip8BtnUp()
+{
+	OpenChapter(8);
+}
+
+void FrGuideBookDlg::OnTip9BtnUp()
+{
+	OpenChapter(9);
+}
+
 IMPLEMENT_ACTOR(CGuideBook, IActor)
 
 CGuideBook::CGuideBook()
 	: m_pDlg(NULL)
 {
 	m_dispPriority = DISP_PRIORITY_4;
-}
-
-bool CGuideBook::OnDlgResult(int result, FrForm* form)
-{
-	m_pDlg = NULL;
-	CMouseCursor::Instance()->Enable(CMouseCursor::AREA_AUXMENU_TIP, true);
-	return true;
 }
 
 void CGuideBook::HandleMsg(const MsgObject& msg)
@@ -318,4 +312,11 @@ void CGuideBook::HandleMsg(const MsgObject& msg)
 		*(bool*)msg.param1 = m_pDlg != NULL;
 		break;
 	}
+}
+
+bool CGuideBook::OnDlgResult(int result, FrForm* form)
+{
+	m_pDlg = NULL;
+	CMouseCursor::Instance()->Enable(CMouseCursor::AREA_AUXMENU_TIP, true);
+	return true;
 }

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "csharedmemory.h"
 
 cIPCMemServer::cIPCMemServer()

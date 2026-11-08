@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "giftalarmdlg.h"
 #include "shareddoc.h"
 #include "treasure.h"

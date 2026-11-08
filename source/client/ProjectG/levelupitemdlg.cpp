@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "levelupitemdlg.h"
 #include "projectg.h"
 #include "wfont.h"

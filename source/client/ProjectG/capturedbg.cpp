@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "capturedbg.h"
 #include "projectg.h"
 

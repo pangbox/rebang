@@ -226,6 +226,3 @@ protected:
 	float m_td4Tooltip;
 	CTextToolTip* m_pTextTip;
 };
-// clang-format off
-namespace ILNUM_MC { typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; } // n=13
-// clang-format on

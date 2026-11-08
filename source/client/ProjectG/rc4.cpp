@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "rc4.h"
 #include <stdlib.h>
 

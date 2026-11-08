@@ -29,8 +29,6 @@ class CRiver : public ntRiver
 public:
 	struct sRiver
 	{
-		sRiver() { }
-
 		WVector pos[2];
 		float u[2];
 	};
@@ -60,8 +58,6 @@ class ntRiver_Lava : public ntRiver
 public:
 	struct sRiver
 	{
-		sRiver() { }
-
 		WVector pos[2];
 		float u[2];
 	};
@@ -91,8 +87,6 @@ class CRiver_ex : public ntRiver
 public:
 	struct sRiver
 	{
-		sRiver() { }
-
 		WVector pos[2];
 		float u[2];
 	};

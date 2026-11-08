@@ -2,7 +2,6 @@
 #include "cardremove.h"
 #include "realmyroommain.h"
 #include "ucclibrary.h"
-#include "minatl.h"
 extern Fresh* g_pFresh;
 
 void DrawPartsSlot(FrGraphicInterface* device, sItemInfo* item,

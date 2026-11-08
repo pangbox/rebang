@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "mousecursor.h"
 #include "club.h"
 #include "quitwindow.h"
@@ -20,9 +19,11 @@ class CGroundPropt
 public:
 	CGroundPropt(const char* name);
 	~CGroundPropt();
+	void InitGroundTip(const char** names);
 	void DrawGroundTip();
 	void SelectGroundTip();
 	void SetGroundType(const char* type) { strcpy(m_groundtype, type); }
+	const char* GetGroundType();
 	CSimpleUI* GetGroundTip() { return m_groundtip; }
 
 private:
@@ -112,6 +113,27 @@ CMouseCursor::~CMouseCursor()
 	{
 		delete m_pGroundPt;
 		m_pGroundPt = NULL;
+	}
+}
+
+void CMouseCursor::SetBoundArea(WRect* bound)
+{
+	if (!bound)
+	{
+		if (m_bound)
+		{
+			delete m_bound;
+			m_bound = NULL;
+		}
+	}
+	else
+	{
+		if (!m_bound)
+			m_bound = new WRect;
+		m_bound->x = bound->x;
+		m_bound->y = bound->y;
+		m_bound->y = bound->y;
+		m_bound->y = bound->y;
 	}
 }
 
@@ -250,75 +272,12 @@ int CMouseCursor::CheckArea()
 	return UNSELECT;
 }
 
-void CMouseCursor::SetBoundArea(WRect* bound)
-{
-	if (!bound)
-	{
-		if (m_bound)
-		{
-			delete m_bound;
-			m_bound = NULL;
-		}
-	}
-	else
-	{
-		if (!m_bound)
-			m_bound = new WRect;
-		m_bound->x = bound->x;
-		m_bound->y = bound->y;
-		m_bound->y = bound->y;
-		m_bound->y = bound->y;
-	}
-}
-
 int CMouseCursor::TestCheck()
 {
 	m_validButton[0] = true;
 	m_validButton[1] = true;
 	m_area = AREA_NORMAL;
 	return UNSELECT;
-}
-
-bool CMouseCursor::IsInclude(float x, float y, float w, float h, bool relative)
-{
-	if (m_pointer.x >= x && m_pointer.x <= (relative ? 0 : x) + w &&
-		m_pointer.y >= y && m_pointer.y <= (relative ? 0 : y) + h)
-		return true;
-	return false;
-}
-
-bool CMouseCursor::SetArea(int area)
-{
-	if (m_bArea[area])
-	{
-		m_area = area;
-		return true;
-	}
-	return false;
-}
-
-int CMouseCursor::GetCursor()
-{
-	return m_bRightButton ? BOTH : m_cursor;
-}
-
-void CMouseCursor::SetCursor(int cursor)
-{
-	if (cursor < MOUSE_MAX_NUM)
-	{
-		m_bRightButton = false;
-		m_cursor = cursor;
-	}
-	else
-	{
-		m_bRightButton = true;
-		m_cursor = ROLL_OVER;
-	}
-}
-
-CGroundPropt::CGroundPropt(const char* name)
-{
-	m_groundtip = new CSimpleUI(name);
 }
 
 bool CMouseCursor::ChildWindowCallback(FrWnd* wnd, void* param)
@@ -365,242 +324,6 @@ hit:
 	return true;
 }
 
-float CMouseCursor::RayTrace4Ground()
-{
-	WVector start;
-	g_view->GetScreen2World(m_pointer.x, m_pointer.y, start, m_ray);
-	m_ray.Normalize();
-	m_ray *= 300.0f;
-	if (Wabs(m_ray.y) < g_EPSILON)
-		return 1;
-	m_rayRatio = g_camera.pivot.y / m_ray.y * -1.0f;
-	WVector point = g_camera.pivot + m_ray * m_rayRatio;
-	if (point.x > m_groundArea.x && point.x < m_groundArea.w &&
-		point.z > m_groundArea.y && point.z < m_groundArea.h)
-		return m_rayRatio;
-	return 1;
-}
-
-void CMouseCursor::SetActive(bool active)
-{
-	if (active)
-	{
-		m_pointer = m_oldPointer;
-		m_stopDuration = 0;
-		m_cursor = UNSELECT;
-		g_input->SetMousePoint(m_pointer.x, m_pointer.y);
-		m_show = true;
-	}
-	else
-	{
-		m_oldPointer = m_pointer;
-		m_area = AREA_NORMAL;
-		m_cursor = UNSELECT;
-	}
-	m_active = active;
-}
-
-void CMouseCursor::Store()
-{
-	m_oldPointer = m_pointer;
-}
-
-bool CMouseCursor::InArea(const WRect& rect)
-{
-	if (CQuitWindow::IsInstantiated() && CQuitWindow::Instance()->IsActive())
-		return false;
-	if (m_pointer.x > rect.x && m_pointer.x < rect.x + rect.w &&
-		m_pointer.y > rect.y && m_pointer.y < rect.y + rect.h)
-	{
-		m_cursor = ROLL_OVER;
-		return true;
-	}
-	return false;
-}
-
-void CMouseCursor::Display()
-{
-	if (!m_bShow)
-		return;
-	if (IsLocalContent(S4_REPLAY_SYSTEM) && Doc()->m_playingMode == 2 &&
-		Doc()->m_replayState == 7)
-		return;
-	if (!m_active && !m_tempActive)
-		return;
-	if (!m_show)
-		return;
-	if (m_mode == SCREEN_GAME && GOLFDOC() && GOLFDOC()->m_gameMode == 0x400)
-		return;
-	WRect dest(m_pointer.x, m_pointer.y, m_overlay[m_cursor].len,
-		m_overlay[m_cursor].len);
-	switch (m_cursor)
-	{
-	case UP:
-		dest.y -= 4;
-		break;
-	case DOWN:
-		dest.y -= 28;
-		break;
-	}
-	if (GOLFDOC() && Doc()->m_golfGame.gameType != 2 &&
-		GOLFDOC()->m_gameMode == 0x200 && m_bTerrainTooltip &&
-		!IS_EXACTKINDOF(CRealMyRoomTask, AfxGetTask()))
-	{
-		if ((m_area == AREA_NORMAL || m_area == AREA_RANK) && m_pGroundPt &&
-			!COption::Instance()->GetQuitWindowed())
-			m_pGroundPt->DrawGroundTip();
-	}
-	m_overlay[m_cursor].overlay->Render(g_view,
-		WRect(m_frame / m_overlay[m_cursor].w * dest.w, 0.0f,
-			dest.w / m_overlay[m_cursor].w, dest.h / m_overlay[m_cursor].h),
-		dest, 0x2080000, 0xffffffff, 0, 0);
-	FrGraphicInterface* device = g_pFresh->GetManager()->GetGDI();
-	if (m_bRightButton && MESSENGER()->IsVisible() &&
-		MESSENGER()->m_dlgRect.IsInRect(m_pointer.x, m_pointer.y))
-	{
-		const Bitmap* bitmap =
-			g_pFresh->GetManager()->GetBitmap("MESSENGER", "mouse_right_btn");
-		if (bitmap)
-			device->DrawTexture(bitmap,
-				WRect(m_pointer.x + 2, m_pointer.y + 12, (float)bitmap->Width(),
-					(float)bitmap->Height()),
-				0xffffffff, 0);
-	}
-	else if (m_bRightButton)
-	{
-		const Bitmap* bitmap =
-			g_pFresh->GetManager()->GetBitmap("NEW_ICON", "mouse_right_button");
-		if (bitmap)
-			device->DrawTexture(bitmap,
-				WRect(m_pointer.x + 2, m_pointer.y + 12, (float)bitmap->Width(),
-					(float)bitmap->Height()),
-				0xffffffff, 0);
-	}
-}
-
-void CMouseCursor::SetCamMode(bool mode)
-{
-	m_camMode = mode;
-	if (mode)
-	{
-		ForceMove(g_view->GetWidth() * 0.65f, g_view->GetHeight() - 150, 0.13f);
-		m_show = true;
-		m_stopDuration = 0;
-		m_cursor = UNSELECT;
-	}
-}
-
-void CMouseCursor::ForceMove(float x, float y, float duration)
-{
-	m_show = true;
-	m_stopDuration = 0;
-	if (duration < 0)
-	{
-		g_input->SetMousePoint(x, y);
-		m_pointer.x = x;
-		m_pointer.y = y;
-		m_cursor = UNSELECT;
-		m_area = AREA_NORMAL;
-	}
-	else
-	{
-		m_target.x = x;
-		m_target.y = y;
-		m_delta = m_pointer - m_target;
-		m_cursor = UNSELECT;
-		m_area = AREA_NORMAL;
-		m_forceMoving = 1;
-		m_forceFactor = 1 / duration;
-	}
-}
-
-CGroundPropt::~CGroundPropt()
-{
-	if (m_groundtip)
-	{
-		delete m_groundtip;
-		m_groundtip = NULL;
-	}
-}
-
-void CGroundPropt::DrawGroundTip()
-{
-	if (m_groundtip)
-	{
-		m_groundtip->SetColor(0xffffffff);
-		float x = g_input->GetMousePoint().x + 3;
-		float y = g_input->GetMousePoint().y + 10;
-		if (x >= g_view->GetWidth() - 90)
-			x = g_view->GetWidth() - 90;
-		if (y >= g_view->GetHeight() - 25)
-			y = g_view->GetHeight() - 25;
-		m_groundtip->Render(m_groundtype, x, y, 1, 0);
-	}
-}
-
-void CGroundPropt::SelectGroundTip()
-{
-	WVector start, ray;
-	WVector mouse = g_input->GetMousePoint();
-	g_view->GetScreen2World(mouse.x, mouse.y, start, ray);
-	WVector point;
-	point = GetPVS().GetRayIntersection(start, ray);
-	if (GOLFDOC()->m_pPolySoup->IsOutOfBound(point))
-	{
-		strcpy(m_groundtype, "OB");
-		return;
-	}
-	CGolfBall::eWater water = (CGolfBall::eWater)0;
-	switch (GetPVS().GetGroundType(point, false, &water))
-	{
-	case 1:
-		strcpy(m_groundtype, "Fairway");
-		break;
-	case 4:
-		strcpy(m_groundtype, "Rough");
-		break;
-	case 6:
-		strcpy(m_groundtype, "Rough");
-		break;
-	case 2:
-		strcpy(m_groundtype, "Green");
-		break;
-	case 3:
-		strcpy(m_groundtype, "Bunker");
-		break;
-	case 13:
-		strcpy(m_groundtype, "Rough");
-		break;
-	case 7:
-		strcpy(m_groundtype, "Ice");
-		break;
-	case 8:
-		strcpy(m_groundtype, "Vector");
-		break;
-	case 9:
-		strcpy(m_groundtype, "Water");
-		break;
-	case 10:
-		if (water == 0 || water == 1)
-			strcpy(m_groundtype, "OB");
-		else
-			strcpy(m_groundtype, "WaterHazard");
-		break;
-	case 11:
-		strcpy(m_groundtype, "Sand");
-		break;
-	case 12:
-		strcpy(m_groundtype, "Rough");
-		break;
-	case 14:
-		strcpy(m_groundtype, "Water");
-		break;
-	default:
-		strcpy(m_groundtype, "Rough");
-		break;
-	}
-}
-
 int CMouseCursor::ChatCheck()
 {
 	if (CQuitWindow::IsInstantiated() && CQuitWindow::Instance()->IsActive())
@@ -630,6 +353,30 @@ int CMouseCursor::ChatCheck()
 		return cursor;
 	m_area = AREA_NORMAL;
 	return UNSELECT;
+}
+
+float CMouseCursor::RayTrace4Ground()
+{
+	WVector start;
+	g_view->GetScreen2World(m_pointer.x, m_pointer.y, start, m_ray);
+	m_ray.Normalize();
+	m_ray *= 300.0f;
+	if (Wabs(m_ray.y) < g_EPSILON)
+		return 1;
+	m_rayRatio = g_camera.pivot.y / m_ray.y * -1.0f;
+	WVector point = g_camera.pivot + m_ray * m_rayRatio;
+	if (point.x > m_groundArea.x && point.x < m_groundArea.w &&
+		point.z > m_groundArea.y && point.z < m_groundArea.h)
+		return m_rayRatio;
+	return 1;
+}
+
+bool CMouseCursor::IsInclude(float x, float y, float w, float h, bool relative)
+{
+	if (m_pointer.x >= x && m_pointer.x <= (relative ? 0 : x) + w &&
+		m_pointer.y >= y && m_pointer.y <= (relative ? 0 : y) + h)
+		return true;
+	return false;
 }
 
 int CMouseCursor::GameCheck()
@@ -943,4 +690,258 @@ int CMouseCursor::GameCheck()
 	m_validButton[1] = false;
 	m_area = AREA_NORMAL;
 	return UNSELECT;
+}
+
+bool CMouseCursor::SetArea(int area)
+{
+	if (m_bArea[area])
+	{
+		m_area = area;
+		return true;
+	}
+	return false;
+}
+
+void CMouseCursor::Display()
+{
+	if (!m_bShow)
+		return;
+	if (IsLocalContent(S4_REPLAY_SYSTEM) && Doc()->m_playingMode == 2 &&
+		Doc()->m_replayState == 7)
+		return;
+	if (!m_active && !m_tempActive)
+		return;
+	if (!m_show)
+		return;
+	if (m_mode == SCREEN_GAME && GOLFDOC() && GOLFDOC()->m_gameMode == 0x400)
+		return;
+	WRect dest(m_pointer.x, m_pointer.y, m_overlay[m_cursor].len,
+		m_overlay[m_cursor].len);
+	switch (m_cursor)
+	{
+	case UP:
+		dest.y -= 4;
+		break;
+	case DOWN:
+		dest.y -= 28;
+		break;
+	}
+	if (GOLFDOC() && Doc()->m_golfGame.gameType != 2 &&
+		GOLFDOC()->m_gameMode == 0x200 && m_bTerrainTooltip &&
+		!IS_EXACTKINDOF(CRealMyRoomTask, AfxGetTask()))
+	{
+		if ((m_area == AREA_NORMAL || m_area == AREA_RANK) && m_pGroundPt &&
+			!COption::Instance()->GetQuitWindowed())
+			m_pGroundPt->DrawGroundTip();
+	}
+	m_overlay[m_cursor].overlay->Render(g_view,
+		WRect(m_frame / m_overlay[m_cursor].w * dest.w, 0.0f,
+			dest.w / m_overlay[m_cursor].w, dest.h / m_overlay[m_cursor].h),
+		dest, 0x2080000, 0xffffffff, 0, 0);
+	FrGraphicInterface* device = g_pFresh->GetManager()->GetGDI();
+	if (m_bRightButton && MESSENGER()->IsVisible() &&
+		MESSENGER()->m_dlgRect.IsInRect(m_pointer.x, m_pointer.y))
+	{
+		const Bitmap* bitmap =
+			g_pFresh->GetManager()->GetBitmap("MESSENGER", "mouse_right_btn");
+		if (bitmap)
+			device->DrawTexture(bitmap,
+				WRect(m_pointer.x + 2, m_pointer.y + 12, (float)bitmap->Width(),
+					(float)bitmap->Height()),
+				0xffffffff, 0);
+	}
+	else if (m_bRightButton)
+	{
+		const Bitmap* bitmap =
+			g_pFresh->GetManager()->GetBitmap("NEW_ICON", "mouse_right_button");
+		if (bitmap)
+			device->DrawTexture(bitmap,
+				WRect(m_pointer.x + 2, m_pointer.y + 12, (float)bitmap->Width(),
+					(float)bitmap->Height()),
+				0xffffffff, 0);
+	}
+}
+
+void CMouseCursor::SetActive(bool active)
+{
+	if (active)
+	{
+		m_pointer = m_oldPointer;
+		m_stopDuration = 0;
+		m_cursor = UNSELECT;
+		g_input->SetMousePoint(m_pointer.x, m_pointer.y);
+		m_show = true;
+	}
+	else
+	{
+		m_oldPointer = m_pointer;
+		m_area = AREA_NORMAL;
+		m_cursor = UNSELECT;
+	}
+	m_active = active;
+}
+
+void CMouseCursor::Store()
+{
+	m_oldPointer = m_pointer;
+}
+
+bool CMouseCursor::InArea(const WRect& rect)
+{
+	if (CQuitWindow::IsInstantiated() && CQuitWindow::Instance()->IsActive())
+		return false;
+	if (m_pointer.x > rect.x && m_pointer.x < rect.x + rect.w &&
+		m_pointer.y > rect.y && m_pointer.y < rect.y + rect.h)
+	{
+		m_cursor = ROLL_OVER;
+		return true;
+	}
+	return false;
+}
+
+void CMouseCursor::SetCamMode(bool mode)
+{
+	m_camMode = mode;
+	if (mode)
+	{
+		ForceMove(g_view->GetWidth() * 0.65f, g_view->GetHeight() - 150, 0.13f);
+		m_show = true;
+		m_stopDuration = 0;
+		m_cursor = UNSELECT;
+	}
+}
+
+void CMouseCursor::ForceMove(float x, float y, float duration)
+{
+	m_show = true;
+	m_stopDuration = 0;
+	if (duration < 0)
+	{
+		g_input->SetMousePoint(x, y);
+		m_pointer.x = x;
+		m_pointer.y = y;
+		m_cursor = UNSELECT;
+		m_area = AREA_NORMAL;
+	}
+	else
+	{
+		m_target.x = x;
+		m_target.y = y;
+		m_delta = m_pointer - m_target;
+		m_cursor = UNSELECT;
+		m_area = AREA_NORMAL;
+		m_forceMoving = 1;
+		m_forceFactor = 1 / duration;
+	}
+}
+
+int CMouseCursor::GetCursor()
+{
+	return m_bRightButton ? BOTH : m_cursor;
+}
+
+void CMouseCursor::SetCursor(int cursor)
+{
+	if (cursor < MOUSE_MAX_NUM)
+	{
+		m_bRightButton = false;
+		m_cursor = cursor;
+	}
+	else
+	{
+		m_bRightButton = true;
+		m_cursor = ROLL_OVER;
+	}
+}
+
+CGroundPropt::CGroundPropt(const char* name)
+{
+	m_groundtip = new CSimpleUI(name);
+}
+
+CGroundPropt::~CGroundPropt()
+{
+	if (m_groundtip)
+	{
+		delete m_groundtip;
+		m_groundtip = NULL;
+	}
+}
+
+void CGroundPropt::SelectGroundTip()
+{
+	WVector start, ray;
+	WVector mouse = g_input->GetMousePoint();
+	g_view->GetScreen2World(mouse.x, mouse.y, start, ray);
+	WVector point;
+	point = GetPVS().GetRayIntersection(start, ray);
+	if (GOLFDOC()->m_pPolySoup->IsOutOfBound(point))
+	{
+		strcpy(m_groundtype, "OB");
+		return;
+	}
+	CGolfBall::eWater water = (CGolfBall::eWater)0;
+	switch (GetPVS().GetGroundType(point, false, &water))
+	{
+	case 1:
+		strcpy(m_groundtype, "Fairway");
+		break;
+	case 4:
+		strcpy(m_groundtype, "Rough");
+		break;
+	case 6:
+		strcpy(m_groundtype, "Rough");
+		break;
+	case 2:
+		strcpy(m_groundtype, "Green");
+		break;
+	case 3:
+		strcpy(m_groundtype, "Bunker");
+		break;
+	case 13:
+		strcpy(m_groundtype, "Rough");
+		break;
+	case 7:
+		strcpy(m_groundtype, "Ice");
+		break;
+	case 8:
+		strcpy(m_groundtype, "Vector");
+		break;
+	case 9:
+		strcpy(m_groundtype, "Water");
+		break;
+	case 10:
+		if (water == 0 || water == 1)
+			strcpy(m_groundtype, "OB");
+		else
+			strcpy(m_groundtype, "WaterHazard");
+		break;
+	case 11:
+		strcpy(m_groundtype, "Sand");
+		break;
+	case 12:
+		strcpy(m_groundtype, "Rough");
+		break;
+	case 14:
+		strcpy(m_groundtype, "Water");
+		break;
+	default:
+		strcpy(m_groundtype, "Rough");
+		break;
+	}
+}
+
+void CGroundPropt::DrawGroundTip()
+{
+	if (m_groundtip)
+	{
+		m_groundtip->SetColor(0xffffffff);
+		float x = g_input->GetMousePoint().x + 3;
+		float y = g_input->GetMousePoint().y + 10;
+		if (x >= g_view->GetWidth() - 90)
+			x = g_view->GetWidth() - 90;
+		if (y >= g_view->GetHeight() - 25)
+			y = g_view->GetHeight() - 25;
+		m_groundtip->Render(m_groundtype, x, y, 1, 0);
+	}
 }

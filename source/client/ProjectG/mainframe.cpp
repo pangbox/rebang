@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "mainframe.h"
 
 extern WMatrix g_camera;

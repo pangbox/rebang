@@ -1,4 +1,3 @@
-#include "minatl.h"
 class FrDowngradeDlg;
 #include "helpdlg.h"
 #include "downgradedlg.h"

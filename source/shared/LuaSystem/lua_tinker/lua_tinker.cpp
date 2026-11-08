@@ -7,7 +7,6 @@
 // please check Licence.txt file for licence and legal issues.
 
 #include "stdafx.h"
-#include "minatl.h"
 #include "lua_tinker.h"
 
 

@@ -3,7 +3,6 @@ class CTMapInfo;
 typedef std::vector<CTMapInfo*>::iterator TMAP_IT;
 #include "treasure.h"
 #include "treasuremap.h"
-#include "minatl.h"
 
 CTMapInfo::CTMapInfo()
 {

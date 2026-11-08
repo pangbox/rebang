@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "mathconsts.h"
 #include "projectg.h"
 #include "balloontext.h"

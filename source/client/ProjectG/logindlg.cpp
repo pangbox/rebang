@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "clientsetting.h"
 #include "logininfo.h"
 #include "logindlg.h"

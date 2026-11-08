@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "noticedlg.h"
 #include "frbutton.h"
 #include "frviewer.h"
@@ -48,6 +47,17 @@ FrNoticeDlg::~FrNoticeDlg()
 	m_images.clear();
 }
 
+void FrNoticeDlg::LoadOnly(const char* filename)
+{
+	if (filename)
+	{
+		m_images.clear();
+		sNoticeImage image;
+		strcpy(image.name, filename);
+		m_images.push_back(image);
+	}
+}
+
 void FrNoticeDlg::LoadInitFile(const char* filename)
 {
 	if (filename)
@@ -93,15 +103,14 @@ void FrNoticeDlg::LoadInitFile(const char* filename)
 	}
 }
 
-void FrNoticeDlg::LoadOnly(const char* filename)
+void FrNoticeDlg::Prev()
 {
-	if (filename)
-	{
-		m_images.clear();
-		sNoticeImage image;
-		strcpy(image.name, filename);
-		m_images.push_back(image);
-	}
+	OnPrevBtnUp();
+}
+
+void FrNoticeDlg::Next()
+{
+	OnNextBtnUp();
 }
 
 void FrNoticeDlg::OnPrevInit(int param)
@@ -116,141 +125,6 @@ void FrNoticeDlg::OnNextInit(int param)
 	m_pNext = DYNAMIC_CAST(FrButton, param);
 	if (m_pNext)
 		m_pNext->SetPushDelay(0.0f);
-}
-
-void FrNoticeDlg::SetScrollBar()
-{
-	bool bScrollBar = false;
-	float offset = floor(m_pViewer->GetScrollBarOffset() * 0.5f);
-	m_pViewer->GetSrcWidth();
-	if (m_pViewer->GetSrcHeight() > 400)
-		bScrollBar = true;
-
-	WRect rect;
-	if (m_pCancel)
-	{
-		rect = m_pCancel->GetRect();
-		if (bScrollBar)
-			rect.x += offset * 3.0f;
-		else if (m_bScrollBar)
-			rect.x -= offset * 3.0f;
-		m_pCancel->MoveWindow(WPoint(rect.x, rect.y));
-	}
-
-	rect = GetRect();
-	if (bScrollBar)
-		rect.w += offset * 3.0f;
-	else if (m_bScrollBar)
-		rect.w -= offset * 3.0f;
-	SetRect(rect);
-
-	rect = m_pViewer->GetRect();
-	if (bScrollBar)
-		rect.w += offset * 2.0f;
-	else if (m_bScrollBar)
-		rect.w -= offset * 2.0f;
-	m_pViewer->SetRect(rect);
-
-	if (bScrollBar)
-	{
-		m_pViewer->ShowScrollBar(true);
-		m_bScrollBar = true;
-	}
-	else
-	{
-		m_pViewer->ShowScrollBar(false);
-		m_bScrollBar = false;
-	}
-}
-
-void FrNoticeDlg::OnCancelInit(int param)
-{
-	m_pCancel = DYNAMIC_CAST(FrButton, param);
-}
-
-void FrNoticeDlg::OnViewInit(int param)
-{
-	m_pViewer = DYNAMIC_CAST(FrViewer, param);
-}
-
-void FrNoticeDlg::OnNumInit(int param)
-{
-	m_pNumList = DYNAMIC_CAST(FrListBox, param);
-}
-
-void FrNoticeDlg::OnNumOwnerDraw(int param)
-{
-	FrListItem* item = (FrListItem*)param;
-	if (item && item->pData)
-	{
-		const char* text = (const char*)item->pData;
-		FrGraphicInterface* gdi = g_pFresh->GetManager()->GetGDI();
-		if (gdi)
-		{
-			unsigned int page = atoi(text);
-			if (m_curIndex == page - 1)
-			{
-				gdi->SetTextColor(0xffff0000, 0xffffffff);
-				gdi->SetTextStyle(1);
-			}
-			else
-			{
-				gdi->SetTextColor(0xff000000, 0xffffffff);
-				gdi->SetTextStyle(0);
-			}
-			gdi->Print(item->pos, 0, text);
-		}
-	}
-}
-
-void FrNoticeDlg::OnViewBtnDown()
-{
-	WPoint point;
-	point = g_pFresh->GetManager()->GetMousePos();
-	std::list<sNoticeImage::sBn>::iterator it;
-	for (it = m_images[m_curIndex].bnList.begin();
-		it != m_images[m_curIndex].bnList.end(); ++it)
-	{
-		WPoint pos(m_pViewer->GetRect().x, m_pViewer->GetRect().y);
-		WRect rect(pos.x + (*it).rect.x, pos.y + (*it).rect.y, (*it).rect.w,
-			(*it).rect.h);
-		if (rect.IsInRect(point))
-		{
-			m_typeId = (*it).typeId;
-			Close(FrOK, true);
-			return;
-		}
-	}
-	Close(FrNONE, true);
-}
-
-void FrNoticeDlg::OpenImage()
-{
-	if (m_images.size() && m_pViewer->Open(m_images[m_curIndex].name))
-	{
-		if (m_pPrev)
-			m_pPrev->Enable(m_curIndex > 0);
-		if (m_pNext)
-			m_pNext->Enable(m_curIndex < m_images.size() - 1);
-		m_pViewer->SetKeyFocus(true);
-	}
-	else
-		Close(true);
-}
-
-void FrNoticeDlg::OnNumLBtnUp()
-{
-	FrListItem* item = m_pNumList->GetItemUnderCursor();
-	if (item && item->pData)
-	{
-		m_curIndex = atoi((const char*)item->pData) - 1;
-		if (m_openedIndex != m_curIndex)
-		{
-			m_openedIndex = m_curIndex;
-			OpenImage();
-			SetScrollBar();
-		}
-	}
 }
 
 void FrNoticeDlg::OnPrevBtnUp()
@@ -335,12 +209,138 @@ bool FrNoticeDlg::OnInit()
 	return FrForm::OnInit();
 }
 
-void FrNoticeDlg::Prev()
+void FrNoticeDlg::SetScrollBar()
 {
-	OnPrevBtnUp();
+	bool bScrollBar = false;
+	float offset = floor(m_pViewer->GetScrollBarOffset() * 0.5f);
+	m_pViewer->GetSrcWidth();
+	if (m_pViewer->GetSrcHeight() > 400)
+		bScrollBar = true;
+
+	WRect rect;
+	if (m_pCancel)
+	{
+		rect = m_pCancel->GetRect();
+		if (bScrollBar)
+			rect.x += offset * 3.0f;
+		else if (m_bScrollBar)
+			rect.x -= offset * 3.0f;
+		m_pCancel->MoveWindow(WPoint(rect.x, rect.y));
+	}
+
+	rect = GetRect();
+	if (bScrollBar)
+		rect.w += offset * 3.0f;
+	else if (m_bScrollBar)
+		rect.w -= offset * 3.0f;
+	SetRect(rect);
+
+	rect = m_pViewer->GetRect();
+	if (bScrollBar)
+		rect.w += offset * 2.0f;
+	else if (m_bScrollBar)
+		rect.w -= offset * 2.0f;
+	m_pViewer->SetRect(rect);
+
+	if (bScrollBar)
+	{
+		m_pViewer->ShowScrollBar(true);
+		m_bScrollBar = true;
+	}
+	else
+	{
+		m_pViewer->ShowScrollBar(false);
+		m_bScrollBar = false;
+	}
 }
 
-void FrNoticeDlg::Next()
+void FrNoticeDlg::OnCancelInit(int param)
 {
-	OnNextBtnUp();
+	m_pCancel = DYNAMIC_CAST(FrButton, param);
+}
+
+void FrNoticeDlg::OnViewInit(int param)
+{
+	m_pViewer = DYNAMIC_CAST(FrViewer, param);
+}
+
+void FrNoticeDlg::OnViewBtnDown()
+{
+	WPoint point;
+	point = g_pFresh->GetManager()->GetMousePos();
+	std::list<sNoticeImage::sBn>::iterator it;
+	for (it = m_images[m_curIndex].bnList.begin();
+		it != m_images[m_curIndex].bnList.end(); ++it)
+	{
+		WPoint pos(m_pViewer->GetRect().x, m_pViewer->GetRect().y);
+		WRect rect(pos.x + (*it).rect.x, pos.y + (*it).rect.y, (*it).rect.w,
+			(*it).rect.h);
+		if (rect.IsInRect(point))
+		{
+			m_typeId = (*it).typeId;
+			Close(FrOK, true);
+			return;
+		}
+	}
+	Close(FrNONE, true);
+}
+
+void FrNoticeDlg::OnNumInit(int param)
+{
+	m_pNumList = DYNAMIC_CAST(FrListBox, param);
+}
+
+void FrNoticeDlg::OpenImage()
+{
+	if (m_images.size() && m_pViewer->Open(m_images[m_curIndex].name))
+	{
+		if (m_pPrev)
+			m_pPrev->Enable(m_curIndex > 0);
+		if (m_pNext)
+			m_pNext->Enable(m_curIndex < m_images.size() - 1);
+		m_pViewer->SetKeyFocus(true);
+	}
+	else
+	{
+		Close(true);
+	}
+}
+
+void FrNoticeDlg::OnNumLBtnUp()
+{
+	FrListItem* item = m_pNumList->GetItemUnderCursor();
+	if (!item || !item->pData)
+		return;
+	m_curIndex = atoi((const char*)item->pData) - 1;
+	if (m_openedIndex != m_curIndex)
+	{
+		m_openedIndex = m_curIndex;
+		OpenImage();
+		SetScrollBar();
+	}
+}
+
+void FrNoticeDlg::OnNumOwnerDraw(int param)
+{
+	FrListItem* item = (FrListItem*)param;
+	if (item && item->pData)
+	{
+		const char* text = (const char*)item->pData;
+		FrGraphicInterface* gdi = g_pFresh->GetManager()->GetGDI();
+		if (gdi)
+		{
+			unsigned int page = atoi(text);
+			if (m_curIndex == page - 1)
+			{
+				gdi->SetTextColor(0xffff0000, 0xffffffff);
+				gdi->SetTextStyle(1);
+			}
+			else
+			{
+				gdi->SetTextColor(0xff000000, 0xffffffff);
+				gdi->SetTextStyle(0);
+			}
+			gdi->Print(item->pos, 0, text);
+		}
+	}
 }

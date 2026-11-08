@@ -12,7 +12,6 @@
 #include "itemwindow.h"
 #include "quitwindow.h"
 #include "fresh.h"
-#include "minatl.h"
 #include "wmathutil.inl"
 #include "soundmanager.h"
 #include "capturedbg.h"
@@ -23,6 +22,8 @@ extern "C" void _WriteBarrier();
 #pragma intrinsic(_WriteBarrier)
 
 extern Fresh* g_pFresh;
+IMPLEMENT_ACTOR(CCamera, IActor)
+
 CCamera::CCamera()
 {
 	(void)&g_HUGE;
@@ -50,218 +51,84 @@ void CCamera::OnInit()
 	m_targetAngle = 0;
 }
 
-float CCamera::GetChangeRate()
+void CCamera::OnProcess(float dt)
 {
-	return m_change * m_change;
-}
-
-float CCamera::GetHeightRate(float height)
-{
-	float delta = height - m_lowest;
-	return delta / (delta + 192);
-}
-
-void CCamera::LookAt(WVector& pos, WVector& target)
-{
-	g_camera = MakeCameraMatrix(pos, target);
-}
-
-void CCamera::GetRotateAcc(float dt)
-{
-	static int previous = 0;
-	if (previous == m_rotateDirection && m_rotateDirection)
-		m_rotateAcc = Between(0.f, m_rotateAcc + dt, 1.f);
-	else
-		m_rotateAcc = 0;
-	previous = m_rotateDirection;
-}
-
-void CCamera::GetMoveAcc(float dt)
-{
-	static int previous = 0;
-	if (previous == m_moveDirection && m_moveDirection)
-		m_moveAcc = Between(0.f, m_moveAcc + dt, 1.f);
-	else
-		m_moveAcc = 0;
-	previous = m_moveDirection;
-}
-
-void CCamera::GetHorizonAcc(float dt)
-{
-	static int previous = 0;
-	if (previous == m_horizonDirection && m_horizonDirection)
-		m_horizonAcc = Between(0.f, m_horizonAcc + dt, 1.f);
-	else
-		m_horizonAcc = 0;
-	previous = m_horizonDirection;
-}
-
-void CCamera::YawFixedCamera(float dt)
-{
-	double angle = dt * m_rotateAcc * 5;
-	m_yaw -= angle;
-	if (m_yaw > 10)
-	{
-		m_yaw = 10;
-	}
-	else if (m_yaw < -10)
-	{
-		m_yaw = -10;
-	}
-	else
-	{
-		m_target -= g_camera.xa * angle;
-		g_camera = MakeCameraMatrix(m_pos, m_target);
-	}
-}
-
-void CCamera::PitchFixedCamera(float dt)
-{
-	double angle = dt * m_horizonAcc * 5;
-	m_pitch += (float)angle;
-	if (m_pitch > 5)
-	{
-		m_pitch = 5;
-	}
-	else if (m_pitch < -5)
-	{
-		m_pitch = -5;
-	}
-	else
-	{
-		m_target += g_camera.ya * angle;
-		g_camera = MakeCameraMatrix(m_pos, m_target);
-	}
-}
-
-void CCamera::SetSpotCamera(bool apply)
-{
-	m_spotCam.moving = !apply;
-	int index;
-	m_spotCam.end = GetPVS().GetGroundPoint(GolfBall().m_pos +
-			(GolfClub().GetRange() * 3.2f) * GOLFDOC()->m_cameraData.mat.za,
-		true, &index, true);
-	if (index == -1)
-	{
-		if (apply)
-			SendMsg(this, "GolfRule", 120, 8, 0, 0, 0);
+	if (!m_active || CCapturedBg::Instance()->IsCaptured() ||
+		(Doc()->m_userInfo[GOLFDOC()->m_currentPlayer].info.dwIdentity & 1))
 		return;
-	}
-	m_spotCam.end += RotVec(WVector(0, 30, -60), GOLFDOC()->m_cameraData.mat);
-	m_spotCam.endPitch = -0.2617994f;
-	if (apply)
+	if (g_input->GetButton(MIDDLE_BUTTON) == 1 && CItemWindow::IsClosed())
 	{
-		m_pos = m_spotCam.end;
-		m_target = m_spotCam.end + GOLFDOC()->m_cameraData.mat.za;
-		m_target.y += tan((double)m_spotCam.endPitch);
-		g_camera = MakeCameraMatrix(m_pos, m_target);
+		m_camMode = !m_camMode;
+		CMouseCursor::Instance()->SetCamMode(m_camMode);
+		if (m_camMode)
+			SendMsg(this, "Screen", 433, 0, 0, 0, 0);
 	}
-	else
+	if (CMouseCursor::Instance()->GetArea() == 22 &&
+		CMouseCursor::Instance()->IsInButtonDownArea(LEFT_BUTTON) &&
+		g_input->GetButton(LEFT_BUTTON) == 2)
+		SendMsg(this, "GolfRule", 120, 8, 0, 0, 0);
+	bool gallery = false;
+	if (OnlinePlay() && Doc()->GetReplayState() != 2)
 	{
-		m_spotCam.start = g_camera.pivot;
-		m_spotCam.startPitch =
-			atanf(g_camera.za.y / sqrtf(1 - g_camera.za.y * g_camera.za.y));
-		m_spotCam.velocity = (m_spotCam.end - m_spotCam.start) * (1.f / 1.2f);
-		m_spotCam.time = 0;
-	}
-}
-
-void CCamera::ProcessMousePick(float dt)
-{
-	WVector mouse = g_input->GetMousePoint();
-	WVector start, ray;
-	g_view->GetScreen2World(mouse.x, mouse.y, start, ray);
-	WVector hit;
-	hit = GetPVS().GetRayIntersection(start, ray);
-	if (g_input->Get("LCONTROL", true) || g_input->Get("RCONTROL", true))
-	{
-		hit.y += GolfBall().GetRadius();
-		if (GOLFDOC()->m_bDropRequest)
+		if (IsMyTurn(false))
 		{
-			WVector positions[2];
-			positions[0] = GolfBall().m_pos - GetHoleCupPos();
-			positions[0].y = 0;
-			positions[1] = hit - GetHoleCupPos();
-			positions[1].y = 0;
-			unsigned char ground = GetPVS().GetGroundType(hit, true, NULL);
-			if (!GetPVS().OverlappedWithObject(hit, 0) &&
-				(!ground ||
-					ground == 1 && !GOLFDOC()->m_pPolySoup->IsOutOfBound(hit) &&
-						positions[1].Magnitude() >
-							positions[0].Magnitude() - 25.6f))
+			m_sendTime += dt;
+			if (m_sendTime > 2)
 			{
-				GOLFDOC()->m_bDropRequest = false;
-				if (OnlinePlay() && GOLFDOC()->m_tutorialMode == 15)
+				m_sendTime -= 2;
+				if (m_angleChanged)
 				{
-					WSendPacket packet((enumClientPacket)25);
-					packet.EncodeBuffer(&hit, sizeof(hit));
+					m_angleChanged = false;
+					WSendPacket packet((enumClientPacket)19);
+					packet.EncodeBuffer(&GOLFDOC()->m_cameraData.angle, 4);
 					packet.Send((eSendTo)0);
 				}
-				else
-					SendMsg(this, "GolfRule", 141, (int)&hit, 0, 0, 0);
-			}
-			else
-			{
-				g_audio->PlaySfx("play_unplayable");
-				if (CHelpMsg::Instance())
-					CHelpMsg::Instance()->SetHelpMsg(20, NULL);
 			}
 		}
 		else
 		{
-			if (!WNetworkSystem::Instance()->IsConnected(
-					(WNetworkSystem::eNetUnit)0))
-				SendMsg(this, "GolfRule", 142, (int)&hit, 0, 0, 0);
+			gallery = true;
 		}
 	}
-	else
+	else if (Doc()->m_gameMode == 5 && !IsMyTurn(false))
+		gallery = true;
+	if (gallery)
 	{
-		WVector screen = g_view->Projection(GolfBall().m_pos);
-		if (sqrtf((mouse.y - screen.y) * (mouse.y - screen.y) +
-				(mouse.x - screen.x) * (mouse.x - screen.x)) > 10)
+		float angle = Between(dt * -0.52359879f,
+			GetBaseAngle(m_targetAngle - m_currentAngle), dt * 0.52359879f);
+		if (!WisZero(angle))
 		{
-			ray = hit - GolfBall().m_pos;
-			ray.y = 0;
-			float distance = ray * ray;
-			ray.Normalize();
-			// HACK!
-			_WriteBarrier();
-			GolfClub().SelectClubByDist(sqrtf(distance) * 0.3125f);
-			WVector cross;
-			cross = WCrossProduct(g_camera.ya, ray);
-			float angle;
-			if (Wabs(cross.y) < g_EPSILON ||
-				WisZero(angle = acosf(Between(-1.f, ray * g_camera.ya, 1.f))))
-			{
-				SendMsg(this, "Spot", 245, 0, 0, 0, 0);
-			}
+			SendMsg(this, "Player", 417, (int)&angle, 0, 0, 0);
+			SendMsg(this, "Spot", 417, (int)&angle, 0, 0, 0);
+			SendMsg(this, "Screen", 417, (int)&angle, 0, 0, 0);
+			SendMsg(this, "Grid", 417, (int)&angle, 0, 0, 0);
+			SendMsg(this, "Caddie", 417, (int)&angle, 0, 0, 0);
+			SendMsg(this, "GuideLine", 417, 0, 0, 0, 0);
+			m_currentAngle = GetBaseAngle(m_currentAngle + angle);
+			RotateForGallery(angle);
+		}
+	}
+
+	ProcessToSpot(dt);
+	FixedCamera(dt);
+	if (!(GOLFDOC()->m_gameMode & 0x8000))
+	{
+		if (m_inputDelay > 0)
+		{
+			m_inputDelay -= dt;
+		}
+		else
+		{
+			if (WisZero(m_remainRotation))
+				ProcessInput(dt);
 			else
-			{
-				if (cross.y > 0)
-				{
-					m_rotateDirection = -1;
-					angle *= -1;
-				}
-				else
-				{
-					m_rotateDirection = 1;
-				}
-				angle = Between(-g_PI, angle, g_PI);
-				m_remainRotation = angle;
-				m_totalRotation = angle;
-				angle += GOLFDOC()->m_cameraData.angle;
-				SendMsg(this, "Spot", 246, (int)&angle, (int)&hit, 0, 0);
-			}
+				ProcessForcedMove(dt);
+			GetRotateAcc(dt);
+			GetMoveAcc(dt);
+			GetHorizonAcc(dt);
 		}
 	}
 }
-
-float CCamera::GetCameraAngle()
-{
-	return Min(0.f, GOLFDOC()->m_cameraData.pitch - atanf(m_change * .65f));
-}
-
-IMPLEMENT_ACTOR(CCamera, IActor)
 
 void CCamera::ProcessToSpot(float dt)
 {
@@ -323,345 +190,35 @@ void CCamera::ProcessToSpot(float dt)
 	}
 }
 
-void CCamera::HandleMsg(const MsgObject& msg)
+void CCamera::SetSpotCamera(bool apply)
 {
-	if (msg.time > g_CurrentTime)
-	{
-		StoreDelayedMsg(msg);
-		return;
-	}
-	switch (msg.message)
-	{
-	case 241:
-		m_change = 0;
-		m_heightRate = 0.5f;
-		break;
-	case 238:
-		m_pos = GOLFDOC()->m_cameraData.mat.pivot;
-		m_target =
-			GOLFDOC()->m_cameraData.mat.pivot + GOLFDOC()->m_cameraData.mat.za;
-		m_target.y += tan((double)GOLFDOC()->m_cameraData.pitch);
-		m_change = 0;
-		m_heightRate = m_baseHeightRate =
-			GetHeightRate(GOLFDOC()->m_cameraData.mat.pivot.y);
-		m_initialHeightRate =
-			GetHeightRate(GOLFDOC()->m_cameraData.mat.pivot.y);
-		break;
-	case 239:
-		m_lowest = GetPVS().GetLowest();
-		m_ceiling = m_lowest + 192;
-		break;
-	case 240:
-		m_translated = false;
-		break;
-	case 242:
-		m_targetAngle = *(float*)msg.param1;
-		break;
-	case 410:
-		m_active = true;
-		break;
-	case 411:
-		m_active = false;
-		break;
-	case 412:
-		*(int*)msg.param1 = m_active;
-		break;
-	case 10008:
-		m_sendTime = 0;
-		GOLFDOC()->m_cameraData.angle = *(float*)msg.param1;
-		if (!IsMyTurn(false))
-		{
-			m_targetAngle = GOLFDOC()->m_cameraData.angle;
-			m_currentAngle = GOLFDOC()->m_cameraData.angle;
-		}
-		break;
-	}
-}
-
-void CCamera::Translate(float dt)
-{
-	if (GOLFDOC()->m_gameMode == 512)
-	{
-		float rate = Between(.1f,
-			(g_camera.pivot.y -
-				GetPVS().GetGroundPoint(g_camera.pivot, true, NULL, true).y) *
-				.01f,
-			1.f);
-		g_camera.pivot +=
-			GOLFDOC()->m_cameraData.mat.za * (rate * m_horizonAcc * dt * 400);
-		g_camera.pivot = GetPVS().TestCameraCollision(g_camera.pivot);
-	}
-	else
-	{
-		WVector diff =
-			GOLFDOC()->m_cameraData.mat.za * (dt * m_horizonAcc * 400);
-		WVector pos = GetPVS().TestCameraCollision(g_camera.pivot + diff);
-		float baseGround = m_lowest;
-		float ground =
-			Max(GetPVS().GetGroundPoint(pos, true, NULL, true).y, baseGround);
-		pos.y = Between(ground + GOLFDOC()->m_cameraData.clearance, pos.y,
-			m_ceiling);
-		diff = pos - g_camera.pivot;
-		m_pos += diff;
-		m_target = m_pos + GOLFDOC()->m_cameraData.mat.za;
-		m_heightRate = (m_pos.y - m_lowest) / 192;
-		m_change = m_heightRate - m_baseHeightRate;
-		m_target.y += tan((double)GetCameraAngle());
-		g_camera = MakeCameraMatrix(m_pos, m_target);
-		m_translated = true;
-		m_baseHeightRate =
-			GetHeightRate(ground + GOLFDOC()->m_cameraData.clearance);
-
-		float before =
-			(((g_camera.pivot - GOLFDOC()->m_cameraData.mat.pivot) - diff) *
-				GOLFDOC()->m_cameraData.mat.za);
-		float after = ((g_camera.pivot - GOLFDOC()->m_cameraData.mat.pivot) *
-			GOLFDOC()->m_cameraData.mat.za);
-		float crossing = before * after;
-		if (GOLFDOC()->m_gameMode == 256 && crossing < 0 &&
-			Abs(g_camera.pivot.y - GOLFDOC()->m_cameraData.mat.pivot.y) < 3.2f)
-		{
-			m_pos = GOLFDOC()->m_cameraData.mat.pivot;
-			m_target = GOLFDOC()->m_cameraData.mat.pivot +
-				GOLFDOC()->m_cameraData.mat.za;
-			m_target.y += tan((double)GOLFDOC()->m_cameraData.pitch);
-			m_change = 0;
-			m_heightRate = m_baseHeightRate;
-			g_camera.pivot = GOLFDOC()->m_cameraData.mat.pivot;
-			if (IsMyTurn(true))
-			{
-				GOLFDOC()->m_uiAlpha = 255;
-				CChatMsg::Instance()->ReplaceBackupUiAlpha();
-			}
-			GOLFDOC()->m_gameMode = 8;
-			m_inputDelay = .25f;
-		}
-		else if (GOLFDOC()->m_gameMode == 8)
-		{
-			GOLFDOC()->m_uiAlpha = 128;
-			CChatMsg::Instance()->ReplaceBackupUiAlpha();
-			GOLFDOC()->m_gameMode = 256;
-		}
-	}
-}
-
-void CCamera::UpDown(float dt)
-{
-	if (GOLFDOC()->m_gameMode == 512)
-	{
-		float ground =
-			GetPVS().GetGroundPoint(g_camera.pivot, true, NULL, true).y + 16;
-		float height = g_camera.pivot.y - ground;
-		if (height < 300)
-			dt *= Max(0.2f, height / 300);
-		g_camera.pivot.y += dt * 400;
-		g_camera.pivot.y = Between(ground, g_camera.pivot.y, m_lowest + 2560);
-	}
-	else
-	{
-		if (GOLFDOC()->m_gameMode == 8 && dt > 0)
-		{
-			GOLFDOC()->m_gameMode = 256;
-			GOLFDOC()->m_uiAlpha = 128;
-			CChatMsg::Instance()->ReplaceBackupUiAlpha();
-		}
-		m_change =
-			Between(0.f, m_change + dt * m_moveAcc, 1 - m_baseHeightRate);
-		if (m_translated)
-		{
-			m_heightRate = m_change + m_baseHeightRate;
-		}
-		else
-		{
-			if (GolfBall().m_groundType == 2)
-				m_heightRate = m_baseHeightRate + m_change;
-			else
-				m_heightRate = m_change * m_change + m_baseHeightRate;
-			g_camera.pivot = GOLFDOC()->m_cameraData.mat.pivot -
-				GOLFDOC()->m_cameraData.mat.za *
-					((GOLFDOC()->m_cameraData.mat.pivot.y - m_lowest + 192) *
-						(1 - m_baseHeightRate) * m_change);
-		}
-		g_camera.pivot.y =
-			(GOLFDOC()->m_cameraData.mat.pivot.y - m_lowest + 192) *
-				m_heightRate +
-			m_lowest;
-		g_camera.pivot = GetPVS().TestCameraCollision(g_camera.pivot);
-		m_pos = g_camera.pivot;
-		m_target = g_camera.pivot + GOLFDOC()->m_cameraData.mat.za;
-		m_target.y += tan((double)GetCameraAngle());
-		g_camera = MakeCameraMatrix(m_pos, m_target);
-		if (!m_translated && m_heightRate == m_initialHeightRate)
-		{
-			GOLFDOC()->m_gameMode = 8;
-			if (IsMyTurn(true))
-			{
-				GOLFDOC()->m_uiAlpha = 255;
-				CChatMsg::Instance()->ReplaceBackupUiAlpha();
-			}
-		}
-	}
-}
-
-void CCamera::RotateEnvironment(float angle)
-{
-	GOLFDOC()->m_cameraData.angle =
-		GetBaseAngle(GOLFDOC()->m_cameraData.angle + angle);
-	GOLFDOC()->m_cameraData.mat = RotMat(GOLFDOC()->m_cameraData.angle +
-			(IsMyTurn(true) ? 0 : GOLFDOC()->m_cameraData.angleOffset),
-		1);
-	WVector direction = GOLFDOC()->m_cameraData.mat.za *
-		(GOLFDOC()->m_cameraData.distance * -1.f);
-	direction.y = GOLFDOC()->m_cameraData.height;
-	GOLFDOC()->m_cameraData.mat.pivot = GetPVS().TestCameraCollision(
-		GOLFDOC()->m_cameraData.target + direction);
-	m_initialHeightRate = GetHeightRate(GOLFDOC()->m_cameraData.mat.pivot.y);
-	if (IsMyTurn(false))
-	{
-		m_angleChanged = true;
-		SendMsg(this, "Player", 417, (int)&angle, 0, 0, 0);
-		SendMsg(this, "Spot", 417, (int)&angle, 0, 0, 0);
-		SendMsg(this, "Screen", 417, (int)&angle, 0, 0, 0);
-		SendMsg(this, "Grid", 417, (int)&angle, 0, 0, 0);
-		SendMsg(this, "Caddie", 417, (int)&angle, 0, 0, 0);
-		SendMsg(this, "GuideLine", 417, 0, 0, 0, 0);
-	}
-}
-
-void CCamera::RotateForGallery(float angle)
-{
-	if (!((unsigned char)(Doc()->m_myInfo.info.dwIdentity >> 1) & 1))
-		return;
-	WMatrix matrix = g_camera * RotMat(angle, 1);
-	matrix = g_camera;
-	WVector& pos = matrix.pivot;
-	pos.x = pos.y = pos.z = 0;
-	matrix = matrix * RotMat(angle, 1);
-	RotateEnvironment(angle);
-	if (GOLFDOC()->m_gameMode & 8)
-	{
-		pos = GOLFDOC()->m_cameraData.mat.pivot;
-	}
-	else
-	{
-		pos = GOLFDOC()->m_cameraData.target +
-			(g_camera.pivot - GOLFDOC()->m_cameraData.target) *
-				RotMat(angle, 1);
-		pos = GetPVS().TestCameraCollision(pos);
-		if (GOLFDOC()->m_gameMode & 512)
-			pos.y = g_camera.pivot.y;
-	}
-	g_camera = matrix;
-	m_pos = g_camera.pivot;
-	m_target = g_camera.pivot + g_camera.za;
-}
-
-void CCamera::Rotate(float dt)
-{
-	dt *= m_rotateAcc;
-	if (m_remainRotation < 0 || 0 < m_remainRotation)
-	{
-		if (Wabs(m_remainRotation) < Wabs(dt) || WisZero(m_remainRotation - dt))
-		{
-			dt = m_remainRotation;
-			m_remainRotation = 0;
-			m_totalRotation = 0;
-		}
-		else
-		{
-			m_remainRotation -= dt;
-		}
-	}
-	WMatrix matrix = g_camera * RotMat(dt, 1);
-	matrix = g_camera;
-	WVector& pos = matrix.pivot;
-	pos.x = pos.y = pos.z = 0;
-	matrix = matrix * RotMat(dt, 1);
-	RotateEnvironment(dt);
-	if (GOLFDOC()->m_gameMode & 8)
-	{
-		pos = GOLFDOC()->m_cameraData.mat.pivot;
-	}
-	else
-	{
-		pos = GOLFDOC()->m_cameraData.target +
-			(g_camera.pivot - GOLFDOC()->m_cameraData.target) * RotMat(dt, 1);
-		pos = GetPVS().TestCameraCollision(pos);
-		if (GOLFDOC()->m_gameMode & 512)
-			pos.y = g_camera.pivot.y;
-	}
-	g_camera = matrix;
-	m_pos = g_camera.pivot;
-	m_target = g_camera.pivot + g_camera.za;
-	if (GOLFDOC()->m_gameMode & 0x40000 && !m_spotCam.moving)
-		SetSpotCamera(true);
-}
-
-void CCamera::FixedCamera(float dt)
-{
-	if (CQuitWindow::Instance()->IsActive() || !CItemWindow::IsClosed() ||
-		((unsigned char)(Doc()->m_myInfo.info.dwIdentity >> 1) & 1) ||
-		GOLFDOC()->m_bDropRequest)
-		return;
+	m_spotCam.moving = !apply;
 	int index;
-	for (index = 3; index < 10; ++index)
+	m_spotCam.end = GetPVS().GetGroundPoint(GolfBall().m_pos +
+			(GolfClub().GetRange() * 3.2f) * GOLFDOC()->m_cameraData.mat.za,
+		true, &index, true);
+	if (index == -1)
 	{
-		if (g_input->GetDown(MakeStr("PAD_%d", index), true) ||
-			g_input->GetDown(MakeStr("NUM_%d", index), true))
-		{
-			WPolySoup::sCamera* camera = GOLFDOC()->m_pPolySoup->FindCamera(
-				MakeStr("\xc4\xab\xb8\xde\xb6\xf3%d", index));
-			if (camera)
-			{
-				m_yaw = 0;
-				m_pitch = 0;
-				m_pos = camera->mat.pivot;
-				m_target = m_pos + camera->mat.za * 10;
-				g_camera = camera->mat;
-				g_view->SetFOV(camera->fov * g_DEGTORAD);
-				GOLFDOC()->m_gameMode = 0x8000;
-			}
-			return;
-		}
+		if (apply)
+			SendMsg(this, "GolfRule", 120, 8, 0, 0, 0);
+		return;
 	}
-	if (GOLFDOC()->m_gameMode == 0x8000)
+	m_spotCam.end += RotVec(WVector(0, 30, -60), GOLFDOC()->m_cameraData.mat);
+	m_spotCam.endPitch = -0.2617994f;
+	if (apply)
 	{
-		m_rotateDirection = 0;
-		if (CMouseCursor::Instance()->GetArea() == 23 &&
-			(int)g_input->GetButton(LEFT_BUTTON) > 0)
-		{
-			m_rotateDirection = 1;
-			YawFixedCamera(dt);
-		}
-		if (CMouseCursor::Instance()->GetArea() == 24 &&
-			(int)g_input->GetButton(LEFT_BUTTON) > 0)
-		{
-			m_rotateDirection = -1;
-			YawFixedCamera(dt * -1.f);
-		}
-		if (g_input->Get("\xc1\xc2", true) && !g_input->Get("LCONTROL", true) &&
-			!g_input->Get("RCONTROL", true) && !g_input->Get("LSHIFT", true) &&
-			!g_input->Get("RSHIFT", true))
-			RotateEnvironment(dt * 1.0471976f);
-		if (g_input->Get("\xbf\xec", true) && !g_input->Get("LCONTROL", true) &&
-			!g_input->Get("RCONTROL", true) && !g_input->Get("LSHIFT", true) &&
-			!g_input->Get("RSHIFT", true))
-			RotateEnvironment(dt * -1.0471976f);
-		GetRotateAcc(dt);
-		m_horizonDirection = 0;
-		int area = CMouseCursor::Instance()->GetArea();
-		if (area == 8 || area == 25 && (int)g_input->GetButton(LEFT_BUTTON) > 0)
-		{
-			m_horizonDirection = 1;
-			PitchFixedCamera(dt);
-		}
-		area = CMouseCursor::Instance()->GetArea();
-		if (area == 9 || area == 26 && (int)g_input->GetButton(LEFT_BUTTON) > 0)
-		{
-			m_horizonDirection = -1;
-			PitchFixedCamera(dt * -1.f);
-		}
-		GetHorizonAcc(dt);
+		m_pos = m_spotCam.end;
+		m_target = m_spotCam.end + GOLFDOC()->m_cameraData.mat.za;
+		m_target.y += tan((double)m_spotCam.endPitch);
+		g_camera = MakeCameraMatrix(m_pos, m_target);
+	}
+	else
+	{
+		m_spotCam.start = g_camera.pivot;
+		m_spotCam.startPitch =
+			atanf(g_camera.za.y / sqrtf(1 - g_camera.za.y * g_camera.za.y));
+		m_spotCam.velocity = (m_spotCam.end - m_spotCam.start) * (1.f / 1.2f);
+		m_spotCam.time = 0;
 	}
 }
 
@@ -844,6 +401,96 @@ void CCamera::ProcessInput(float dt)
 		ProcessMousePick(dt);
 }
 
+void CCamera::ProcessMousePick(float dt)
+{
+	WVector mouse = g_input->GetMousePoint();
+	WVector start, ray;
+	g_view->GetScreen2World(mouse.x, mouse.y, start, ray);
+	WVector hit;
+	hit = GetPVS().GetRayIntersection(start, ray);
+	if (g_input->Get("LCONTROL", true) || g_input->Get("RCONTROL", true))
+	{
+		hit.y += GolfBall().GetRadius();
+		if (GOLFDOC()->m_bDropRequest)
+		{
+			WVector positions[2];
+			positions[0] = GolfBall().m_pos - GetHoleCupPos();
+			positions[0].y = 0;
+			positions[1] = hit - GetHoleCupPos();
+			positions[1].y = 0;
+			unsigned char ground = GetPVS().GetGroundType(hit, true, NULL);
+			if (!GetPVS().OverlappedWithObject(hit, 0) &&
+				(!ground ||
+					ground == 1 && !GOLFDOC()->m_pPolySoup->IsOutOfBound(hit) &&
+						positions[1].Magnitude() >
+							positions[0].Magnitude() - 25.6f))
+			{
+				GOLFDOC()->m_bDropRequest = false;
+				if (OnlinePlay() && GOLFDOC()->m_tutorialMode == 15)
+				{
+					WSendPacket packet((enumClientPacket)25);
+					packet.EncodeBuffer(&hit, sizeof(hit));
+					packet.Send((eSendTo)0);
+				}
+				else
+					SendMsg(this, "GolfRule", 141, (int)&hit, 0, 0, 0);
+			}
+			else
+			{
+				g_audio->PlaySfx("play_unplayable");
+				if (CHelpMsg::Instance())
+					CHelpMsg::Instance()->SetHelpMsg(20, NULL);
+			}
+		}
+		else
+		{
+			if (!WNetworkSystem::Instance()->IsConnected(
+					(WNetworkSystem::eNetUnit)0))
+				SendMsg(this, "GolfRule", 142, (int)&hit, 0, 0, 0);
+		}
+	}
+	else
+	{
+		WVector screen = g_view->Projection(GolfBall().m_pos);
+		if (sqrtf((mouse.y - screen.y) * (mouse.y - screen.y) +
+				(mouse.x - screen.x) * (mouse.x - screen.x)) > 10)
+		{
+			ray = hit - GolfBall().m_pos;
+			ray.y = 0;
+			float distance = ray * ray;
+			ray.Normalize();
+			// HACK!
+			_WriteBarrier();
+			GolfClub().SelectClubByDist(sqrtf(distance) * 0.3125f);
+			WVector cross;
+			cross = WCrossProduct(g_camera.ya, ray);
+			float angle;
+			if (Wabs(cross.y) < g_EPSILON ||
+				WisZero(angle = acosf(Between(-1.f, ray * g_camera.ya, 1.f))))
+			{
+				SendMsg(this, "Spot", 245, 0, 0, 0, 0);
+			}
+			else
+			{
+				if (cross.y > 0)
+				{
+					m_rotateDirection = -1;
+					angle *= -1;
+				}
+				else
+				{
+					m_rotateDirection = 1;
+				}
+				angle = Between(-g_PI, angle, g_PI);
+				m_remainRotation = angle;
+				m_totalRotation = angle;
+				angle += GOLFDOC()->m_cameraData.angle;
+				SendMsg(this, "Spot", 246, (int)&angle, (int)&hit, 0, 0);
+			}
+		}
+	}
+}
+
 void CCamera::ProcessForcedMove(float dt)
 {
 	Rotate((m_rotateDirection == 1 ? 1.f : -1.f) * dt * 4.1887903f);
@@ -854,81 +501,433 @@ void CCamera::ProcessForcedMove(float dt)
 	SendMsg(this, "Spot", 247, (int)&dt, 0, 0, 0);
 }
 
-void CCamera::OnProcess(float dt)
+void CCamera::HandleMsg(const MsgObject& msg)
 {
-	if (!m_active || CCapturedBg::Instance()->IsCaptured() ||
-		(Doc()->m_userInfo[GOLFDOC()->m_currentPlayer].info.dwIdentity & 1))
+	if (msg.time > g_CurrentTime)
+	{
+		StoreDelayedMsg(msg);
 		return;
-	if (g_input->GetButton(MIDDLE_BUTTON) == 1 && CItemWindow::IsClosed())
-	{
-		m_camMode = !m_camMode;
-		CMouseCursor::Instance()->SetCamMode(m_camMode);
-		if (m_camMode)
-			SendMsg(this, "Screen", 433, 0, 0, 0, 0);
 	}
-	if (CMouseCursor::Instance()->GetArea() == 22 &&
-		CMouseCursor::Instance()->IsInButtonDownArea(LEFT_BUTTON) &&
-		g_input->GetButton(LEFT_BUTTON) == 2)
-		SendMsg(this, "GolfRule", 120, 8, 0, 0, 0);
-	bool gallery = false;
-	if (OnlinePlay() && Doc()->GetReplayState() != 2)
+	switch (msg.message)
 	{
-		if (IsMyTurn(false))
+	case 241:
+		m_change = 0;
+		m_heightRate = 0.5f;
+		break;
+	case 238:
+		m_pos = GOLFDOC()->m_cameraData.mat.pivot;
+		m_target =
+			GOLFDOC()->m_cameraData.mat.pivot + GOLFDOC()->m_cameraData.mat.za;
+		m_target.y += tan((double)GOLFDOC()->m_cameraData.pitch);
+		m_change = 0;
+		m_heightRate = m_baseHeightRate =
+			GetHeightRate(GOLFDOC()->m_cameraData.mat.pivot.y);
+		m_initialHeightRate =
+			GetHeightRate(GOLFDOC()->m_cameraData.mat.pivot.y);
+		break;
+	case 239:
+		m_lowest = GetPVS().GetLowest();
+		m_ceiling = m_lowest + 192;
+		break;
+	case 240:
+		m_translated = false;
+		break;
+	case 242:
+		m_targetAngle = *(float*)msg.param1;
+		break;
+	case 410:
+		m_active = true;
+		break;
+	case 411:
+		m_active = false;
+		break;
+	case 412:
+		*(int*)msg.param1 = m_active;
+		break;
+	case 10008:
+		m_sendTime = 0;
+		GOLFDOC()->m_cameraData.angle = *(float*)msg.param1;
+		if (!IsMyTurn(false))
 		{
-			m_sendTime += dt;
-			if (m_sendTime > 2)
+			m_targetAngle = GOLFDOC()->m_cameraData.angle;
+			m_currentAngle = GOLFDOC()->m_cameraData.angle;
+		}
+		break;
+	}
+}
+
+void CCamera::LookAt(WVector& pos, WVector& target)
+{
+	g_camera = MakeCameraMatrix(pos, target);
+}
+
+void CCamera::Rotate(float dt)
+{
+	dt *= m_rotateAcc;
+	if (m_remainRotation < 0 || 0 < m_remainRotation)
+	{
+		if (Wabs(m_remainRotation) < Wabs(dt) || WisZero(m_remainRotation - dt))
+		{
+			dt = m_remainRotation;
+			m_remainRotation = 0;
+			m_totalRotation = 0;
+		}
+		else
+		{
+			m_remainRotation -= dt;
+		}
+	}
+	WMatrix matrix = g_camera * RotMat(dt, 1);
+	matrix = g_camera;
+	WVector& pos = matrix.pivot;
+	pos.x = pos.y = pos.z = 0;
+	matrix = matrix * RotMat(dt, 1);
+	RotateEnvironment(dt);
+	if (GOLFDOC()->m_gameMode & 8)
+	{
+		pos = GOLFDOC()->m_cameraData.mat.pivot;
+	}
+	else
+	{
+		pos = GOLFDOC()->m_cameraData.target +
+			(g_camera.pivot - GOLFDOC()->m_cameraData.target) * RotMat(dt, 1);
+		pos = GetPVS().TestCameraCollision(pos);
+		if (GOLFDOC()->m_gameMode & 512)
+			pos.y = g_camera.pivot.y;
+	}
+	g_camera = matrix;
+	m_pos = g_camera.pivot;
+	m_target = g_camera.pivot + g_camera.za;
+	if (GOLFDOC()->m_gameMode & 0x40000 && !m_spotCam.moving)
+		SetSpotCamera(true);
+}
+
+void CCamera::Translate(float dt)
+{
+	if (GOLFDOC()->m_gameMode == 512)
+	{
+		float rate = Between(.1f,
+			(g_camera.pivot.y -
+				GetPVS().GetGroundPoint(g_camera.pivot, true, NULL, true).y) *
+				.01f,
+			1.f);
+		g_camera.pivot +=
+			GOLFDOC()->m_cameraData.mat.za * (rate * m_horizonAcc * dt * 400);
+		g_camera.pivot = GetPVS().TestCameraCollision(g_camera.pivot);
+	}
+	else
+	{
+		WVector diff =
+			GOLFDOC()->m_cameraData.mat.za * (dt * m_horizonAcc * 400);
+		WVector pos = GetPVS().TestCameraCollision(g_camera.pivot + diff);
+		float baseGround = m_lowest;
+		float ground =
+			Max(GetPVS().GetGroundPoint(pos, true, NULL, true).y, baseGround);
+		pos.y = Between(ground + GOLFDOC()->m_cameraData.clearance, pos.y,
+			m_ceiling);
+		diff = pos - g_camera.pivot;
+		m_pos += diff;
+		m_target = m_pos + GOLFDOC()->m_cameraData.mat.za;
+		m_heightRate = (m_pos.y - m_lowest) / 192;
+		m_change = m_heightRate - m_baseHeightRate;
+		m_target.y += tan((double)GetCameraAngle());
+		g_camera = MakeCameraMatrix(m_pos, m_target);
+		m_translated = true;
+		m_baseHeightRate =
+			GetHeightRate(ground + GOLFDOC()->m_cameraData.clearance);
+
+		float before =
+			(((g_camera.pivot - GOLFDOC()->m_cameraData.mat.pivot) - diff) *
+				GOLFDOC()->m_cameraData.mat.za);
+		float after = ((g_camera.pivot - GOLFDOC()->m_cameraData.mat.pivot) *
+			GOLFDOC()->m_cameraData.mat.za);
+		float crossing = before * after;
+		if (GOLFDOC()->m_gameMode == 256 && crossing < 0 &&
+			Abs(g_camera.pivot.y - GOLFDOC()->m_cameraData.mat.pivot.y) < 3.2f)
+		{
+			m_pos = GOLFDOC()->m_cameraData.mat.pivot;
+			m_target = GOLFDOC()->m_cameraData.mat.pivot +
+				GOLFDOC()->m_cameraData.mat.za;
+			m_target.y += tan((double)GOLFDOC()->m_cameraData.pitch);
+			m_change = 0;
+			m_heightRate = m_baseHeightRate;
+			g_camera.pivot = GOLFDOC()->m_cameraData.mat.pivot;
+			if (IsMyTurn(true))
 			{
-				m_sendTime -= 2;
-				if (m_angleChanged)
-				{
-					m_angleChanged = false;
-					WSendPacket packet((enumClientPacket)19);
-					packet.EncodeBuffer(&GOLFDOC()->m_cameraData.angle, 4);
-					packet.Send((eSendTo)0);
-				}
+				GOLFDOC()->m_uiAlpha = 255;
+				CChatMsg::Instance()->ReplaceBackupUiAlpha();
+			}
+			GOLFDOC()->m_gameMode = 8;
+			m_inputDelay = .25f;
+		}
+		else if (GOLFDOC()->m_gameMode == 8)
+		{
+			GOLFDOC()->m_uiAlpha = 128;
+			CChatMsg::Instance()->ReplaceBackupUiAlpha();
+			GOLFDOC()->m_gameMode = 256;
+		}
+	}
+}
+
+void CCamera::UpDown(float dt)
+{
+	if (GOLFDOC()->m_gameMode == 512)
+	{
+		float ground =
+			GetPVS().GetGroundPoint(g_camera.pivot, true, NULL, true).y + 16;
+		float height = g_camera.pivot.y - ground;
+		if (height < 300)
+			dt *= Max(0.2f, height / 300);
+		g_camera.pivot.y += dt * 400;
+		g_camera.pivot.y = Between(ground, g_camera.pivot.y, m_lowest + 2560);
+	}
+	else
+	{
+		if (GOLFDOC()->m_gameMode == 8 && dt > 0)
+		{
+			GOLFDOC()->m_gameMode = 256;
+			GOLFDOC()->m_uiAlpha = 128;
+			CChatMsg::Instance()->ReplaceBackupUiAlpha();
+		}
+		m_change =
+			Between(0.f, m_change + dt * m_moveAcc, 1 - m_baseHeightRate);
+		if (m_translated)
+		{
+			m_heightRate = m_change + m_baseHeightRate;
+		}
+		else
+		{
+			if (GolfBall().m_groundType == 2)
+				m_heightRate = m_baseHeightRate + m_change;
+			else
+				m_heightRate = m_change * m_change + m_baseHeightRate;
+			g_camera.pivot = GOLFDOC()->m_cameraData.mat.pivot -
+				GOLFDOC()->m_cameraData.mat.za *
+					((GOLFDOC()->m_cameraData.mat.pivot.y - m_lowest + 192) *
+						(1 - m_baseHeightRate) * m_change);
+		}
+		g_camera.pivot.y =
+			(GOLFDOC()->m_cameraData.mat.pivot.y - m_lowest + 192) *
+				m_heightRate +
+			m_lowest;
+		g_camera.pivot = GetPVS().TestCameraCollision(g_camera.pivot);
+		m_pos = g_camera.pivot;
+		m_target = g_camera.pivot + GOLFDOC()->m_cameraData.mat.za;
+		m_target.y += tan((double)GetCameraAngle());
+		g_camera = MakeCameraMatrix(m_pos, m_target);
+		if (!m_translated && m_heightRate == m_initialHeightRate)
+		{
+			GOLFDOC()->m_gameMode = 8;
+			if (IsMyTurn(true))
+			{
+				GOLFDOC()->m_uiAlpha = 255;
+				CChatMsg::Instance()->ReplaceBackupUiAlpha();
 			}
 		}
-		else
-		{
-			gallery = true;
-		}
 	}
-	else if (Doc()->m_gameMode == 5 && !IsMyTurn(false))
-		gallery = true;
-	if (gallery)
-	{
-		float angle = Between(dt * -0.52359879f,
-			GetBaseAngle(m_targetAngle - m_currentAngle), dt * 0.52359879f);
-		if (!WisZero(angle))
-		{
-			SendMsg(this, "Player", 417, (int)&angle, 0, 0, 0);
-			SendMsg(this, "Spot", 417, (int)&angle, 0, 0, 0);
-			SendMsg(this, "Screen", 417, (int)&angle, 0, 0, 0);
-			SendMsg(this, "Grid", 417, (int)&angle, 0, 0, 0);
-			SendMsg(this, "Caddie", 417, (int)&angle, 0, 0, 0);
-			SendMsg(this, "GuideLine", 417, 0, 0, 0, 0);
-			m_currentAngle = GetBaseAngle(m_currentAngle + angle);
-			RotateForGallery(angle);
-		}
-	}
+}
 
-	ProcessToSpot(dt);
-	FixedCamera(dt);
-	if (!(GOLFDOC()->m_gameMode & 0x8000))
+float CCamera::GetCameraAngle()
+{
+	return Min(0.f, GOLFDOC()->m_cameraData.pitch - atanf(m_change * .65f));
+}
+
+float CCamera::GetChangeRate()
+{
+	return m_change * m_change;
+}
+
+void CCamera::GetRotateAcc(float dt)
+{
+	static int previous = 0;
+	if (previous == m_rotateDirection && m_rotateDirection)
+		m_rotateAcc = Between(0.f, m_rotateAcc + dt, 1.f);
+	else
+		m_rotateAcc = 0;
+	previous = m_rotateDirection;
+}
+
+void CCamera::GetMoveAcc(float dt)
+{
+	static int previous = 0;
+	if (previous == m_moveDirection && m_moveDirection)
+		m_moveAcc = Between(0.f, m_moveAcc + dt, 1.f);
+	else
+		m_moveAcc = 0;
+	previous = m_moveDirection;
+}
+
+void CCamera::GetHorizonAcc(float dt)
+{
+	static int previous = 0;
+	if (previous == m_horizonDirection && m_horizonDirection)
+		m_horizonAcc = Between(0.f, m_horizonAcc + dt, 1.f);
+	else
+		m_horizonAcc = 0;
+	previous = m_horizonDirection;
+}
+
+float CCamera::GetHeightRate(float height)
+{
+	float delta = height - m_lowest;
+	return delta / (delta + 192);
+}
+
+void CCamera::FixedCamera(float dt)
+{
+	if (CQuitWindow::Instance()->IsActive() || !CItemWindow::IsClosed() ||
+		((unsigned char)(Doc()->m_myInfo.info.dwIdentity >> 1) & 1) ||
+		GOLFDOC()->m_bDropRequest)
+		return;
+	int index;
+	for (index = 3; index < 10; ++index)
 	{
-		if (m_inputDelay > 0)
+		if (g_input->GetDown(MakeStr("PAD_%d", index), true) ||
+			g_input->GetDown(MakeStr("NUM_%d", index), true))
 		{
-			m_inputDelay -= dt;
-		}
-		else
-		{
-			if (WisZero(m_remainRotation))
-				ProcessInput(dt);
-			else
-				ProcessForcedMove(dt);
-			GetRotateAcc(dt);
-			GetMoveAcc(dt);
-			GetHorizonAcc(dt);
+			WPolySoup::sCamera* camera = GOLFDOC()->m_pPolySoup->FindCamera(
+				MakeStr("\xc4\xab\xb8\xde\xb6\xf3%d", index));
+			if (camera)
+			{
+				m_yaw = 0;
+				m_pitch = 0;
+				m_pos = camera->mat.pivot;
+				m_target = m_pos + camera->mat.za * 10;
+				g_camera = camera->mat;
+				g_view->SetFOV(camera->fov * g_DEGTORAD);
+				GOLFDOC()->m_gameMode = 0x8000;
+			}
+			return;
 		}
 	}
+	if (GOLFDOC()->m_gameMode == 0x8000)
+	{
+		m_rotateDirection = 0;
+		if (CMouseCursor::Instance()->GetArea() == 23 &&
+			(int)g_input->GetButton(LEFT_BUTTON) > 0)
+		{
+			m_rotateDirection = 1;
+			YawFixedCamera(dt);
+		}
+		if (CMouseCursor::Instance()->GetArea() == 24 &&
+			(int)g_input->GetButton(LEFT_BUTTON) > 0)
+		{
+			m_rotateDirection = -1;
+			YawFixedCamera(dt * -1.f);
+		}
+		if (g_input->Get("\xc1\xc2", true) && !g_input->Get("LCONTROL", true) &&
+			!g_input->Get("RCONTROL", true) && !g_input->Get("LSHIFT", true) &&
+			!g_input->Get("RSHIFT", true))
+			RotateEnvironment(dt * 1.0471976f);
+		if (g_input->Get("\xbf\xec", true) && !g_input->Get("LCONTROL", true) &&
+			!g_input->Get("RCONTROL", true) && !g_input->Get("LSHIFT", true) &&
+			!g_input->Get("RSHIFT", true))
+			RotateEnvironment(dt * -1.0471976f);
+		GetRotateAcc(dt);
+		m_horizonDirection = 0;
+		int area = CMouseCursor::Instance()->GetArea();
+		if (area == 8 || area == 25 && (int)g_input->GetButton(LEFT_BUTTON) > 0)
+		{
+			m_horizonDirection = 1;
+			PitchFixedCamera(dt);
+		}
+		area = CMouseCursor::Instance()->GetArea();
+		if (area == 9 || area == 26 && (int)g_input->GetButton(LEFT_BUTTON) > 0)
+		{
+			m_horizonDirection = -1;
+			PitchFixedCamera(dt * -1.f);
+		}
+		GetHorizonAcc(dt);
+	}
+}
+
+void CCamera::YawFixedCamera(float dt)
+{
+	double angle = dt * m_rotateAcc * 5;
+	m_yaw -= angle;
+	if (m_yaw > 10)
+	{
+		m_yaw = 10;
+	}
+	else if (m_yaw < -10)
+	{
+		m_yaw = -10;
+	}
+	else
+	{
+		m_target -= g_camera.xa * angle;
+		g_camera = MakeCameraMatrix(m_pos, m_target);
+	}
+}
+
+void CCamera::PitchFixedCamera(float dt)
+{
+	double angle = dt * m_horizonAcc * 5;
+	m_pitch += (float)angle;
+	if (m_pitch > 5)
+	{
+		m_pitch = 5;
+	}
+	else if (m_pitch < -5)
+	{
+		m_pitch = -5;
+	}
+	else
+	{
+		m_target += g_camera.ya * angle;
+		g_camera = MakeCameraMatrix(m_pos, m_target);
+	}
+}
+
+void CCamera::RotateEnvironment(float angle)
+{
+	GOLFDOC()->m_cameraData.angle =
+		GetBaseAngle(GOLFDOC()->m_cameraData.angle + angle);
+	GOLFDOC()->m_cameraData.mat = RotMat(GOLFDOC()->m_cameraData.angle +
+			(IsMyTurn(true) ? 0 : GOLFDOC()->m_cameraData.angleOffset),
+		1);
+	WVector direction = GOLFDOC()->m_cameraData.mat.za *
+		(GOLFDOC()->m_cameraData.distance * -1.f);
+	direction.y = GOLFDOC()->m_cameraData.height;
+	GOLFDOC()->m_cameraData.mat.pivot = GetPVS().TestCameraCollision(
+		GOLFDOC()->m_cameraData.target + direction);
+	m_initialHeightRate = GetHeightRate(GOLFDOC()->m_cameraData.mat.pivot.y);
+	if (IsMyTurn(false))
+	{
+		m_angleChanged = true;
+		SendMsg(this, "Player", 417, (int)&angle, 0, 0, 0);
+		SendMsg(this, "Spot", 417, (int)&angle, 0, 0, 0);
+		SendMsg(this, "Screen", 417, (int)&angle, 0, 0, 0);
+		SendMsg(this, "Grid", 417, (int)&angle, 0, 0, 0);
+		SendMsg(this, "Caddie", 417, (int)&angle, 0, 0, 0);
+		SendMsg(this, "GuideLine", 417, 0, 0, 0, 0);
+	}
+}
+
+void CCamera::RotateForGallery(float angle)
+{
+	if (!((unsigned char)(Doc()->m_myInfo.info.dwIdentity >> 1) & 1))
+		return;
+	WMatrix matrix = g_camera * RotMat(angle, 1);
+	matrix = g_camera;
+	WVector& pos = matrix.pivot;
+	pos.x = pos.y = pos.z = 0;
+	matrix = matrix * RotMat(angle, 1);
+	RotateEnvironment(angle);
+	if (GOLFDOC()->m_gameMode & 8)
+	{
+		pos = GOLFDOC()->m_cameraData.mat.pivot;
+	}
+	else
+	{
+		pos = GOLFDOC()->m_cameraData.target +
+			(g_camera.pivot - GOLFDOC()->m_cameraData.target) *
+				RotMat(angle, 1);
+		pos = GetPVS().TestCameraCollision(pos);
+		if (GOLFDOC()->m_gameMode & 512)
+			pos.y = g_camera.pivot.y;
+	}
+	g_camera = matrix;
+	m_pos = g_camera.pivot;
+	m_target = g_camera.pivot + g_camera.za;
 }

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include <stack>
 
 #include "tikimagicboxtable.h"

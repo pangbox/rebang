@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "christmassockeventdlg.h"
 #include "frviewer.h"
 

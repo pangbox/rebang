@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include <wininet.h>
 #include "clientsetting.h"
 #include "ppl.h"

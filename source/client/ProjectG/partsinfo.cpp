@@ -4,7 +4,6 @@
 #include "wbone.h"
 #include "ucclibrary.h"
 #include "../../shared/exceptionreport.h"
-#include "minatl.h"
 #include "uccmanager.h"
 #include "taskmanager.h"
 #include "golfdoc.h"

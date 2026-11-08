@@ -30,6 +30,18 @@ CAmbientSound::CAmbientSound()
 	AddSkipList(0x85040);
 }
 
+void CAmbientSound::OnInit()
+{
+	std::list<sSoundBox>& boxes =
+		CSharedDoc::Instance()->m_pGolfDoc->m_pPolySoup->m_soundBox;
+	for (std::list<sSoundBox>::iterator it = boxes.begin(); it != boxes.end();
+		++it)
+	{
+		if ((*it).interval < 0 && !g_audio->IsPlaying((*it).name))
+			g_audio->PlaySfx((*it).name, NULL, 1, (*it).name);
+	}
+}
+
 float CAmbientSound::GetVolume(const Wobb& obb, float distance)
 {
 	if (obb.IsInclude(g_camera.pivot) || distance < 0)
@@ -48,30 +60,6 @@ float CAmbientSound::GetVolume(const Wobb& obb, float distance)
 	}
 	float volume = 1.0f - sqrtf(squaredDistance) / (distance * 3.2f);
 	return Max(0.0f, volume);
-}
-
-void CAmbientSound::OnInit()
-{
-	std::list<sSoundBox>& boxes =
-		CSharedDoc::Instance()->m_pGolfDoc->m_pPolySoup->m_soundBox;
-	for (std::list<sSoundBox>::iterator it = boxes.begin(); it != boxes.end();
-		++it)
-	{
-		if ((*it).interval < 0 && !g_audio->IsPlaying((*it).name))
-			g_audio->PlaySfx((*it).name, NULL, 1, (*it).name);
-	}
-}
-
-void CAmbientSound::HandleMsg(const MsgObject& msg)
-{
-	if (msg.message == 500)
-	{
-		std::list<sSoundBox>& boxes =
-			CSharedDoc::Instance()->m_pGolfDoc->m_pPolySoup->m_soundBox;
-		for (std::list<sSoundBox>::iterator it = boxes.begin();
-			it != boxes.end(); ++it)
-			g_audio->StopSfx((*it).name);
-	}
 }
 
 void CAmbientSound::OnProcess(float delta)
@@ -112,5 +100,17 @@ void CAmbientSound::OnProcess(float delta)
 		if (g_audio->IsPlaying((*it).first.c_str()))
 			g_audio->SetSFXVolumeWhilePlaying((*it).first.c_str(),
 				(*it).second);
+	}
+}
+
+void CAmbientSound::HandleMsg(const MsgObject& msg)
+{
+	if (msg.message == 500)
+	{
+		std::list<sSoundBox>& boxes =
+			CSharedDoc::Instance()->m_pGolfDoc->m_pPolySoup->m_soundBox;
+		for (std::list<sSoundBox>::iterator it = boxes.begin();
+			it != boxes.end(); ++it)
+			g_audio->StopSfx((*it).name);
 	}
 }

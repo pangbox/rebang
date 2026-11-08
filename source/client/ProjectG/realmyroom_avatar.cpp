@@ -947,7 +947,7 @@ void CRealMyRoom_Avatar::Render()
 		WVector normal(2.9f, 0.0f, 0.0f);
 		WVector tangent(0.0f, 0.0f, 2.9f);
 		GetPVS().DrawDecal(m_pMain->m_shadowTex, pos, normal, tangent, 1.0f,
-			m_alpha, (enumPolyBlend)0, false);
+			m_alpha, W_POLY_BLEND_NORMAL, false);
 	}
 
 	if (m_pPetFrame != NULL && m_pPetFrame->GetCurAniPet() != NULL)

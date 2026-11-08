@@ -288,32 +288,87 @@ ntRiver_Lava::~ntRiver_Lava()
 	}
 }
 
-void ntRiver_Lava::ReadAttribute(const char* name)
+void ntRiver_Lava::Setup(const std::vector<WVector>& points, const char* name)
 {
-	int index[2] = { 0, 1 };
+	ReadAttribute(name);
 
-	m_side[0].bActive = true;
-	m_side[1].bActive = true;
-
-	for (int i = 0; i < 2; i++)
+	Waabb aabb;
+	WVector dir;
+	float height;
+	float widths[256] = { 0.0f };
+	unsigned int i, n;
+	for (i = 0; i < points.size() - 1; i++)
 	{
-		m_side[i].scroll = Random(0.0f, 1.0f);
-		m_side[i].scrollVel = RIVERINFO().GetScrollVelocity(index[i]);
-		m_side[i].tileHead = RIVERINFO().GetHeadTile(index[i]);
-		m_side[i].tileSide = RIVERINFO().GetSideTile(index[i]);
-		m_side[i].depth = RIVERINFO().GetDepth(index[i]) * 3.2f;
-		m_side[i].texHandle = g_resrcmng->LoadTexture(
-			MakeStr("[hell_river_%s.jpg", i == 0 ? "up" : "down"), 0, 0, 0);
+		dir = points[i + 1] - points[i];
+		dir.y = 0;
+		dir = WCrossProduct(dir, WVector::UNIT_POS_Y).Normalize();
+
+		height = GetPVS().GetLowestGround(points[i]) +
+			Max(m_side[0].depth, m_side[1].depth);
+
+		for (;;)
+		{
+			if (GetPVS().GetLowestGround(
+					dir * (widths[i] += 6.4f) + points[i]) > height)
+			{
+				widths[i] += 3.2f;
+				break;
+			}
+
+			if (widths[i] > 160.0f)
+				break;
+		}
 	}
 
-	if (strstr(name, "*d"))
-	{
-		float depth = 0.0f;
-		if (sscanf(strchr(name, 'd') + 1, "%f", &depth) + 1 == 0)
-			depth = 1.0f;
+	m_river.reserve(50);
 
-		m_side[0].depth = depth;
-		m_side[1].depth = depth;
+	for (i = 0, n = 0; i < points.size() - 1; i++)
+	{
+		dir = points[i + 1] - points[i];
+		dir.y = 0;
+		dir = WCrossProduct(dir, WVector::UNIT_POS_Y).Normalize();
+		dir *= widths[i];
+
+		sRiver river;
+		WVector pos = points[i];
+		float ground = GetPVS().GetLowestGround(points[i]);
+
+		for (unsigned int j = 0; j < 2; j++)
+		{
+			river.pos[j] = dir * ((j & 1) ? 1.0f : -1.0f) + pos;
+			river.pos[j].y = ground + m_side[0].depth;
+			if (n == 0)
+			{
+				river.u[j] = 0.0f;
+			}
+			else
+			{
+				WVector d = river.pos[j] - m_river[n - 1].pos[j];
+				river.u[j] = d.Magnitude() / widths[i] * m_side[j].tileHead +
+					m_river[n - 1].u[j];
+			}
+		}
+
+		if (n > 0)
+		{
+			aabb.max.x = Max(Max(river.pos[0].x, river.pos[1].x),
+				Max(m_river[n - 1].pos[0].x, m_river[n - 1].pos[1].x));
+			aabb.max.y = Min(river.pos[0].y, m_river[n - 1].pos[0].y);
+			aabb.max.z = Max(Max(river.pos[0].z, river.pos[1].z),
+				Max(m_river[n - 1].pos[0].z, m_river[n - 1].pos[1].z));
+
+			aabb.min.x = Min(Min(river.pos[0].x, river.pos[1].x),
+				Min(m_river[n - 1].pos[0].x, m_river[n - 1].pos[1].x));
+			aabb.min.y = aabb.max.y - Max(m_side[0].depth, m_side[1].depth);
+			aabb.min.z = Min(Min(river.pos[0].z, river.pos[1].z),
+				Min(m_river[n - 1].pos[0].z, m_river[n - 1].pos[1].z));
+
+			GetPVS().AddWater(aabb, 2);
+		}
+
+		m_river.push_back(river);
+
+		n++;
 	}
 }
 
@@ -358,6 +413,35 @@ void ntRiver_Lava::Render()
 					(m_side[i].texHandle & 0x7ff) | 0x28c00000, 0x400, false);
 			}
 		}
+	}
+}
+
+void ntRiver_Lava::ReadAttribute(const char* name)
+{
+	int index[2] = { 0, 1 };
+
+	m_side[0].bActive = true;
+	m_side[1].bActive = true;
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_side[i].scroll = Random(0.0f, 1.0f);
+		m_side[i].scrollVel = RIVERINFO().GetScrollVelocity(index[i]);
+		m_side[i].tileHead = RIVERINFO().GetHeadTile(index[i]);
+		m_side[i].tileSide = RIVERINFO().GetSideTile(index[i]);
+		m_side[i].depth = RIVERINFO().GetDepth(index[i]) * 3.2f;
+		m_side[i].texHandle = g_resrcmng->LoadTexture(
+			MakeStr("[hell_river_%s.jpg", i == 0 ? "up" : "down"), 0, 0, 0);
+	}
+
+	if (strstr(name, "*d"))
+	{
+		float depth = 0.0f;
+		if (sscanf(strchr(name, 'd') + 1, "%f", &depth) + 1 == 0)
+			depth = 1.0f;
+
+		m_side[0].depth = depth;
+		m_side[1].depth = depth;
 	}
 }
 
@@ -579,90 +663,6 @@ void CRiver_ex::Setup(const std::vector<WVector>& points, const char* name)
 
 		m_river.push_back(r);
 		count++;
-	}
-}
-
-void ntRiver_Lava::Setup(const std::vector<WVector>& points, const char* name)
-{
-	ReadAttribute(name);
-
-	Waabb aabb;
-	WVector dir;
-	float height;
-	float widths[256] = { 0.0f };
-	unsigned int i, n;
-	for (i = 0; i < points.size() - 1; i++)
-	{
-		dir = points[i + 1] - points[i];
-		dir.y = 0;
-		dir = WCrossProduct(dir, WVector::UNIT_POS_Y).Normalize();
-
-		height = GetPVS().GetLowestGround(points[i]) +
-			Max(m_side[0].depth, m_side[1].depth);
-
-		for (;;)
-		{
-			if (GetPVS().GetLowestGround(
-					dir * (widths[i] += 6.4f) + points[i]) > height)
-			{
-				widths[i] += 3.2f;
-				break;
-			}
-
-			if (widths[i] > 160.0f)
-				break;
-		}
-	}
-
-	m_river.reserve(50);
-
-	for (i = 0, n = 0; i < points.size() - 1; i++)
-	{
-		dir = points[i + 1] - points[i];
-		dir.y = 0;
-		dir = WCrossProduct(dir, WVector::UNIT_POS_Y).Normalize();
-		dir *= widths[i];
-
-		sRiver river;
-		WVector pos = points[i];
-		float ground = GetPVS().GetLowestGround(points[i]);
-
-		for (unsigned int j = 0; j < 2; j++)
-		{
-			river.pos[j] = dir * ((j & 1) ? 1.0f : -1.0f) + pos;
-			river.pos[j].y = ground + m_side[0].depth;
-			if (n == 0)
-			{
-				river.u[j] = 0.0f;
-			}
-			else
-			{
-				WVector d = river.pos[j] - m_river[n - 1].pos[j];
-				river.u[j] = d.Magnitude() / widths[i] * m_side[j].tileHead +
-					m_river[n - 1].u[j];
-			}
-		}
-
-		if (n > 0)
-		{
-			aabb.max.x = Max(Max(river.pos[0].x, river.pos[1].x),
-				Max(m_river[n - 1].pos[0].x, m_river[n - 1].pos[1].x));
-			aabb.max.y = Min(river.pos[0].y, m_river[n - 1].pos[0].y);
-			aabb.max.z = Max(Max(river.pos[0].z, river.pos[1].z),
-				Max(m_river[n - 1].pos[0].z, m_river[n - 1].pos[1].z));
-
-			aabb.min.x = Min(Min(river.pos[0].x, river.pos[1].x),
-				Min(m_river[n - 1].pos[0].x, m_river[n - 1].pos[1].x));
-			aabb.min.y = aabb.max.y - Max(m_side[0].depth, m_side[1].depth);
-			aabb.min.z = Min(Min(river.pos[0].z, river.pos[1].z),
-				Min(m_river[n - 1].pos[0].z, m_river[n - 1].pos[1].z));
-
-			GetPVS().AddWater(aabb, 2);
-		}
-
-		m_river.push_back(river);
-
-		n++;
 	}
 }
 

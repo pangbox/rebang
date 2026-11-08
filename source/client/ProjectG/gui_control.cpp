@@ -53,11 +53,6 @@ extern Fresh* g_pFresh;
 
 extern WMatrix g_camera;
 
-namespace S5
-{
-	bool IsUsableCalipers();
-}
-
 float Random(float min, float max, int seed);
 
 IMPLEMENT_ACTOR(CScreen, IActor)

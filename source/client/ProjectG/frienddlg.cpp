@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "frienddlg.h"
 #include "giftdlg.h"
 #include "post_senddlg.h"

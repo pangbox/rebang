@@ -29,11 +29,6 @@ const localContentType_t S4_RANGE_BUFF = (localContentType_t)0x70;
 extern WMatrix g_camera;
 extern Fresh* g_pFresh;
 
-namespace S5
-{
-	bool IsUsableCalipers();
-}
-
 void PerformPowerBarSetting();
 bool IsMyTurn(bool check);
 sPlayerData* PLAYER(unsigned char index);
@@ -47,16 +42,6 @@ float bar_speed[17] = { 460.0f, 460.0f, 460.0f, 460.0f, 460.0f, 440.0f, 440.0f,
 
 float ground_accuracy[15] = { 8.0f, 8.0f, 0.0f, 1.0f, 5.0f, 5.0f, 5.0f, 5.0f,
 	5.0f, 0.0f, 0.0f, 5.0f, 0.0f, 1.0f, 0.0f };
-
-inline bool IsUsedItembyMe(unsigned long item)
-{
-	if (IsMyTurn(false))
-	{
-		unsigned char cur = GOLFDOC()->m_currentPlayer;
-		return GOLFDOC()->GetPlayer(cur)->item == item ? true : false;
-	}
-	return false;
-}
 
 CClub::CClub()
 	: m_pClub(NULL), m_clubList(16, 8)

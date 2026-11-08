@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "cardsystem.h"
 #include "carddlg.h"
 #include "itembuffactor.h"

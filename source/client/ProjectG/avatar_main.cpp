@@ -37,12 +37,6 @@
 
 int WisZero(const float& value, float epsilon);
 extern Fresh* g_pFresh;
-namespace _util
-{
-	void GenerateRandomTidParts(unsigned long, unsigned long* const,
-		unsigned long* const);
-}
-
 bool g_SALoadingState = false;
 extern WMatrix g_camera;
 extern bool g_bQuit;
@@ -1533,14 +1527,14 @@ void ntAvatarChatMain::Display(void)
 		}
 		GetPVS().DrawDecal(m_glowTex, pTarget->m_pos, normal, tangent,
 			(cosf(m_glowTime * 10.0f) + 1.0f) * 0.05f + 1.0f, 1.0f,
-			(enumPolyBlend)0x800000, false);
+			W_POLY_BLEND_ADD, false);
 	}
 	else
 	{
 		GetPVS().DrawDecal(m_glowTex,
 			ntAvatarManager::Instance()->m_pMyAvatar->GetTargetPosition(),
 			normal, tangent, (cosf(m_glowTime * 10.0f) + 1.0f) * 0.05f + 1.0f,
-			1.0f, (enumPolyBlend)0x800000, false);
+			1.0f, W_POLY_BLEND_ADD, false);
 	}
 }
 

@@ -258,16 +258,22 @@ void FrElementDoc::ClearBitmaps()
 	m_mapBitmap.clear();
 }
 
+enum picType_t
+{
+	BMP = 0,
+	TGA = 1
+};
+
 int FrElementDoc::LoadPic(const char* filename)
 {
-	int type = 1;
+	picType_t type = TGA;
 	cFile* file = g_resrcmng->GetCFile(MakeStr("%s.tga", filename), 0xffff);
 	if (!file)
 	{
 		file = g_resrcmng->GetCFile(MakeStr("%s.bmp", filename), 0xffff);
 		if (!file)
 			return 0;
-		type = 0;
+		type = BMP;
 	}
 
 	int filesize = file->Length();
@@ -280,7 +286,7 @@ int FrElementDoc::LoadPic(const char* filename)
 	unsigned height;
 	unsigned bpl;
 	BYTE* data;
-	if (type == 0)
+	if (type == BMP)
 	{
 		data = buf + 54;
 		pBitmap = new Bitmap(*(int*)(buf + 18), *(int*)(buf + 22),
@@ -288,7 +294,7 @@ int FrElementDoc::LoadPic(const char* filename)
 		height = *(int*)(buf + 22);
 		bpl = pBitmap->pitch;
 	}
-	else if (type == 1)
+	else if (type == TGA)
 	{
 		data = buf + 18;
 		pBitmap = new Bitmap(*(short*)(buf + 12), *(short*)(buf + 14), buf[16]);

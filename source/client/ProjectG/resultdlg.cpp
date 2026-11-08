@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "resultdlg.h"
 #include "exhibition.h"
 #include "scoredlg.h"

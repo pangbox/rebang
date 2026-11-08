@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "avatartipdlg.h"
 #include "frviewer.h"
 

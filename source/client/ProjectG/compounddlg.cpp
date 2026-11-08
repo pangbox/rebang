@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "compounddlg.h"
 #include "frwnd.h"
 #include "frarea.h"

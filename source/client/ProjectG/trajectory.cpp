@@ -1278,6 +1278,6 @@ void ntExplodeMark::Display()
 	if (m_bActive)
 		GetPVS().DrawDecal(m_texHandle,
 			GetPVS().GetGroundPoint(m_pos, false, NULL, false),
-			WVector(15, 0, 0), WVector(0, 0, 15), 1.f, 1.f, (enumPolyBlend)0,
+			WVector(15, 0, 0), WVector(0, 0, 15), 1.f, 1.f, W_POLY_BLEND_NORMAL,
 			false);
 }

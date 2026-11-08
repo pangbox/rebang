@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "binstr.h"
 #include "../../shared/localize.h"
 

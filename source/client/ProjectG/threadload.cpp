@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "threadload.h"
 #include <process.h>
 #include <mmsystem.h>

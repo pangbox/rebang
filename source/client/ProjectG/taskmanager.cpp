@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "taskmanager.h"
 #include "projectg.h"
 #include "../../shared/itemmanager.h"

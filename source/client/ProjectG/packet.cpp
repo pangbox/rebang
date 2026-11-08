@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "packet.h"
 #include "networksystem.h"
 #include "jrencrypt.h"

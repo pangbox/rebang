@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "s5/utilities.h"
 #include "frdesktop.h"
 #include "titles_client.h"

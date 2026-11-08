@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "grounditem.h"
 #include "grounditemman.h"
 #include "scenemanager.h"

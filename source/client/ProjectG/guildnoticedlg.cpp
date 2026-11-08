@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "guildnoticedlg.h"
 #include "newsreader.h"
 #include "frbutton.h"

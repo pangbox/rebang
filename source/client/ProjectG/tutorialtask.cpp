@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "tutorialtask.h"
 #include "actor.h"
 #include "fresh.h"

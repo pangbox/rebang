@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "reportdlg.h"
 #include "emoticondlg.h"
 #include "fredit.h"

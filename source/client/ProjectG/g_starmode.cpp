@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include <fstream>
 #include <wininet.h>
 #include "g_starmode.h"

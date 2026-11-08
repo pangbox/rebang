@@ -5,7 +5,42 @@
 #include "frbutton.h"
 
 class FrOptionDlg;
-class FrQuitForm;
+
+class FrQuitForm : public FrForm
+{
+public:
+	DECLARE_OBJECT(FrQuitForm)
+	FrQuitForm();
+
+	void EnableOptionBtn(bool bEnable);
+
+	WRect GetOptionBtnRect() { return m_pOptionBtn->GetRect(); }
+
+protected:
+	virtual void OnProc(const float delta);
+	virtual void OnDraw();
+
+	void OnOptionBtnInit(int param);
+	void OnNextBtnInit(int param);
+	void OnToLobbyBtnInit(int param);
+	void OnExitBtnInit(int param);
+	void OnOptionBtnUp();
+	void OnNextBtnUp();
+	void OnToLobbyBtnUp();
+	void OnExitBtnUp();
+	void OnCloseBtnUp();
+	bool OnToLobbyConfirmResult(int result, FrForm* pForm);
+	bool OnExitConfirmResult(int result, FrForm* pForm);
+
+	FrButton* m_pOptionBtn;
+	FrButton* m_pNextBtn;
+	FrButton* m_pToLobbyBtn;
+	FrButton* m_pExitBtn;
+	FrButton* m_pHoverBtn;
+	float m_time;
+
+	DECLARE_FRESH_MSGMAP()
+};
 
 class CQuitWindow : public WSingleton<CQuitWindow>, public FrCmdTarget
 {

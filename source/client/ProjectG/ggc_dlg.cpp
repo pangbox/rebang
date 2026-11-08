@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "ggc_dlg.h"
 #include "ggc_helper.h"
 #include "fredit.h"

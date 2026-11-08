@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "slicestr.h"
 #include <stdio.h>
 #include <stdlib.h>

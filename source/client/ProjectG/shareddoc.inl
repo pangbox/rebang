@@ -224,6 +224,22 @@ inline unsigned char GetHoleIndex(unsigned char hole)
 	return 19;
 }
 
+inline unsigned char GetNextHole()
+{
+	for (unsigned char i = 0; i < 18; ++i)
+		if (Doc()->m_holeOrder[i] == GOLFDOC()->m_currentHole)
+			return Doc()->m_holeOrder[i + 1];
+	return 19;
+}
+
+inline bool IsValidHole(unsigned char hole)
+{
+	for (unsigned char i = 0; i < Doc()->m_golfGame.holes; ++i)
+		if (Doc()->m_holeOrder[i] == hole)
+			return true;
+	return false;
+}
+
 inline unsigned char GetWeather()
 {
 	return Doc()->m_golfGame.weather;
@@ -239,6 +255,14 @@ inline unsigned char GetDifficulty()
 	if (Doc()->m_golfGame.pCourse == NULL)
 		return 1;
 	return Doc()->m_golfGame.pCourse->Difficulty;
+}
+
+inline unsigned char GetDiffFlag()
+{
+	IFF_STRUCT::sCourse* course = Doc()->m_golfGame.pCourse;
+	if (!course)
+		return 0;
+	return course->DiffFlag;
 }
 
 inline void SetShotTimeLimit(unsigned long limit)
@@ -345,14 +369,14 @@ inline void DeleteString(std::string* p)
 	std::auto_ptr<std::string> holder(p);
 }
 
-inline unsigned long GetGameTimeLimit()
-{
-	return Doc()->m_golfGame.gameTimeLimit;
-}
-
 inline void SetGameTimeLimit(unsigned long limit)
 {
 	Doc()->m_golfGame.gameTimeLimit = limit;
+}
+
+inline unsigned long GetGameTimeLimit()
+{
+	return Doc()->m_golfGame.gameTimeLimit;
 }
 
 inline unsigned long MyGuid(bool bGallery)
@@ -430,22 +454,6 @@ inline unsigned char MyIndex()
 	return Doc()->GetIndex(Doc()->m_myInfo.info.dwGuid);
 }
 
-inline int IsObserver(unsigned long identity)
-{
-	if (identity == 0xffffffff)
-		identity = Doc()->m_myInfo.info.dwIdentity;
-
-	return (identity & 0xe) == 0xe;
-}
-
-inline int IsAdministrator(unsigned long identity)
-{
-	if (identity == 0xffffffff)
-		identity = Doc()->m_myInfo.info.dwIdentity;
-
-	return (identity & 4) == 4;
-}
-
 inline __int64 MyPang()
 {
 	return Doc()->m_myInfo.stat.i64Pang;
@@ -466,12 +474,33 @@ inline __int64 MyBonusCash()
 	return Doc()->m_bonusCash;
 }
 
+inline void SetMyOutsideCash(__int64 cash)
+{
+	Doc()->m_cash = cash;
+}
+
 inline int GalleryMode()
 {
 	if (Doc()->m_myInfo.info.IsIdentity(2))
 		return TRUE;
 
 	return FALSE;
+}
+
+inline int IsObserver(unsigned long identity)
+{
+	if (identity == 0xffffffff)
+		identity = Doc()->m_myInfo.info.dwIdentity;
+
+	return (identity & 0xe) == 0xe;
+}
+
+inline int IsAdministrator(unsigned long identity)
+{
+	if (identity == 0xffffffff)
+		identity = Doc()->m_myInfo.info.dwIdentity;
+
+	return (identity & 4) == 4;
 }
 
 inline bool IsAngelWing(unsigned long typeId)
@@ -514,15 +543,12 @@ inline unsigned char GetCurRoomMapType()
 	return Doc()->m_roomInfo.mapType;
 }
 
-inline void SetMyOutsideCash(__int64 cash)
+inline bool IsUsedItembyMe(unsigned long item)
 {
-	Doc()->m_cash = cash;
-}
-
-inline unsigned char GetDiffFlag()
-{
-	IFF_STRUCT::sCourse* course = Doc()->m_golfGame.pCourse;
-	if (!course)
-		return 0;
-	return course->DiffFlag;
+	if (IsMyTurn(false))
+	{
+		unsigned char cur = GOLFDOC()->m_currentPlayer;
+		return GOLFDOC()->GetPlayer(cur)->item == item ? true : false;
+	}
+	return false;
 }

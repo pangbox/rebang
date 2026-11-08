@@ -130,7 +130,6 @@ template unsigned int std::vector<CRC_MT::sCRC_CHKTASK*>::size() const;
 // HACK: workaround for unsolved symbol ordering problems
 template void std::vector<WVector>::reserve(unsigned int);
 #include "shareddoc.h"
-ILNUM_SD
 #include "uccmanager.h"
 #include "frtext.h"
 #include "wtemplate.h"

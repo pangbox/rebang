@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "emoticondlg.h"
 #include "frlistbox.h"
 #include "frframe.h"

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "frimagenoticedlg.h"
 #include "frbutton.h"
 #include "frarea.h"

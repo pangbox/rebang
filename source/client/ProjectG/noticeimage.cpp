@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "noticeimage.h"
 #include "wresrcmng.h"
 

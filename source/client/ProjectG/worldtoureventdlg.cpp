@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "worldtoureventdlg.h"
 #include "contentsdoc.h"
 

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "golfdoc.h"
 #include "scenemanager.h"
 #include "fx.h"

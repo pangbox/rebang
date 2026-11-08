@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "ingameguildmyroomdlg.h"
 
 extern Fresh* g_pFresh;

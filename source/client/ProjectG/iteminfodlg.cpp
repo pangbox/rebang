@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "iteminfodlg.h"
 #include "../../shared/globalnetworkdefine.h"
 #include "uccmanager.h"

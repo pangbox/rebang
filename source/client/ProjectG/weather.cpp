@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "projectg.h"
 #include "weather.h"
 #include "woverlay.h"

@@ -75,4 +75,5 @@ extern "C"
 	IJLERR __stdcall ijlInit(JPEG_CORE_PROPERTIES* jcprops);
 	IJLERR __stdcall ijlFree(JPEG_CORE_PROPERTIES* jcprops);
 	IJLERR __stdcall ijlRead(JPEG_CORE_PROPERTIES* jcprops, IJLIOTYPE iotype);
+	IJLERR __stdcall ijlWrite(JPEG_CORE_PROPERTIES* jcprops, IJLIOTYPE iotype);
 }

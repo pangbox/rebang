@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "standinginline.h"
 #include "frviewer.h"
 #include "frlistbox.h"

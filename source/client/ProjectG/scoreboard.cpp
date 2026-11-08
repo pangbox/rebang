@@ -28,7 +28,6 @@
 #include "clientsetting.h"
 #include "wminmax.h"
 #include "frdesktop.h"
-#include "minatl.h"
 
 extern Fresh* g_pFresh;
 

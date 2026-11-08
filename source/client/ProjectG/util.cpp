@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "util.h"
 
 static bool IsZero(float f)

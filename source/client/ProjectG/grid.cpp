@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "projectg.h"
 #include "grid.h"
 #include "golfdoc.h"
@@ -14,6 +13,20 @@ CGrid::CGrid()
 	m_slopeTex = 0;
 	m_middleTex = 0;
 	m_dispPriority = DISP_PRIORITY_1;
+}
+
+void CGrid::OnDestroy()
+{
+	if (g_resrcmng && m_slopeTex)
+	{
+		g_resrcmng->Release(m_slopeTex);
+		m_slopeTex = 0;
+	}
+	if (g_resrcmng && m_middleTex)
+	{
+		g_resrcmng->Release(m_middleTex);
+		m_middleTex = 0;
+	}
 }
 
 void CGrid::OnPreLoadInit()
@@ -36,20 +49,6 @@ void CGrid::OnPreLoadInit()
 		"\xb1\xd7\xb8\xae\xb5\xe5", 0, NULL);
 }
 
-void CGrid::OnDestroy()
-{
-	if (g_resrcmng && m_slopeTex)
-	{
-		g_resrcmng->Release(m_slopeTex);
-		m_slopeTex = 0;
-	}
-	if (g_resrcmng && m_middleTex)
-	{
-		g_resrcmng->Release(m_middleTex);
-		m_middleTex = 0;
-	}
-}
-
 void CGrid::OnLoad()
 {
 	m_slopeTex = g_resrcmng->LoadTexture("[slope.jpg", 0, 0, 0);
@@ -60,11 +59,6 @@ void CGrid::OnReload()
 {
 	m_bBlink = false;
 	Reset();
-}
-
-void CGrid::MoveLine(float delta)
-{
-	m_linePos += delta;
 }
 
 void CGrid::Reset()
@@ -97,26 +91,85 @@ void CGrid::Reset()
 	}
 }
 
-int CGrid::GetColor(float slope)
+void CGrid::SetGridType()
 {
-	float factor = Min((slope > 0.f ? slope : -slope) / (.1f * 3.2f), 1.f);
-	if (slope > 0.f)
-		return ULblend(0xffa1c400, 0xffc6f2de, factor * 255.f);
-	return ULblend(0xffa1c400, 0xff00562f, factor * 255.f);
+	unsigned char playerIndex = GOLFDOC()->m_currentPlayer;
+	sPlayerData* player = GOLFDOC()->GetPlayer(playerIndex);
+	WVector pin = GOLFDOC()->GetHoleData().pin;
+	WVector diff = pin - player->pos;
+	diff.y = 0.f;
+	if (GolfBall().m_groundType == 2 || diff.Magnitude() < 128.f)
+	{
+		m_flag.Disable(2);
+		if (GolfBall().m_groundType == 2 && GolfClub().GetType() == 3 &&
+			!GolfClub().IsPowerPutter())
+		{
+			m_colNum = 10;
+			m_rowNum = 11;
+			m_interval = 3.2f;
+			m_colNumAdd = -4;
+			m_rowNumAdd = 0;
+			m_intervalAdd = 3.2f;
+		}
+		else
+		{
+			m_colNum = 8;
+			m_rowNum = 16;
+			m_interval = 6.4f;
+			m_colNumAdd = -2;
+			m_rowNumAdd = 5;
+			m_intervalAdd = 0.f;
+		}
+	}
+	else
+	{
+		m_flag.Enable(2);
+		m_colNum = 10;
+		m_rowNum = 11;
+		m_interval = 12.8f;
+		m_colNumAdd = 0;
+		m_rowNumAdd = 0;
+		m_intervalAdd = 0.f;
+		MakeStaticGrid();
+	}
+	Reset();
 }
 
-float CGrid::GetSlope(int row, int col, float interval, bool bRow)
+void CGrid::OnProcess(float delta)
 {
-	if (bRow)
-		return atanf((GetPVS().GetGreenPos(m_block[row][col].pos) -
-						 GetPVS().GetGreenPos(m_block[row + 1][col].pos)) /
-				   interval) *
-			8.f;
-	else
-		return atanf((GetPVS().GetGreenPos(m_block[row][col].pos) -
-						 GetPVS().GetGreenPos(m_block[row][col + 1].pos)) /
-				   interval) *
-			8.f;
+	if (GOLFDOC()->m_tutorialMode < 4 || CCapturedBg::Instance()->IsCaptured())
+		return;
+	if (GolfClub().Updated())
+		m_flag.Enable(16);
+	if (m_flag.GetFlag(4))
+		return;
+	WVector diff = g_camera.pivot - m_center;
+	diff.y = 0.f;
+	if (diff.Magnitude() > 320.f)
+	{
+		m_flag.Enable(1);
+		return;
+	}
+	m_flag.Disable(1);
+	if (!m_flag.GetFlag(2))
+	{
+		if (m_flag.GetFlag(16))
+		{
+			m_dir = RotMat(m_angle, 1).za;
+			m_right = WCrossProduct(WVector::UNIT_POS_Y, m_dir);
+			MakeDynamicGrid();
+			SetHoleGrid();
+			MakeSlopeIndex();
+			m_flag.Disable(8);
+		}
+		else
+			m_flag.Enable(8);
+	}
+	m_flag.Disable(16);
+	if (GolfBall().m_state)
+		CheckGridPass();
+	if (m_bBlink)
+		m_blinkTime += delta;
 }
 
 void CGrid::CheckGridPass()
@@ -219,189 +272,6 @@ void CGrid::Display()
 	}
 }
 
-void CGrid::OnProcess(float delta)
-{
-	if (GOLFDOC()->m_tutorialMode < 4 || CCapturedBg::Instance()->IsCaptured())
-		return;
-	if (GolfClub().Updated())
-		m_flag.Enable(16);
-	if (m_flag.GetFlag(4))
-		return;
-	WVector diff = g_camera.pivot - m_center;
-	diff.y = 0.f;
-	if (diff.Magnitude() > 320.f)
-	{
-		m_flag.Enable(1);
-		return;
-	}
-	m_flag.Disable(1);
-	if (!m_flag.GetFlag(2))
-	{
-		if (m_flag.GetFlag(16))
-		{
-			m_dir = RotMat(m_angle, 1).za;
-			m_right = WCrossProduct(WVector::UNIT_POS_Y, m_dir);
-			MakeDynamicGrid();
-			SetHoleGrid();
-			MakeSlopeIndex();
-			m_flag.Disable(8);
-		}
-		else
-			m_flag.Enable(8);
-	}
-	m_flag.Disable(16);
-	if (GolfBall().m_state)
-		CheckGridPass();
-	if (m_bBlink)
-		m_blinkTime += delta;
-}
-
-void CGrid::MakeDynamicGrid()
-{
-	for (int row = 0; row < m_rowNum + (GolfClub().Is("1PT") ? m_rowNumAdd : 0);
-		row++)
-		for (int col = 0;
-			col < m_colNum + (GolfClub().Is("1PT") ? m_colNumAdd : 0); col++)
-		{
-			WVector pos = GolfBall().m_pos +
-				(m_interval + (GolfClub().Is("1PT") ? m_intervalAdd : 0.f)) *
-					(m_dir * row +
-						m_right *
-							(col + .5f -
-								(m_colNum +
-									(GolfClub().Is("1PT") ? m_colNumAdd : 0)) /
-									2));
-			float radius = GolfBall().GetRadius();
-			m_block[row][col].pos =
-				GetPVS().GetGroundPoint(pos, true, NULL, true) +
-				WVector(0, radius, 0);
-		}
-}
-
-void CGrid::MakeStaticGrid()
-{
-	for (int row = 0; row < m_rowNum; row++)
-		for (int col = 0; col < m_colNum; col++)
-		{
-			WVector pos = m_center +
-				WVector((col - m_colNum / 2) * m_interval, 0,
-					(row - m_rowNum / 2) * m_interval);
-			float radius = GolfBall().GetRadius();
-			m_block[row][col].pos =
-				GetPVS().GetGroundPoint(pos, true, NULL, true) +
-				WVector(0, radius, 0);
-		}
-	m_dir = WVector::UNIT_POS_Z;
-	m_right = WVector::UNIT_POS_X;
-	MakeSlopeIndex();
-}
-
-void CGrid::SetGridType()
-{
-	unsigned char playerIndex = GOLFDOC()->m_currentPlayer;
-	sPlayerData* player = GOLFDOC()->GetPlayer(playerIndex);
-	WVector pin = GOLFDOC()->GetHoleData().pin;
-	WVector diff = pin - player->pos;
-	diff.y = 0.f;
-	if (GolfBall().m_groundType == 2 || diff.Magnitude() < 128.f)
-	{
-		m_flag.Disable(2);
-		if (GolfBall().m_groundType == 2 && GolfClub().GetType() == 3 &&
-			!GolfClub().IsPowerPutter())
-		{
-			m_colNum = 10;
-			m_rowNum = 11;
-			m_interval = 3.2f;
-			m_colNumAdd = -4;
-			m_rowNumAdd = 0;
-			m_intervalAdd = 3.2f;
-		}
-		else
-		{
-			m_colNum = 8;
-			m_rowNum = 16;
-			m_interval = 6.4f;
-			m_colNumAdd = -2;
-			m_rowNumAdd = 5;
-			m_intervalAdd = 0.f;
-		}
-	}
-	else
-	{
-		m_flag.Enable(2);
-		m_colNum = 10;
-		m_rowNum = 11;
-		m_interval = 12.8f;
-		m_colNumAdd = 0;
-		m_rowNumAdd = 0;
-		m_intervalAdd = 0.f;
-		MakeStaticGrid();
-	}
-	Reset();
-}
-
-void CGrid::SetHoleGrid()
-{
-	WVector diff = GetHoleCupPos() - GolfBall().m_pos;
-	diff.y = 0.f;
-	float interval = m_interval + (GolfClub().Is("1PT") ? m_intervalAdd : 0.f);
-	m_holeRow = (diff * m_dir) / interval;
-	m_holeCol = (int)floorf((diff * m_right) / interval - .5f) +
-		(m_colNum + (GolfClub().Is("1PT") ? m_colNumAdd : 0)) / 2;
-	const int& rowCount = m_rowNum;
-	if (m_holeRow > rowCount + (GolfClub().Is("1PT") ? m_rowNumAdd : 0) - 2)
-		m_holeRow = -1;
-	const int& colCount = m_colNum;
-	if (m_holeCol > colCount + (GolfClub().Is("1PT") ? m_colNumAdd : 0) - 2)
-		m_holeCol = -1;
-	m_bHoleGrid = true;
-	int distance = diff.Magnitude() /
-		(GolfClub().GetApproachMode() > 1
-				? 6.4f
-				: (GolfClub().Is("1PT") ? 6.4f : 3.2f));
-	int rows = m_rowNum + (GolfClub().Is("1PT") ? m_rowNumAdd : 0);
-	int middle = (m_colNum + (GolfClub().Is("1PT") ? m_colNumAdd : 0)) * .5f;
-	if (GolfBall().m_groundType == 2 && GolfClub().GetType() == 3 &&
-		middle >= 1)
-	{
-		float* heights = new float[rows];
-		heights[0] =
-			(m_block[0][middle].pos.y + m_block[0][middle - 1].pos.y) * .5f;
-		for (int i = 1; i < rows; i++)
-			heights[i] =
-				(m_block[i][middle].pos.y + m_block[i][middle - 1].pos.y +
-					m_block[i - 1][middle - 1].pos.y +
-					m_block[i - 1][middle].pos.y) *
-				.25f;
-		SendMsg(this, "Screen", 430, distance, rows - 1, (int)heights, 0);
-		delete[] heights;
-	}
-	else
-		SendMsg(this, "Screen", 430, distance, rows - 1, 0, 0);
-}
-
-void CGrid::MakeSlopeIndex()
-{
-	float interval = m_interval + (GolfClub().Is("1PT") ? m_intervalAdd : 0.f);
-	for (int row = 0;
-		row < m_rowNum + (GolfClub().Is("1PT") ? m_rowNumAdd : 0) - 1; row++)
-		for (int col = 0;
-			col < m_colNum + (GolfClub().Is("1PT") ? m_colNumAdd : 0) - 1;
-			col++)
-		{
-			float r =
-				Between(-.45f, GetSlope(row, col, interval, true), .45f) + .5f;
-			float c =
-				Between(-.45f, GetSlope(row, col, interval, false), .45f) + .5f;
-			float radius = GolfBall().GetRadius();
-			m_block[row][col].slope =
-				GetPVS().GetGroundPoint(m_block[row][col].pos +
-						(r * m_dir + c * m_right) * interval,
-					true, NULL, true) +
-				WVector(0, radius, 0);
-		}
-}
-
 void CGrid::HandleMsg(const MsgObject& msg)
 {
 	switch (msg.message)
@@ -455,4 +325,141 @@ void CGrid::HandleMsg(const MsgObject& msg)
 		m_flag.Enable(16);
 		break;
 	}
+}
+
+void CGrid::MakeStaticGrid()
+{
+	for (int row = 0; row < m_rowNum; row++)
+	{
+		for (int col = 0; col < m_colNum; col++)
+		{
+			WVector pos = m_center +
+				WVector((col - m_colNum / 2) * m_interval, 0,
+					(row - m_rowNum / 2) * m_interval);
+			float radius = GolfBall().GetRadius();
+			m_block[row][col].pos =
+				GetPVS().GetGroundPoint(pos, true, NULL, true) +
+				WVector(0, radius, 0);
+		}
+	}
+	m_dir = WVector::UNIT_POS_Z;
+	m_right = WVector::UNIT_POS_X;
+	MakeSlopeIndex();
+}
+
+void CGrid::MakeDynamicGrid()
+{
+	for (int row = 0; row < m_rowNum + (GolfClub().Is("1PT") ? m_rowNumAdd : 0);
+		row++)
+	{
+		for (int col = 0;
+			col < m_colNum + (GolfClub().Is("1PT") ? m_colNumAdd : 0); col++)
+		{
+			WVector pos = GolfBall().m_pos +
+				(m_interval + (GolfClub().Is("1PT") ? m_intervalAdd : 0.f)) *
+					(m_dir * row +
+						m_right *
+							(col + .5f -
+								(m_colNum +
+									(GolfClub().Is("1PT") ? m_colNumAdd : 0)) /
+									2));
+			float radius = GolfBall().GetRadius();
+			m_block[row][col].pos =
+				GetPVS().GetGroundPoint(pos, true, NULL, true) +
+				WVector(0, radius, 0);
+		}
+	}
+}
+
+int CGrid::GetColor(float slope)
+{
+	float factor = Min((slope > 0.f ? slope : -slope) / (.1f * 3.2f), 1.f);
+	if (slope > 0.f)
+		return ULblend(0xffa1c400, 0xffc6f2de, factor * 255.f);
+	return ULblend(0xffa1c400, 0xff00562f, factor * 255.f);
+}
+
+void CGrid::SetHoleGrid()
+{
+	WVector diff = GetHoleCupPos() - GolfBall().m_pos;
+	diff.y = 0.f;
+	float interval = m_interval + (GolfClub().Is("1PT") ? m_intervalAdd : 0.f);
+	m_holeRow = (diff * m_dir) / interval;
+	m_holeCol = (int)floorf((diff * m_right) / interval - .5f) +
+		(m_colNum + (GolfClub().Is("1PT") ? m_colNumAdd : 0)) / 2;
+	const int& rowCount = m_rowNum;
+	if (m_holeRow > rowCount + (GolfClub().Is("1PT") ? m_rowNumAdd : 0) - 2)
+		m_holeRow = -1;
+	const int& colCount = m_colNum;
+	if (m_holeCol > colCount + (GolfClub().Is("1PT") ? m_colNumAdd : 0) - 2)
+		m_holeCol = -1;
+	m_bHoleGrid = true;
+	int distance = diff.Magnitude() /
+		(GolfClub().GetApproachMode() > 1
+				? 6.4f
+				: (GolfClub().Is("1PT") ? 6.4f : 3.2f));
+	int rows = m_rowNum + (GolfClub().Is("1PT") ? m_rowNumAdd : 0);
+	int middle = (m_colNum + (GolfClub().Is("1PT") ? m_colNumAdd : 0)) * .5f;
+	if (GolfBall().m_groundType == 2 && GolfClub().GetType() == 3 &&
+		middle >= 1)
+	{
+		float* heights = new float[rows];
+		heights[0] =
+			(m_block[0][middle].pos.y + m_block[0][middle - 1].pos.y) * .5f;
+		for (int i = 1; i < rows; i++)
+			heights[i] =
+				(m_block[i][middle].pos.y + m_block[i][middle - 1].pos.y +
+					m_block[i - 1][middle - 1].pos.y +
+					m_block[i - 1][middle].pos.y) *
+				.25f;
+		SendMsg(this, "Screen", 430, distance, rows - 1, (int)heights, 0);
+		delete[] heights;
+	}
+	else
+	{
+		SendMsg(this, "Screen", 430, distance, rows - 1, 0, 0);
+	}
+}
+
+void CGrid::MoveLine(float delta)
+{
+	m_linePos += delta;
+}
+
+void CGrid::MakeSlopeIndex()
+{
+	float interval = m_interval + (GolfClub().Is("1PT") ? m_intervalAdd : 0.f);
+	for (int row = 0;
+		row < m_rowNum + (GolfClub().Is("1PT") ? m_rowNumAdd : 0) - 1; row++)
+	{
+		for (int col = 0;
+			col < m_colNum + (GolfClub().Is("1PT") ? m_colNumAdd : 0) - 1;
+			col++)
+		{
+			float r =
+				Between(-.45f, GetSlope(row, col, interval, true), .45f) + .5f;
+			float c =
+				Between(-.45f, GetSlope(row, col, interval, false), .45f) + .5f;
+			float radius = GolfBall().GetRadius();
+			m_block[row][col].slope =
+				GetPVS().GetGroundPoint(m_block[row][col].pos +
+						(r * m_dir + c * m_right) * interval,
+					true, NULL, true) +
+				WVector(0, radius, 0);
+		}
+	}
+}
+
+float CGrid::GetSlope(int row, int col, float interval, bool bRow)
+{
+	if (bRow)
+		return atanf((GetPVS().GetGreenPos(m_block[row][col].pos) -
+						 GetPVS().GetGreenPos(m_block[row + 1][col].pos)) /
+				   interval) *
+			8.f;
+	else
+		return atanf((GetPVS().GetGreenPos(m_block[row][col].pos) -
+						 GetPVS().GetGreenPos(m_block[row][col + 1].pos)) /
+				   interval) *
+			8.f;
 }

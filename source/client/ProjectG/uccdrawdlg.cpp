@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "uccclothes.h"
 #include "uccdrawdlg.h"
 #include "uccpickcolordlg.h"

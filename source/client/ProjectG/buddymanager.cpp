@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include "buddymanager.h"
 #include "imessage.h"
 #include "chatmsg.h"

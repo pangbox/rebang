@@ -32,7 +32,6 @@ private:
 #include "golfdoc.h"
 #include "mousecursor.h"
 #include "tinyxml.h"
-#include "minatl.h"
 
 extern Fresh* g_pFresh;
 

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "ntavatar.h"
 #include "realmyroomdata.h"
 #include "actor.h"

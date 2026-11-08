@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "ghostgamedlg.h"
 #include "inputmanager.h"
 #include "shareddoc.h"

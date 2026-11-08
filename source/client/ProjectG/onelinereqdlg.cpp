@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "onelinereqdlg.h"
 #include "onelineboard.h"
 #include "emoticondlg.h"

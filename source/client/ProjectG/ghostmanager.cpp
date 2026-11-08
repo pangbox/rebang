@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "ghostmanager.h"
 #include "ghostdocument.h"
 #include "ghosthandler.h"
@@ -46,6 +45,21 @@ void CGhostManager::ReleaseDocument()
 	m_pDocument = NULL;
 }
 
+void CGhostManager::SaveDocument(const std::string& fileName)
+{
+	if (!m_pDocument)
+		return;
+	DWORD start = GetTickCount();
+	m_pDocument->Export(fileName);
+	ReleaseDocument();
+	sResource resource;
+	resource.filename = fileName;
+	resource.type = RESOURCE_GHOST;
+	sprintf(resource.arg, "%d", MyUID());
+	NetResManager()->Upload(resource,
+		"http://qa.contents.pangya.gametree.co.kr:50006/GHOST/upload.asp");
+}
+
 void CGhostManager::LoadDocument(const std::string& fileName)
 {
 	m_latestFileName = fileName;
@@ -77,84 +91,6 @@ void CGhostManager::LoadDocumentFromLocalFile(const std::string& fileName)
 	GetGhostGameBriefFromFileName(m_pLatestGameBrief, fileName.c_str());
 	CGhostHandler::Instance()->LoadingComplete(
 		CGhostLoader().LoadFromFile(fileName));
-}
-
-void CGhostManager::SaveDocument(const std::string& fileName)
-{
-	if (!m_pDocument)
-		return;
-	DWORD start = GetTickCount();
-	m_pDocument->Export(fileName);
-	ReleaseDocument();
-	sResource resource;
-	resource.filename = fileName;
-	resource.type = RESOURCE_GHOST;
-	sprintf(resource.arg, "%d", MyUID());
-	NetResManager()->Upload(resource,
-		"http://qa.contents.pangya.gametree.co.kr:50006/GHOST/upload.asp");
-}
-
-void conv_legacycard_to_ghostcard(const sSCardAvilityPeriodInfo* from,
-	GHOST_CARD_DATA* to)
-{
-	to->typeId = from->tid;
-	to->itemId = from->uid;
-	to->partsTypeId = from->partsTid;
-	to->partsItemId = from->partsUid;
-	to->ability = from->Avility;
-	to->abilityValue = from->AvilityValue;
-	to->slotNum = from->slotNum;
-	to->cardType = from->cardType;
-}
-
-void conv_ghostcard_to_legacycard(const GHOST_CARD_DATA* from,
-	sSCardAvilityPeriodInfo* to)
-{
-	to->Avility = from->ability;
-	to->AvilityValue = from->abilityValue;
-	to->cardType = from->cardType;
-	to->partsTid = from->partsTypeId;
-	to->partsUid = from->partsItemId;
-	to->slotNum = from->slotNum;
-	to->tid = from->typeId;
-	to->uid = from->itemId;
-	to->valid = 1;
-}
-
-void conv_ghostshot_to_shotprotocol(const sShotProtocol* from,
-	GHOST_SHOT_PROTOCOL* to)
-{
-	to->maxClick = from->maxClick;
-	to->minClick = from->minClick;
-	to->curve = from->curve;
-	to->spin = from->spin;
-	to->accuracy = from->accuracy;
-	to->special = from->speical;
-	to->frame = from->frame;
-	to->shotAngle = from->angle;
-	to->shotTime = from->shotTime;
-	to->center = from->center;
-	to->clubIndex = from->clubIndex;
-	to->randomPower = from->randomPower;
-	to->randomAngle = from->randomAngle;
-}
-
-void conv_shotprotocol_to_ghostshot(const GHOST_SHOT_PROTOCOL* from,
-	sShotProtocol* to)
-{
-	to->maxClick = from->maxClick;
-	to->minClick = from->minClick;
-	to->curve = from->curve;
-	to->spin = from->spin;
-	to->accuracy = from->accuracy;
-	to->speical = from->special;
-	to->frame = from->frame;
-	to->angle = from->shotAngle;
-	to->shotTime = from->shotTime;
-	to->center = from->center;
-	to->clubIndex = from->clubIndex;
-	to->randomPower = from->randomPower;
-	to->randomAngle = from->randomAngle;
 }
 
 void conv_ghostdata_to_userinfo(const GHOST_USER_DATA* from, sUserInfo* to)
@@ -232,6 +168,69 @@ void conv_ghostdata_to_slotinfo(const GHOST_USER_DATA* from, sSlotInfo* to)
 	to->dwGuid = -2;
 	to->tidChar = from->charTypeId;
 	to->tidMascot = from->mascotTypeId;
+}
+
+void conv_legacycard_to_ghostcard(const sSCardAvilityPeriodInfo* from,
+	GHOST_CARD_DATA* to)
+{
+	to->typeId = from->tid;
+	to->itemId = from->uid;
+	to->partsTypeId = from->partsTid;
+	to->partsItemId = from->partsUid;
+	to->ability = from->Avility;
+	to->abilityValue = from->AvilityValue;
+	to->slotNum = from->slotNum;
+	to->cardType = from->cardType;
+}
+
+void conv_ghostcard_to_legacycard(const GHOST_CARD_DATA* from,
+	sSCardAvilityPeriodInfo* to)
+{
+	to->Avility = from->ability;
+	to->AvilityValue = from->abilityValue;
+	to->cardType = from->cardType;
+	to->partsTid = from->partsTypeId;
+	to->partsUid = from->partsItemId;
+	to->slotNum = from->slotNum;
+	to->tid = from->typeId;
+	to->uid = from->itemId;
+	to->valid = 1;
+}
+
+void conv_ghostshot_to_shotprotocol(const sShotProtocol* from,
+	GHOST_SHOT_PROTOCOL* to)
+{
+	to->maxClick = from->maxClick;
+	to->minClick = from->minClick;
+	to->curve = from->curve;
+	to->spin = from->spin;
+	to->accuracy = from->accuracy;
+	to->special = from->speical;
+	to->frame = from->frame;
+	to->shotAngle = from->angle;
+	to->shotTime = from->shotTime;
+	to->center = from->center;
+	to->clubIndex = from->clubIndex;
+	to->randomPower = from->randomPower;
+	to->randomAngle = from->randomAngle;
+}
+
+void conv_shotprotocol_to_ghostshot(const GHOST_SHOT_PROTOCOL* from,
+	sShotProtocol* to)
+{
+	to->maxClick = from->maxClick;
+	to->minClick = from->minClick;
+	to->curve = from->curve;
+	to->spin = from->spin;
+	to->accuracy = from->accuracy;
+	to->speical = from->special;
+	to->frame = from->frame;
+	to->angle = from->shotAngle;
+	to->shotTime = from->shotTime;
+	to->center = from->center;
+	to->clubIndex = from->clubIndex;
+	to->randomPower = from->randomPower;
+	to->randomAngle = from->randomAngle;
 }
 
 static bool registered_conv_userinfo_to_ghostdata =

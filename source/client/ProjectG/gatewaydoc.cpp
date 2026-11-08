@@ -1,5 +1,3 @@
-#include "minatl.h"
-
 #include "gatewaydoc.h"
 #include "messagemanager.h"
 #include "specialbox.h"

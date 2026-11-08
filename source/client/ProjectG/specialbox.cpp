@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "specialbox.h"
 #include "specialboxdlg.h"
 #include "gatewayactor.h"

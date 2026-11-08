@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "kbdmanualdlg.h"
 
 IMPLEMENT_OBJECT(FrKbdManualDlg, FrForm)

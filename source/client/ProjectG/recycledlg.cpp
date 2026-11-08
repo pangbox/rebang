@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "recycledlg.h"
 #include "../../shared/recycletable.inl"
 #include "shareddoc.h"

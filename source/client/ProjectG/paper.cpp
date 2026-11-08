@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "minatl.h"
 #include <stdarg.h>
 
 #include "paper.h"

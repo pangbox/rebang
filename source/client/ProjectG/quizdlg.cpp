@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "quizdlg.h"
 #include "frlistbox.h"
 #include "fresh.h"

@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "shufflebonus.h"
 #include "projectg.h"
 #include "golfdoc.h"

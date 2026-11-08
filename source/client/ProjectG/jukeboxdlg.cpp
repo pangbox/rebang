@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "jukeboxdlg.h"
 #include "fredit.h"
 #include "soundmanager.h"

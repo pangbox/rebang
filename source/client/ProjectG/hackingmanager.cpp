@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "hackingmanager.h"
 
 extern HWND g_hwnd;

@@ -33,6 +33,12 @@ struct w_keyframe_rot
 	WQuat rot;
 };
 
+struct w_keyframe_scale
+{
+	float t;
+	float scale;
+};
+
 class WBone
 {
 public:
@@ -101,6 +107,12 @@ public:
 	void SetBasicMatrix(const WMatrix& matrix);
 	void CopyBasicMatrix(WBone* root, bool child);
 	void SetMatrix(const WMatrix& matrix, WView* view);
+	enum
+	{
+		RECURSIVE = 1,
+		FORCE = 2,
+		EX_SUBPONYTAIL = 4,
+	};
 	void InsertBoneSetList(float time, WBoneSet* set, int flag);
 	void ApplyBoneSetList(WBoneSet* set);
 	void OptimizeBoneSet(float (*range)[2], int count, int child);
@@ -255,6 +267,7 @@ private:
 		int count, bool last);
 	void ClearMesh(w_mesh* mesh);
 	int OptimizeRotKey(float (*range)[2], int count, w_keyframe_rot** out);
+	int OptimizeScaleKey(float (*range)[2], int count, w_keyframe_scale** out);
 	int OptimizePosKey(float (*range)[2], int count, w_keyframe_pos** out);
 	static int __cdecl SortByTextureHandle(const void* left, const void* right);
 	char m_name[64];

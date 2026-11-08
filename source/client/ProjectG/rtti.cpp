@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "rtti.h"
 
 WRTTI::WRTTI(const char* name, const WRTTI* baseRTTI)

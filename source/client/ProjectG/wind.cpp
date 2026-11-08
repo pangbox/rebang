@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "minatl.h"
 #include "mathconsts.h"
 #include "wind.h"
 #include "fx.h"

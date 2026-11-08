@@ -76,6 +76,8 @@ protected:
 	float m_replayTime;
 };
 
+IMPLEMENT_ACTOR(CLetter, IActor)
+
 CLetter::CLetter()
 	: m_pText(NULL), m_textList(32, 16)
 {
@@ -111,269 +113,6 @@ void CLetter::OnDestroy()
 		delete text;
 	m_textList.Reset();
 }
-
-void CLetter::DisplayReplay()
-{
-	static bool display = false;
-	static bool blink = false;
-	if (m_bShow)
-	{
-		if (m_replayTime > 1.0f)
-		{
-			blink ^= true;
-			m_replayTime = 0.5f;
-			display = true;
-		}
-		if (blink)
-		{
-			if (display && m_pReplay)
-				m_pReplay->overlay->Render(g_view, m_pReplay->uv,
-					m_pReplay->rect, 0, 0xffffffff, 0, 0);
-		}
-		else if (display)
-			display = false;
-	}
-}
-
-void CLetter::Print(float x, float y, const char* str, float gap, int align,
-	float scale, unsigned long color)
-{
-	if (!str || !strlen(str))
-		return;
-	const char* charset = m_fontInfo.pCharSet;
-	m_pFont->SetScale(scale);
-	float offset = 0;
-	const char* p = str;
-	switch (m_align)
-	{
-	case 1:
-		while (*p)
-		{
-			int ch = *p++;
-			const char* found = strchr(charset, ch);
-			offset +=
-				m_pFont->GetCharWidth(g_view, found - charset) + gap * scale;
-		}
-		offset = (offset - gap) * 0.5f;
-		break;
-	case 2:
-		while (*p)
-		{
-			int ch = *p++;
-			const char* found = strchr(charset, ch);
-			offset +=
-				m_pFont->GetCharWidth(g_view, found - charset) + gap * scale;
-		}
-		offset -= gap;
-		break;
-	}
-	x -= offset;
-	p = str;
-	while (*p)
-	{
-		int ch = *p++;
-		const char* found = strchr(charset, ch);
-		const float width =
-			m_pFont->PutChar(g_view, x, y, found - charset, align, color);
-		x = (width + gap) + x;
-	}
-}
-
-void CLetter::AddOverlay(const char* name, const char* filename, WRect* rect,
-	bool bSkip)
-{
-	sText* text = new sText;
-	text->overlay = g_resrcmng->GetOverlay(filename, 0);
-	if (!text->overlay)
-	{
-		delete text;
-		return;
-	}
-	{
-		strcpy(text->name, name);
-		text->time = 0;
-		float width = (float)text->overlay->GetWidth();
-		float height = (float)text->overlay->GetHeight();
-		if (rect)
-		{
-			text->uv.x = rect->x / width;
-			text->uv.y = rect->y / height;
-			text->uv.w = rect->w / width;
-			text->uv.h = rect->h / height;
-		}
-		else
-			text->uv = WRect(0.0f, 0.0f, 1.0f, 1.0f);
-		text->rect.w = width * text->uv.w;
-		text->rect.h = height * text->uv.h;
-		text->rect.x =
-			(float)(int)(g_view->GetWidth() * 0.5f - text->rect.w * 0.5f);
-		text->rect.y =
-			(float)(int)(g_view->GetHeight() * 0.25f - text->rect.h * 0.5f);
-		text->bSkip = bSkip;
-		text->number.bShow = false;
-		m_textList.AddItem(text, text->name, 0);
-	}
-}
-
-void CLetter::SetPos(const char* name, float x, float y)
-{
-	sText* text = m_textList.Find(name);
-	if (text)
-	{
-		text->rect.x = (float)(int)(x - text->rect.w * 0.5f);
-		text->rect.y = (float)(int)(y - text->rect.h * 0.5f);
-	}
-}
-
-void CLetter::OnProcess(float delta)
-{
-	m_replayTime += delta;
-	if (m_pText && !CCapturedBg::Instance()->IsCaptured())
-	{
-		if (GOLFDOC()->m_gameMode & 0x8210)
-			m_state = 0;
-		switch (m_state)
-		{
-		case 1:
-			m_alpha += delta / m_fadeTime * 255.0f;
-			if (m_alpha > 255.0f)
-				m_state = 2;
-			break;
-		case 2:
-			if (m_pText->time > 0)
-			{
-				m_pText->time -= delta;
-				if (m_pText->time < 0)
-					m_state = 3;
-			}
-			if (m_pText->bSkip && g_input->GetList())
-				m_state = 3;
-			break;
-		case 3:
-			m_alpha -= delta / m_fadeTime * 255.0f;
-			if (m_alpha < 0)
-			{
-				m_alpha = 0;
-				m_state = 0;
-			}
-			break;
-		}
-		float alpha = m_alpha;
-		m_alpha = alpha < 0.0f ? 0.0f : alpha > 255.0f ? 255.0f : alpha;
-	}
-}
-
-void CLetter::OnDisplay()
-{
-	if (CCapturedBg::Instance()->IsCaptured())
-		return;
-	if (CHeadIcon::Instance())
-		CHeadIcon::Instance()->DisplayOverPlayer();
-	DisplayReplay();
-	if (m_pFastForward)
-	{
-		if (m_pReplay)
-			m_pFastForward->rect.x = 88.0f;
-		else
-			m_pFastForward->rect.x = 13.0f;
-		m_pFastForward->overlay->Render(g_view, m_pFastForward->uv,
-			m_pFastForward->rect, 0, 0xffffffff, 0, 0);
-	}
-	if (m_bShow && m_state && m_pText && !(GOLFDOC()->m_gameMode & 0x20400))
-	{
-		m_pText->overlay->Render(g_view, m_pText->uv, m_pText->rect, 0,
-			((int)m_alpha << 24) + 0xffffff, 0, 0);
-		if (m_pText->number.bShow)
-			Print(g_view->GetWidth() * 0.5f + 5.0f,
-				g_view->GetHeight() * 0.25f + 5.0f,
-				MakeStr("%d", m_pText->number.number), 3.0f, 0,
-				m_pText->number.scale, m_pText->number.color);
-	}
-}
-
-void CLetter::HandleMsg(const MsgObject& msg)
-{
-	if (msg.time > g_CurrentTime)
-	{
-		StoreDelayedMsg(msg);
-		return;
-	}
-	switch (msg.message)
-	{
-	case 402:
-		m_pReplay = m_textList.Find("Replay");
-		m_replayTime = 0.5f;
-		break;
-	case 403:
-		m_pFastForward = m_textList.Find("FastForward");
-		break;
-	case 396:
-		if (m_pText && msg.param1)
-		{
-			if (strstr(m_pText->name, (const char*)msg.param1))
-				m_pText = NULL;
-		}
-		else
-		{
-			m_pText = NULL;
-			m_pReplay = NULL;
-			m_pFastForward = NULL;
-		}
-		break;
-	case 399:
-		m_state = 3;
-		break;
-	case 397:
-		m_pText = m_textList.Find((const char*)msg.param1);
-		if (m_pText)
-		{
-			if (msg.param2)
-				m_pText->time = *(float*)msg.param2;
-			else
-				m_pText->time = 0;
-			if (msg.param3)
-			{
-				m_alpha = 255.0f;
-				m_state = 2;
-			}
-			else
-			{
-				m_alpha = 0;
-				m_state = 1;
-			}
-		}
-		break;
-	case 398:
-		m_state = 1;
-		break;
-	case 401:
-		m_pText = m_textList.Find((const char*)msg.param1);
-		if (m_pText)
-		{
-			m_pText->number = *(sNumber*)msg.param2;
-			m_pText->number.bShow = true;
-		}
-		break;
-	case 400:
-		m_bShow = msg.param1 == 1;
-		break;
-	case 10011:
-		for (sText* text = m_textList.Start(); text; text = m_textList.Next())
-		{
-			text->rect.x =
-				(float)(int)(g_view->GetWidth() * 0.5f - text->rect.w * 0.5f);
-			text->rect.y =
-				(float)(int)(g_view->GetHeight() * 0.25f - text->rect.h * 0.5f);
-		}
-		SetPos("Wait", g_view->GetWidth() * 0.5f, g_view->GetHeight() * 0.18f);
-		SetPos("AI", g_view->GetWidth() * 0.5f, g_view->GetHeight() * 0.18f);
-		SetPos("Replay", 45.0f, 60.0f);
-		SetPos("FastForward", 45.0f, 60.0f);
-		break;
-	}
-}
-
-IMPLEMENT_ACTOR(CLetter, IActor)
 
 void CLetter::OnLoad()
 {
@@ -629,4 +368,267 @@ void CLetter::OnLoad()
 	m_fontInfo.texh = 128;
 	m_fontInfo.pCharSet = "1234567890ym%-./x ";
 	m_pFont->Create(&m_fontInfo);
+}
+
+void CLetter::AddOverlay(const char* name, const char* filename, WRect* rect,
+	bool bSkip)
+{
+	sText* text = new sText;
+	text->overlay = g_resrcmng->GetOverlay(filename, 0);
+	if (!text->overlay)
+	{
+		delete text;
+		return;
+	}
+	strcpy(text->name, name);
+	text->time = 0;
+	float width = (float)text->overlay->GetWidth();
+	float height = (float)text->overlay->GetHeight();
+	if (rect)
+	{
+		text->uv.x = rect->x / width;
+		text->uv.y = rect->y / height;
+		text->uv.w = rect->w / width;
+		text->uv.h = rect->h / height;
+	}
+	else
+	{
+		text->uv = WRect(0.0f, 0.0f, 1.0f, 1.0f);
+	}
+	text->rect.w = width * text->uv.w;
+	text->rect.h = height * text->uv.h;
+	text->rect.x =
+		(float)(int)(g_view->GetWidth() * 0.5f - text->rect.w * 0.5f);
+	text->rect.y =
+		(float)(int)(g_view->GetHeight() * 0.25f - text->rect.h * 0.5f);
+	text->bSkip = bSkip;
+	text->number.bShow = false;
+	m_textList.AddItem(text, text->name, 0);
+}
+
+void CLetter::SetPos(const char* name, float x, float y)
+{
+	sText* text = m_textList.Find(name);
+	if (text)
+	{
+		text->rect.x = (float)(int)(x - text->rect.w * 0.5f);
+		text->rect.y = (float)(int)(y - text->rect.h * 0.5f);
+	}
+}
+
+void CLetter::OnProcess(float delta)
+{
+	m_replayTime += delta;
+	if (m_pText && !CCapturedBg::Instance()->IsCaptured())
+	{
+		if (GOLFDOC()->m_gameMode & 0x8210)
+			m_state = 0;
+		switch (m_state)
+		{
+		case 1:
+			m_alpha += delta / m_fadeTime * 255.0f;
+			if (m_alpha > 255.0f)
+				m_state = 2;
+			break;
+		case 2:
+			if (m_pText->time > 0)
+			{
+				m_pText->time -= delta;
+				if (m_pText->time < 0)
+					m_state = 3;
+			}
+			if (m_pText->bSkip && g_input->GetList())
+				m_state = 3;
+			break;
+		case 3:
+			m_alpha -= delta / m_fadeTime * 255.0f;
+			if (m_alpha < 0)
+			{
+				m_alpha = 0;
+				m_state = 0;
+			}
+			break;
+		}
+		float alpha = m_alpha;
+		m_alpha = alpha < 0.0f ? 0.0f : alpha > 255.0f ? 255.0f : alpha;
+	}
+}
+
+void CLetter::DisplayReplay()
+{
+	static bool display = false;
+	static bool blink = false;
+	if (m_bShow)
+	{
+		if (m_replayTime > 1.0f)
+		{
+			blink ^= true;
+			m_replayTime = 0.5f;
+			display = true;
+		}
+		if (blink)
+		{
+			if (display && m_pReplay)
+				m_pReplay->overlay->Render(g_view, m_pReplay->uv,
+					m_pReplay->rect, 0, 0xffffffff, 0, 0);
+		}
+		else if (display)
+		{
+			display = false;
+		}
+	}
+}
+
+void CLetter::OnDisplay()
+{
+	if (CCapturedBg::Instance()->IsCaptured())
+		return;
+	if (CHeadIcon::Instance())
+		CHeadIcon::Instance()->DisplayOverPlayer();
+	DisplayReplay();
+	if (m_pFastForward)
+	{
+		if (m_pReplay)
+			m_pFastForward->rect.x = 88.0f;
+		else
+			m_pFastForward->rect.x = 13.0f;
+		m_pFastForward->overlay->Render(g_view, m_pFastForward->uv,
+			m_pFastForward->rect, 0, 0xffffffff, 0, 0);
+	}
+	if (m_bShow && m_state && m_pText && !(GOLFDOC()->m_gameMode & 0x20400))
+	{
+		m_pText->overlay->Render(g_view, m_pText->uv, m_pText->rect, 0,
+			((int)m_alpha << 24) + 0xffffff, 0, 0);
+		if (m_pText->number.bShow)
+			Print(g_view->GetWidth() * 0.5f + 5.0f,
+				g_view->GetHeight() * 0.25f + 5.0f,
+				MakeStr("%d", m_pText->number.number), 3.0f, 0,
+				m_pText->number.scale, m_pText->number.color);
+	}
+}
+
+void CLetter::HandleMsg(const MsgObject& msg)
+{
+	if (msg.time > g_CurrentTime)
+	{
+		StoreDelayedMsg(msg);
+		return;
+	}
+	switch (msg.message)
+	{
+	case 402:
+		m_pReplay = m_textList.Find("Replay");
+		m_replayTime = 0.5f;
+		break;
+	case 403:
+		m_pFastForward = m_textList.Find("FastForward");
+		break;
+	case 396:
+		if (m_pText && msg.param1)
+		{
+			if (strstr(m_pText->name, (const char*)msg.param1))
+				m_pText = NULL;
+		}
+		else
+		{
+			m_pText = NULL;
+			m_pReplay = NULL;
+			m_pFastForward = NULL;
+		}
+		break;
+	case 399:
+		m_state = 3;
+		break;
+	case 397:
+		m_pText = m_textList.Find((const char*)msg.param1);
+		if (m_pText)
+		{
+			if (msg.param2)
+				m_pText->time = *(float*)msg.param2;
+			else
+				m_pText->time = 0;
+			if (msg.param3)
+			{
+				m_alpha = 255.0f;
+				m_state = 2;
+			}
+			else
+			{
+				m_alpha = 0;
+				m_state = 1;
+			}
+		}
+		break;
+	case 398:
+		m_state = 1;
+		break;
+	case 401:
+		m_pText = m_textList.Find((const char*)msg.param1);
+		if (m_pText)
+		{
+			m_pText->number = *(sNumber*)msg.param2;
+			m_pText->number.bShow = true;
+		}
+		break;
+	case 400:
+		m_bShow = msg.param1 == 1;
+		break;
+	case 10011:
+		for (sText* text = m_textList.Start(); text; text = m_textList.Next())
+		{
+			text->rect.x =
+				(float)(int)(g_view->GetWidth() * 0.5f - text->rect.w * 0.5f);
+			text->rect.y =
+				(float)(int)(g_view->GetHeight() * 0.25f - text->rect.h * 0.5f);
+		}
+		SetPos("Wait", g_view->GetWidth() * 0.5f, g_view->GetHeight() * 0.18f);
+		SetPos("AI", g_view->GetWidth() * 0.5f, g_view->GetHeight() * 0.18f);
+		SetPos("Replay", 45.0f, 60.0f);
+		SetPos("FastForward", 45.0f, 60.0f);
+		break;
+	}
+}
+
+void CLetter::Print(float x, float y, const char* str, float gap, int align,
+	float scale, unsigned long color)
+{
+	if (!str || !strlen(str))
+		return;
+	const char* charset = m_fontInfo.pCharSet;
+	m_pFont->SetScale(scale);
+	float offset = 0;
+	const char* p = str;
+	switch (m_align)
+	{
+	case 1:
+		while (*p)
+		{
+			int ch = *p++;
+			const char* found = strchr(charset, ch);
+			offset +=
+				m_pFont->GetCharWidth(g_view, found - charset) + gap * scale;
+		}
+		offset = (offset - gap) * 0.5f;
+		break;
+	case 2:
+		while (*p)
+		{
+			int ch = *p++;
+			const char* found = strchr(charset, ch);
+			offset +=
+				m_pFont->GetCharWidth(g_view, found - charset) + gap * scale;
+		}
+		offset -= gap;
+		break;
+	}
+	x -= offset;
+	p = str;
+	while (*p)
+	{
+		int ch = *p++;
+		const char* found = strchr(charset, ch);
+		const float width =
+			m_pFont->PutChar(g_view, x, y, found - charset, align, color);
+		x = (width + gap) + x;
+	}
 }

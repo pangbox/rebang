@@ -43,7 +43,7 @@ WPuppet::WPuppet()
 	m_frame = 0;
 	m_framenum = 0;
 	m_storeTexList = 0;
-	m_rendMode = 0;
+	m_rendMode = W_PUPPET_RENDER_NORMAL;
 	m_aniLen = 0.0f;
 	m_rootbone = 0;
 	m_lightmode = 0;
@@ -313,20 +313,23 @@ WBoneSet* WPuppet::GetBones(const char* name, float time, int mode, char* bone,
 				WBone* found = add->rootbone->FindBone(bone, 0);
 				if ((mode & EXCEPTPARENT) == 0)
 				{
-					found->InsertBoneSetList(time - add->s, set, 1);
+					found->InsertBoneSetList(time - add->s, set,
+						WBone::RECURSIVE);
 				}
 				else
 				{
 					for (WBone* child = found->GetChild(); child != 0;
 						child = child->GetNext())
-						child->InsertBoneSetList(time - add->s, set, 1);
+						child->InsertBoneSetList(time - add->s, set,
+							WBone::RECURSIVE);
 				}
 			}
 			else
 			{
 				for (WBone* item = add->rootbone; item != 0;
 					item = item->GetNext())
-					item->InsertBoneSetList(time - add->s, set, 1);
+					item->InsertBoneSetList(time - add->s, set,
+						WBone::RECURSIVE);
 			}
 			goto keyed;
 		}
@@ -342,19 +345,19 @@ WBoneSet* WPuppet::GetBones(const char* name, float time, int mode, char* bone,
 		}
 		if ((mode & EXCEPTPARENT) == 0)
 		{
-			found->InsertBoneSetList(time, set, 1);
+			found->InsertBoneSetList(time, set, WBone::RECURSIVE);
 		}
 		else
 		{
 			for (WBone* child = found->GetChild(); child != 0;
 				child = child->GetNext())
-				child->InsertBoneSetList(time, set, 1);
+				child->InsertBoneSetList(time, set, WBone::RECURSIVE);
 		}
 	}
 	else
 	{
 		for (WBone* item = m_rootbone; item != 0; item = item->GetNext())
-			item->InsertBoneSetList(time, set, 1);
+			item->InsertBoneSetList(time, set, WBone::RECURSIVE);
 	}
 keyed:
 	if (mode & FIXEDPIVOT)
@@ -1677,7 +1680,7 @@ void WPuppet::LoadPET(cFile* file, bool flag, char* directory, int type)
 	int count = 0;
 
 	m_iPetType = type;
-	if ((type & 1) != 0)
+	if ((type & W_PET_SV_TEXT) != 0)
 		texture = LoadPET_Texture(file, flag, directory, &count);
 
 	WMatrix mat;
@@ -1685,24 +1688,24 @@ void WPuppet::LoadPET(cFile* file, bool flag, char* directory, int type)
 	m_rootbone = LoadPET_Bone(file, type);
 	m_rootbone->Transform(mat, 0, 1.0f, 0);
 
-	if ((type & 4) != 0)
+	if ((type & W_PET_SV_ANIM) != 0)
 		m_aniLen = LoadPET_Animation(file, m_rootbone);
-	if ((type & 8) != 0)
+	if ((type & W_PET_SV_MESH) != 0)
 		LoadPET_Mesh(file, m_rootbone, texture, type == 0x11b);
-	if ((type & 0x10) != 0)
+	if ((type & W_PET_SV_FANM) != 0)
 		LoadPET_FaceAnim(file, texture, m_rootbone, directory);
-	if ((type & 0x20) != 0)
+	if ((type & W_PET_SV_FRAM) != 0)
 		LoadPET_Frame(file);
-	if ((type & 0x40) != 0)
+	if ((type & W_PET_SV_MOTI) != 0)
 		m_mdList = LoadPET_Motion(file, 0.0f);
-	if ((type & 0x80) != 0)
+	if ((type & W_PET_SV_COLL) != 0)
 		LoadPET_Collision(file);
 
 	for (int i = 0; i < count; ++i)
 	{
 		if (texture[i].mapType == 3)
 		{
-			m_rendMode = 5;
+			m_rendMode = W_PUPPET_RENDER_TWO_TEXTURE_ADD;
 			m_rootbone->ApplySpecularMap(texture[i].texHandle);
 			break;
 		}
@@ -1953,39 +1956,40 @@ w_pet_texture_info* WPuppet::LoadPET_Texture(cFile* file, bool alphaTest,
 			{
 			case '+':
 				if (alphaTest)
-					info[i].drawFlags |= 0x80000000;
+					info[i].drawFlags |= W_POLY_USE_ALPHA_TEST;
 				else
-					info[i].drawFlags |= 0x400000;
+					info[i].drawFlags |= W_POLY_POSTRENDER;
 				info[i].xulDrawFlag2 |= 0x10;
 				break;
 			case '[':
 				if (alphaTest)
-					info[i].drawFlags |= 0x80000000;
+					info[i].drawFlags |= W_POLY_USE_ALPHA_TEST;
 				else
-					info[i].drawFlags |= 0x400000;
+					info[i].drawFlags |= W_POLY_POSTRENDER;
 				break;
 			case ']':
-				info[i].drawFlags |= 0x80000000;
+				info[i].drawFlags |= W_POLY_USE_ALPHA_TEST;
 				info[i].xulDrawFlag2 |= 4;
 				break;
 			case '{':
-				info[i].drawFlags |= 0x80000000;
+				info[i].drawFlags |= W_POLY_USE_ALPHA_TEST;
 				break;
 			case '~':
-				info[i].drawFlags |= 0x20800000;
+				info[i].drawFlags |= W_POLY_NO_DEPTH_WRITE | W_POLY_BLEND_ADD;
 				if (alphaTest)
-					info[i].drawFlags |= 0x80000000;
+					info[i].drawFlags |= W_POLY_USE_ALPHA_TEST;
 				else
-					info[i].drawFlags |= 0x400000;
+					info[i].drawFlags |= W_POLY_POSTRENDER;
 				if (!texture[i].flag)
 					info[i].bBind = true;
 				break;
 			case '}':
-				info[i].drawFlags |= 0x21800000;
+				info[i].drawFlags |=
+					W_POLY_NO_DEPTH_WRITE | W_POLY_BLEND_INVMULTIPLY;
 				if (alphaTest)
-					info[i].drawFlags |= 0x80000000;
+					info[i].drawFlags |= W_POLY_USE_ALPHA_TEST;
 				else
-					info[i].drawFlags |= 0x400000;
+					info[i].drawFlags |= W_POLY_POSTRENDER;
 				break;
 			case '@':
 				info[i].mapType = 1;

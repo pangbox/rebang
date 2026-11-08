@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "birthdayeventdlg.h"
 #include "simpleoverlay.h"
 
@@ -183,6 +182,18 @@ void FrBirthdayEventDlg::SetRemainGiftCount(unsigned long count)
 	m_giftCount = div(count, 10);
 }
 
+void FrBirthdayEventDlg::SetMissionInfo(std::vector<unsigned long>& missions,
+	std::vector<unsigned long>& values)
+{
+	for (unsigned int i = 0; i < missions.size(); ++i)
+		m_mission[missions[i] - 1].value = values[i];
+}
+
+void FrBirthdayEventDlg::OnMouseMove(const WPoint& pos)
+{
+	CheckToolTip(pos);
+}
+
 void FrBirthdayEventDlg::OnProc(const float dt)
 {
 	static bool bReturn = true;
@@ -222,67 +233,23 @@ void FrBirthdayEventDlg::OnProc(const float dt)
 	}
 }
 
-void FrBirthdayEventDlg::OnInitGiftButton(int param)
+void FrBirthdayEventDlg::CheckToolTip(const WPoint& pos)
 {
-	m_pGiftBtn = DYNAMIC_CAST(FrButton, (FrWnd*)param);
-}
-
-void FrBirthdayEventDlg::OnOwnerDrawBoardArea(int param)
-{
-	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
+	WRect rect(0, 0, m_board[0].boardRect.w, m_board[0].boardRect.h);
 	for (int y = 0; y < 4; ++y)
-	{
 		for (int x = 0; x < 4; ++x)
 		{
 			int index = y * 4 + x;
-			WRect& number = m_board[index].numberRect;
-			if (m_mission[index].bComplete)
-				m_pBoardUI->Render(MakeStr("BoardBG_%d", index + 1),
-					m_board[index].boardRect.x + m_rect.x,
-					m_board[index].boardRect.y + m_rect.y, 1.0f, 0);
-			else
+			rect.x =
+				x * m_board[0].boardRect.w + m_board[0].boardRect.x + m_rect.x;
+			rect.y =
+				y * m_board[0].boardRect.h + m_board[0].boardRect.y + m_rect.y;
+			if (rect.IsInRect(pos))
 			{
-				WRect rect;
-				rect.w = number.w;
-				rect.x = (number.x + m_rect.x);
-				double numberY = number.y;
-				rect.y = numberY + m_rect.y;
-				rect.h = number.h;
-				gi->DrawTexture(
-					m_board[BIRTHDAYEVENT::board4_4[m_boardIndex][index] - 1]
-						.pNumberBmp,
-					rect, 0xffffffff, 0);
+				m_pBoardNumberArea->SetRect(rect);
+				MakeToolTipText(BIRTHDAYEVENT::board4_4[m_boardIndex][index]);
 			}
 		}
-	}
-	WRect rect(0, 0, m_clickRect.w, m_clickRect.h);
-	if (m_remainGiftCount > 0)
-	{
-		if (m_giftCount.quot)
-			m_pGiftNumberUI->Render(MakeStr("GiftNumber_%d", m_giftCount.quot),
-				m_giftNumberRect.x, m_giftNumberRect.y, 1.0f, 0x22);
-		rect.x = m_clickRect.x + m_clickOffset + m_rect.x;
-		rect.y = m_clickRect.y + m_rect.y;
-		gi->DrawTexture(m_pClickBmp, rect, 0xffffffff, 0);
-	}
-	m_pGiftNumberUI->Render(MakeStr("GiftNumber_%d", m_giftCount.rem),
-		m_giftNumberRect.w + m_giftNumberRect.x, m_giftNumberRect.y, 1.0f,
-		0x22);
-}
-
-void FrBirthdayEventDlg::OnInitBoardNumberArea(int param)
-{
-	m_pBoardNumberArea = DYNAMIC_CAST(FrArea, (FrWnd*)param);
-}
-
-void FrBirthdayEventDlg::OnInitBoardBG1Area(int param)
-{
-	m_pBoardBG1Area = DYNAMIC_CAST(FrArea, (FrWnd*)param);
-}
-
-void FrBirthdayEventDlg::SetEventName(std::string& name)
-{
-	m_eventName = name;
 }
 
 void FrBirthdayEventDlg::MakeToolTipText(int mission)
@@ -344,6 +311,11 @@ char* FrBirthdayEventDlg::MakeMapInfoText(int mission, char* buf)
 	return buf;
 }
 
+void FrBirthdayEventDlg::SetEventName(std::string& name)
+{
+	m_eventName = name;
+}
+
 void FrBirthdayEventDlg::OnLButtonDownHelpButton()
 {
 	m_pHelpDlg = CreateForm<FrBirthdayEventHelpDlg>(g_pFresh->GetManager(),
@@ -356,6 +328,11 @@ void FrBirthdayEventDlg::OnLButtonDownHelpButton()
 		m_pHelpDlg->OpenHelpDlg(m_pBitmapBox->GetFileName("Explanation"));
 	}
 	m_pBoardNumberArea->SetVisible(false);
+}
+
+void FrBirthdayEventDlg::OnInitGiftButton(int param)
+{
+	m_pGiftBtn = DYNAMIC_CAST(FrButton, (FrWnd*)param);
 }
 
 void FrBirthdayEventDlg::OnLButtonDownGiftButton()
@@ -372,35 +349,57 @@ void FrBirthdayEventDlg::OnLButtonDownGiftButton()
 	AfxGetTask()->SendMsgToMainActor(MsgObject(NULL, 1, 0, 0, 0, 0, 0));
 }
 
-void FrBirthdayEventDlg::SetMissionInfo(std::vector<unsigned long>& missions,
-	std::vector<unsigned long>& values)
+void FrBirthdayEventDlg::OnOwnerDrawBoardArea(int param)
 {
-	for (unsigned int i = 0; i < missions.size(); ++i)
-		m_mission[missions[i] - 1].value = *(values.begin() + i);
-}
-
-void FrBirthdayEventDlg::CheckToolTip(const WPoint& pos)
-{
-	WRect rect(0, 0, m_board[0].boardRect.w, m_board[0].boardRect.h);
+	FrGraphicInterface* gi = g_pFresh->GetManager()->GetGDI();
 	for (int y = 0; y < 4; ++y)
+	{
 		for (int x = 0; x < 4; ++x)
 		{
 			int index = y * 4 + x;
-			rect.x =
-				x * m_board[0].boardRect.w + m_board[0].boardRect.x + m_rect.x;
-			rect.y =
-				y * m_board[0].boardRect.h + m_board[0].boardRect.y + m_rect.y;
-			if (rect.IsInRect(pos))
+			WRect& number = m_board[index].numberRect;
+			if (m_mission[index].bComplete)
+				m_pBoardUI->Render(MakeStr("BoardBG_%d", index + 1),
+					m_board[index].boardRect.x + m_rect.x,
+					m_board[index].boardRect.y + m_rect.y, 1.0f, 0);
+			else
 			{
-				m_pBoardNumberArea->SetRect(rect);
-				MakeToolTipText(BIRTHDAYEVENT::board4_4[m_boardIndex][index]);
+				WRect rect;
+				rect.w = number.w;
+				rect.x = (number.x + m_rect.x);
+				double numberY = number.y;
+				rect.y = numberY + m_rect.y;
+				rect.h = number.h;
+				gi->DrawTexture(
+					m_board[BIRTHDAYEVENT::board4_4[m_boardIndex][index] - 1]
+						.pNumberBmp,
+					rect, 0xffffffff, 0);
 			}
 		}
+	}
+	WRect rect(0, 0, m_clickRect.w, m_clickRect.h);
+	if (m_remainGiftCount > 0)
+	{
+		if (m_giftCount.quot)
+			m_pGiftNumberUI->Render(MakeStr("GiftNumber_%d", m_giftCount.quot),
+				m_giftNumberRect.x, m_giftNumberRect.y, 1.0f, 0x22);
+		rect.x = m_clickRect.x + m_clickOffset + m_rect.x;
+		rect.y = m_clickRect.y + m_rect.y;
+		gi->DrawTexture(m_pClickBmp, rect, 0xffffffff, 0);
+	}
+	m_pGiftNumberUI->Render(MakeStr("GiftNumber_%d", m_giftCount.rem),
+		m_giftNumberRect.w + m_giftNumberRect.x, m_giftNumberRect.y, 1.0f,
+		0x22);
 }
 
-void FrBirthdayEventDlg::OnMouseMove(const WPoint& pos)
+void FrBirthdayEventDlg::OnInitBoardNumberArea(int param)
 {
-	CheckToolTip(pos);
+	m_pBoardNumberArea = DYNAMIC_CAST(FrArea, (FrWnd*)param);
+}
+
+void FrBirthdayEventDlg::OnInitBoardBG1Area(int param)
+{
+	m_pBoardBG1Area = DYNAMIC_CAST(FrArea, (FrWnd*)param);
 }
 
 IMPLEMENT_OBJECT(FrBirthdayEventHelpDlg, FrForm)
@@ -417,15 +416,15 @@ FrBirthdayEventHelpDlg::~FrBirthdayEventHelpDlg()
 {
 }
 
+void FrBirthdayEventHelpDlg::OnInitHelpView(int param)
+{
+	m_pHelpView = DYNAMIC_CAST(FrViewer, (FrWnd*)param);
+}
+
 void FrBirthdayEventHelpDlg::OpenHelpDlg(const char* filename)
 {
 	if (m_pHelpView)
 		m_pHelpView->Open(filename);
-}
-
-void FrBirthdayEventHelpDlg::OnInitHelpView(int param)
-{
-	m_pHelpView = DYNAMIC_CAST(FrViewer, (FrWnd*)param);
 }
 
 IMPLEMENT_OBJECT(FrBirthdayEventMissionDlg, FrForm)

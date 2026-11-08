@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "wind.h"
 #include "quadtree.h"
 #include "golfball.h"
@@ -5316,7 +5315,9 @@ void CQuadTree::DrawDecal(int texHandle, const WVector& pos,
 	}
 
 	g_view->DrawIndexedTriangles(vertices, numVerts, indices, numIndices,
-		(texHandle & 0x7ff) | blend | 0x22200000, 0x400);
+		(texHandle & 0x7ff) | blend | W_POLY_NO_DEPTH_WRITE |
+			W_POLY_TYPE_NORMAL_CLAMP | W_POLY_ZFUNC_MOSTLESSEQUAL,
+		0x400);
 }
 
 void CQuadTree::TraceAABB(const WVector& from, const WVector& to,

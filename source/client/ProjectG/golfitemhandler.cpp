@@ -1,4 +1,3 @@
-#include "minatl.h"
 #include "golfitemhandler.h"
 #include "golftask.h"
 #include "noticedlg.h"
