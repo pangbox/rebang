@@ -14,12 +14,11 @@ public:
 
 class NetSyncActor : public IActor, public NetSyncable
 {
+	DECLARE_OBJECT(NetSyncActor)
+
 public:
 	NetSyncActor();
 	virtual ~NetSyncActor();
-
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
 
 	virtual void OnInit();
 	virtual void OnDestroy();

@@ -48,10 +48,9 @@ protected:
 
 class FrListBox : public FrWnd
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrListBox)
 
+public:
 	typedef std::list<FrListItem*> ITEM_LIST;
 	ITEM_LIST m_itemList;
 

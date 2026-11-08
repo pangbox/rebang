@@ -6,11 +6,6 @@ FrGroupBox::FrGroupBox()
 {
 }
 
-const WRTTI* FrGroupBox::GetRTTI() const
-{
-	return &m_RTTI;
-}
-
 FrGroupBox::~FrGroupBox()
 {
 }

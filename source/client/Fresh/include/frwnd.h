@@ -71,14 +71,11 @@ enum eProcessMask
 
 class FrWnd : public IObject, public FrCmdTarget
 {
-	// Not 100% sure if true.
+	DECLARE_OBJECT(FrWnd)
 	friend class Fresh;
 	friend class FrWndManager;
-	friend IObject* FrWndMakeInstance();
 
 public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
 	virtual ~FrWnd();
 	void DestroyChild();
 	virtual bool Close(bool bFade);

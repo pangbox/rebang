@@ -83,13 +83,11 @@ CActorFactory& ActorFactory();
 
 class IActor : public IObject
 {
+	DECLARE_OBJECT(IActor)
 	friend class CTask;
 	friend IActor* operator<<(IActor* pActor, const MsgObject& msg);
 
 public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-
 	IActor();
 	virtual ~IActor();
 

@@ -8,9 +8,9 @@
 
 class FrGroupBox : public FrWnd
 {
+	DECLARE_OBJECT(FrGroupBox)
+
 public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const;
 	FrGroupBox();
 	virtual ~FrGroupBox();
 	void Init(FrGuiItem& item, FrWndManager* manager, FrWnd* parent);

@@ -36,12 +36,10 @@ protected:
 
 class CTask : public IObject, public CHandOwner, public FrCmdTarget
 {
+	DECLARE_OBJECT(CTask);
 	friend class CTaskManager;
 
 public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-
 	struct TIP_ITEM
 	{
 		int id;

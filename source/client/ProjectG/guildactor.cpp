@@ -11,10 +11,7 @@ namespace _guild
 {
 	class CGuildActor : public IActor, public FrCmdTarget
 	{
-	public:
-		static const WRTTI m_RTTI;
-		virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-		friend IObject* CGuildActorMakeInstance();
+		DECLARE_OBJECT(CGuildActor)
 
 	protected:
 		CGuildActor();

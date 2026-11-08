@@ -9,10 +9,9 @@ class FrWndManager;
 
 class FrStatic : public FrWnd
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrStatic)
 
+public:
 	FrStatic();
 	virtual ~FrStatic();
 	void Init(FrGuiItem& item, FrWndManager* pManager, FrWnd* pParent);

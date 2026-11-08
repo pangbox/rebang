@@ -11,14 +11,11 @@
 #define ILFILL256 ILFILL64 ILFILL64 ILFILL64 ILFILL64
 
 #define ILFILLFN(n) void f##n() { ILFILL256 }
-#define ILFILLFN10(n) \
-	ILFILLFN(n##0) ILFILLFN(n##1) ILFILLFN(n##2) ILFILLFN(n##3) \
-	ILFILLFN(n##4) ILFILLFN(n##5) ILFILLFN(n##6) ILFILLFN(n##7) \
-	ILFILLFN(n##8) ILFILLFN(n##9)
 
 #define ILFILL1 \
 	namespace ILFILLP1 \
 	{ \
+		typedef int t0; typedef int t1; typedef int t2; typedef int t3; typedef int t4; typedef int t5; typedef int t6; typedef int t7; typedef int t8; typedef int t9; typedef int t10; typedef int t11; typedef int t12; typedef int t13; typedef int t14; typedef int t15; typedef int t16; typedef int t17; typedef int t18; typedef int t19; typedef int t20; typedef int t21; typedef int t22; typedef int t23; typedef int t24; typedef int t25; typedef int t26; typedef int t27; typedef int t28; typedef int t29; typedef int t30; typedef int t31; typedef int t32; typedef int t33; typedef int t34; typedef int t35; typedef int t36; typedef int t37; typedef int t38; typedef int t39; typedef int t40; typedef int t41; typedef int t42; typedef int t43; typedef int t44; \
 		struct Pad \
 		{ \
 			int v; \
@@ -159,7 +156,7 @@
 		struct Pad \
 		{ \
 			int v; \
-			void g() { v += 1; v += 1; v += 1; ILFILL16 ILFILL16 ILFILL4 v += 1; } \
+			void g() { v += 1; v += 1; v += 1; v += 1; ILFILL16 ILFILL16 ILFILL4 v += 1; } \
 		}; \
 	}
 

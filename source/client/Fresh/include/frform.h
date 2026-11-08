@@ -53,12 +53,10 @@ enum eFormFlags
 
 class FrForm : public FrWnd
 {
+	DECLARE_OBJECT(FrForm)
 	friend class FrWndManager;
 
 public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
-
 	FrForm();
 	virtual ~FrForm();
 	void Init(FrGuiItem& item, FrWndManager* pManager, FrWnd* pParent);

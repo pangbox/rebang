@@ -8,10 +8,9 @@ struct FrInputState;
 
 class FrScrollBar : public FrWnd
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrScrollBar)
 
+public:
 	FrScrollBar();
 	virtual ~FrScrollBar();
 	void Init(FrWndManager* pManager, FrWnd* parentWnd, int row,

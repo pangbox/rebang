@@ -11,10 +11,9 @@ class FrWndManager;
 
 class FrViewer : public FrWnd
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrViewer)
 
+public:
 	FrViewer();
 	virtual ~FrViewer();
 	void Init(FrGuiItem& item, FrWndManager* pManager, FrWnd* pParent);

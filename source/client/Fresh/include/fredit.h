@@ -25,10 +25,9 @@ struct FrLine
 
 class FrEdit : public FrWnd
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrEdit)
 
+public:
 	enum eEditStyle
 	{
 		ES_EMOTICON = 1,

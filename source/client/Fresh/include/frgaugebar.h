@@ -11,10 +11,9 @@ class FrWndManager;
 
 class FrGaugeBar : public FrWnd
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrGaugeBar)
 
+public:
 	FrGaugeBar();
 	virtual ~FrGaugeBar();
 	virtual void Init(FrGuiItem& item, FrWndManager* pManager, FrWnd* pParent);
@@ -58,10 +57,9 @@ protected:
 
 class FrGaugeBarEx : public FrGaugeBar
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrGaugeBarEx)
 
+public:
 	FrGaugeBarEx();
 	virtual ~FrGaugeBarEx();
 	virtual void Init(FrGuiItem& item, FrWndManager* pManager, FrWnd* pParent);
@@ -96,10 +94,9 @@ protected:
 
 class FrGaugeBarImage : public FrGaugeBar
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrGaugeBarImage)
 
+public:
 	enum eGauge
 	{
 		GAUGE_NORMAL,

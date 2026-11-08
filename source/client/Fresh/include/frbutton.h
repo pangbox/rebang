@@ -14,10 +14,9 @@ enum eButtonMoreStyles
 
 class FrButton : public FrWnd
 {
-public:
-	static const WRTTI m_RTTI;
-	virtual const WRTTI* GetRTTI() const { return &m_RTTI; }
+	DECLARE_OBJECT(FrButton)
 
+public:
 	enum eButMode
 	{
 		NORMAL,
