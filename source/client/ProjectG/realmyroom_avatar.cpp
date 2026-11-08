@@ -31,9 +31,6 @@
 #define BONE_PELVIS "Bip01 Pelvis"
 #define OVERLAY_NEAR_Z 0.044f
 
-const char* __fastcall GetStrConst(const char* src, char* dest);
-const char* GetCharsTillSpace(const char* str, char* out);
-
 extern Fresh* g_pFresh;
 extern WMatrix g_camera;
 

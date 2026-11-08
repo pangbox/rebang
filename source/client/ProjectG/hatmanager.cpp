@@ -19,8 +19,6 @@ extern Fresh* g_pFresh;
 
 extern unsigned long g_CurrentTime;
 
-const char* GetCharsTillSpace(const char* pSrc, char* pDest);
-
 unsigned short FakeTable[28] = { ' ', '`', '~', '!', '@', '#', '$', '%', '^',
 	'&', '*', '(', ')', '-', '_', '=', '+', '|', ';', ':', '\'', '"', ',', '<',
 	'.', '>', '/', '?' };

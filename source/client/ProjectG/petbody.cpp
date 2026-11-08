@@ -17,8 +17,6 @@
 extern WView* g_view;
 extern WResourceManager* g_resrcmng;
 
-const char* GetStrConst(const char* str, char* out);
-
 static WMatrix s_headMat(0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 CPetBody::CPetBody(const char* script, bool bOption)
 	: m_scriptHandle(8, 0)

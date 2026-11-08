@@ -15,8 +15,6 @@
 extern Fresh* g_pFresh;
 extern WResourceManager* g_resrcmng;
 
-void RemakeNumber(int value, char* text);
-
 IMPLEMENT_OBJECT(FrUserInfoForm, FrForm)
 
 BEGIN_FRESH_MSGMAP(FrUserInfoForm, FrForm)

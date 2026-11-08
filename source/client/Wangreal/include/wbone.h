@@ -98,7 +98,7 @@ public:
 		m_child = 0;
 		m_next = 0;
 	}
-	void SetLocalMatrix(const WMatrix& matrix);
+	void SetLocalMatrix(const WMatrix& matrix) { m_localMat = matrix; }
 	void SetLocalMatrix(const WQuat& quat, const WVector& pos)
 	{
 		m_localMat = quat;
@@ -177,11 +177,11 @@ public:
 	WVector GetKeyPos(float time);
 	WQuat GetKeyRot(float time);
 	WSphere GetBoundSphere() { return m_bound_sphere; }
-	Waabb GetBoundBox();
+	Waabb GetBoundBox() { return m_bound_aabb; }
 	bool IsVisible() { return m_flag.GetFlag(VISIBLE); }
-	bool HasRigidVtx();
+	bool HasRigidVtx() { return m_flag.GetFlag(HASRIGIDVTX); }
 	bool IsHidden() { return m_flag.GetFlag(HIDEBONE); }
-	bool IsSelfIllum();
+	bool IsSelfIllum() { return m_flag.GetFlag(SELFILLUM); }
 	void SetRigidVtxFlag(void);
 	void SetInvisible(bool recursive, bool invisible);
 	bool IsInvisible() { return m_flag.GetFlag(INVISIBLE); }

@@ -43,7 +43,8 @@ ILFILLTU_GOLFRULE
 #include "shadow.h"
 #include "quitwindow.h"
 #include "itemwindow.h"
-#include "user_info.h"
+#include "userinfoform.h"
+#include "matchhistory.h"
 #include "frcombobox.h"
 #include "frdesktop.h"
 #include "kbdmanualdlg.h"
@@ -114,7 +115,6 @@ sLadderItem g_ladderItem[] = {
 };
 
 #include "frcombobox.h"
-#include "user_info.h"
 #include "quitwindow.h"
 
 extern Fresh* g_pFresh;

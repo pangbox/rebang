@@ -23,9 +23,6 @@
 #include "projectg.h"
 #include "mathconsts.h"
 
-const char* GetStrConst(const char* str, char* out);
-const char* GetCharsTillSpace(const char* str, char* out);
-
 IMPLEMENT_ACTOR(CGolfPlayer, IActor)
 
 static struct sTailTexture

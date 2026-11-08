@@ -544,21 +544,17 @@ namespace ILHTTP
 	struct Pad
 	{
 		int v;
-		void f0() { ILFILL64 }
-		void f1();
+		void g()
+		{
+			ILFILL64 ILFILL4 ILFILL4 v += 1;
+			v += 1;
+		}
 	};
 }
 
 const char* GenericHTTPClient::QueryHTTPResponseHeader()
 {
 	return _szHTTPResponseHeader;
-}
-
-inline void ILHTTP::Pad::f1()
-{
-	ILFILL4 v += 1;
-	v += 1;
-	v += 1;
 }
 
 const char* GenericHTTPClient::QueryHTTPResponse()

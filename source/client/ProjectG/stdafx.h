@@ -69,6 +69,7 @@ ILFILL0
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 
 #include "basicdebug.h"
 
@@ -81,14 +82,12 @@ ILFILLC
 #include "../../shared/classdefine.h"
 #include "chatmsg.h"
 #include "../../shared/errorcode.h"
-ILFILLEXC
 #include "tweaker.h"
 #include "frelement.h"
 #include "ucclibrary.h"
 #include "hackingmanager.h"
 ILFILL1
 #include "frwnd.h"
-ILFILLF1
 #include "frframe.h"
 #include "frbutton.h"
 #include "frstatic.h"

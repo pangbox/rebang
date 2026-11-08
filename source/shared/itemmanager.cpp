@@ -72,7 +72,7 @@ void CItemManager::Reload()
 {
 	_client::_private::CLock<_client::CCriticalSection> lock(m_cs);
 
-	DWORD dwTick = GetTickCount();
+	GetTickCount();
 
 	m_IsReloading = true;
 	Reset();

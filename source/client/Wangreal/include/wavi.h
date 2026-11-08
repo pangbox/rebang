@@ -1,64 +1,9 @@
 #pragma once
 
 #include <windows.h>
+#include <vfw.h>
 
 #include "bitmap.h"
-
-struct IAVIFile;
-struct IAVIStream;
-
-struct AVISTREAMINFOA
-{
-	DWORD fccType;
-	DWORD fccHandler;
-	DWORD dwFlags;
-	DWORD dwCaps;
-	WORD wPriority;
-	WORD wLanguage;
-	DWORD dwScale;
-	DWORD dwRate;
-	DWORD dwStart;
-	DWORD dwLength;
-	DWORD dwInitialFrames;
-	DWORD dwSuggestedBufferSize;
-	DWORD dwQuality;
-	DWORD dwSampleSize;
-	RECT rcFrame;
-	DWORD dwEditCount;
-	DWORD dwFormatChangeCount;
-	char szName[64];
-};
-
-struct AVICOMPRESSOPTIONS
-{
-	DWORD fccType;
-	DWORD fccHandler;
-	DWORD dwKeyFrameEvery;
-	DWORD dwQuality;
-	DWORD dwBytesPerSecond;
-	DWORD dwFlags;
-	void* lpFormat;
-	DWORD cbFormat;
-	void* lpParms;
-	DWORD cbParms;
-	DWORD dwInterleaveEvery;
-};
-
-extern "C"
-{
-	void WINAPI AVIFileInit();
-	void WINAPI AVIFileExit();
-	HRESULT WINAPI AVIFileOpenA(IAVIFile**, const char*, UINT, CLSID*);
-	HRESULT WINAPI AVIFileCreateStreamA(IAVIFile*, IAVIStream**,
-		AVISTREAMINFOA*);
-	HRESULT WINAPI AVIMakeCompressedStream(IAVIStream**, IAVIStream*,
-		AVICOMPRESSOPTIONS*, CLSID*);
-	HRESULT WINAPI AVIStreamSetFormat(IAVIStream*, LONG, void*, LONG);
-	HRESULT WINAPI AVIStreamWrite(IAVIStream*, LONG, LONG, void*, LONG, DWORD,
-		LONG*, LONG*);
-	ULONG WINAPI AVIStreamRelease(IAVIStream*);
-	ULONG WINAPI AVIFileRelease(IAVIFile*);
-}
 
 struct sAviResult
 {

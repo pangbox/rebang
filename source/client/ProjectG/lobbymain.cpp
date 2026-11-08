@@ -15,7 +15,8 @@ class FrMailBoxDlg;
 #include "topiconinterface.h"
 #include "topiconmanager.h"
 #include "lobbymain.h"
-#include "user_info.h"
+#include "userinfoform.h"
+#include "matchhistory.h"
 #include "chatmsg.h"
 #include "buddymanager.h"
 #include "cardsystem.h"
@@ -69,7 +70,6 @@ class FrMailBoxDlg;
 #include "../../shared/sharedtables.h"
 #include "s5/utilities.h"
 #include "guildactor.h"
-#include "userinfoform.h"
 #include "caddieinfodlg.h"
 #include "mathconsts.h"
 

@@ -34,8 +34,6 @@
 
 extern Fresh* g_pFresh;
 
-void LimitText(char* str, int limit);
-
 extern char PY_PUBLIC_VERSION[];
 
 bool sOption::sbClipPlaneSupport;

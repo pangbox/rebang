@@ -24,9 +24,6 @@
 extern Fresh* g_pFresh;
 extern WMatrix g_camera;
 
-const char* __fastcall GetStrConst(const char* str, char* out);
-const char* GetCharsTillSpace(const char* str, char* out);
-
 static const int s_charMotionTable[10][12] = {
 	{ 0, 1, 3, 5, 6, -1 },
 	{ 0, 1, 3, 5, 6, -1 },

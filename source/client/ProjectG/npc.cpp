@@ -6,8 +6,6 @@
 #include "fx.h"
 #include "wbone.h"
 
-const char* GetStrConst(const char* source, char* dest);
-
 IMPLEMENT_ACTOR(CNPC, IActor)
 
 void CNPC::OnDestroy()

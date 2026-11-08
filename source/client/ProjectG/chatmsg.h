@@ -33,7 +33,7 @@ public:
 	void GetChatText_JP(std::string&, std::string&, std::string&, int);
 	int GetCurCaretPos() { return m_iCurByte; }
 	const char* GetCompChar();
-	const char* GetCompositionString();
+	const char* GetCompositionString() { return m_szComp; }
 	void GetCompositionString(sCompStr*);
 	void SetChatText(const char*, bool);
 	void SetChatFacialUser(std::string& user) { m_chatFacialUser = user; }
@@ -42,7 +42,7 @@ public:
 		m_iCurByte = 0;
 		m_iCurChar = 0;
 	}
-	void CurCaretMoveLeft();
+	void CurCaretMoveLeft() { OnMoveLeft(); }
 	void CurCaretMoveRight() { OnMoveRight(); }
 	int GetNumBytes() { return m_iNumBytes; }
 	void Open(bool, bool);
@@ -64,7 +64,7 @@ public:
 	int GetConsolKeyCode() const { return m_iConsolCode; }
 	bool IsActive() const { return m_bActive; }
 	WFont* GetMaskedFont() const { return m_pMaskedFont; }
-	char IsExtChar(int);
+	char IsExtChar(int index) { return m_szExt[index]; }
 	void SetAlwaysActive();
 	bool HasBeenPrinted();
 	void EnableCaretMove(bool enable) { m_bCaretMove = enable; }

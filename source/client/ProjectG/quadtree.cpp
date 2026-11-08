@@ -13,8 +13,6 @@
 extern char g_colTex[16][32];
 extern int g_colNum;
 
-const char* GetStrConst(const char* source, char* dest);
-
 namespace intersection
 {
 	WVector closestPointOnLine(const WVector& a, const WVector& b,

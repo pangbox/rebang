@@ -3,6 +3,7 @@
 #include <string>
 #include <list>
 #include <stack>
+#include <vector>
 #include "singleton.h"
 
 inline int float2int(float value)
@@ -48,6 +49,13 @@ std::string GetMyComputerName();
 
 void InitPakedFile();
 bool InitPakedFile2();
+
+void LineParse(const char* line, std::vector<std::string>& tokens);
+char* GetStr(char* source, char* dest);
+const char* GetStrConst(const char* source, char* dest);
+const char* GetCharsTillSpace(const char* source, char* dest);
+void LimitText(char* text, int size);
+void RemakeNumber(int value, char* text);
 
 template <class T>
 void sequence_delete(T first, T last)

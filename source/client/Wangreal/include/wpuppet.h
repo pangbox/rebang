@@ -154,7 +154,7 @@ public:
 		bool flag1, bool software);
 	void RenderHierarchy(WView* view, bool transform, float value, float scale);
 	void RenderNormals(WView* view, bool transform, float value, float scale);
-	WVector InvTransform(const WVector&);
+	WVector InvTransform(const WVector& point) { return point * ~m_mat; }
 	void ChangeTexture(char* name, int handle);
 	bool ChangeTexturePart(char* name, char* part, Bitmap** bitmap,
 		tagRECT* rect);

@@ -4,8 +4,6 @@
 #include "fx.h"
 #include "fxinterpreter.h"
 #include "mathconsts.h"
-const char* GetStrConst(const char* str, char* out);
-const char* GetCharsTillSpace(const char* str, char* out);
 
 const char FxInterpreter::TOKEN[][8] = { "*fx", "*playif" };
 
