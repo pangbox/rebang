@@ -51,6 +51,10 @@ void InitPakedFile();
 bool InitPakedFile2();
 
 const char* LoadStr(unsigned int id);
+bool IsPakFile(const char* name);
+bool IsIntegratedPakFile(const char* name);
+bool IsExeFile(const char* name);
+void DeleteReadOnlyFile(const char* name);
 char* FindTag(char* begin, char* end, char* tag);
 void TrimExt(const char* source, char* dest);
 void GetModuleName(char* name);

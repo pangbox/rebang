@@ -399,5 +399,3 @@ std::string CBrowser::GetPostArgument() const
 
 	return result;
 }
-
-ILFILLB2
