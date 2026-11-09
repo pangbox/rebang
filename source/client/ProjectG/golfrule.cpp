@@ -65,8 +65,6 @@ extern int g_iSendPacketType;
 extern int g_iRecvPacketType;
 extern const char* ball_stop_replay_data_name;
 
-ILFILLTU_GOLFRULE3
-
 const char* g_bgmPutting[] = {
 	"putting.mp3",
 	"putting2.mp3",
