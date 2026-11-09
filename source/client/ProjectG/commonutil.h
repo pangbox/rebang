@@ -50,6 +50,11 @@ std::string GetMyComputerName();
 void InitPakedFile();
 bool InitPakedFile2();
 
+const char* LoadStr(unsigned int id);
+char* FindTag(char* begin, char* end, char* tag);
+void TrimExt(const char* source, char* dest);
+void GetModuleName(char* name);
+
 void LineParse(const char* line, std::vector<std::string>& tokens);
 char* GetStr(char* source, char* dest);
 const char* GetStrConst(const char* source, char* dest);
