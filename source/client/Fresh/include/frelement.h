@@ -116,12 +116,18 @@ protected:
 class __declspec(novtable) FrElement
 {
 public:
-	FrElement();
+	FrElement()
+		: m_type(ED_NONE)
+	{
+	}
 	FrElement(enumElement type)
 		: m_type(type)
 	{
 	}
-	FrElement(enumElement type, const std::string& name);
+	FrElement(enumElement type, const std::string& name)
+		: m_name(name), m_type(type)
+	{
+	}
 	virtual ~FrElement() { }
 	virtual void Init(const TiXmlNode* pSrc) = 0;
 
@@ -136,7 +142,10 @@ public:
 		: FrElement(ED_FRAME)
 	{
 	}
-	FrElementFrame(const std::string& name);
+	FrElementFrame(const std::string& name)
+		: FrElement(ED_FRAME, name)
+	{
+	}
 	virtual ~FrElementFrame() { }
 	virtual void Init(const TiXmlNode* pSrc);
 
@@ -158,7 +167,10 @@ public:
 		: FrElement(ED_LAYOUT)
 	{
 	}
-	FrElementLayout(const std::string& name);
+	FrElementLayout(const std::string& name)
+		: FrElement(ED_LAYOUT, name)
+	{
+	}
 	virtual ~FrElementLayout()
 	{
 		sequence_delete(m_guiList.begin(), m_guiList.end());

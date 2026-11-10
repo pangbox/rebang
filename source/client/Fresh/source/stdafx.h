@@ -7,206 +7,15 @@
 #include <algorithm>
 #include <list>
 #include <stack>
+#include <map>
+#include <vector>
 #include <math.h>
+#include "../../Wangreal/include/wlocalize.h"
 // HACK!
-namespace
-{
-	struct Pad
-	{
-		int v;
-		void g()
-		{
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-			v += 1;
-		}
-	};
-}
+// clang-format off
+#define FRESH_ILFILL10 v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1;
+inline void FreshPchPad(int v) { FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 }
+// clang-format on
 #include "../../Wangreal/include/wtypes.h"
 #include <string>
 #include "../../Wangreal/include/bitmap.h"
@@ -217,23 +26,8 @@ namespace
 
 // HACK! TU IL filler for frform.cpp and frwnd.cpp
 // clang-format off
-#define FRESH_ILFILL10 v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1;
 #define FRESH_TU_ILFILL \
-	namespace \
-	{ \
-		struct TuPad \
-		{ \
-			int v; \
-			void g() { v += 1; v += 1; FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 } \
-		}; \
-	}
+	inline void FreshFormPad(int v) { v += 1; FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; }
 #define FRESH_TU_ILFILL_FRWND \
-	namespace \
-	{ \
-		struct TuPad \
-		{ \
-			int v; \
-			void g() { v += 1; v += 1; v += 1; FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 v += 1; v += 1; v += 1; v += 1; v += 1; } \
-		}; \
-	}
+	inline void FreshWndPad(int v) { v += 1; FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 FRESH_ILFILL10 v += 1; v += 1; v += 1; v += 1; v += 1; v += 1; }
 // clang-format on

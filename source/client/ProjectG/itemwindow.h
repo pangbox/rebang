@@ -12,7 +12,7 @@ protected:
 	CItemWindow();
 
 public:
-	virtual ~CItemWindow();
+	virtual ~CItemWindow() { }
 
 	DECLARE_OBJECT(CItemWindow)
 

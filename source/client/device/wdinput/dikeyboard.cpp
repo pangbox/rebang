@@ -353,5 +353,3 @@ HRESULT DirectInputKeyboard::Acquire()
 {
 	return this->diKey->Acquire();
 }
-
-#include "wproc.inl"

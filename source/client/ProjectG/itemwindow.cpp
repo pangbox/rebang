@@ -11,10 +11,6 @@
 #include "cardsystem.h"
 #include "wbone.h"
 
-inline CItemWindow::~CItemWindow()
-{
-}
-
 IMPLEMENT_ACTOR(CItemWindow, IActor)
 
 CItemWindow::eState CItemWindow::ms_state = STATE_CLOSED;

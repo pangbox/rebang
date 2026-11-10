@@ -1,6 +1,6 @@
 #include "wfont.h"
 #include "wresrcmng.h"
-#include "wminmax.h"
+#include "wutil.h"
 #include <stdio.h>
 #include <string.h>
 

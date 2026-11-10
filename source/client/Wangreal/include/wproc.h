@@ -13,23 +13,7 @@ public:
 		WProc* proc;
 	};
 
-#ifdef WANGREAL_DEVICE
 	void DelProc(WProc* proc);
-#else
-	void DelProc(WProc* proc)
-	{
-		int n = procNum;
-		int i;
-		for (i = 0; i < procNum; ++i)
-		{
-			if (procList[i].proc == proc)
-				break;
-		}
-		procList[i].hWnd = procList[n - 1].hWnd;
-		procList[i].proc = procList[n - 1].proc;
-		--procNum;
-	}
-#endif
 
 	void AddProc(WProc* proc, HWND hWnd);
 
@@ -45,7 +29,6 @@ class WProc
 public:
 	WProc() { this->include = NULL; }
 
-#ifdef WANGREAL_DEVICE
 	virtual ~WProc()
 	{
 		if (this->include)
@@ -53,10 +36,6 @@ public:
 			this->include->DelProc(this);
 		}
 	}
-
-#else
-	virtual ~WProc();
-#endif
 
 	virtual int WinProc(UINT msg, unsigned long wParam,
 		unsigned long lParam) = 0;
@@ -71,7 +50,6 @@ private:
 	WProcManager* include;
 };
 
-#ifdef WANGREAL_DEVICE
 inline void WProcManager::DelProc(WProc* proc)
 {
 	int n = procNum;
@@ -85,8 +63,6 @@ inline void WProcManager::DelProc(WProc* proc)
 	procList[i].proc = procList[n - 1].proc;
 	--procNum;
 }
-
-#endif
 
 inline void WProcManager::AddProc(WProc* proc, HWND hWnd)
 {

@@ -4,6 +4,7 @@
 #include <list>
 #include <stack>
 #include <vector>
+#include <utility>
 #include "singleton.h"
 
 inline int float2int(float value)
@@ -31,6 +32,11 @@ inline int Ceil(float value, float tolerance)
 	}
 }
 
+namespace WTL
+{
+	class CString;
+}
+
 class Bitmap;
 class cFile;
 class WResourceManager;
@@ -49,6 +55,16 @@ std::string GetMyComputerName();
 
 void InitPakedFile();
 bool InitPakedFile2();
+
+extern int g_iLoadTotalNum;
+extern bool g_bExitDrawLoading;
+extern int g_iLoadNextNum;
+extern int g_iLoadCurNum;
+
+bool __stdcall GetCRCCheckList(
+	std::list<std::pair<std::string, unsigned long> >& result);
+
+WTL::CString __stdcall GetRegIntegratedPakName();
 
 const char* LoadStr(unsigned int id);
 bool IsPakFile(const char* name);

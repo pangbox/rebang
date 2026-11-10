@@ -2,26 +2,9 @@
 #include "polysoup.h"
 #include "golfdoc.h"
 #include "soundmanager.h"
+#include "ambientsound.h"
 
 extern WMatrix g_camera;
-
-class CAmbientSound : public IActor
-{
-public:
-	virtual ~CAmbientSound() { }
-	DECLARE_OBJECT(CAmbientSound)
-
-protected:
-	CAmbientSound();
-
-public:
-	virtual void OnInit();
-	virtual void OnProcess(float delta);
-
-protected:
-	virtual void HandleMsg(const MsgObject& msg);
-	float GetVolume(const Wobb& obb, float distance);
-};
 
 IMPLEMENT_ACTOR(CAmbientSound, IActor)
 

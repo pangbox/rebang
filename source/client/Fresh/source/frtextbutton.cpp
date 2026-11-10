@@ -25,6 +25,7 @@
 #include "frgraphicinterface.h"
 #include "frcursor.h"
 #include "../../../shared/token.h"
+#include "wlocalize.h"
 
 IMPLEMENT_OBJECT(FrTextButton, FrWnd)
 
@@ -87,7 +88,7 @@ void FrTextButton::SetCaption(const char* caption)
 	cTokenV token;
 	token.Init(caption, (int)strlen(caption));
 	float offset = 0.0f;
-	static const char* pSep = (0, "|");
+	static const char* pSep = K2L_Compatibility("|");
 	m_sepWidth = GDI()->GetTextExtend(pSep);
 	while (true)
 	{
@@ -233,7 +234,7 @@ void FrTextButton::OnDraw()
 		++it;
 		if (it == m_tBtnList.end())
 			break;
-		static const char* pSep = (0, "|");
+		static const char* pSep = K2L_Compatibility("|");
 		GDI()->Print(right, 0, pSep);
 	}
 	if (m_clip)

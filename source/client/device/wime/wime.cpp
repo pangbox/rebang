@@ -460,5 +460,3 @@ void WIme::Update(unsigned long timeStamp)
 		bUpdated = false;
 	}
 }
-
-#include "wproc.inl"

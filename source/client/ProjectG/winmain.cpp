@@ -16,10 +16,6 @@
 ILFILLW1
 
 extern HWND g_hwnd;
-extern int g_iLoadTotalNum;
-extern int g_iLoadCurNum;
-extern int g_iLoadNextNum;
-extern bool g_bExitDrawLoading;
 
 static bool IsZero(float f)
 {

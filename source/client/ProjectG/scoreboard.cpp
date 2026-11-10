@@ -26,7 +26,7 @@
 #include "capturedbg.h"
 #include "inputmanager.h"
 #include "clientsetting.h"
-#include "wminmax.h"
+#include "wutil.h"
 #include "frdesktop.h"
 
 extern Fresh* g_pFresh;

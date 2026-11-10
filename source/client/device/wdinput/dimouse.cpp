@@ -353,5 +353,3 @@ HRESULT DirectInputMouse::Acquire()
 	}
 	return 1;
 }
-
-#include "wproc.inl"

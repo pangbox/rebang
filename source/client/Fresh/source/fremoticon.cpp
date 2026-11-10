@@ -5,6 +5,7 @@
 #include "wresrcmng.h"
 #include "tinyxml.h"
 #include "../../../shared/token.h"
+#include "wlocalize.h"
 #include <mmsystem.h>
 
 extern "C" __declspec(dllimport) int __cdecl strcmpi(const char*, const char*);
@@ -137,9 +138,9 @@ float FrEmoticon::PrintText(const WPoint& pos, unsigned long align,
 	}
 	cTokenV token;
 	token.Init(text, strlen(text));
-	static const char* pLeft = (0, "(");
-	static const char* pRite = (0, ")");
-	static const char* pBoth = (0, "()");
+	static const char* pLeft = K2L_Compatibility("(");
+	static const char* pRite = K2L_Compatibility(")");
+	static const char* pBoth = K2L_Compatibility("()");
 	while (token.GetPos() < token.GetLen())
 	{
 		char* str;
@@ -208,9 +209,9 @@ float FrEmoticon::PrintText11(const WPoint& pos, unsigned long align,
 	}
 	cTokenV token;
 	token.Init(text, strlen(text));
-	static const char* pLeft = (0, "(");
-	static const char* pRite = (0, ")");
-	static const char* pBoth = (0, "()");
+	static const char* pLeft = K2L_Compatibility("(");
+	static const char* pRite = K2L_Compatibility(")");
+	static const char* pBoth = K2L_Compatibility("()");
 	while (token.GetPos() < token.GetLen())
 	{
 		char* str;
@@ -260,9 +261,9 @@ float FrEmoticon::GetTextWidth(const char* text)
 	float width = 0.0f;
 	cTokenV token;
 	token.Init(text, strlen(text));
-	static const char* pLeft = (0, "(");
-	static const char* pRite = (0, ")");
-	static const char* pBoth = (0, "()");
+	static const char* pLeft = K2L_Compatibility("(");
+	static const char* pRite = K2L_Compatibility(")");
+	static const char* pBoth = K2L_Compatibility("()");
 	while (token.GetPos() < token.GetLen())
 	{
 		char* str;
@@ -303,9 +304,9 @@ float FrEmoticon::GetTextWidth11(const char* text)
 	float width = 0.0f;
 	cTokenV token;
 	token.Init(text, strlen(text));
-	static const char* pLeft = (0, "(");
-	static const char* pRite = (0, ")");
-	static const char* pBoth = (0, "()");
+	static const char* pLeft = K2L_Compatibility("(");
+	static const char* pRite = K2L_Compatibility(")");
+	static const char* pBoth = K2L_Compatibility("()");
 	while (token.GetPos() < token.GetLen())
 	{
 		char* str;

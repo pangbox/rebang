@@ -1,4 +1,5 @@
 ILFILLTU_GOLFRULE
+#include "itemwindow.h"
 #include "voiceitem.h"
 #include "fxsequence.h"
 #include "golfball.h"
@@ -42,7 +43,6 @@ ILFILLTU_GOLFRULE
 #include "fx.h"
 #include "shadow.h"
 #include "quitwindow.h"
-#include "itemwindow.h"
 #include "userinfoform.h"
 #include "matchhistory.h"
 #include "frcombobox.h"

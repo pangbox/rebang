@@ -48,5 +48,3 @@ WInputDev* WDirectInput::MakeClone(char* modeName, HWND hWnd)
 	}
 	return NULL;
 }
-
-#include "wproc.inl"

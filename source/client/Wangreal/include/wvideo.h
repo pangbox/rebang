@@ -34,9 +34,13 @@ enum enumPolyFlag
 {
 	W_POLY_NO_FILTERING = 0x80000,
 	W_POLY_POSTRENDER = 0x400000,
+	// HACK!
+#ifndef WANGREAL_DEVICE
+	W_POLY_NO_PERSPECTIVE = 0x10000000,
+#endif
 	W_POLY_NO_DEPTH_WRITE = 0x20000000,
 	W_POLY_NO_VERTEX_COLOR = 0x40000000,
-	W_POLY_USE_ALPHA_TEST = -2147483648,
+	W_POLY_USE_ALPHA_TEST = 0x80000000,
 };
 
 enum WVDTRANSFORMSTATETYPE
@@ -376,6 +380,38 @@ enum WVDFXPARAMETERTYPE
 #ifdef WANGREAL_DEVICE
 #include "wsplash.h"
 #endif
+
+struct WxBatchState
+{
+	int xiFlag0;
+	int xiFlag1;
+	int xiBaseVtxIdx;
+	int xnVtxs;
+	int xiBaseIdxIdx;
+	int xnIdxs;
+	ulong xdwDiffuse;
+	WMatrix xmW;
+	float xfDepth;
+	int xnmTransfs;
+	const WMatrix* const* xpapmW;
+	const WMatrix* const* xpapmO;
+
+	WxBatchState()
+	{
+		xiFlag0 = 0;
+		xiFlag1 = 0;
+		xiBaseVtxIdx = 0;
+		xnVtxs = 0;
+		xiBaseIdxIdx = 0;
+		xnIdxs = 0;
+		xdwDiffuse = 0xffffffff;
+		xfDepth = g_HUGE;
+		xnmTransfs = 0;
+		xpapmW = 0;
+		xpapmO = 0;
+		xmW.Reset();
+	}
+};
 
 struct WRenderToTextureSizeInfo
 {

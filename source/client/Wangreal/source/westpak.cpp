@@ -1,5 +1,5 @@
 #include "westpak.h"
-#include "wminmax.h"
+#include "wutil.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

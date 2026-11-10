@@ -2,6 +2,11 @@
 #include "club.h"
 #include "quadtree.h"
 
+CAutoTarget::~CAutoTarget()
+{
+	Reset();
+}
+
 void CAutoTarget::Reset()
 {
 	m_pointList.clear();
@@ -157,10 +162,6 @@ WVector CAutoTarget::GetPoint(const char* club)
 		}
 	}
 	return GetHoleCupPos();
-}
-
-CAutoTarget::~CAutoTarget()
-{
 }
 
 WVector CAutoTarget::SolveEquation(unsigned char index, float dist)

@@ -222,7 +222,7 @@ public:
 	void ShowBone(bool recursive);
 	void SetSelfIllum(bool enabled, bool recursive);
 	void SetSelfIllumColor(unsigned long color, bool recursive);
-	unsigned long GetSelfIllumColor() const;
+	unsigned long GetSelfIllumColor() const { return m_selfillumColor; }
 	void ToggleSelfIllum()
 	{
 		unsigned char off = (unsigned char)~((unsigned long)m_flag >> 1);

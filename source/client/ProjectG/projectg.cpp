@@ -60,8 +60,6 @@ extern WInputDev* g_keyboard;
 extern WInputDev* g_mouse;
 extern WFont* g_font;
 
-void InitSingletonClasses();
-void DeleteSingletonClasses();
 void ExecuteStartMode();
 void __cdecl ReleasePAK();
 bool __stdcall GetCRCCheckList(

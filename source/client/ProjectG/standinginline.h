@@ -1,21 +1,26 @@
 #pragma once
 
 #include "frform.h"
+#include "wlocalize.h"
 
 class FrViewer;
 class FrListBox;
 
-static const char* g_szArrayName[] = { (0, "\xb4\xa9\xb8\xae"),
-	(0, "\xc7\xcf\xb3\xaa"), (0, "\xbe\xc6\xc0\xfa"),
-	(0, "\xbc\xbc\xbd\xc7\xb8\xae\xbe\xc6"), (0, "\xb8\xc6\xbd\xba"),
-	(0, "\xc4\xed"), (0, "\xbe\xc6\xb8\xb0"), (0, "\xc4\xab\xc1\xee"),
-	(0, "\xb7\xe7\xbd\xc3\xbe\xc6"), (0, "\xb3\xda"),
+static const char* g_szArrayName[] = { K2L_Compatibility("\xb4\xa9\xb8\xae"),
+	K2L_Compatibility("\xc7\xcf\xb3\xaa"),
+	K2L_Compatibility("\xbe\xc6\xc0\xfa"),
+	K2L_Compatibility("\xbc\xbc\xbd\xc7\xb8\xae\xbe\xc6"),
+	K2L_Compatibility("\xb8\xc6\xbd\xba"), K2L_Compatibility("\xc4\xed"),
+	K2L_Compatibility("\xbe\xc6\xb8\xb0"),
+	K2L_Compatibility("\xc4\xab\xc1\xee"),
+	K2L_Compatibility("\xb7\xe7\xbd\xc3\xbe\xc6"),
+	K2L_Compatibility("\xb3\xda"),
 
-	(0, "\xc5\xac\xb7\xb4"),
+	K2L_Compatibility("\xc5\xac\xb7\xb4"),
 
-	(0, "\xbe\xc6\xc0\xcc\xc5\xdb"),
+	K2L_Compatibility("\xbe\xc6\xc0\xcc\xc5\xdb"),
 
-	(0, "\xb1\xe2\xc5\xb8") };
+	K2L_Compatibility("\xb1\xe2\xc5\xb8") };
 
 class CStandingInLine : public FrForm
 {

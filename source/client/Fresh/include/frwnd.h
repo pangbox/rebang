@@ -139,7 +139,7 @@ public:
 	const WFlags& GetStyle() const { return m_dwStyle; }
 	float GetAlpha() const { return m_wndAlpha; }
 	void SetAlpha(float alpha) { m_wndAlpha = alpha; }
-	float GetAlpha2() const;
+	float GetAlpha2() const { return m_wndAlpha2; }
 	void SetAlpha2(float alpha);
 	void SetAlpha2ToChild(float a);
 	virtual void Enable(bool enable) { m_dwStyle.Turn(FWS_DISABLED, !enable); }

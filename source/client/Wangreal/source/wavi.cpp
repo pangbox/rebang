@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "wavi.h"
-#include "wminmax.h"
+#include "wutil.h"
 
 extern "C" __declspec(dllimport) long __cdecl filelength(int);
 
